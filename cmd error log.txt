@@ -1,0 +1,37 @@
+C:\Users\mafsa>transformers-cli convert --model EleutherAI/gpt-neo-2.7B --model_type gpt2 --tf_checkpoint EleutherAI/gpt-neo-2.7B --pytorch_dump_output "D:\AVA\EleutherAI gpt-neo-2.7B"
+2024-02-15 16:15:13.842118: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING:tensorflow:From C:\Users\mafsa\AppData\Local\Programs\Python\Python311\Lib\site-packages\keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+Converting TensorFlow checkpoint from C:\Users\mafsa\EleutherAI\gpt-neo-2.7B
+Traceback (most recent call last):
+  File "C:\Users\mafsa\AppData\Local\Programs\Python\Python311\Lib\site-packages\tensorflow\python\training\py_checkpoint_reader.py", line 92, in NewCheckpointReader
+    return CheckpointReader(compat.as_bytes(filepattern))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Unsuccessful TensorSliceReader constructor: Failed to find any matching files for C:\Users\mafsa\EleutherAI\gpt-neo-2.7B
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\mafsa\AppData\Local\Programs\Python\Python311\Scripts\transformers-cli.exe\__main__.py", line 7, in <module>
+  File "C:\Users\mafsa\AppData\Local\Programs\Python\Python311\Lib\site-packages\transformers\commands\transformers_cli.py", line 55, in main
+    service.run()
+  File "C:\Users\mafsa\AppData\Local\Programs\Python\Python311\Lib\site-packages\transformers\commands\convert.py", line 151, in run
+    convert_gpt2_checkpoint_to_pytorch(self._tf_checkpoint, self._config, self._pytorch_dump_output)
+  File "C:\Users\mafsa\AppData\Local\Programs\Python\Python311\Lib\site-packages\transformers\models\gpt2\convert_gpt2_original_tf_checkpoint_to_pytorch.py", line 38, in convert_gpt2_checkpoint_to_pytorch
+    load_tf_weights_in_gpt2(model, config, gpt2_checkpoint_path)
+  File "C:\Users\mafsa\AppData\Local\Programs\Python\Python311\Lib\site-packages\transformers\models\gpt2\modeling_gpt2.py", line 82, in load_tf_weights_in_gpt2
+    init_vars = tf.train.list_variables(tf_path)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mafsa\AppData\Local\Programs\Python\Python311\Lib\site-packages\tensorflow\python\training\checkpoint_utils.py", line 141, in list_variables
+    reader = load_checkpoint(ckpt_dir_or_file)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mafsa\AppData\Local\Programs\Python\Python311\Lib\site-packages\tensorflow\python\training\checkpoint_utils.py", line 80, in load_checkpoint
+    return py_checkpoint_reader.NewCheckpointReader(filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mafsa\AppData\Local\Programs\Python\Python311\Lib\site-packages\tensorflow\python\training\py_checkpoint_reader.py", line 96, in NewCheckpointReader
+    error_translator(e)
+  File "C:\Users\mafsa\AppData\Local\Programs\Python\Python311\Lib\site-packages\tensorflow\python\training\py_checkpoint_reader.py", line 31, in error_translator
+    raise errors_impl.NotFoundError(None, None, error_message)
+tensorflow.python.framework.errors_impl.NotFoundError: Unsuccessful TensorSliceReader constructor: Failed to find any matching files for C:\Users\mafsa\EleutherAI\gpt-neo-2.7B
