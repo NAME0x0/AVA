@@ -31,41 +31,41 @@ AVA (Afsah's Virtual Assistant) is a personalized, AI-powered virtual assistant 
 
 ```bash
 AVA/
-├── .git/                     # Git version control folder
-├── .github/                  # GitHub-related configurations
-├── src/                      # Main source code for the assistant
-│   ├── __init__.py           # Makes src a Python package
-│   ├── core/                 # Core functionality of the assistant
-│   │   ├── assistant.py      # Main virtual assistant logic
-│   │   ├── command_handler.py# Processes user commands
-│   │   ├── config.py         # Configuration and settings
-│   │   ├── logger.py         # Logging setup
-│   │   ├── scheduler.py      # Scheduling and reminders
-│   ├── modules/              # Modular functionalities (e.g., tools, integrations)
+├── .git/                        # Git version control folder
+├── .github/                     # GitHub-related configurations
+├── src/                         # Main source code for the assistant
+│   ├── __init__.py              # Makes src a Python package
+│   ├── core/                    # Core functionality of the assistant
+│   │   ├── assistant.py         # Main virtual assistant logic
+│   │   ├── command_handler.py   # Processes user commands
+│   │   ├── config.py            # Configuration and settings
+│   │   ├── logger.py            # Logging setup
+│   │   ├── scheduler.py         # Scheduling and reminders
+│   ├── modules/                 # Modular functionalities (e.g., tools, integrations)
 │   │   ├── audio_processing.py
 │   │   ├── text_generation.py
 │   │   ├── speech_recognition.py
-│   │   ├── system_utils.py   # File and system-related utilities
-│   ├── interfaces/           # User interface components
-│   │   ├── cli.py            # Command-line interface
-│   │   ├── web_interface.py  # Optional web-based UI
-├── data/                     # Static data files
-│   ├── assets/               # Media files, such as icons, sounds
-│   ├── language_models/      # Lightweight language models (if any)
-│   ├── settings.json         # Default settings and user preferences
-├── tests/                    # Testing suite
-│   ├── test_audio.py         # Unit tests for audio module
-│   ├── test_commands.py      # Unit tests for command handling
-│   ├── test_text_gen.py      # Unit tests for text generation
-├── docs/                     # Documentation
-│   ├── README.md             # Overview of the project
-│   ├── INSTALLATION.md       # Installation instructions
-│   ├── USAGE.md              # Usage instructions
-├── examples/                 # Example scripts for demonstration
+│   │   ├── system_utils.py      # File and system-related utilities
+│   ├── interfaces/              # User interface components
+│   │   ├── cli.py               # Command-line interface
+│   │   ├── web_interface.py     # Optional web-based UI
+├── data/                        # Static data files
+│   ├── assets/                  # Media files, such as icons, sounds
+│   ├── language_models/         # Lightweight language models (if any)
+│   ├── settings.json            # Default settings and user preferences
+├── tests/                       # Testing suite
+│   ├── test_audio.py            # Unit tests for audio module
+│   ├── test_commands.py         # Unit tests for command handling
+│   ├── test_text_gen.py         # Unit tests for text generation
+├── docs/                        # Documentation
+│   ├── README.md                # Overview of the project
+│   ├── INSTALLATION.md          # Installation instructions
+│   ├── USAGE.md                 # Usage instructions
+├── examples/                    # Example scripts for demonstration
 │   ├── demo.py
-├── requirements.txt          # Python dependencies
-├── LICENSE                   # License file
-└── setup.py                  # Package setup script for PyPI
+├── requirements.txt             # Python dependencies
+├── LICENSE                      # License file
+└── setup.py                     # Package setup script for PyPI
 ```
 
 - **src/**: Main codebase for AVA, including core logic, modules, and utility functions.
