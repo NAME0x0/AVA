@@ -18,9 +18,10 @@ This project is built upon the conceptual framework detailed in the accompanying
 
 **AVA: A Semi-Sentient Modular AI System with Neurosymbolic Cognition and Ensemble Architecture**
 
-> **[Read the Full Research Document Here]([AVA_Research.md])** 👈 *Replace this link with the actual path or URL to your research document (e.g., in the `docs/` folder or an external link).*
+> **[Read the Full Research Document Here](docs/AVA_Research.md)** 👈 *Assuming the research document is located at `docs/AVA_Research.md`.*
 
 The paper outlines the core architectural principles, including:
+
 -   **Modular Ensemble Design:** Using a compact base model combined with specialized expert models, managed by a Mixture-of-Agents (MoA) meta-controller.
 -   **Cognitive Layering:** Implementing Systems 0 (Meta-Awareness), 1 (Intuitive Processing), and 2 (Analytical Reasoning).
 -   **Neurosymbolic Computation:** Bridging neural pattern recognition with symbolic reasoning, inspired by cortical simulation.
@@ -92,85 +93,110 @@ AVA/
 ├── LICENSE                    # Project License
 └── setup.py                   # Python package setup script
 ```
-(Note: The structure above is illustrative and based on the original; adapt as needed for the actual implementation reflecting the research concepts.)
 
-🔧 Installation
+*(Note: The structure above is illustrative and based on the original; adapt as needed for the actual implementation reflecting the research concepts.)*
+
+## 🔧 Installation
+
 To get started with AVA, follow these steps:
 
-Clone the Repository
+### 1. Clone the Repository
 
-```Bash
-git clone [https://github.com/NAME0x0/AVA.git](https://github.com/NAME0x0/AVA.git)
+```bash
+git clone https://github.com/NAME0x0/AVA.git
 cd AVA
-Set up Dependencies
 ```
+
+### 2. Set up Dependencies
 
 Install Python requirements:
 
-```Bash
+```bash
 pip install -r requirements.txt
 ```
 
-Install and Configure Ollama: AVA relies on local models run via Ollama for its cognitive functions. Please ensure Ollama is installed and configured. You may need to pull specific models mentioned in the configuration or research document. See Ollama Docs
+Install and Configure Ollama:
+
+-   AVA relies on local models run via Ollama for its cognitive functions.
+-   Please ensure Ollama is installed and configured.
+-   You may need to pull specific models mentioned in the configuration or research document.
+-   See [Ollama Docs](https://github.com/ollama/ollama) for installation instructions.
+
 Install other system dependencies if any (e.g., Rust compiler if Rust modules are used).
-Configuration
 
-Update configuration files (e.g., config.py or settings.json) with API keys, model names, user preferences, etc.
-Run the Assistant
+### 3. Configuration
 
-```Bash
-python src/main.py # Or the relevant entry point script
+Update configuration files (e.g., `src/core/config.py` or `data/settings.json`) with API keys, model names, user preferences, etc.
+
+### 4. Run the Assistant
+
+```bash
+python src/main.py # Or the relevant entry point script (adjust path if needed)
 ```
 
-🛠️ Usage
-Launch AVA using the command provided after installation and configuration.
-Interact via the primary interface (e.g., command line).
-Explore available commands and modules. Refer to docs/USAGE.md for detailed instructions.
-🗺️ Roadmap
+## 🛠️ Usage
+
+1.  Launch AVA using the command provided after installation and configuration.
+2.  Interact via the primary interface (e.g., command line).
+3.  Explore available commands and modules. Refer to `docs/USAGE.md` for detailed instructions.
+
+## 🗺️ Roadmap
+
 This roadmap is guided by the research vision:
 
-🚀 Near-Term Goals
-Implement Core Cognitive Loop: Integrate System 1 (fast response) and System 2 (deliberate analysis) interaction.
-Develop MoA Controller: Implement the Mixture-of-Agents meta-controller for dynamic routing to expert modules.
-Integrate Base Model: Set up inference with the quantized base model (r1-like) via Ollama.
-Build Initial Expert Modules: Create first versions of key modules (e.g., coding, basic reasoning).
-Refine Ethical Safeguard Layer 1: Implement initial consequence modeling or rule-based checks.
-🛠️ Mid-Term Goals
-Implement System 0: Develop the meta-awareness layer for world modeling and state tracking.
-Advance Neurosymbolic Components: Begin implementing basic neurosymbolic techniques for improved reasoning or explainability.
-Enhance Ethical Framework: Add deontic and virtue ethics layers.
-Develop Self-Modeling Capabilities: Implement basic connectome tracing or capability awareness.
-Expand Expert Modules: Add more specialized agents (therapy, business, etc.).
-User Interface: Develop a more user-friendly GUI or web interface.
-🌱 Long-Term Vision
-Full Cortical Simulation Analogs: Implement more sophisticated neuro-inspired architectures (e.g., sparse attention, predictive coding).
-Advanced Metacognition: Achieve robust self-awareness and introspection based on the research model.
-Neuro-Curriculum Training: Explore advanced training protocols if retraining models becomes feasible.
-Optimize for High fMRI Similarity: Refine algorithms to better mimic biological neural activity patterns.
-Community Building: Foster an open-source community around cognitive AI development.
-🌐 Contribution
+### 🚀 Near-Term Goals
+
+-   Implement Core Cognitive Loop: Integrate System 1 (fast response) and System 2 (deliberate analysis) interaction.
+-   Develop MoA Controller: Implement the Mixture-of-Agents meta-controller for dynamic routing to expert modules.
+-   Integrate Base Model: Set up inference with the quantized base model (r1-like) via Ollama.
+-   Build Initial Expert Modules: Create first versions of key modules (e.g., coding, basic reasoning).
+-   Refine Ethical Safeguard Layer 1: Implement initial consequence modeling or rule-based checks.
+
+### 🛠️ Mid-Term Goals
+
+-   Implement System 0: Develop the meta-awareness layer for world modeling and state tracking.
+-   Advance Neurosymbolic Components: Begin implementing basic neurosymbolic techniques for improved reasoning or explainability.
+-   Enhance Ethical Framework: Add deontic and virtue ethics layers.
+-   Develop Self-Modeling Capabilities: Implement basic connectome tracing or capability awareness.
+-   Expand Expert Modules: Add more specialized agents (therapy, business, etc.).
+-   User Interface: Develop a more user-friendly GUI or web interface.
+
+### 🌱 Long-Term Vision
+
+-   Full Cortical Simulation Analogs: Implement more sophisticated neuro-inspired architectures (e.g., sparse attention, predictive coding).
+-   Advanced Metacognition: Achieve robust self-awareness and introspection based on the research model.
+-   Neuro-Curriculum Training: Explore advanced training protocols if retraining models becomes feasible.
+-   Optimize for High fMRI Similarity: Refine algorithms to better mimic biological neural activity patterns.
+-   Community Building: Foster an open-source community around cognitive AI development.
+
+## 🌐 Contribution
+
 Contributions that align with the research vision are highly encouraged! If you'd like to contribute:
 
-Fork the repository.
-Create a new branch (git checkout -b feature/YourFeatureName or fix/IssueDescription).
-Make your changes. Focus on clear, documented, and tested code.
-Commit your changes (git commit -m 'Add: Detailed description of your feature').
-Push to the branch (git push origin feature/YourFeatureName).
-Open a Pull Request, clearly describing the changes and linking to relevant issues or the research paper concepts.
+1.  Fork the repository.
+2.  Create a new branch (`git checkout -b feature/YourFeatureName` or `fix/IssueDescription`).
+3.  Make your changes. Focus on clear, documented, and tested code.
+4.  Commit your changes (`git commit -m 'Add: Detailed description of your feature'`).
+5.  Push to the branch (`git push origin feature/YourFeatureName`).
+6.  Open a Pull Request, clearly describing the changes and linking to relevant issues or the research paper concepts.
+
 We particularly welcome contributions in:
 
-Implementation of cognitive systems (System 0, 1, 2).
-Development of the MoA controller.
-Neurosymbolic reasoning techniques.
-Ethical safeguard implementation and testing.
-Model optimization and efficient inference.
-Development of specialized expert modules.
-Please read CONTRIBUTING.md for more detailed guidelines.
+-   Implementation of cognitive systems (System 0, 1, 2).
+-   Development of the MoA controller.
+-   Neurosymbolic reasoning techniques.
+-   Ethical safeguard implementation and testing.
+-   Model optimization and efficient inference.
+-   Development of specialized expert modules.
 
-📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+Please read `CONTRIBUTING.md` for more detailed guidelines.
 
-📧 Contact
+## 📄 License
+
+This project is licensed under the MIT License - see the `LICENSE` file for details.
+
+## 📧 Contact
+
 For inquiries, suggestions, or collaboration proposals related to the AVA project and its research foundations, please reach out to:
 
 Muhammad Afsah Mumtaz
