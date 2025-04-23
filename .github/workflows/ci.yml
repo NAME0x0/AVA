@@ -14,11 +14,13 @@ jobs:
           python-version: '3.8'
 
       - name: Install system dependencies
-        run: sudo apt-get install -y portaudio19-dev
+        run: sudo apt-get update && sudo apt-get install -y portaudio19-dev
 
       - name: Install Python dependencies
-        run: pip install -r MAIN/requirements.txt || echo "Skipping installation of pyaudio"
+        run: pip install -r requirements.txt # Corrected path
 
       - name: Run tests
         run: |
-          if [ -d "MAIN/tests" ]; then pytest MAIN/tests; else echo "Tests directory not found"; fi
+          # Corrected path and added pytest installation
+          pip install pytest
+          if [ -d "tests" ]; then pytest tests; else echo "Tests directory not found"; fi

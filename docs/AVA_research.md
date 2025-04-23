@@ -1,4 +1,3 @@
-
 # AVA: A Semi-Sentient Modular AI System with Neurosymbolic Cognition and Ensemble Architecture
 
 **Muhammad Afsah Mumtaz**  
@@ -22,7 +21,7 @@ Recent advances in large language models (LLMs), neurosymbolic architectures, an
 
 ### 2.1 Modular Ensemble Design
 
-- **Base Model**: A 26M parameter "r1" architecture, akin to DeepSeek-R1, forms the foundation.
+- **Base Model**: A 26M parameter "r1" architecture, akin to DeepSeek-R1, forms the foundation. *(Note: The practical implementation detailed in [DEVELOPMENT.md](DEVELOPMENT.md) currently utilizes larger, readily available models like DeepSeek-R1 8B or fine-tuned Llama-3 via Ollama, serving as the primary engine or expert components within this conceptual framework).*
 - **Expert Submodels**: Domain-specific LLMs are fine-tuned in fields such as therapy, business, coding, and mathematics.
 - **Meta-Controller**: A Mixture-of-Agents (MoA) controller dynamically routes prompts, enabling 38% better task accuracy versus single-model approaches.
 

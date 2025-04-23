@@ -4,13 +4,13 @@
 
 [![Project Status](https://img.shields.io/badge/status-in%20development-yellow)](https://github.com/NAME0x0/AVA)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen)](CONTRIBUTING.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
 
 Welcome to the **AVA** project! 🎉
 
 AVA (Afsah's Virtual Assistant) is an advanced AI initiative aimed at creating a personalized, **semi-sentient modular AI system**. Inspired by sophisticated AI concepts like JARVIS and grounded in cutting-edge research, AVA integrates **neurosymbolic cognition**, an **ensemble architecture**, and **layered cognitive processing** (simulating intuitive, analytical, and meta-aware thought).
 
-The goal is to develop an efficient, adaptable, and ethically-aligned virtual assistant capable of complex reasoning, task automation, and human-like interaction, moving beyond traditional virtual assistants towards a more cognitive AI.
+The goal is to develop an efficient, adaptable, and ethically-aligned virtual assistant capable of complex reasoning, task automation, and human-like interaction, leveraging local models like DeepSeek-R1 via Ollama.
 
 ## 📚 Research Foundation
 
@@ -18,11 +18,11 @@ This project is built upon the conceptual framework detailed in the accompanying
 
 **AVA: A Semi-Sentient Modular AI System with Neurosymbolic Cognition and Ensemble Architecture**
 
-> **[Read the Full Research Document Here](docs/AVA_Research.md)** 👈 *Assuming the research document is located at `docs/AVA_Research.md`.*
+> **[Read the Full Research Document Here](docs/AVA_Research.md)** 👈
 
 The paper outlines the core architectural principles, including:
 
--   **Modular Ensemble Design:** Using a compact base model combined with specialized expert models, managed by a Mixture-of-Agents (MoA) meta-controller.
+-   **Modular Ensemble Design:** Using a compact base model combined with specialized expert models, managed by a Mixture-of-Agents (MoA) meta-controller. *(Practical implementation currently focuses on leveraging models like DeepSeek-R1)*.
 -   **Cognitive Layering:** Implementing Systems 0 (Meta-Awareness), 1 (Intuitive Processing), and 2 (Analytical Reasoning).
 -   **Neurosymbolic Computation:** Bridging neural pattern recognition with symbolic reasoning, inspired by cortical simulation.
 -   **Ethical and Metacognitive Framework:** Incorporating self-modeling capabilities and robust, multi-layered ethical safeguards.
@@ -32,24 +32,27 @@ The paper outlines the core architectural principles, including:
 
 -   **Personalized Task Automation**: Automates daily tasks based on personal routines and preferences.
 -   **Voice and Text Command Interface**: Interact with AVA via text or voice commands.
--   **Modular Ensemble Architecture**: Leverages a base model and domain-specific expert models routed by an MoA controller for enhanced accuracy and capability.
--   **Layered Cognitive Processing**: Simulates dual-process thinking (System 1 & 2) and meta-awareness (System 0) for more nuanced responses.
+-   **Modular Ensemble Architecture (Goal)**: Aims to leverage a base model and domain-specific expert models routed by an MoA controller for enhanced accuracy and capability.
+-   **Layered Cognitive Processing (Goal)**: Aims to simulate dual-process thinking (System 1 & 2) and meta-awareness (System 0) for more nuanced responses.
 -   **Neurosymbolic Integration (Goal)**: Aims to combine neural learning with symbolic reasoning for deeper understanding and explainability.
--   **Ethical & Metacognitive Framework**: Designed with self-awareness mechanisms and integrated ethical safeguards.
+-   **Ethical & Metacognitive Framework (Goal)**: Designed with self-awareness mechanisms and integrated ethical safeguards.
 -   **Integration with APIs**: Seamless connection with various external APIs (weather, calendar, etc.).
 -   **Cross-Platform Support**: Designed to operate across different operating systems.
--   **Efficiency Focused**: Utilizes optimization techniques like model quantization (`llama.cpp` based) for reduced resource consumption.
+-   **Efficiency Focused**: Utilizes optimization techniques like model quantization and local inference via Ollama.
 
 ## 🚀 Technologies Used
 
 -   **Python**: Core programming language for backend logic and AI model integration.
 -   **Bash / Batch Scripting**: For system-level task automation.
 -   **Docker**: Containerization for consistent deployment and testing environments.
--   **Ollama**: Utilized for running local language models efficiently (as referenced in research).
+-   **Ollama**: Utilized for running local language models (e.g., DeepSeek-R1) efficiently.
+-   **Unsloth**: Used for efficient model fine-tuning (optional, for development).
+-   **PyTorch**: Core deep learning framework.
+-   **Transformers**: Library for accessing and using pre-trained models.
 -   **Node.js**: Potential frontend development for interactive interfaces.
 -   **Rust**: Potentially used for high-performance data processing modules (as suggested in research).
 -   **YAML**: Configuration management.
--   **AI/ML Frameworks**: Libraries like Transformers, PyTorch/TensorFlow, `llama-cpp-python`.
+-   **AI/ML Frameworks**: Libraries like Transformers, PyTorch, `llama-cpp-python` (via Ollama).
 
 ## 📚 Project Structure
 
@@ -57,88 +60,71 @@ The paper outlines the core architectural principles, including:
 AVA/
 ├── .git/                      # Git version control
 ├── .github/                   # GitHub specific configs (e.g., workflows)
+│   └── workflows/
+│       └── ci.yml
 ├── src/                       # Main source code
 │   ├── __init__.py
-│   ├── core/                  # Core assistant logic (cognitive systems, MoA)
+│   ├── core/                  # Core assistant logic
 │   │   ├── assistant.py
 │   │   ├── command_handler.py
 │   │   ├── config.py
 │   │   ├── logger.py
-│   │   ├── cognitive_systems.py # Implementation of System 0, 1, 2
-│   │   └── meta_controller.py   # MoA implementation
+│   │   └── scheduler.py       # (Existing file, added here)
+#   │   ├── cognitive_systems.py # (Future) Implementation of System 0, 1, 2
+#   │   └── meta_controller.py   # (Future) MoA implementation
 │   ├── modules/               # Specialized expert modules/tools
 │   │   ├── audio_processing.py
-│   │   ├── nlp_module.py
-│   │   ├── reasoning_module.py
-│   │   └── ethical_guardrails.py
+│   │   ├── speech_recognition.py # (Existing file, added here)
+│   │   ├── system_utils.py       # (Existing file, added here)
+│   │   ├── text_generation.py  # Replaces nlp_module.py
+#   │   ├── reasoning_module.py   # (Future)
+#   │   └── ethical_guardrails.py # (Future)
 │   ├── interfaces/            # User interfaces (CLI, Web)
 │   │   ├── cli.py
 │   │   └── web_interface.py
-│   └── neurosymbolic/         # Components related to neurosymbolic integration (aspirational)
+#   └── neurosymbolic/         # (Future) Components related to neurosymbolic integration
 ├── data/                      # Static data, models, settings
-│   ├── assets/
-│   ├── language_models/       # Configs or links to models
+│   ├── assets/                # Voice assets, etc.
+│   │   └── Sonia/
+│   ├── language_models/       # (Placeholder) Configs or links to models
 │   └── settings.json
 ├── tests/                     # Testing suite
-│   ├── test_core.py
-│   └── test_modules.py
+│   ├── test_audio.py
+│   ├── test_commands.py
+│   └── test_text_gen.py
 ├── docs/                      # Documentation
 │   ├── README.md              # This file
 │   ├── INSTALLATION.md
 │   ├── USAGE.md
+│   ├── DEVELOPMENT.md         # Guide for developers
 │   └── AVA_Research.md        # Research doc
 ├── examples/                  # Example usage scripts
 │   └── demo.py
 ├── requirements.txt           # Python dependencies
 ├── LICENSE                    # Project License
-└── setup.py                   # Python package setup script
+├── setup.py                   # Python package setup script
+└── .gitignore                 # Git ignore file
 ```
 
-*(Note: The structure above is illustrative and based on the original; adapt as needed for the actual implementation reflecting the research concepts.)*
+*(Note: Structure updated based on provided files. Items marked `(Future)` or commented out are from the research/roadmap but not yet present.)*
 
 ## 🔧 Installation
 
-To get started with AVA, follow these steps:
+Detailed installation instructions are available in [docs/INSTALLATION.md](docs/INSTALLATION.md). The basic steps involve:
 
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/NAME0x0/AVA.git
-cd AVA
-```
-
-### 2. Set up Dependencies
-
-Install Python requirements:
-
-```bash
-pip install -r requirements.txt
-```
-
-Install and Configure Ollama:
-
--   AVA relies on local models run via Ollama for its cognitive functions.
--   Please ensure Ollama is installed and configured.
--   You may need to pull specific models mentioned in the configuration or research document.
--   See [Ollama Docs](https://github.com/ollama/ollama) for installation instructions.
-
-Install other system dependencies if any (e.g., Rust compiler if Rust modules are used).
-
-### 3. Configuration
-
-Update configuration files (e.g., `src/core/config.py` or `data/settings.json`) with API keys, model names, user preferences, etc.
-
-### 4. Run the Assistant
-
-```bash
-python src/main.py # Or the relevant entry point script (adjust path if needed)
-```
+1.  Cloning the repository.
+2.  Setting up Python and dependencies (`requirements.txt`).
+3.  Installing and configuring Ollama to run local models (like `deepseek-r1:8b`).
+4.  Optionally setting up CUDA and Unsloth for development/training.
+5.  Configuring settings (API keys, model names) as needed.
 
 ## 🛠️ Usage
 
-1.  Launch AVA using the command provided after installation and configuration.
-2.  Interact via the primary interface (e.g., command line).
-3.  Explore available commands and modules. Refer to `docs/USAGE.md` for detailed instructions.
+Refer to [docs/USAGE.md](docs/USAGE.md) for detailed usage instructions. Generally:
+
+1.  Ensure Ollama is running with the required model (e.g., `ollama run deepseek-r1:8b`).
+2.  Run the main assistant interface (e.g., `python src/interfaces/cli.py` or `python examples/demo.py` - *adjust based on actual entry point*).
+3.  Interact via the chosen interface (CLI, Web, Voice).
 
 ## 🗺️ Roadmap
 
@@ -193,7 +179,7 @@ Please read `CONTRIBUTING.md` for more detailed guidelines.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+This project is licensed under the MIT License - see the [`LICENSE`](../LICENSE) file for details.
 
 ## 📧 Contact
 
