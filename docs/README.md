@@ -34,7 +34,7 @@ AVA represents a synthesis of cutting-edge research across multiple domains, inc
 ## Navigating This Repository
 
 * **[STRUCTURE.md](./STRUCTURE.md):** A detailed breakdown of the AVA v6 architecture.
-* **[AVA_Research.md](./AVA_Research.md):** Focuses on the novel research aspects and cutting-edge technologies integrated into AVA.
+* **[AVA_research.md](./AVA_research.md):** Focuses on the novel research aspects and cutting-edge technologies integrated into AVA.
 * **[ROADMAP.md](./ROADMAP.md):** The proposed phased development plan for AVA.
 * **[DEVELOPMENT.md](./DEVELOPMENT.md):** Guidelines and considerations for the development process.
 * **[TODO.md](./TODO.md):** High-level tasks and research challenges.
