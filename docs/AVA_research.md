@@ -1,11 +1,9 @@
-# AVA: A Semi-Sentient Modular AI System with Neurosymbolic Cognition and Ensemble Architecture
+# AVA Research Directions (v6 - Quantum & Neuro-Synergistic Apex)
 
 **Muhammad Afsah Mumtaz**  
 *May 2025*
 
 ---
-
-# AVA Research Directions (v6 - Quantum & Neuro-Synergistic Apex)
 
 Project AVA v6 stands at the confluence of multiple cutting-edge research fields. Its realization hinges on significant advancements and novel integrations across these domains. This document outlines the key research areas that are foundational to AVA's architecture and capabilities.
 
