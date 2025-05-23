@@ -7,11 +7,11 @@ This document outlines the concrete tasks for developing AVA as a high-capabilit
 ### Project Setup & Model Acquisition
 *   [x] **Finalize Project Directory Structure:** Ensure clarity for code, docs, datasets, models.
 *   [ ] **Select & Download Base LLM:** Gemma 3n 4B (primary) or 1B (backup/testing).
-*   [ ] **Setup Python Environment:** Install `bitsandbytes`, `transformers`, `peft`, `trl`, `unsloth`, `torch` (with CUDA for RTX A2000).
-*   [ ] **Install Ollama:** For local model management and serving (alternative to custom Python server).
+*   [~] **Setup Python Environment:** Install `bitsandbytes`, `transformers`, `peft`, `trl`, `unsloth`, `torch` (with CUDA for RTX A2000).
+*   [x] **Install Ollama:** For local model management and serving (alternative to custom Python server).
 
 ### Aggressive Quantization & Initial Testing
-*   [ ] **Implement 4-bit Quantization:** Use `bitsandbytes` (NF4/FP4) for the chosen base model.
+*   [~] **Implement 4-bit Quantization:** Use `bitsandbytes` (NF4/FP4) for the chosen base model.
 *   [ ] **Benchmark VRAM & Inference Speed:** Post-quantization on RTX A2000.
 *   [ ] **Qualitative Coherence Testing:** Basic prompts to check model sanity.
 *   [x] **Document Quantization:** In `OPTIMIZATION_STRATEGIES.md`.
