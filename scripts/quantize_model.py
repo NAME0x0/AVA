@@ -149,8 +149,7 @@ class ModelQuantizer:
                 model_info.param_count = config.num_parameters
             else:
                 # Rough estimation for transformer models
-                model_info.param_count = model_info.vocab_size * model_info.hidden_size * 2 + \
-                                       model_info.num_layers * model_info.hidden_size * model_info.hidden_size * 4
+                model_info.param_count = model_info.vocab_size * model_info.hidden_size * 2 + model_info.num_layers * model_info.hidden_size * model_info.hidden_size * 4
             
             # Estimate model size (parameters * 2 bytes for fp16)
             model_info.model_size_mb = (model_info.param_count * 2) / (1024 * 1024)
