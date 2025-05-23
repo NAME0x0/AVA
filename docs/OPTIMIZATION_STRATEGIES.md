@@ -91,3 +91,65 @@ All optimization strategies will be subject to continuous benchmarking:
 *   **Qualitative Analysis:** Human evaluation of response coherence, helpfulness, and tool usage.
 
 Results will inform iterative adjustments to quantization parameters, LoRA configurations, synthetic data generation prompts, and overall model architecture choices. 
+
+---
+
+## 4-bit Model Quantization with bitsandbytes
+
+To enable running capable models on consumer hardware with limited VRAM, such as the NVIDIA RTX A2000 (4GB), we employ 4-bit quantization. This significantly reduces the memory footprint of the language model.
+
+### Method and Configuration
+
+We utilize the `bitsandbytes` library integrated with Hugging Face `transformers` to perform post-training quantization. The primary configuration parameters used are:
+
+-   **`load_in_4bit=True`**: This flag enables the loading of model weights in 4-bit precision.
+-   **`bnb_4bit_quant_type="nf4"`**: Specifies the "NormalFloat4" (NF4) quantization type, which is a sophisticated method designed to handle normally distributed weights effectively.
+-   **`bnb_4bit_use_double_quant=True`**: Enables a nested quantization scheme where quantization constants are themselves quantized, further saving memory.
+-   **`bnb_4bit_compute_dtype=torch.bfloat16`**: Sets the computation data type to `bfloat16`. While weights are stored in 4-bit, computations (like matrix multiplications during inference) are performed in a higher precision (e.g., `bfloat16` or `float16`) for accuracy. `bfloat16` is often preferred on modern GPUs that support it.
+
+### Target Model
+
+The initial target for this quantization is the **Gemma 3n 4B** model (currently using `google/gemma-2b` as a placeholder in the scripts due to its availability and suitability for the VRAM target).
+
+### Implementation Script: `scripts/quantize_model.py`
+
+The core of the quantization process is handled by the enhanced `scripts/quantize_model.py`. This script offers a comprehensive solution for model quantization, including:
+
+-   **Command-Line Interface:** Allows specifying model ID, output path, quantization strategy (e.g., `bnb_4bit`, `bnb_8bit`), quantization type (e.g., `nf4`, `fp4`), VRAM limits, and other parameters.
+-   **Configuration Management:** Uses dataclasses for detailed control over quantization settings.
+-   **VRAM Optimization:** Includes memory management features specifically for environments like the RTX A2000.
+-   **Model Analysis:** Extracts and logs information about the model being quantized.
+-   **Built-in Validation:** Can perform a test generation after quantization to verify model integrity using the `--test_generation` flag. It also includes a `--test` flag to run a full test pipeline with a small predefined model (e.g., `microsoft/DialoGPT-small`).
+-   **Metadata Generation:** Saves a `quantization_metadata.json` file alongside the quantized model, detailing the model info, quantization configuration, and performance metrics like VRAM usage.
+-   **Error Handling & Logging:** Provides robust logging and error management.
+
+**Basic Usage Example:**
+```bash
+python scripts/quantize_model.py \
+    --model_id google/gemma-2b \
+    --output_path ./models/quantized/gemma-2b-4bit \
+    --strategy bnb_4bit \
+    --quantization_type nf4 \
+    --test_generation
+```
+For a quick test of the script and environment:
+```bash
+python scripts/quantize_model.py --test
+```
+
+### Expected Outcome
+
+The primary goal is to reduce the model's VRAM usage to comfortably fit within 4GB, allowing for local inference on the target hardware. While some minor degradation in performance metrics is expected compared to the full-precision model, 4-bit quantization with NF4 is known to maintain a high degree of model accuracy.
+
+### VRAM Usage & Performance Notes
+
+*(To be updated after running `scripts/quantize_model.py` on the target hardware. The script's output and the generated `quantization_metadata.json` will provide key metrics.)*
+
+-   **Base Model Estimated Size (MB):** The script logs this.
+-   **Quantized Model Size (MB):** The script logs this and it can be derived from saved files.
+-   **Compression Ratio:** Calculated and logged by the script.
+-   **VRAM Usage (GB) during quantization:** Measured and logged by the script.
+-   **Quantization Time (seconds):** Measured and logged by the script.
+-   **Qualitative Observations from Test Generation:** Based on output from the `--test_generation` flag.
+
+---
