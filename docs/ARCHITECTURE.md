@@ -1,110 +1,136 @@
-# AVA System Architecture (Foundational)
+# AVA System Architecture: Local Agentic AI Daily Driver
 
-**Current Focus:** This document outlines the architecture for the foundational version of AVA (Afsah's Virtual Assistant). This version prioritizes core functionality, reliability, and a solid framework for future enhancements.
+**Project Vision:** To establish AVA as a compact, powerful, and locally-run agentic AI model capable of serving as a daily driver for advanced tasks on an NVIDIA RTX A2000 GPU with 4GB VRAM. AVA is designed for complex agentic tasks, seamless user experience (CLI and GUI), and remote access via token broadcasting.
 
-Our long-term vision for AVA is expansive and detailed in `docs/ARCHITECTURE_VISION.md` and `docs/STRUCTURE_VISION.md`.
+This document details the architecture of AVA, focusing on achieving high performance and advanced capabilities within significant hardware constraints.
 
-## I. Core Principles for Foundational AVA
+## I. Core Challenge: 4GB VRAM Limitation
 
-*   **Simplicity:** Employ straightforward and well-understood technologies.
-*   **Modularity:** Design components with clear responsibilities for easier development, testing, and future upgrades.
-*   **Practicability:** Focus on features that can be reliably implemented with current resources.
-*   **User-Centricity:** Prioritize a useful and intuitive user experience.
+The NVIDIA RTX A2000 (Ampere Architecture) typically features 6GB or 12GB GDDR6 memory. The project's specific 4GB VRAM constraint necessitates an exceptionally aggressive approach to model selection, optimization, and fine-tuning. This limitation drives all architectural decisions.
 
-## II. Foundational Architecture Overview
+## II. Foundational Layers
 
-The foundational AVA system is composed of the following key layers and components:
+### A. Base Model Selection
+
+*   **Constraint:** Strict 4GB VRAM limit.
+*   **Strategy:** Prioritize ultra-small, highly efficient LLM architectures.
+*   **Viable Candidates (Post-Quantization):**
+    *   **Gemma 3n 4B:** Requires ~2.3-2.6GB VRAM (4-bit quantized). Chosen for its balance of capability and small footprint.
+    *   **Gemma 3n 1B:** Requires ~0.5GB VRAM (4-bit quantized). An alternative for even tighter constraints or simpler tasks.
+*   **Rationale:** Larger models (e.g., DeepSeek 7B+) are infeasible. Gemma models are engineered for efficiency on consumer hardware, featuring Per-Layer Embeddings (PLE) and MatFormer architecture for dynamic memory footprint reduction.
+
+### B. Core Optimization Strategies
+
+1.  **Aggressive Model Compression:**
+    *   **4-bit Quantization (INT4):** Essential for fitting the model into VRAM. Reduces numerical precision of weights/activations. Implemented using libraries like `bitsandbytes` (provides `LLM.int8()` and QLoRA for 4-bit) which is well-suited for Ampere GPUs.
+    *   **Knowledge Distillation:** A smaller "student" model (AVA) learns from a larger, more capable "teacher" model. AVA learns from the teacher's soft probabilities and internal representations, enabling it to approximate superior performance with fewer parameters. This is key to AVA being "more advanced" in specific capabilities.
+    *   **Pruning & Sparsification:** Systematically removing redundant parameters (weights, connections) using techniques like structured pruning or SparseGPT. Models can be exported to optimized formats like ONNX.
+
+2.  **Parameter-Efficient Fine-Tuning (PEFT):**
+    *   **QLoRA (Quantized Low-Rank Adaptation):** Freezes most of the pre-trained LLM's 4-bit quantized weights and introduces a small set of trainable low-rank adaptation (LoRA) weights. This drastically reduces computational/storage costs of fine-tuning and prevents catastrophic forgetting. Implemented using libraries like `trl`, `unsloth`, `peft`, and `bitsandbytes`.
+    *   **High-Quality Synthetic Dataset Generation:** Leverage LLMs (e.g., using tools like Gretel Navigator or custom workflows) to create task-specific instruction data (question-answer pairs, step-by-step evaluations). This overcomes data scarcity for specialized agentic tasks.
+
+## III. Agentic Capabilities Architecture
+
+AVA's agentic workflow relies on sophisticated Natural Language Understanding (NLU), Dialogue Management (DM), and Natural Language Generation (NLG), with memory-enhanced architectures for long-term context.
+
+### A. Core Agentic Components
+
+1.  **Function Calling & Tool Use:**
+    *   AVA will be fine-tuned to recognize when external tools/APIs are needed and output structured JSON with arguments for execution.
+    *   Enables dynamic access to real-time data (weather, databases) and actions (scheduling, code generation).
+
+2.  **Structured Output:**
+    *   Ensures AVA produces reliable, parsable outputs (JSON, formatted SQL) for downstream processing and interoperability.
+    *   Utilizes libraries like LlamaIndex (Pydantic Programs, Output Parsers) leveraging native function calling or post-processing text completions.
+
+3.  **Reasoning Mechanisms:**
+    *   **Chain-of-Thought (CoT) Prompting:** Instructing the LLM to generate explicit step-by-step reasoning.
+    *   **Advanced Reasoning (e.g., RL-of-Thoughts - RLoT):** Potential for training a lightweight "navigator" model via reinforcement learning to adaptively select and combine reasoning blocks for complex tasks.
+
+### B. Model Context Protocol (MCP) Integration
+
+*   **Concept:** An open standard allowing AVA (as an MCP Host) to directly access files, APIs, and tools via lightweight MCP Servers, bypassing traditional RAG embeddings/vector searches.
+*   **Benefits:**
+    *   **Direct, Real-time Data Access:** Reduces computational load, improves data freshness, and minimizes hallucinations.
+    *   **Streamlined Tool Orchestration:** Simplifies adding new data sources/tools by standardizing the interface (N+M vs N x M integration complexity).
+    *   **Enhanced Security:** Minimizes data movement and storage.
+
+## IV. User Experience (UX) and Connectivity
+
+### A. User Interfaces
+
+1.  **Command Line Interface (CLI):**
+    *   For direct control, scripting, and advanced users.
+    *   Allows prompt input, function execution, tool interaction, and structured output in the terminal.
+
+2.  **Graphical User Interface (GUI):**
+    *   **Recommended Foundation:** Open WebUI – a self-hosted, offline-capable AI platform supporting Ollama and OpenAI-compatible APIs.
+    *   **Key Open WebUI Features:** ChatGPT-style interface, LLM selector, parameter playground, knowledge collections (document upload), live web search, GPU acceleration via Docker.
+    *   **Advanced Agentic UI Inspirations (from OpenAI Codex, Claude Code Terminal):**
+        *   Interactive code snippets.
+        *   Project context awareness.
+        *   Actionable outputs (e.g., diffs, follow-up tasks).
+        *   User configurability (agent behavior, permissions).
+        *   Feedback mechanisms.
+
+### B. Remote Access & Token Broadcasting
+
+1.  **Secure Tunneling for Local Inference:**
+    *   Expose AVA's local server (e.g., running on a specific port) to the internet via a secure public URL using tools like `Localtonet` or `ngrok`.
+    *   Crucial for privacy and cost-saving (data remains local).
+    *   Requires security features: basic authentication, IP whitelisting.
+
+2.  **Token Streaming for Responsive UI:**
+    *   Incrementally send generated tokens to the client as they become available, eliminating long load times.
+    *   **Recommended Method:** Server-Sent Events (SSE) for efficient, uni-directional streaming of text data over HTTP.
+    *   Alternative: WebSockets for bi-directional streaming if more interactive communication is needed.
+
+## V. System Overview Diagram
 
 ```mermaid
 graph TD
-    A[User Interface (CLI / Web)] --> B{Command Parser};
-    B -- Text/Voice Input --> C[Interaction Manager];
-    C --> D{Core Logic & LLM Backend};
-    D --> E[Tool Interface];
-    E --> F[Weather API];
-    E --> G[Calendar API];
-    E --> H[Reminders (Local DB)];
-    E --> I[Computation Module];
-    E --> J[Time/Date Module];
-    F --> C;
-    G --> C;
-    H --> C;
-    I --> C;
-    J --> C;
-    C --> K[Response Formatter];
-    K -- Text/Voice Output --> A;
-    L[Logging Service] --> C;
-    L --> D;
-    L --> E;
+    A[User (CLI / GUI / Remote)] --> B{AVA Core};
+
+    subgraph AVA Core
+        C[Interface Manager (CLI/GUI Adapters)] --> D{Dialogue Manager};
+        D -- User Input --> E[NLU Engine];
+        E --> F[Optimized LLM (Gemma 3n 4B + QLoRA)];
+        F -- Internal Thought/Reasoning --> F;
+        F -- Structured Output/Function Call --> G{Agentic Engine};
+        G -- Needs Tool/Data --> H{Tool & MCP Interface};
+        H --> I[Local Files (via MCP)];
+        H --> J[External APIs (Weather, Calendar etc.)];
+        H --> K[Databases (via MCP)];
+        I --> H;
+        J --> H;
+        K --> H;
+        H -- Tool/Data Response --> G;
+        G -- Action/Response Plan --> L[NLG Engine];
+        L -- Formatted Response --> C;
+    end
+
+    B -- Token Stream (SSE) --> A;
+    M[Synthetic Data Generation Workflow] -.-> F;
+    N[Knowledge Distillation Teacher Model] -.-> F;
+
+    subgraph External Services
+        O[MCP Servers]
+        P[External APIs]
+        Q[Databases]
+    end
+
+    H <--> O;
+    H <--> P;
+    H <--> Q;
+
+    R[Secure Tunnel (e.g., Localtonet)] <--> B;
 ```
 
-**Layers & Components:**
+## VI. Implementation Roadmap Summary
 
-1.  **User Interface (UI) Layer:**
-    *   **Description:** The primary point of interaction for the user.
-    *   **Initial Implementation:** Command-Line Interface (CLI) built with Python (e.g., using `argparse`).
-    *   **Potential Enhancement:** A simple web-based UI (e.g., using Flask or Streamlit).
-    *   **Interaction Modalities:**
-        *   **Text:** Direct text input.
-        *   **Voice (Optional):** Speech-to-Text (STT) for input and Text-to-Speech (TTS) for output, integrated via libraries like `SpeechRecognition` and `gTTS` or `pyttsx3`.
+1.  **Phase 1: Foundation & Optimization:** Base model selection (Gemma 3n 4B), 4-bit quantization, QLoRA setup, synthetic dataset pipeline.
+2.  **Phase 2: Agentic Core Development:** Function calling, structured output, reasoning mechanisms (CoT), MCP integration.
+3.  **Phase 3: Interface & Connectivity:** CLI development, GUI (Open WebUI base), secure tunneling, token streaming.
 
-2.  **Command Parser:**
-    *   **Description:** Interprets user input to determine intent and extract relevant information.
-    *   **Implementation:**
-        *   **Rule-Based Matching:** Uses regular expressions or keyword spotting for predefined commands (e.g., "What is the weather?", "Set a reminder").
-        *   **Natural Language Understanding (NLU) Fallback:** For more complex or ambiguous queries, the input can be passed to the Core Logic & LLM Backend for intent extraction and entity recognition.
-
-3.  **Interaction Manager:**
-    *   **Description:** Orchestrates the flow of information between the UI, Core Logic, and Tools. It routes parsed commands to the appropriate backend components and ensures responses are delivered back to the user.
-    *   **Implementation:** Python-based logic.
-
-4.  **Core Logic & LLM Backend:**
-    *   **Description:** The "brain" of the foundational AVA. It handles general queries, conversation management, and directs tasks to specific tools when needed.
-    *   **Implementation:**
-        *   **Large Language Model (LLM):** Leverages a pre-trained LLM (e.g., via OpenAI API, Anthropic API, or a locally hosted model via Ollama).
-        *   **System Prompt:** A carefully defined system prompt guides the LLM's persona, tone (polite, helpful, concise), and basic operational guidelines.
-        *   **Session Management (Basic):** Maintains a short history of the conversation for contextual understanding.
-
-5.  **Tool Interface & Modules:**
-    *   **Description:** A standardized way for the Core Logic to interact with various tools that provide specific functionalities.
-    *   **Implementation:** Each tool is a Python module with a defined interface.
-    *   **Initial Tools:**
-        *   **Weather Tool:** Connects to a public weather API (e.g., OpenWeatherMap) to fetch weather information.
-        *   **Calendar Tool:** Integrates with a calendar service (e.g., Google Calendar API) to manage events.
-        *   **Reminders Tool:** Stores and retrieves reminders, potentially using a local SQLite database or a simple file (e.g., JSON).
-        *   **Computation Tool:** Handles basic mathematical calculations (either via LLM or a safe local evaluation method).
-        *   **Time/Date Tool:** Provides current time and date information using Python's `datetime` module.
-
-6.  **Response Formatter:**
-    *   **Description:** Takes the output from the Core Logic or Tools and formats it into a user-friendly textual (or speech) response.
-    *   **Implementation:** Python-based string formatting and logic.
-
-7.  **Logging Service:**
-    *   **Description:** Records key interactions, errors, and system events for debugging and monitoring.
-    *   **Implementation:** Utilizes Python's `logging` module to write to log files.
-
-## III. Data Flow Example (Weather Query)
-
-1.  User types: "What's the weather like in London?" (or speaks it via STT).
-2.  Command Parser identifies "weather" intent and "London" as the location.
-3.  Interaction Manager routes this to the Core Logic.
-4.  Core Logic, via the Tool Interface, calls the Weather Tool with "London".
-5.  Weather Tool queries the OpenWeatherMap API.
-6.  API returns weather data for London.
-7.  Weather Tool processes data and returns it to the Core Logic.
-8.  Core Logic passes the processed data to the Response Formatter.
-9.  Response Formatter creates a sentence like: "The current weather in London is..."
-10. UI displays the text (or speaks it via TTS).
-11. Logging Service records the transaction.
-
-## IV. Technology Stack (Foundational)
-
-*   **Primary Language:** Python
-*   **LLM Interaction:** APIs (OpenAI, Anthropic) or local via Ollama.
-*   **CLI:** Python's `argparse`.
-*   **Web UI (Optional):** Flask, Streamlit.
-*   **Databases (for Reminders):** SQLite (initially).
-*   **APIs:** Standard HTTP request libraries (e.g., `requests` in Python).
-*   **Voice (Optional):** `SpeechRecognition`, `gTTS`, `pyttsx3`.
-
-This foundational architecture provides a robust starting point for AVA, focusing on delivering core assistant functionalities effectively. Future iterations will build upon this base to incorporate more advanced features progressively. 
+**Continuous Improvement:** Establish feedback loops (user ratings, interaction analysis) for ongoing model refinement, prompt adjustments, and tool integration updates. 

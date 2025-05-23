@@ -1,98 +1,95 @@
-# AVA Project: Tasks & Challenges 🛠️
+# AVA Project: Task List for Local Agentic AI 🛠️
 
-This document outlines tasks and research challenges for Project AVA. It is divided into sections for the **Foundational AVA** (current development focus) and the **Long-Term Advanced Vision**.
+This document outlines the concrete tasks for developing AVA as a high-capability, local agentic AI on an NVIDIA RTX A2000 (4GB VRAM). Refer to `ROADMAP.md` for phased timelines and `ARCHITECTURE.md` for detailed design.
 
-## Part 1: Foundational AVA - Tasks
+## Phase 1: Foundation & Core Optimization
 
-These are practical tasks for building the initial, functional version of AVA.
+### Project Setup & Model Acquisition
+*   [x] **Finalize Project Directory Structure:** Ensure clarity for code, docs, datasets, models.
+*   [ ] **Select & Download Base LLM:** Gemma 3n 4B (primary) or 1B (backup/testing).
+*   [ ] **Setup Python Environment:** Install `bitsandbytes`, `transformers`, `peft`, `trl`, `unsloth`, `torch` (with CUDA for RTX A2000).
+*   [ ] **Install Ollama:** For local model management and serving (alternative to custom Python server).
 
-### Core System & Interface
-*   [ ] **Setup Project Structure:** Organize directories for code, tests, and documentation.
-*   [ ] **Develop CLI:** Implement a command-line interface using Python (`argparse`).
-*   [ ] **Integrate LLM Backend:** Connect to chosen LLM (OpenAI API, local via Ollama, etc.).
-*   [ ] **Create System Prompt:** Define AVA's persona, tone, and basic guidelines.
-*   [ ] **Implement Basic Command Parser:** Use regex for keywords and LLM for fallback.
-*   [ ] **Develop Interaction Manager:** Orchestrate flow between UI, core logic, and tools.
-*   [ ] **Implement Response Formatter:** Ensure user-friendly output.
-*   [ ] **Add Basic Logging:** Record interactions and errors.
-*   [ ] **(Optional) Develop Simple Web UI:** Using Flask or Streamlit.
-*   [ ] **(Optional) Implement STT/TTS:** For voice input and output.
+### Aggressive Quantization & Initial Testing
+*   [ ] **Implement 4-bit Quantization:** Use `bitsandbytes` (NF4/FP4) for the chosen base model.
+*   [ ] **Benchmark VRAM & Inference Speed:** Post-quantization on RTX A2000.
+*   [ ] **Qualitative Coherence Testing:** Basic prompts to check model sanity.
+*   [x] **Document Quantization:** In `OPTIMIZATION_STRATEGIES.md`.
 
-### Tool Integration
-*   [ ] **Design Tool Interface Layer:** Standardize how core logic calls tools.
-*   [ ] **Implement Weather Tool:** Connect to a weather API.
-*   [ ] **Implement Time/Date Tool:** Using Python `datetime`.
-*   [ ] **Implement Computation Tool:** LLM-based or safe local evaluation.
-*   [_] **Implement Calendar Tool:** Integrate with Google Calendar API or similar.
-*   [ ] **Implement Reminders Tool:** Local storage (SQLite or JSON).
+### QLoRA Setup & Synthetic Data Pipeline
+*   [ ] **Implement QLoRA Fine-tuning:** Using `peft`, `trl`, `unsloth` with the quantized model.
+*   [ ] **Develop Synthetic Data Generation Workflow:** Script to use a larger LLM (e.g., via API) to create instruction/evaluation data.
+*   [ ] **Create Initial Synthetic Dataset:** For a simple agentic task (e.g., parsing, basic tool selection).
+*   [ ] **Test QLoRA Fine-tuning Run:** On the initial synthetic dataset.
+*   [x] **Document QLoRA & Synthetic Data:** In `OPTIMIZATION_STRATEGIES.md`.
 
-### Testing & Documentation
-*   [ ] **Write Unit Tests:** For all modules and tools.
-*   [ ] **Conduct User Acceptance Testing (UAT).**
-*   [ ] **Finalize Foundational `ARCHITECTURE.md` Document.**
-*   [ ] **Write User Guide for Foundational AVA.**
-*   [ ] **Document Setup in `INSTALLATION.md` for Foundational AVA.**
+### Knowledge Distillation & Pruning (Research & Planning)
+*   [ ] **Research Practical Knowledge Distillation:** Identify teacher models, data requirements, and pipeline.
+*   [ ] **Explore Pruning/Sparsification Methods:** (e.g., SparseGPT) and ONNX export.
+*   [x] **Document Initial Findings:** In `OPTIMIZATION_STRATEGIES.md`.
 
----
+## Phase 2: Agentic Core Development
 
-## Part 2: Long-Term Advanced Vision - Research Challenges
+### Function Calling & Basic Tool Use
+*   [ ] **Fine-tune AVA for Function Detection:** Using QLoRA and synthetic data.
+*   [ ] **Implement Structured Argument Generation:** (JSON output for function calls).
+*   [x] **Develop Basic Tool Interface:** Python classes/functions for initial tools.
+*   [ ] **Integrate 1-2 Simple Tools:** (e.g., calculator, date/time lookup).
+*   [x] **Document Function Calling:** In `AGENTIC_DESIGN.md`.
 
-These are broad research areas requiring significant effort and breakthroughs for the advanced AVA concept.
+### Structured Output Implementation
+*   [ ] **Implement Output Parsing/Validation:** Ensure reliable structured outputs (JSON, etc.).
+*   [ ] **Integrate LlamaIndex Utilities:** Pydantic Programs or Output Parsers, or custom logic.
+*   [ ] **Test Structured Output in Tool Workflows.**
+*   [x] **Document Structured Output:** In `AGENTIC_DESIGN.md`.
 
-### I. Advanced Core Cognitive Backbone
-*   [ ] **Research & Develop Scalable Attention/SSM Hybrids:** Target 3-7M+ token context windows with practical efficiency.
-*   [ ] **Design & Implement Dynamic Neural Topologies:** Enable structural adaptation in the advanced backbone for continual learning.
-*   [ ] **Identify & Benchmark Quantum-Hybrid Co-processing Tasks:** Determine where quantum algorithms offer real-world advantages for AI sub-problems (e.g., attention optimization, graph problems in latent spaces).
-*   [ ] **Develop Efficient Classical-Quantum Interfaces:** For integrating potential quantum co-processors.
-*   [ ] **Create Robust Pre-training Datasets for Advanced Models:** Curate and manage petabyte-scale, diverse, high-quality datasets.
+### Reasoning Mechanisms & MCP Foundation
+*   [ ] **Implement Chain-of-Thought (CoT) Prompting:** Develop and test CoT prompt templates.
+*   [x] **Plan Model Context Protocol (MCP) Integration:**
+    *   [x] Design AVA as MCP Host.
+    *   [ ] Plan for simple MCP Server interaction (e.g., local file access).
+*   [x] **Document CoT & MCP Concepts:** In `AGENTIC_DESIGN.md`.
 
-### II. Advanced Specialization & Skill Matrix (MoE³ Vision)
-*   [ ] **Develop Algorithms for Automated Expert Evolution:** Design systems for advanced AVA to generate, test, and integrate new expert architectures.
-*   [ ] **Implement Advanced Predictive Routing for MoE:** Create routers with lookahead and feedback for optimal expert selection in a vast MoE.
-*   [ ] **Design & Integrate Neuromorphic Experts:** Develop specialized neuromorphic hardware/software experts for ultra-low-power tasks.
-*   [ ] **Design & Integrate Quantum-Inspired Algorithm Experts:** For specialized optimization tasks within the advanced MoE.
-*   [ ] **Solve Expert Load Balancing at Massive Scale:** Ensure efficient utilization of potentially hundreds of thousands of experts.
+### Advanced Tool Integration & MCP Prototyping
+*   [ ] **Integrate More Complex Tools:** Web search API, database query via MCP.
+*   [ ] **Develop Prototype MCP Server:** For a local data source (e.g., text files, simple DB).
+*   [ ] **Test AVA with MCP Server:** Data retrieval and use.
+*   [ ] **Refine Agentic Workflows:** Combine reasoning, tools, and structured output.
 
-### III. Advanced Collaborative & Reasoning Nexus (MoA³ Vision)
-*   [ ] **Build Robust Neuro-Symbolic Agent Architectures:** Effectively combine neural and symbolic reasoning at scale.
-*   [ ] **Develop Scalable Formal Verification Tools for AI Agents:** Prove properties of critical agent components in advanced AI.
-*   [ ] **Implement Advanced Multi-Agent Argumentation & Trust Systems.**
-*   [ ] **Train Agents with Process-Supervised Reward Models (PRMs):** For reliable and explainable reasoning in complex agents.
-*   [ ] **Research Emergent Behaviors in Complex MoA Systems:** Understand and guide collective agent intelligence.
+## Phase 3: User Interface, Connectivity & Refinement
 
-### IV. Advanced Strategic Orchestration Core (Meta-Controller Vision)
-*   [ ] **Design Meta-Controller with Advanced AI Planning & Meta-Reasoning Capabilities.**
-*   [ ] **Integrate Quantum-Assisted Planning Tools (Conceptual):** For complex strategic decision-making.
-*   [ ] **Develop Sophisticated "Sleeptime Compute" Schedulers & Resource Managers for Large-Scale Operations.**
-*   [ ] **Research Meta-Controller Functional Self-Awareness:** Regarding system capabilities, limitations, and confidence.
+### CLI Development
+*   [x] **Develop Robust CLI:** Using `argparse`, `Typer`, or `Click`.
+*   [ ] **Implement CLI Commands:** For prompts, function calls, settings.
+*   [ ] **Ensure CLI Handles Structured/Streamed Responses.**
+*   [x] **Document CLI Usage:** In `UI_CONNECTIVITY.md` and `USAGE.md`.
 
-### V. Advanced Extended Cognition (Tool Ecosystem Vision)
-*   [ ] **Develop Framework for Automated Tool Augmentation & Synthesis by Agents.**
-*   [ ] **Implement Secure & Privacy-Preserving Federated Tool Learning Mechanisms.**
-*   [ ] **Create Rigorous Verification Systems for Tool Outputs in Complex Scenarios.**
+### GUI Implementation (Open WebUI)
+*   [ ] **Setup Open WebUI:** With Docker, configure for GPU acceleration.
+*   [ ] **Integrate AVA with Open WebUI:** Via Ollama or custom API endpoint.
+*   [ ] **Configure Open WebUI for AVA:** System prompts, parameters, knowledge collections (if used).
+*   [ ] **(Stretch) Customize Open WebUI:** For agentic features (tool call display, context view).
+*   [x] **Document GUI Setup:** In `UI_CONNECTIVITY.md` and `USAGE.md`.
 
-### VI. Advanced Unified Perception & Creation (Multimodal Fusion Vision)
-*   [ ] **Build Deeply Unified Latent Spaces for All Supported Modalities in the Advanced System.**
-*   [ ] **Integrate Real-Time Sensor Stream Processing (including neuromorphic pre-processing for advanced sensors).**
-*   [ ] **Develop State-of-the-Art Controllable Multimodal Generation Models for Advanced Applications.**
-*   [ ] **Research Cross-Modal Reasoning and Analogy Making at a Deep Level.**
+### Remote Access & Token Broadcasting
+*   [ ] **Implement Secure Tunneling:** Using `Localtonet` or `ngrok` for AVA's local server.
+*   [ ] **Configure Security:** Authentication, IP whitelisting.
+*   [ ] **Implement Token Streaming:** Server-Sent Events (SSE) for AVA's output.
+*   [ ] **Test Remote Access & Streaming.**
+*   [x] **Document Remote Access:** In `UI_CONNECTIVITY.md`.
 
-### VII. Advanced Principled Evolution Engine (Alignment & Self-Improvement Vision)
-*   [ ] **Develop & Refine Constitutional AI Framework for Advanced AI:** Including robust governance for updates.
-*   [ ] **Implement Iterated Distillation and Amplification (IDA) / Debate Mechanisms for Alignment of Advanced AI.**
-*   [ ] **Apply Formal Verification to Core Alignment Properties & Safety-Critical Modules in Advanced AI.**
-*   [ ] **Build AI-Driven Scientific Discovery Cycle Capabilities:** Enable advanced AVA to autonomously conduct research.
-*   [ ] **Create Self-Improving Data Pipeline Mechanisms:** For advanced AVA to optimize its own learning data.
-*   [ ] **Research and Mitigate Potential Failure Modes of Advanced Alignment Techniques.**
-*   [ ] **Develop Robust Methods for Human Oversight in a Rapidly Evolving Advanced AI System.**
+### Testing, Feedback & Documentation
+*   [ ] **Comprehensive End-to-End Testing:** Local and remote scenarios.
+*   [ ] **Develop User Feedback Mechanism:** (e.g., simple rating in GUI).
+*   [ ] **Iterative Refinement:** Based on testing and feedback.
+*   [ ] **Finalize All Documentation:** `INSTALLATION.md`, `USAGE.md`, etc.
 
-### VIII. Cross-Cutting Concerns for Advanced Vision
-*   [ ] **Develop Comprehensive Simulation Environments for Advanced AI Systems.**
-*   [ ] **Establish Novel Benchmarks:** To evaluate capabilities beyond current AI tests (e.g., complex reasoning, autonomous discovery, AGI-like behaviors).
-*   [ ] **Address Extreme Computational & Data Scalability Challenges for Advanced AI.**
-*   [ ] **Ensure System-Wide Robustness, Security, and Resilience in Advanced AI.**
-*   [ ] **Develop Advanced Debugging & Observability Tools for Hyper-Complex AI.**
-*   [ ] **Continuously Research & Address Ethical, Societal, and Governance Implications of AGI-level Systems.**
-*   [ ] **Foster Global Collaboration & Standards for Safe AGI Development.**
+## Continuous Improvement (Ongoing)
 
-This TODO list will evolve significantly as research progresses and new challenges emerge, especially for the long-term advanced vision.
+*   [ ] **Establish Feedback Collection & Analysis Pipeline.**
+*   [ ] **Regularly Fine-tune/Update AVA Model:** With new data, techniques.
+*   [ ] **Expand Toolset & Agentic Capabilities.**
+*   [ ] **Monitor Performance Metrics.**
+*   [ ] **Engage with Community for Contributions.**
+
+This task list is a living document and will be updated as development progresses.

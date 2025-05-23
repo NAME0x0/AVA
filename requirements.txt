@@ -1,0 +1,55 @@
+# Core LLM & Optimization Libraries
+transformers
+# bitsandbytes # Installation can be OS-specific, see docs/INSTALLATION.md
+# torch # Installation is CUDA/CPU specific, see docs/INSTALLATION.md
+torchvision
+torchaudio
+peft
+trl
+unsloth
+datasets
+accelerate
+sentencepiece
+protobuf
+
+# Local LLM Management
+ollama
+
+# API Interaction (e.g., for teacher models, external tools)
+openai
+requests
+
+# CLI Development
+typer
+# or click
+
+# Web Server (if building custom AVA server beyond Ollama)
+# fastapi
+# uvicorn
+
+# Data Handling
+pandas
+numpy
+
+# Utilities
+python-dotenv
+PyYAML
+
+# LlamaIndex (for structured output, MCP ideas)
+# llama-index
+
+# Security/Tunneling (conceptual, not direct Python deps usually)
+# localtonet (service)
+# ngrok (service)
+
+# Testing
+# pytest
+# pytest-cov
+
+# Linters & Formatters (for development)
+# ruff
+# black
+# mypy
+
+# Note: Specific versions should be pinned once stable dependencies are established.
+# Example: transformers==4.38.2

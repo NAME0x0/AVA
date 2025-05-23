@@ -1,0 +1,12 @@
+# User-specific AVA Configuration
+# Copy this file to user_config.yaml and modify it with your settings.
+# This file will override settings in base_config.yaml and is .gitignored by default (should be).
+
+# Example: Override logging level for development
+# logging_level: DEBUG
+
+# Example: Specify a different Ollama model to use
+# default_ollama_model: "ava-agent-experimental:latest"
+
+# Example: User-specific API keys (though .env is preferred for secrets)
+# some_tool_api_key: "your_personal_api_key_for_tool_xyz" 
