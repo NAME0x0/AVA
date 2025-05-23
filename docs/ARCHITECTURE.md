@@ -1,75 +1,110 @@
-# AVA System Architecture - Visual Overview (v6 - Conceptual)
+# AVA System Architecture (Foundational)
 
-This document provides a conceptual visual representation of the AVA v6 ("Quantum & Neuro-Synergistic Apex") architecture. Due to the immense complexity and multi-dimensional nature of AVA, this diagram is a simplified, layered abstraction intended to illustrate the relationships between major components.
+**Current Focus:** This document outlines the architecture for the foundational version of AVA (Afsah's Virtual Assistant). This version prioritizes core functionality, reliability, and a solid framework for future enhancements.
 
-**Key:**
-* `==>` / `<==` / `<==>`: Major data/control flow
-* `-->` / `<--` / `<-->`: Internal component interaction or data flow
-* `(...)`: Notes or sub-components
+Our long-term vision for AVA is expansive and detailed in `docs/ARCHITECTURE_VISION.md` and `docs/STRUCTURE_VISION.md`.
 
-## Conceptual Diagram
+## I. Core Principles for Foundational AVA
 
-+------------------------------------------------------------------------------------------------------+
-|                                       EXTERNAL WORLD / USER INTERFACE                                |
-|                                (Natural Language, APIs, Sensors, Actuators)                          |
-+------------------------------------------------------------------------------------------------------+
-^                                                                                                      ^
-| Input/Queries                                        | Output/Actions                                |
-v                                                                                                      v
-+------------------------------------------------------------------------------------------------------+
-| VI. UNIFIED PERCEPTION & CREATION: DEEP MULTIMODAL & ENVIRONMENTAL FUSION                            |
-|   (Text, Image, Video, Audio, 3D, Real-time Sensor Streams, Neuromorphic Sensory Pre-processing)     |
-|   (Shared Generative Latent Space, State-of-the-Art Generative Capabilities)                         |
-+------------------------------------------------------------------------------------------------------+
-^                                          <==>                                         ^
-| Processed Input / Generation Requests      | Control/Data                             | Raw/Generated Outputv                                          <==>                                         v+------------------------------------------------------------------------------------------------------+| IV. STRATEGIC ORCHESTRATION CORE: SENTIENT META-CONTROLLER ||   (Advanced AI Planning, Meta-Reasoning, Quantum-Assisted Planning, "Sleeptime Compute" Orchestration)||   <------------------------------------------------------------------------------------------------>   ||   | Orchestrates & Coordinates All Layers Below                                                      |   |+------------------------------------------------------------------------------------------------------+|         |         |         |         |         || <==>    | <==>    | <==>    | <==>    | <==>    | <==> (Control & Tasking)v         v         v         v         v         v+-----------+ +-----------+ +-----------+ +-----------+ +-----------------+ +-----------------------+| III. MoA³| | II. MoE³ | | V. TOOLS | | I. BACKBONE| | VII. EVOLUTION| | SLEEPTIME COMPUTE || (Agents)  | | (Experts) | |(Ecosystem)| |(Hybrid Core)| |   (Self-Improve)| |   (Background Tasks)  |+-----------+ +-----------+ +-----------+ +-----------+ +-----------------+ +-----------------------+|         |         |                   |                   ||         |         |                   |                   ||         |         |                   |                   |+------v---------------------------------------+------v-------------------------------------------------+| III. COLLABORATIVE & REASONING NEXUS (MoA³)| II. SPECIALIZATION & SKILL MATRIX (MoE³) ||  (Mixture of Agents with Formal Verification) |   (Hyper-Dynamic Mixture of Evolving Experts)           ||  - Generalist LLM Agents                      |   - Fine-tuned LLMs, Compact NNs, SSMs                ||  - Neuro-Symbolic Agents                      |   - Neuro-Symbolic Modules, Modality Processors         ||  - Process-Supervised & Reflective Agents     |   - Neuromorphic Experts                              ||  - Formally Verifiable Agents (critical)      |   - Quantum-Inspired Algorithm Experts                ||  (Advanced Argumentation & Trust Mechanisms)  |   (Intelligent Routing & Self-Organizing Lifecycle)   ||  <--> Interaction with Tools & Backbone       |   <--> Activated by Meta-Controller, Uses Backbone    |+-----------------------------------------------+---------------------------------------------------------+^                                                                ^| Tasking/Data                                                   | Expert Activation/Data|                                                                || <-------------------- Shared Access & Control Flow ---------------------> ||                                                                |+------v----------------------------------------------------------------v---------------------------------+| I. CORE COGNITIVE BACKBONE: QUANTUM-ENHANCED HYBRID TRANSFORMER-SSM ||   (Ultra-Large Context Window: 3-7M+ Tokens)                                                           ||   - Advanced Transformer Architecture (FlashAttention-3/4+, Ring/Distributed Attention)                  ||   - Integrated State-Space Models (SSMs: Mamba/S7+ variants)                                           ||   - Advanced Positional Embeddings (RoPE, xPOS)                                                        ||   - Quantum-Hybrid Co-processors for Optimization (Attention, Graph Opt.)                              ||   - Dynamic Neural Topologies                                                                          |+----------------------------------------------------------------------------------------------------------+^                                                                     ^| Data Access / Model Execution                                       | Tool Invocation / Datav                                                                     v+-------------------------------------------------------------------------+ +---------------------------------+| V. EXTENDED COGNITION: SELF-EXPANDING, VERIFIABLE & FEDERATED TOOL ECOSYSTEM | | SLEEPTIME COMPUTE RESOURCES ||  - Vast Tool Library (APIs, Simulators, Databases)                      | |  (Managed by Meta-Controller)   ||  - Automated Tool Augmentation & Synthesis                              | |  - Intensive Learning Tasks     ||  - Rigorous Tool Output Verification                                    | |  - Expert Lifecycle Mgmt.       ||  - Federated Tool Learning & Adaptation                                 | |  - Exploratory Research         |+-------------------------------------------------------------------------+ +---------------------------------+^| Feedback & Data for Learningv+----------------------------------------------------------------------------------------------------------+| VII. PRINCIPLED EVOLUTION ENGINE: ITERATED OVERSIGHT, CONSTITUTIONAL AI & FORMAL ALIGNMENT ||  - Core Learning: RLHF/RLAIF, PRMs                                                                      ||  - Constitutional AI & Ethical Governance (IDA, Debate Mechanisms)                                      ||  - Formal Verification of Alignment Properties                                                          ||  - Active Curriculum & Knowledge Frontier Exploration (AI-Driven Scientific Discovery Cycle)            ||  - Self-Improving Data Pipelines                                                                        |+----------------------------------------------------------------------------------------------------------+
-## Layers and Key Interactions Explained:
+*   **Simplicity:** Employ straightforward and well-understood technologies.
+*   **Modularity:** Design components with clear responsibilities for easier development, testing, and future upgrades.
+*   **Practicability:** Focus on features that can be reliably implemented with current resources.
+*   **User-Centricity:** Prioritize a useful and intuitive user experience.
 
-1.  **External World / User Interface:** The entry and exit point for all interactions with AVA. This includes natural language, APIs for programmatic access, and potentially direct sensor input or actuator control if AVA interfaces with physical systems.
+## II. Foundational Architecture Overview
 
-2.  **Unified Perception & Creation (Multimodal Fusion):** This layer handles the initial processing of all incoming data from various modalities and the final generation of outputs. It translates diverse inputs into a common internal representation for the cognitive core and renders internal representations into rich, multimodal outputs. Neuromorphic pre-processing for sensor data happens here.
+The foundational AVA system is composed of the following key layers and components:
 
-3.  **Strategic Orchestration Core (Meta-Controller):** The central "brain" or conductor of AVA.
-    * It receives processed input/queries from the Perception layer.
-    * It performs high-level planning, task decomposition, and resource allocation.
-    * It decides which agents (MoA), experts (MoE), tools, or backbone capabilities to engage.
-    * It leverages quantum-assisted planning for highly complex scenarios.
-    * It manages the "Sleeptime Compute" resources for background tasks.
-    * It monitors overall system performance and initiates meta-reasoning or re-planning if necessary.
-    * It sends generation requests back to the Perception/Creation layer.
+```mermaid
+graph TD
+    A[User Interface (CLI / Web)] --> B{Command Parser};
+    B -- Text/Voice Input --> C[Interaction Manager];
+    C --> D{Core Logic & LLM Backend};
+    D --> E[Tool Interface];
+    E --> F[Weather API];
+    E --> G[Calendar API];
+    E --> H[Reminders (Local DB)];
+    E --> I[Computation Module];
+    E --> J[Time/Date Module];
+    F --> C;
+    G --> C;
+    H --> C;
+    I --> C;
+    J --> C;
+    C --> K[Response Formatter];
+    K -- Text/Voice Output --> A;
+    L[Logging Service] --> C;
+    L --> D;
+    L --> E;
+```
 
-4.  **Collaborative & Reasoning Nexus (MoA³):** A dynamic collection of specialized AI agents that perform complex reasoning, problem-solving, and collaborative tasks.
-    * Receives tasks from the Meta-Controller.
-    * Agents (Generalist, Neuro-Symbolic, Process-Supervised, Formally Verifiable) collaborate, critique, and refine solutions.
-    * Interacts heavily with the Tool Ecosystem and the Core Backbone for information and computation.
+**Layers & Components:**
 
-5.  **Specialization & Skill Matrix (MoE³):** A vast array of highly specialized expert models and algorithms.
-    * Activated by the Meta-Controller or specific agents to perform fine-grained tasks or provide specialized knowledge/computation (e.g., a neuromorphic expert for a specific pattern, a quantum-inspired algorithm for an optimization sub-problem).
-    * Relies on the Core Backbone for underlying computational power.
-    * Subject to lifecycle management (evolution, pruning) by the Principled Evolution Engine via Sleeptime Compute.
+1.  **User Interface (UI) Layer:**
+    *   **Description:** The primary point of interaction for the user.
+    *   **Initial Implementation:** Command-Line Interface (CLI) built with Python (e.g., using `argparse`).
+    *   **Potential Enhancement:** A simple web-based UI (e.g., using Flask or Streamlit).
+    *   **Interaction Modalities:**
+        *   **Text:** Direct text input.
+        *   **Voice (Optional):** Speech-to-Text (STT) for input and Text-to-Speech (TTS) for output, integrated via libraries like `SpeechRecognition` and `gTTS` or `pyttsx3`.
 
-6.  **Core Cognitive Backbone (Hybrid Transformer-SSM):** The fundamental engine for sequence processing, representation learning, and large-scale computation.
-    * Provides the massive context window and core processing power for all higher-level functions (MoA, MoE, Meta-Controller).
-    * Integrates classical (Transformer/SSM) and quantum-hybrid co-processors.
-    * Its dynamic neural topology allows for structural adaptation over time.
+2.  **Command Parser:**
+    *   **Description:** Interprets user input to determine intent and extract relevant information.
+    *   **Implementation:**
+        *   **Rule-Based Matching:** Uses regular expressions or keyword spotting for predefined commands (e.g., "What is the weather?", "Set a reminder").
+        *   **Natural Language Understanding (NLU) Fallback:** For more complex or ambiguous queries, the input can be passed to the Core Logic & LLM Backend for intent extraction and entity recognition.
 
-7.  **Extended Cognition (Tool Ecosystem):** Provides AVA with access to external knowledge, real-world data, and specialized functionalities not built into its core.
-    * Used by agents (MoA) and potentially the Meta-Controller.
-    * Subject to self-expansion and federated learning.
+3.  **Interaction Manager:**
+    *   **Description:** Orchestrates the flow of information between the UI, Core Logic, and Tools. It routes parsed commands to the appropriate backend components and ensures responses are delivered back to the user.
+    *   **Implementation:** Python-based logic.
 
-8.  **Principled Evolution Engine:** Drives AVA's continuous learning, adaptation, self-improvement, and adherence to its ethical constitution.
-    * Receives feedback from all layers (user interactions, agent performance, tool usage, internal monitoring).
-    * Implements Constitutional AI, RLHF/RLAIF, PRMs, and active curriculum learning.
-    * Guides the AI-Driven Scientific Discovery Cycle and manages self-improving data pipelines.
-    * Many of its intensive processes utilize "Sleeptime Compute."
+4.  **Core Logic & LLM Backend:**
+    *   **Description:** The "brain" of the foundational AVA. It handles general queries, conversation management, and directs tasks to specific tools when needed.
+    *   **Implementation:**
+        *   **Large Language Model (LLM):** Leverages a pre-trained LLM (e.g., via OpenAI API, Anthropic API, or a locally hosted model via Ollama).
+        *   **System Prompt:** A carefully defined system prompt guides the LLM's persona, tone (polite, helpful, concise), and basic operational guidelines.
+        *   **Session Management (Basic):** Maintains a short history of the conversation for contextual understanding.
 
-9.  **Sleeptime Compute Resources:** An underlying pool of computational capacity managed by the Meta-Controller for non-real-time, intensive background tasks essential for AVA's long-term growth and optimization (e.g., training reward models, evolving experts, large-scale data analysis, active discovery experiments).
+5.  **Tool Interface & Modules:**
+    *   **Description:** A standardized way for the Core Logic to interact with various tools that provide specific functionalities.
+    *   **Implementation:** Each tool is a Python module with a defined interface.
+    *   **Initial Tools:**
+        *   **Weather Tool:** Connects to a public weather API (e.g., OpenWeatherMap) to fetch weather information.
+        *   **Calendar Tool:** Integrates with a calendar service (e.g., Google Calendar API) to manage events.
+        *   **Reminders Tool:** Stores and retrieves reminders, potentially using a local SQLite database or a simple file (e.g., JSON).
+        *   **Computation Tool:** Handles basic mathematical calculations (either via LLM or a safe local evaluation method).
+        *   **Time/Date Tool:** Provides current time and date information using Python's `datetime` module.
 
-## Limitations of this Diagram
+6.  **Response Formatter:**
+    *   **Description:** Takes the output from the Core Logic or Tools and formats it into a user-friendly textual (or speech) response.
+    *   **Implementation:** Python-based string formatting and logic.
 
-* **Static Representation:** This diagram is static, while AVA is envisioned as an extremely dynamic and adaptive system.
-* **Dimensionality:** It's difficult to represent the richness of connections and the multi-layered interactions in a 2D textual format. Many components have connections to multiple other components not explicitly drawn as direct lines to maintain clarity.
-* **Scale:** The sheer number of experts, agents, and the complexity of their interactions are hard to convey visually here.
-* **Feedback Loops:** While implied, the intricate feedback loops between all layers (especially to the Evolution Engine and Meta-Controller) are simplified.
+7.  **Logging Service:**
+    *   **Description:** Records key interactions, errors, and system events for debugging and monitoring.
+    *   **Implementation:** Utilizes Python's `logging` module to write to log files.
 
-This visual overview should be used in conjunction with the detailed [STRUCTURE.md](./STRUCTURE.md) document for a fuller understanding of the AVA v6 architecture.
+## III. Data Flow Example (Weather Query)
+
+1.  User types: "What's the weather like in London?" (or speaks it via STT).
+2.  Command Parser identifies "weather" intent and "London" as the location.
+3.  Interaction Manager routes this to the Core Logic.
+4.  Core Logic, via the Tool Interface, calls the Weather Tool with "London".
+5.  Weather Tool queries the OpenWeatherMap API.
+6.  API returns weather data for London.
+7.  Weather Tool processes data and returns it to the Core Logic.
+8.  Core Logic passes the processed data to the Response Formatter.
+9.  Response Formatter creates a sentence like: "The current weather in London is..."
+10. UI displays the text (or speaks it via TTS).
+11. Logging Service records the transaction.
+
+## IV. Technology Stack (Foundational)
+
+*   **Primary Language:** Python
+*   **LLM Interaction:** APIs (OpenAI, Anthropic) or local via Ollama.
+*   **CLI:** Python's `argparse`.
+*   **Web UI (Optional):** Flask, Streamlit.
+*   **Databases (for Reminders):** SQLite (initially).
+*   **APIs:** Standard HTTP request libraries (e.g., `requests` in Python).
+*   **Voice (Optional):** `SpeechRecognition`, `gTTS`, `pyttsx3`.
+
+This foundational architecture provides a robust starting point for AVA, focusing on delivering core assistant functionalities effectively. Future iterations will build upon this base to incorporate more advanced features progressively. 
