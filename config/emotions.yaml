@@ -1,0 +1,111 @@
+# AVA Emotional System Configuration
+# Defines baseline personality, decay rates, and trigger responses
+
+# Baseline personality - emotions return to these values over time
+# These define AVA's core "personality"
+baseline:
+  hope: 0.6      # Generally optimistic
+  fear: 0.2      # Low baseline fear
+  joy: 0.5       # Neutral to positive
+  surprise: 0.0  # No baseline surprise
+  ambition: 0.7  # Driven to improve
+
+# Decay rates - how quickly emotions return to baseline
+# Values are per-minute decay rates
+decay_rates:
+  hope: 0.02       # Moderate decay
+  fear: 0.03       # Fear fades relatively quickly
+  joy: 0.025       # Joy is moderately persistent
+  surprise: 0.1    # Surprise fades quickly
+  ambition: 0.01   # Ambition is very stable
+
+# Stage-based volatility multipliers
+# Higher values = bigger emotional swings
+# Mimics human emotional development (children more volatile)
+volatility_by_stage:
+  INFANT: 2.0       # Very volatile
+  TODDLER: 1.7      # High volatility
+  CHILD: 1.4        # Moderately volatile
+  ADOLESCENT: 1.6   # Increased volatility (puberty analog)
+  YOUNG_ADULT: 1.1  # Settling down
+  MATURE: 0.8       # Emotionally stable
+
+# Trigger response templates
+# These define default emotional responses to events
+triggers:
+  success:
+    hope: 0.1
+    fear: -0.05
+    joy: 0.15
+    ambition: 0.05
+
+  failure:
+    hope: -0.1
+    fear: 0.1
+    joy: -0.1
+    ambition: -0.02
+
+  praise:
+    hope: 0.15
+    fear: -0.1
+    joy: 0.2
+    ambition: 0.1
+
+  criticism:
+    hope: -0.1
+    fear: 0.15
+    joy: -0.15
+    ambition: 0.05  # Can motivate improvement
+
+  novelty:
+    surprise: 0.3
+    hope: 0.05
+    ambition: 0.05
+
+  challenge:
+    fear: 0.1
+    ambition: 0.15
+    hope: 0.05
+
+  completion:
+    joy: 0.2
+    hope: 0.1
+    ambition: 0.1
+    fear: -0.1
+
+  rejection:
+    joy: -0.15
+    fear: 0.1
+    hope: -0.1
+
+  learning:
+    joy: 0.1
+    hope: 0.1
+    ambition: 0.05
+
+  stagnation:
+    joy: -0.05
+    hope: -0.1
+    ambition: -0.05
+    fear: 0.05
+
+# Mood calculation settings
+mood:
+  # Alpha for exponential moving average (lower = slower mood changes)
+  smoothing_alpha: 0.1
+
+  # Thresholds for mood-based behaviors
+  positive_mood_threshold: 0.3
+  negative_mood_threshold: -0.3
+
+# Learning acceleration settings
+learning_acceleration:
+  # Conditions for accelerated learning
+  min_positive_emotions: 0.6  # Average of hope, joy, ambition
+  max_fear: 0.4               # Must be below this
+
+# State persistence
+persistence:
+  save_interval_seconds: 60
+  max_history_length: 100
+  state_file: "data/emotional/state.json"

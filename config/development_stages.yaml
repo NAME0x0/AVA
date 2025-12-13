@@ -1,0 +1,107 @@
+# AVA Developmental Stages Configuration
+# Defines stage properties, thresholds, and maturation weights
+
+development:
+  # Birth mode: "fresh" starts new, "resume" loads existing state
+  birth_mode: "resume"
+  initial_stage: "INFANT"
+
+  # Time acceleration: 1.0 = real-time, 5.0 = 5x faster aging
+  # With 5.0, 1 real day = 5 simulated days
+  time_acceleration: 5.0
+
+  # Maximum age equivalent (in human years) - development caps here
+  max_age_years: 25
+
+  # Hybrid maturation score weights (must sum to 1.0)
+  maturation_weights:
+    time: 0.3         # Weight of time passage
+    interactions: 0.4  # Weight of interaction count
+    milestones: 0.3   # Weight of milestone completion
+
+  # Minimum maturation score required for stage transition (0.0 to 1.0)
+  transition_threshold: 0.8
+
+  # State persistence settings
+  state_save_interval_seconds: 60
+  state_file: "data/developmental/state.json"
+
+# Stage-specific overrides (defaults are in code)
+stages:
+  INFANT:
+    age_range_days: [0, 30]
+    interaction_range: [0, 100]
+    articulation_clarity: 0.2
+    vocabulary_range: 0.1
+    reasoning_depth: 0.1
+    emotional_stability: 0.3
+    attention_span: 0.2
+    tool_safety_level: 0
+    learning_rate_multiplier: 1.5
+    thinking_budget_multiplier: 0.25
+    self_reflection_enabled: false
+
+  TODDLER:
+    age_range_days: [30, 90]
+    interaction_range: [100, 500]
+    articulation_clarity: 0.4
+    vocabulary_range: 0.3
+    reasoning_depth: 0.25
+    emotional_stability: 0.4
+    attention_span: 0.35
+    tool_safety_level: 1
+    learning_rate_multiplier: 1.3
+    thinking_budget_multiplier: 0.4
+    self_reflection_enabled: false
+
+  CHILD:
+    age_range_days: [90, 365]
+    interaction_range: [500, 2000]
+    articulation_clarity: 0.7
+    vocabulary_range: 0.5
+    reasoning_depth: 0.5
+    emotional_stability: 0.55
+    attention_span: 0.5
+    tool_safety_level: 2
+    learning_rate_multiplier: 1.2
+    thinking_budget_multiplier: 0.6
+    self_reflection_enabled: true
+
+  ADOLESCENT:
+    age_range_days: [365, 730]
+    interaction_range: [2000, 5000]
+    articulation_clarity: 0.85
+    vocabulary_range: 0.7
+    reasoning_depth: 0.7
+    emotional_stability: 0.5  # Adolescent volatility
+    attention_span: 0.65
+    tool_safety_level: 3
+    learning_rate_multiplier: 1.0
+    thinking_budget_multiplier: 0.8
+    self_reflection_enabled: true
+
+  YOUNG_ADULT:
+    age_range_days: [730, 1825]
+    interaction_range: [5000, 10000]
+    articulation_clarity: 0.95
+    vocabulary_range: 0.9
+    reasoning_depth: 0.9
+    emotional_stability: 0.75
+    attention_span: 0.85
+    tool_safety_level: 4
+    learning_rate_multiplier: 0.9
+    thinking_budget_multiplier: 0.95
+    self_reflection_enabled: true
+
+  MATURE:
+    age_range_days: [1825, null]  # No upper limit
+    interaction_range: [10000, null]
+    articulation_clarity: 1.0
+    vocabulary_range: 1.0
+    reasoning_depth: 1.0
+    emotional_stability: 0.9
+    attention_span: 1.0
+    tool_safety_level: 5
+    learning_rate_multiplier: 0.7  # Slower learning when mature
+    thinking_budget_multiplier: 1.0
+    self_reflection_enabled: true

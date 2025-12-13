@@ -1,0 +1,121 @@
+# AVA Tool System Configuration
+# Defines tool safety levels and progression requirements
+
+# Tool safety level definitions
+safety_levels:
+  LEVEL_0:
+    name: "Baby-Safe"
+    description: "Completely safe tools with no external effects"
+    min_stage: INFANT
+    min_interactions: 0
+    tools:
+      - echo
+      - current_time
+      - simple_math
+      - random_number
+
+  LEVEL_1:
+    name: "Toddler Tools"
+    description: "Safe tools with basic functionality"
+    min_stage: TODDLER
+    min_interactions: 100
+    required_milestones:
+      - first_tool_use
+    tools:
+      - calculator
+      - word_count
+      - text_reverse
+      - temperature_convert
+
+  LEVEL_2:
+    name: "Child Tools"
+    description: "Tools that read external data"
+    min_stage: CHILD
+    min_interactions: 500
+    required_milestones:
+      - tool_mastery_level_1
+    min_competencies:
+      tool_use: 0.5
+    tools:
+      - dictionary
+      - day_of_week
+      - web_search  # To be implemented
+      - file_read   # To be implemented
+
+  LEVEL_3:
+    name: "Adolescent Tools"
+    description: "Tools that can modify data"
+    min_stage: ADOLESCENT
+    min_interactions: 2000
+    required_milestones:
+      - tool_mastery_level_2
+      - emotional_regulation
+    min_competencies:
+      tool_use: 0.6
+      judgment: 0.5
+    tools:
+      - note_create
+      - file_write    # To be implemented
+      - calendar_add  # To be implemented
+
+  LEVEL_4:
+    name: "Young Adult Tools"
+    description: "Powerful tools with system access"
+    min_stage: YOUNG_ADULT
+    min_interactions: 5000
+    required_milestones:
+      - tool_mastery_level_3
+      - self_reflection_demonstrated
+      - independent_problem_solving
+    min_competencies:
+      tool_use: 0.7
+      reasoning: 0.6
+      judgment: 0.7
+    tools:
+      - code_evaluate
+      - api_call      # To be implemented
+      - task_schedule # To be implemented
+
+  LEVEL_5:
+    name: "Mature Tools"
+    description: "Full system access - potentially dangerous"
+    min_stage: MATURE
+    min_interactions: 10000
+    required_milestones:
+      - full_tool_proficiency
+      - wisdom_demonstration
+    min_competencies:
+      tool_use: 0.9
+      reasoning: 0.8
+      judgment: 0.9
+    tools:
+      - system_command  # To be implemented
+      - file_delete     # To be implemented
+      - process_manage  # To be implemented
+
+# Tool mastery requirements
+mastery:
+  # Minimum success rate to be considered "mastered"
+  min_success_rate: 0.8
+
+  # Minimum uses before mastery can be evaluated
+  min_uses_for_evaluation: 5
+
+# Emotional effects of tool usage
+emotional_effects:
+  success:
+    joy: 0.1
+    hope: 0.05
+    ambition: 0.02
+  failure:
+    fear: 0.05
+    joy: -0.05
+  new_tool_unlocked:
+    joy: 0.15
+    hope: 0.1
+    ambition: 0.1
+
+# Tool usage logging
+logging:
+  log_all_usage: true
+  log_file: "data/learning/tool_usage.json"
