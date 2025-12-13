@@ -1,0 +1,120 @@
+# AVA Learning System Configuration
+# Defines fine-tuning triggers, QLoRA settings, and learning parameters
+
+# Fine-tuning triggers - when to initiate training
+triggers:
+  sample_threshold: 100      # Minimum samples to trigger
+  time_threshold_days: 7     # Days between automatic training
+  stage_transition_min_samples: 30  # Minimum for stage transition trigger
+  emotional_boost_threshold:
+    ambition: 0.7
+    joy: 0.6
+    min_samples: 30
+  performance_drop_threshold: 0.5  # Success rate threshold
+
+# Sample quality thresholds
+quality:
+  # Minimum quality to include in training
+  min_quality: "neutral"  # "excellent", "good", "neutral", "poor", "bad"
+  
+  # Learning weights by quality
+  weights:
+    excellent: 2.0
+    good: 1.5
+    neutral: 1.0
+    poor: 0.5
+    bad: 0.3
+  
+  # Correction multiplier (corrections are highly valuable)
+  correction_multiplier: 2.0
+
+# QLoRA configuration
+qlora:
+  # LoRA parameters
+  lora_r: 8
+  lora_alpha: 16
+  lora_dropout: 0.1
+  target_modules:
+    - "q_proj"
+    - "v_proj"
+  
+  # Training parameters
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 0.0002
+  num_epochs: 3
+  warmup_ratio: 0.1
+  max_seq_length: 512
+  
+  # 4-bit quantization settings
+  use_4bit: true
+  bnb_4bit_compute_dtype: "float16"
+  bnb_4bit_quant_type: "nf4"
+  use_double_quant: true
+
+# Continual learning settings
+continual:
+  # Sample buffer
+  max_buffer_size: 100
+  
+  # Persistence
+  auto_flush_interval_seconds: 300
+  
+  # Event tracking
+  max_events_in_memory: 1000
+
+# Nested learning context settings
+nested:
+  # Maximum observations per context
+  max_observations: 100
+  
+  # Maximum insights per context
+  max_insights: 50
+  
+  # Session auto-close after inactivity (seconds)
+  session_timeout: 3600
+  
+  # Propagation settings
+  propagate_observations: true
+  propagate_insights: true
+  propagate_outcomes: true
+
+# Learning rate modulation by developmental stage
+# These multiply the base learning rate
+stage_learning_rates:
+  INFANT: 1.5       # Learn fastest as an infant
+  TODDLER: 1.3
+  CHILD: 1.2
+  ADOLESCENT: 1.0
+  YOUNG_ADULT: 0.9
+  MATURE: 0.7       # Learning slows at maturity
+
+# Emotional modulation of learning
+emotional_modulation:
+  # How emotions affect learning rate
+  hope:
+    learning_boost: 0.2    # +20% learning
+    enabled: true
+  fear:
+    learning_penalty: 0.3  # -30% learning
+    enabled: true
+  joy:
+    learning_boost: 0.15   # +15% learning
+    enabled: true
+  surprise:
+    temporary_boost: 0.5   # +50% for short time
+    decay_seconds: 60
+    enabled: true
+  ambition:
+    learning_boost: 0.25   # +25% learning
+    enabled: true
+
+# Memory integration settings
+memory_integration:
+  # Use episodic memories in training context
+  include_episodic: true
+  max_episodic_per_sample: 3
+  
+  # Use semantic memories for knowledge grounding
+  include_semantic: true
+  max_semantic_per_sample: 5

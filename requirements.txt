@@ -1,53 +1,42 @@
-# AVA - Afsah's Virtual Assistant
-# Core dependencies for local agentic AI on RTX A2000 4GB VRAM
-# Production-ready versions with security and compatibility considerations
+# AVA - Developmental AI
+# An AI that learns and grows like a human child
+# Dependencies for developmental, emotional, memory, and learning systems
 
 # ============================================================================
-# Core LLM & Optimization Libraries (Critical for 4GB VRAM constraint)
+# Core Dependencies
 # ============================================================================
-transformers>=4.38.0,<5.0.0
-torch>=2.1.0  # CUDA support - see docs/INSTALLATION.md for specific installation
-torchvision>=0.16.0
-torchaudio>=2.1.0
-
-# PEFT & Quantization (Essential for QLoRA and 4-bit optimization)
-peft>=0.8.0,<1.0.0
-trl>=0.7.0,<1.0.0
-bitsandbytes>=0.42.0  # Critical for 4-bit quantization
-accelerate>=0.25.0,<1.0.0
-datasets>=2.16.0,<3.0.0
-
-# Fast fine-tuning optimization
-unsloth>=2024.1.1
-
-# Tokenization and serialization
-sentencepiece>=0.1.99,<1.0.0
-protobuf>=3.20.0,<5.0.0
+python-dateutil>=2.8.0
+pyyaml>=6.0
 
 # ============================================================================
-# Local LLM Management & Serving
+# LLM Integration (Ollama)
 # ============================================================================
-ollama>=0.1.7,<1.0.0
+httpx>=0.27.0,<1.0.0  # Async HTTP client for Ollama API
 
 # ============================================================================
-# API Interaction & External Tools
+# CLI & User Interface
 # ============================================================================
-openai>=1.12.0,<2.0.0  # For teacher models and API-based tools
-requests>=2.31.0,<3.0.0
-httpx>=0.27.0,<1.0.0  # Alternative to requests with async support
-
-# ============================================================================
-# CLI Development & User Interface
-# ============================================================================
-typer[all]>=0.9.0,<1.0.0
+typer>=0.9.0,<1.0.0
 rich>=13.7.0,<14.0.0  # Enhanced CLI output and formatting
-click>=8.1.0,<9.0.0  # Alternative CLI framework (if needed)
 
 # ============================================================================
-# Web Server (for custom AVA server beyond Ollama)
+# Fine-Tuning & Learning (Optional - for QLoRA training)
 # ============================================================================
-fastapi>=0.109.0,<1.0.0
-uvicorn[standard]>=0.27.0,<1.0.0
+# Uncomment these if you want to run local fine-tuning:
+# torch>=2.1.0
+# transformers>=4.38.0,<5.0.0
+# peft>=0.8.0,<1.0.0
+# bitsandbytes>=0.42.0
+# accelerate>=0.25.0,<1.0.0
+# datasets>=2.16.0,<3.0.0
+
+# ============================================================================
+# Testing & Development
+# ============================================================================
+pytest>=7.4.0
+pytest-asyncio>=0.23.0
+pytest-cov>=4.1.0
+
 pydantic>=2.5.0,<3.0.0  # Data validation and structured output
 sse-starlette>=1.8.0,<2.0.0  # Server-sent events for token streaming
 
