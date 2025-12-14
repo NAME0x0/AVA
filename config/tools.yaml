@@ -119,3 +119,146 @@ emotional_effects:
 logging:
   log_all_usage: true
   log_file: "data/learning/tool_usage.json"
+
+# =============================================================================
+# TOOLFORMER CONFIGURATION
+# =============================================================================
+# Reference: "Toolformer: Language Models Teach Themselves to Use Tools" (2023)
+#
+# Enables autonomous tool recognition, execution, and self-distillation.
+# The model learns when to call tools without explicit training.
+# =============================================================================
+
+toolformer:
+  # Enable Toolformer-style self-distillation
+  enabled: true
+  
+  # Auto-detection of tool opportunities
+  auto_detect: true
+  
+  # Quality threshold for distillation
+  # Only collect tool-augmented samples with quality >= this value
+  quality_threshold: 0.6
+  
+  # Maximum distillation samples to store
+  max_distillation_samples: 1000
+  
+  # Tool call syntax patterns recognized
+  # Model can output these patterns to trigger tools
+  call_patterns:
+    - "[ToolName: arguments]"
+    - "[ToolName(arguments)]"
+  
+  # Tools available for Toolformer augmentation
+  # Each tool has detection patterns and execution details
+  tools:
+    calculator:
+      enabled: true
+      detection_patterns:
+        - "\\d+\\s*[\\+\\-\\*\\/]\\s*\\d+"
+        - "calculate|compute|sum|multiply"
+        - "how much is|what is \\d+"
+      safety_level: 1  # TODDLER
+      description: "Performs mathematical calculations"
+    
+    current_time:
+      enabled: true
+      detection_patterns:
+        - "what time|current time"
+        - "what day|today|date"
+      safety_level: 0  # INFANT
+      description: "Returns current date and time"
+    
+    search:
+      enabled: true
+      detection_patterns:
+        - "who is|what is|where is"
+        - "tell me about|information about"
+        - "define|meaning of"
+      safety_level: 2  # CHILD
+      description: "Searches for information"
+    
+    qa:
+      enabled: true
+      detection_patterns:
+        - "what does .+ mean"
+        - "explain .+ to me"
+        - "how does .+ work"
+      safety_level: 2  # CHILD
+      description: "Answers factual questions"
+    
+    dictionary:
+      enabled: true
+      detection_patterns:
+        - "define|definition"
+        - "meaning of|what does .+ mean"
+      safety_level: 2  # CHILD
+      description: "Provides word definitions"
+    
+    temperature_convert:
+      enabled: true
+      detection_patterns:
+        - "celsius|fahrenheit|kelvin"
+        - "convert .+ degrees"
+      safety_level: 1  # TODDLER
+      description: "Converts temperature units"
+    
+    word_count:
+      enabled: true
+      detection_patterns:
+        - "how many words|word count"
+        - "count words|characters"
+      safety_level: 1  # TODDLER
+      description: "Counts words or characters"
+  
+  # Self-distillation settings
+  distillation:
+    # Collect samples after this many interactions
+    collection_start: 50
+    
+    # How often to create training batches (interactions)
+    batch_interval: 100
+    
+    # Batch size for distillation training
+    batch_size: 32
+    
+    # Weight for distillation loss vs. standard loss
+    loss_weight: 0.3
+    
+    # Minimum improvement required to keep sample
+    min_improvement_threshold: 0.05
+  
+  # Perplexity estimation settings
+  perplexity_estimation:
+    # Estimate perplexity reduction from tool use
+    enabled: true
+    
+    # Threshold for considering augmentation beneficial
+    reduction_threshold: 0.05
+
+# =============================================================================
+# TOOL AUGMENTATION EXAMPLES
+# =============================================================================
+# These examples show how the model should use tools in responses.
+# Used for few-shot learning and quality assessment.
+# =============================================================================
+
+tool_examples:
+  calculator:
+    - input: "What is 15 + 27?"
+      expected_output: "Let me calculate that. [Calculator: 15+27] = 42. So 15 + 27 equals 42."
+    
+    - input: "If I have 120 apples and give away 35, how many do I have left?"
+      expected_output: "I'll calculate this for you. [Calculator: 120-35] = 85. You would have 85 apples left."
+  
+  current_time:
+    - input: "What time is it?"
+      expected_output: "[current_time:] = 2:30 PM, December 14, 2025. It's currently 2:30 PM."
+  
+  search:
+    - input: "Who was Marie Curie?"
+      expected_output: "[Search: Marie Curie] = Polish-French physicist and chemist, pioneer in radioactivity research, first woman to win Nobel Prize. Marie Curie was a pioneering scientist who discovered polonium and radium."
+  
+  dictionary:
+    - input: "What does 'ephemeral' mean?"
+      expected_output: "[Dictionary: ephemeral] = lasting for a very short time. 'Ephemeral' means something that is brief or fleeting, lasting only for a short period.

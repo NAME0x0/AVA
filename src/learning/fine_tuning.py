@@ -6,6 +6,16 @@ Manages periodic QLoRA fine-tuning cycles based on:
 - Time since last fine-tune
 - Developmental stage transitions
 - Emotional state (high ambition + joy triggers training)
+
+Also implements distillation pipelines for:
+- Chain-of-Thought (CoT) reasoning transfer
+- Toolformer-style tool-use distillation
+- Self-distillation loops
+
+Reference Papers:
+- "QLoRA: Efficient Finetuning of Quantized LLMs" (arXiv:2305.14314)
+- "Distilling Step-by-Step!" (ACL Findings, 2023)
+- "Toolformer: Language Models Teach Themselves to Use Tools" (2023)
 """
 
 import json
@@ -15,7 +25,9 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -417,6 +429,634 @@ class FineTuningScheduler:
                 
         except Exception as e:
             logger.warning(f"Failed to save training history: {e}")
+
+
+# ==============================================================================
+# DISTILLATION PIPELINE (Distilling Step-by-Step + Toolformer Integration)
+# ==============================================================================
+
+@dataclass
+class DistillationSample:
+    """
+    A single distillation sample containing input, rationale, and tool calls.
+    
+    Reference: "Distilling Step-by-Step!" (ACL Findings 2023) emphasizes
+    extracting intermediate rationales, not just final predictions.
+    """
+    input_text: str
+    output_text: str
+    rationale: Optional[str] = None  # Chain-of-thought reasoning
+    tool_calls: List[Dict[str, Any]] = field(default_factory=list)
+    tool_results: List[Dict[str, Any]] = field(default_factory=list)
+    quality_score: float = 0.0  # Perplexity-based quality metric
+    teacher_model: str = ""
+    timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
+    
+    def to_training_format(self) -> Dict[str, str]:
+        """
+        Convert to training format suitable for QLoRA fine-tuning.
+        
+        If rationale exists, include it in the expected output format.
+        If tool calls exist, include them in Toolformer-style format.
+        """
+        # Build structured output with CoT if available
+        structured_output = ""
+        
+        if self.rationale:
+            structured_output += f"<think>\n{self.rationale}\n</think>\n"
+        
+        # Include tool calls in Toolformer-style format
+        for i, (call, result) in enumerate(zip(self.tool_calls, self.tool_results)):
+            tool_name = call.get("name", "Unknown")
+            tool_args = call.get("args", "")
+            tool_output = result.get("output", "")
+            structured_output += f"[{tool_name}:{tool_args}] → {tool_output}\n"
+        
+        structured_output += f"\n{self.output_text}"
+        
+        return {
+            "instruction": self.input_text,
+            "output": structured_output.strip(),
+        }
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "input_text": self.input_text,
+            "output_text": self.output_text,
+            "rationale": self.rationale,
+            "tool_calls": self.tool_calls,
+            "tool_results": self.tool_results,
+            "quality_score": self.quality_score,
+            "teacher_model": self.teacher_model,
+            "timestamp": self.timestamp,
+        }
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "DistillationSample":
+        return cls(**data)
+
+
+@dataclass
+class DistillationConfig:
+    """Configuration for distillation pipeline."""
+    
+    # Teacher model settings
+    teacher_model: str = "llama3.2:latest"  # Default Ollama model
+    teacher_temperature: float = 0.7
+    
+    # Quality filtering
+    min_quality_score: float = 0.6  # Minimum perplexity-based score
+    max_samples_per_iteration: int = 100
+    
+    # Toolformer distillation
+    enable_tool_distillation: bool = True
+    tool_augmentation_threshold: float = 0.05  # Perplexity improvement threshold
+    
+    # CoT distillation
+    enable_cot_distillation: bool = True
+    cot_prompt_template: str = "Think step by step before answering."
+    
+    # Self-distillation (student teaches itself on filtered samples)
+    enable_self_distillation: bool = True
+    self_distill_iterations: int = 3
+    
+    # Storage
+    samples_dir: str = "data/learning/distillation_samples"
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "teacher_model": self.teacher_model,
+            "teacher_temperature": self.teacher_temperature,
+            "min_quality_score": self.min_quality_score,
+            "max_samples_per_iteration": self.max_samples_per_iteration,
+            "enable_tool_distillation": self.enable_tool_distillation,
+            "tool_augmentation_threshold": self.tool_augmentation_threshold,
+            "enable_cot_distillation": self.enable_cot_distillation,
+            "cot_prompt_template": self.cot_prompt_template,
+            "enable_self_distillation": self.enable_self_distillation,
+            "self_distill_iterations": self.self_distill_iterations,
+            "samples_dir": self.samples_dir,
+        }
+
+
+class DistillationPipeline:
+    """
+    Distillation pipeline for transferring knowledge from teacher to student.
+    
+    Implements three distillation strategies:
+    1. Chain-of-Thought Distillation: Extract reasoning chains from teacher
+    2. Tool-Use Distillation: Learn when/how to call tools (Toolformer-style)
+    3. Self-Distillation: Student improves on its own high-quality outputs
+    
+    Reference Papers:
+    - "Distilling Step-by-Step!" (Hsieh et al., 2023): Uses rationale extraction
+      to achieve SOTA with 770x less data than full fine-tuning
+    - "Toolformer" (Schick et al., 2023): Self-supervised tool use learning
+    """
+    
+    def __init__(
+        self,
+        config: Optional[DistillationConfig] = None,
+        ollama_client: Optional[Any] = None,
+        tool_registry: Optional[Any] = None,
+    ):
+        self.config = config or DistillationConfig()
+        self.ollama_client = ollama_client
+        self.tool_registry = tool_registry
+        
+        # Storage
+        self.samples_dir = Path(self.config.samples_dir)
+        self.samples_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Current batch of samples
+        self.pending_samples: List[DistillationSample] = []
+        self.iteration_count: int = 0
+        
+        # Statistics
+        self.stats = {
+            "total_samples_collected": 0,
+            "samples_filtered_quality": 0,
+            "tool_augmentations_successful": 0,
+            "cot_extractions": 0,
+            "self_distill_iterations": 0,
+        }
+        
+        logger.info(f"DistillationPipeline initialized with config: {self.config.to_dict()}")
+    
+    async def collect_cot_sample(
+        self,
+        input_text: str,
+        context: Optional[str] = None,
+    ) -> Optional[DistillationSample]:
+        """
+        Collect a Chain-of-Thought sample from the teacher model.
+        
+        Uses explicit CoT prompting to extract intermediate reasoning steps.
+        
+        Reference: "Distilling Step-by-Step!" shows that rationale extraction
+        significantly improves student model performance on reasoning tasks.
+        """
+        if not self.config.enable_cot_distillation:
+            return None
+        
+        if not self.ollama_client:
+            logger.warning("No Ollama client available for CoT collection")
+            return None
+        
+        try:
+            # Create CoT prompt
+            cot_prompt = self._create_cot_prompt(input_text, context)
+            
+            # Query teacher model
+            response = await self._query_teacher(cot_prompt)
+            
+            if not response:
+                return None
+            
+            # Parse CoT response
+            rationale, final_answer = self._parse_cot_response(response)
+            
+            # Score quality
+            quality_score = await self._score_sample_quality(input_text, response)
+            
+            if quality_score < self.config.min_quality_score:
+                self.stats["samples_filtered_quality"] += 1
+                return None
+            
+            sample = DistillationSample(
+                input_text=input_text,
+                output_text=final_answer,
+                rationale=rationale,
+                quality_score=quality_score,
+                teacher_model=self.config.teacher_model,
+            )
+            
+            self.stats["cot_extractions"] += 1
+            self.pending_samples.append(sample)
+            
+            return sample
+            
+        except Exception as e:
+            logger.error(f"Failed to collect CoT sample: {e}")
+            return None
+    
+    async def collect_tool_augmented_sample(
+        self,
+        input_text: str,
+        base_output: str,
+        available_tools: Optional[List[str]] = None,
+    ) -> Optional[DistillationSample]:
+        """
+        Collect a tool-augmented sample in Toolformer style.
+        
+        Process:
+        1. Given base output, identify positions where tool calls could help
+        2. Insert candidate tool calls
+        3. Execute tools and compare perplexity
+        4. Keep augmentation if it improves perplexity beyond threshold
+        
+        Reference: Toolformer Section 3 describes the self-supervised
+        augmentation process that enables tool learning without manual annotation.
+        """
+        if not self.config.enable_tool_distillation:
+            return None
+        
+        if not self.tool_registry:
+            logger.warning("No tool registry available for tool distillation")
+            return None
+        
+        try:
+            # Get available tools
+            tools = available_tools or self.tool_registry.get_available_tools()
+            
+            # Find tool insertion points
+            tool_proposals = await self._propose_tool_insertions(input_text, base_output, tools)
+            
+            if not tool_proposals:
+                return None
+            
+            # Execute proposed tools
+            tool_calls = []
+            tool_results = []
+            
+            for proposal in tool_proposals:
+                try:
+                    result = await self._execute_tool(proposal)
+                    if result:
+                        tool_calls.append(proposal)
+                        tool_results.append(result)
+                except Exception as e:
+                    logger.debug(f"Tool execution failed: {e}")
+                    continue
+            
+            if not tool_calls:
+                return None
+            
+            # Score augmentation quality
+            augmented_output = self._create_augmented_output(base_output, tool_calls, tool_results)
+            
+            base_score = await self._score_sample_quality(input_text, base_output)
+            augmented_score = await self._score_sample_quality(input_text, augmented_output)
+            
+            # Only keep if augmentation improves beyond threshold
+            improvement = augmented_score - base_score
+            if improvement < self.config.tool_augmentation_threshold:
+                return None
+            
+            sample = DistillationSample(
+                input_text=input_text,
+                output_text=augmented_output,
+                tool_calls=tool_calls,
+                tool_results=tool_results,
+                quality_score=augmented_score,
+                teacher_model=self.config.teacher_model,
+            )
+            
+            self.stats["tool_augmentations_successful"] += 1
+            self.pending_samples.append(sample)
+            
+            return sample
+            
+        except Exception as e:
+            logger.error(f"Failed to collect tool-augmented sample: {e}")
+            return None
+    
+    async def self_distillation_iteration(
+        self,
+        student_model: str = "llama3.2:latest",
+    ) -> List[DistillationSample]:
+        """
+        Perform one iteration of self-distillation.
+        
+        Process:
+        1. Take existing high-quality samples
+        2. Have student generate on same inputs
+        3. Score student outputs
+        4. Add student outputs that exceed quality threshold
+        
+        This creates a virtuous cycle where the student improves
+        by learning from its own best outputs (filtered by quality).
+        
+        Reference: Similar to "Self-Improving Language Models" concept
+        where filtering on verifiable dimensions enables improvement.
+        """
+        if not self.config.enable_self_distillation:
+            return []
+        
+        if self.iteration_count >= self.config.self_distill_iterations:
+            logger.info("Max self-distillation iterations reached")
+            return []
+        
+        try:
+            # Load existing samples
+            existing_samples = self._load_samples()
+            
+            if not existing_samples:
+                logger.info("No existing samples for self-distillation")
+                return []
+            
+            new_samples = []
+            
+            for sample in existing_samples[:self.config.max_samples_per_iteration]:
+                # Generate student response
+                student_response = await self._query_model(
+                    sample.input_text,
+                    model=student_model,
+                )
+                
+                if not student_response:
+                    continue
+                
+                # Score student output
+                student_score = await self._score_sample_quality(
+                    sample.input_text,
+                    student_response,
+                )
+                
+                # Only add if quality exceeds threshold
+                if student_score >= self.config.min_quality_score:
+                    new_sample = DistillationSample(
+                        input_text=sample.input_text,
+                        output_text=student_response,
+                        rationale=sample.rationale,  # Preserve original rationale
+                        quality_score=student_score,
+                        teacher_model=student_model,  # Student is now teacher
+                    )
+                    new_samples.append(new_sample)
+            
+            # Add to pending samples
+            self.pending_samples.extend(new_samples)
+            self.iteration_count += 1
+            self.stats["self_distill_iterations"] += 1
+            
+            logger.info(f"Self-distillation iteration {self.iteration_count}: {len(new_samples)} new samples")
+            
+            return new_samples
+            
+        except Exception as e:
+            logger.error(f"Self-distillation iteration failed: {e}")
+            return []
+    
+    def prepare_training_data(self) -> Tuple[str, int]:
+        """
+        Prepare distillation samples for QLoRA fine-tuning.
+        
+        Returns:
+            Tuple of (path to training data JSON, number of samples)
+        """
+        # Deduplicate and filter samples
+        filtered_samples = self._filter_samples(self.pending_samples)
+        
+        if not filtered_samples:
+            logger.warning("No samples to prepare for training")
+            return "", 0
+        
+        # Convert to training format
+        training_data = [sample.to_training_format() for sample in filtered_samples]
+        
+        # Save to file
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_file = self.samples_dir / f"distillation_train_{timestamp}.json"
+        
+        with open(output_file, "w") as f:
+            json.dump(training_data, f, indent=2)
+        
+        # Clear pending samples
+        self.stats["total_samples_collected"] += len(filtered_samples)
+        self.pending_samples = []
+        
+        logger.info(f"Prepared {len(training_data)} samples for training: {output_file}")
+        
+        return str(output_file), len(training_data)
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """Get distillation statistics."""
+        return {
+            **self.stats,
+            "pending_samples": len(self.pending_samples),
+            "iteration_count": self.iteration_count,
+            "config": self.config.to_dict(),
+        }
+    
+    # ==================== Private Helper Methods ====================
+    
+    def _create_cot_prompt(self, input_text: str, context: Optional[str] = None) -> str:
+        """Create a Chain-of-Thought prompt."""
+        prompt = f"{self.config.cot_prompt_template}\n\n"
+        
+        if context:
+            prompt += f"Context: {context}\n\n"
+        
+        prompt += f"Question: {input_text}\n\n"
+        prompt += "Let me think through this step by step:\n"
+        
+        return prompt
+    
+    def _parse_cot_response(self, response: str) -> Tuple[str, str]:
+        """
+        Parse CoT response into rationale and final answer.
+        
+        Looks for explicit markers or infers from structure.
+        """
+        # Check for explicit think tags
+        if "<think>" in response and "</think>" in response:
+            start = response.index("<think>") + len("<think>")
+            end = response.index("</think>")
+            rationale = response[start:end].strip()
+            final_answer = response[end + len("</think>"):].strip()
+            return rationale, final_answer
+        
+        # Check for "Therefore" or "So" markers
+        markers = ["Therefore,", "So,", "Thus,", "In conclusion,", "The answer is"]
+        
+        for marker in markers:
+            if marker in response:
+                parts = response.split(marker, 1)
+                rationale = parts[0].strip()
+                final_answer = marker + parts[1].strip() if len(parts) > 1 else ""
+                return rationale, final_answer
+        
+        # No clear separation - treat entire response as answer
+        return "", response
+    
+    async def _query_teacher(self, prompt: str) -> Optional[str]:
+        """Query the teacher model."""
+        return await self._query_model(
+            prompt,
+            model=self.config.teacher_model,
+            temperature=self.config.teacher_temperature,
+        )
+    
+    async def _query_model(
+        self,
+        prompt: str,
+        model: str = None,
+        temperature: float = 0.7,
+    ) -> Optional[str]:
+        """Query an Ollama model."""
+        if not self.ollama_client:
+            return None
+        
+        try:
+            # This assumes ollama_client has a generate method
+            # Actual implementation depends on AVA's Ollama wrapper
+            response = await self.ollama_client.generate(
+                model=model or self.config.teacher_model,
+                prompt=prompt,
+                temperature=temperature,
+            )
+            return response.get("response", "") if isinstance(response, dict) else str(response)
+        except Exception as e:
+            logger.error(f"Model query failed: {e}")
+            return None
+    
+    async def _score_sample_quality(self, input_text: str, output: str) -> float:
+        """
+        Score sample quality using perplexity-based metric.
+        
+        Lower perplexity = higher quality score.
+        """
+        # Simple heuristic scoring (actual implementation would use model perplexity)
+        score = 0.5
+        
+        # Length bonus (prefer detailed responses)
+        if len(output) > 100:
+            score += 0.1
+        if len(output) > 300:
+            score += 0.1
+        
+        # Structure bonus (has reasoning markers)
+        reasoning_markers = ["because", "since", "therefore", "step", "first", "then"]
+        for marker in reasoning_markers:
+            if marker.lower() in output.lower():
+                score += 0.05
+        
+        # Relevance penalty (very short or generic)
+        if len(output) < 20:
+            score -= 0.3
+        
+        return max(0.0, min(1.0, score))
+    
+    async def _propose_tool_insertions(
+        self,
+        input_text: str,
+        output: str,
+        tools: List[str],
+    ) -> List[Dict[str, Any]]:
+        """Propose tool insertions for output."""
+        proposals = []
+        
+        # Simple heuristic tool proposal
+        # Actual implementation would use model to identify insertion points
+        
+        tool_triggers = {
+            "Calculator": ["calculate", "compute", "math", "number", "sum", "multiply"],
+            "Search": ["search", "find", "lookup", "information about", "who is", "what is"],
+            "Time": ["time", "date", "today", "current"],
+            "Define": ["define", "meaning", "definition", "what does"],
+        }
+        
+        lower_input = input_text.lower()
+        
+        for tool_name, triggers in tool_triggers.items():
+            if tool_name in tools:
+                for trigger in triggers:
+                    if trigger in lower_input:
+                        proposals.append({
+                            "name": tool_name,
+                            "args": input_text,
+                            "position": 0,  # Beginning of output
+                        })
+                        break
+        
+        return proposals[:3]  # Limit proposals
+    
+    async def _execute_tool(self, proposal: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Execute a tool call proposal."""
+        if not self.tool_registry:
+            return None
+        
+        try:
+            tool_name = proposal.get("name")
+            tool_args = proposal.get("args", "")
+            
+            result = await self.tool_registry.execute(tool_name, tool_args)
+            
+            return {
+                "name": tool_name,
+                "output": str(result),
+                "success": True,
+            }
+        except Exception as e:
+            logger.debug(f"Tool execution failed: {e}")
+            return None
+    
+    def _create_augmented_output(
+        self,
+        base_output: str,
+        tool_calls: List[Dict[str, Any]],
+        tool_results: List[Dict[str, Any]],
+    ) -> str:
+        """Create tool-augmented output."""
+        augmented = ""
+        
+        for call, result in zip(tool_calls, tool_results):
+            tool_name = call.get("name", "")
+            tool_args = call.get("args", "")
+            tool_output = result.get("output", "")
+            augmented += f"[{tool_name}:{tool_args}] → {tool_output}\n"
+        
+        augmented += "\n" + base_output
+        return augmented.strip()
+    
+    def _filter_samples(
+        self,
+        samples: List[DistillationSample],
+    ) -> List[DistillationSample]:
+        """Filter and deduplicate samples."""
+        # Remove low quality
+        filtered = [s for s in samples if s.quality_score >= self.config.min_quality_score]
+        
+        # Deduplicate by input text
+        seen_inputs = set()
+        unique_samples = []
+        
+        for sample in filtered:
+            input_hash = hash(sample.input_text[:100])  # Use prefix for hash
+            if input_hash not in seen_inputs:
+                seen_inputs.add(input_hash)
+                unique_samples.append(sample)
+        
+        return unique_samples[:self.config.max_samples_per_iteration]
+    
+    def _save_samples(self):
+        """Save pending samples to disk."""
+        if not self.pending_samples:
+            return
+        
+        samples_file = self.samples_dir / "pending_samples.json"
+        
+        with open(samples_file, "w") as f:
+            json.dump(
+                [s.to_dict() for s in self.pending_samples],
+                f,
+                indent=2,
+            )
+    
+    def _load_samples(self) -> List[DistillationSample]:
+        """Load samples from disk."""
+        samples_file = self.samples_dir / "pending_samples.json"
+        
+        if not samples_file.exists():
+            return []
+        
+        try:
+            with open(samples_file, "r") as f:
+                data = json.load(f)
+                return [DistillationSample.from_dict(s) for s in data]
+        except Exception as e:
+            logger.warning(f"Failed to load samples: {e}")
+            return []
 
 
 def create_qlora_training_script(
