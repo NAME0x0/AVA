@@ -113,3 +113,22 @@ secrets.json
 db.sqlite3
 ./data/*
 *.db
+
+# rust build files
+/target/
+**/target/
+./ui/target/
+./ui/**/target/
+**/*.rlib
+**/*.rmeta
+**/*.dll
+**/*.dylib
+**/*.so
+**/*.exe
+**/*.pdb
+**/*.lib
+**/*.a
+**/*.app
+**/*.ilk
+**/*.exp
+./ui/target/debug/*
