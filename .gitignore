@@ -107,3 +107,9 @@ secrets.json
 
 # Ollama models (if stored in project and large)
 # ollama_models/
+
+
+# db.sqlite3
+db.sqlite3
+./data/*
+*.db

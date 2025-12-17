@@ -183,7 +183,7 @@ class Frankensystem:
             high_varentropy_threshold=self.config.varentropy_threshold,
         )
         self._entropix = Entropix(entropix_config)
-        logger.info("✓ Entropix metacognitive module initialized")
+        logger.info("[OK] Entropix metacognitive module initialized")
         
         # Initialize Titans Sidecar
         from hippocampus.titans import TitansSidecar, TitansSidecarConfig
@@ -194,7 +194,7 @@ class Frankensystem:
             momentum=self.config.titans_momentum,
         )
         self._titans_sidecar = TitansSidecar(titans_config)
-        logger.info(f"✓ Titans Sidecar initialized ({self._titans_sidecar.backend} backend)")
+        logger.info(f"[OK] Titans Sidecar initialized ({self._titans_sidecar.backend} backend)")
         
         # Initialize Episodic Buffer
         from hippocampus.episodic_buffer import EpisodicBuffer, BufferConfig
@@ -204,11 +204,34 @@ class Frankensystem:
             surprise_threshold=self.config.surprise_threshold,
         )
         self._episodic_buffer = EpisodicBuffer(buffer_config)
-        logger.info("✓ Episodic buffer initialized")
+        logger.info("[OK] Episodic buffer initialized")
         
-        # Initialize Nightmare Engine
+        # Initialize Nightmare Engine with QLoRA Trainer
         if self.config.enable_sleep:
             from subconscious.nightmare import NightmareEngine, NightmareConfig
+            
+            # THE MISSING SPARK: Initialize QLoRA Trainer for actual learning
+            qlora_trainer = None
+            try:
+                from learning.qlora import QLoRATrainer, QLoRAConfig
+                qlora_config = QLoRAConfig(
+                    base_model=self.config.model,  # Use same model for fine-tuning
+                    lora_r=8,  # Start with fast weights (rank-8)
+                    num_train_epochs=2,
+                )
+                qlora_trainer = QLoRATrainer(
+                    config=qlora_config,
+                    adapters_dir=self.config.adapter_output_dir,
+                )
+                logger.info("[OK] QLoRA Trainer initialized (learning will occur during sleep)")
+            except ImportError as e:
+                logger.warning(f"QLoRA dependencies not available: {e}")
+                logger.info("  Install with: pip install transformers peft bitsandbytes accelerate")
+                logger.info("  Sleep cycles will generate data but skip training")
+            except Exception as e:
+                logger.warning(f"Failed to initialize QLoRA Trainer: {e}")
+                logger.info("  Sleep cycles will generate data but skip training")
+            
             nightmare_config = NightmareConfig(
                 idle_threshold_minutes=self.config.idle_threshold_minutes,
                 output_dir=self.config.adapter_output_dir,
@@ -216,12 +239,13 @@ class Frankensystem:
             self._nightmare_engine = NightmareEngine(
                 self._episodic_buffer,
                 nightmare_config,
+                qlora_trainer=qlora_trainer,  # <--- THE SPARK THAT GIVES IT LIFE
                 on_phase_change=self._on_sleep_phase_change,
             )
             self._nightmare_engine.start_background_monitoring()
-            logger.info("✓ Nightmare Engine initialized (background monitoring active)")
+            logger.info("[OK] Nightmare Engine initialized (background monitoring active)")
         else:
-            logger.info("✓ Nightmare Engine disabled")
+            logger.info("[OK] Nightmare Engine disabled")
         
         # Initialize Ollama interface
         try:
@@ -235,11 +259,11 @@ class Frankensystem:
             # Test connection
             models = await self._ollama.list_models()
             if self.config.model.split(':')[0] in [m.split(':')[0] for m in models]:
-                logger.info(f"✓ Ollama connected (model: {self.config.model})")
+                logger.info(f"[OK] Ollama connected (model: {self.config.model})")
             else:
                 logger.warning(f"Model {self.config.model} not found. Available: {models}")
         except Exception as e:
-            logger.error(f"✗ Failed to connect to Ollama: {e}")
+            logger.error(f"[FAIL] Failed to connect to Ollama: {e}")
             logger.info("  Make sure Ollama is running: ollama serve")
             raise
         
@@ -248,7 +272,7 @@ class Frankensystem:
     
     def _on_sleep_phase_change(self, phase):
         """Callback when Nightmare Engine changes sleep phase."""
-        logger.info(f"💤 Sleep phase: {phase.name}")
+        logger.info(f"[SLEEP] Phase: {phase.name}")
     
     async def process(self, user_input: str) -> Dict[str, Any]:
         """
