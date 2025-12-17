@@ -1,0 +1,215 @@
+# ============================================================================
+# AVA FRANKENSYSTEM CONFIGURATION
+# ============================================================================
+# Neuro-Symbolic Cognitive Architecture Configuration
+# 
+# This file configures all components of the Frankensystem:
+# - Entropix: Metacognitive awareness
+# - Titans Sidecar: Neural memory with test-time learning
+# - Episodic Buffer: High-surprise event storage
+# - Nightmare Engine: Offline consolidation via QLoRA
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# OLLAMA INTERFACE
+# ----------------------------------------------------------------------------
+ollama:
+  host: "http://localhost:11434"
+  model: "llama3.2:latest"
+  embedding_model: "nomic-embed-text"
+  request_timeout: 120
+  max_retries: 3
+  
+  # Generation defaults
+  generation:
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 40
+    repeat_penalty: 1.1
+    num_ctx: 4096
+    
+  # Always request logprobs for Entropix
+  options:
+    logprobs: true
+    num_predict: 512
+
+# ----------------------------------------------------------------------------
+# ENTROPIX - Metacognitive Module
+# ----------------------------------------------------------------------------
+# Measures entropy (H) and varentropy (V) to classify cognitive states:
+# - FLOW: Low H, Low V - Confident generation
+# - HESITATION: Low H, High V - Uncertain phrasing
+# - CONFUSION: High H, Low V - Lost in entropy space
+# - CREATIVE: High H, High V - Exploring possibilities
+# ----------------------------------------------------------------------------
+entropix:
+  # Entropy thresholds (natural log units)
+  low_entropy_threshold: 0.5
+  high_entropy_threshold: 3.0
+  
+  # Varentropy thresholds
+  low_varentropy_threshold: 0.5
+  high_varentropy_threshold: 2.0
+  
+  # Temperature adjustments per state
+  base_temperature: 0.7
+  confusion_temperature: 0.3    # Lower when confused
+  creative_temperature: 1.2     # Higher for creativity
+  
+  # Action triggers
+  confusion_triggers_tools: true
+  hesitation_triggers_cot: true
+  
+  # Surprise signal scaling for Titans
+  surprise_scale: 1.0
+
+# ----------------------------------------------------------------------------
+# TITANS SIDECAR - Neural Memory Module
+# ----------------------------------------------------------------------------
+# PyTorch sidecar for test-time learning based on:
+# "Titans: Learning to Memorize at Test Time" (2025)
+# ----------------------------------------------------------------------------
+titans:
+  # Architecture
+  input_dim: 768              # nomic-embed-text output
+  hidden_dim: 1024
+  output_dim: 768
+  num_layers: 3
+  use_layer_norm: true
+  dropout: 0.1
+  
+  # Learning parameters
+  learning_rate: 0.001        # Test-time learning rate
+  momentum: 0.9               # Gradient momentum
+  forget_alpha: 0.01          # Forgetting rate
+  
+  # Surprise thresholds
+  surprise_threshold: 0.5     # Min surprise for update
+  high_surprise_threshold: 2.0 # Threshold for event tracking
+  
+  # Storage
+  max_stored_episodes: 1000
+  state_save_path: "data/memory/titans_state.pkl"
+
+# ----------------------------------------------------------------------------
+# EPISODIC BUFFER - Experience Storage
+# ----------------------------------------------------------------------------
+# SQLite-backed replay buffer for high-surprise experiences
+# Used by Nightmare Engine for offline consolidation
+# ----------------------------------------------------------------------------
+episodic_buffer:
+  db_path: "data/memory/episodic/replay_buffer.db"
+  max_episodes: 10000
+  surprise_threshold: 0.5     # Min surprise for storage
+  cleanup_interval: 100       # Cleanup every N additions
+  priority_alpha: 0.6         # 0 = uniform, 1 = pure priority
+
+# ----------------------------------------------------------------------------
+# NIGHTMARE ENGINE - Offline Consolidation
+# ----------------------------------------------------------------------------
+# QLoRA fine-tuning during idle periods ("sleep")
+# Consolidates high-value experiences into long-term knowledge
+# ----------------------------------------------------------------------------
+nightmare:
+  # Sleep triggers
+  enable_sleep: true
+  idle_threshold_minutes: 30
+  min_episodes_for_training: 10
+  
+  # Training parameters
+  batch_size: 4
+  fast_epochs: 2              # Light sleep
+  slow_epochs: 5              # Deep sleep / REM
+  fast_rank: 8                # LoRA rank for fast updates
+  slow_rank: 64               # LoRA rank for slow consolidation
+  learning_rate: 0.0001
+  
+  # Phase durations (in real deployment)
+  light_sleep_duration_minutes: 5
+  deep_sleep_duration_minutes: 15
+  rem_duration_minutes: 30
+  
+  # Replay sampling
+  replay_batch_size: 32
+  min_surprise: 1.0
+  min_quality: 0.6
+  
+  # Output
+  output_dir: "models/fine_tuned_adapters/nightmare"
+  max_training_time_minutes: 60
+
+# ----------------------------------------------------------------------------
+# QLORA TRAINING
+# ----------------------------------------------------------------------------
+# Quantized Low-Rank Adaptation for efficient fine-tuning
+# Reference: "QLoRA: Efficient Finetuning of Quantized LLMs" (2023)
+# ----------------------------------------------------------------------------
+qlora:
+  # Model
+  base_model: "meta-llama/Llama-3.2-3B-Instruct"
+  
+  # Quantization (4-bit for memory efficiency)
+  load_in_4bit: true
+  bnb_4bit_compute_dtype: "float16"
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_use_double_quant: true
+  
+  # LoRA configuration
+  lora_alpha: 16
+  lora_dropout: 0.05
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+  
+  # Training
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_seq_length: 2048
+  gradient_checkpointing: true
+  fp16: true
+
+# ----------------------------------------------------------------------------
+# NESTED LEARNING
+# ----------------------------------------------------------------------------
+# Multi-timescale learning system
+# Reference: "Nested Learning" (Google, 2025)
+# ----------------------------------------------------------------------------
+nested_learning:
+  # Fast weights (session-level adaptation)
+  fast_lr: 0.001
+  fast_momentum: 0.9
+  fast_decay: 0.99
+  
+  # Slow weights (permanent consolidation)
+  slow_lr: 0.00001
+  slow_momentum: 0.999
+  slow_decay: 0.9999
+  
+  # Synchronization
+  sync_interval: 100
+  sync_ratio: 0.01
+
+# ----------------------------------------------------------------------------
+# DATA PATHS
+# ----------------------------------------------------------------------------
+paths:
+  data_root: "data"
+  memory_dir: "data/memory"
+  learning_dir: "data/learning"
+  model_dir: "models"
+  adapter_dir: "models/fine_tuned_adapters"
+  log_file: "data/frankensystem.log"
+
+# ----------------------------------------------------------------------------
+# LOGGING
+# ----------------------------------------------------------------------------
+logging:
+  level: "INFO"
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+  console: true
+  file: true

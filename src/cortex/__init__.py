@@ -28,6 +28,7 @@ Reference Papers:
 from .stream import ConsciousStream, StreamConfig
 from .dreaming import Dreamer, DreamerConfig
 from .executive import Executive, ExecutiveConfig
+from .entropix import Entropix, EntropixConfig, CognitiveState, CognitiveStateLabel
 
 __all__ = [
     "ConsciousStream",
@@ -36,4 +37,8 @@ __all__ = [
     "DreamerConfig",
     "Executive",
     "ExecutiveConfig",
+    "Entropix",
+    "EntropixConfig",
+    "CognitiveState",
+    "CognitiveStateLabel",
 ]
