@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 8 8 12;
+    --foreground: 240 240 245;
+    
+    --card: 14 14 20;
+    --card-foreground: 240 240 245;
+    
+    --popover: 14 14 20;
+    --popover-foreground: 240 240 245;
+    
+    --primary: 0 212 200;
+    --primary-foreground: 8 8 12;
+    
+    --secondary: 22 22 30;
+    --secondary-foreground: 240 240 245;
+    
+    --muted: 30 30 42;
+    --muted-foreground: 100 100 120;
+    
+    --accent: 0 212 200;
+    --accent-foreground: 8 8 12;
+    
+    --destructive: 255 80 80;
+    --destructive-foreground: 240 240 245;
+    
+    --border: 30 30 42;
+    --input: 22 22 30;
+    --ring: 0 212 200;
+    
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-neural-hover;
+  }
+  
+  body {
+    @apply bg-neural-void text-text-primary font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-neural-surface;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neural-hover rounded-full;
+    transition: background-color 0.2s;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-accent-dim;
+  }
+  
+  /* Selection */
+  ::selection {
+    @apply bg-accent-glow text-text-primary;
+  }
+}
+
+@layer components {
+  /* Glow effects */
+  .glow-accent {
+    box-shadow: 0 0 20px rgba(0, 212, 200, 0.3);
+  }
+  
+  .glow-cortex {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  }
+  
+  .glow-medulla {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  }
+  
+  /* Glass morphism */
+  .glass {
+    @apply bg-neural-surface/80 backdrop-blur-md border border-neural-hover/50;
+  }
+  
+  .glass-elevated {
+    @apply bg-neural-elevated/90 backdrop-blur-lg border border-neural-hover;
+  }
+  
+  /* Neural card */
+  .neural-card {
+    @apply bg-neural-surface border border-neural-hover rounded-xl p-4;
+    transition: all 0.2s ease;
+  }
+  
+  .neural-card:hover {
+    @apply border-accent-dim shadow-neural;
+  }
+  
+  /* Input styles */
+  .neural-input {
+    @apply bg-neural-elevated border border-neural-hover rounded-lg px-4 py-3;
+    @apply text-text-primary placeholder:text-text-muted;
+    @apply focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary/50;
+    transition: all 0.2s ease;
+  }
+  
+  /* Button styles */
+  .neural-button {
+    @apply bg-neural-elevated border border-neural-hover rounded-lg px-4 py-2;
+    @apply text-text-secondary hover:text-text-primary;
+    @apply hover:border-accent-dim hover:bg-neural-hover;
+    @apply active:bg-neural-surface;
+    @apply transition-all duration-200;
+  }
+  
+  .neural-button-primary {
+    @apply bg-accent-primary border-accent-primary text-neural-void;
+    @apply hover:bg-accent-dim hover:border-accent-dim;
+    @apply shadow-neural;
+  }
+  
+  /* Status indicator */
+  .status-dot {
+    @apply w-2 h-2 rounded-full;
+  }
+  
+  .status-dot-animated {
+    @apply animate-pulse;
+  }
+  
+  /* Message bubbles */
+  .message-user {
+    @apply bg-accent-primary/10 border border-accent-dim/30 text-text-primary;
+  }
+  
+  .message-assistant {
+    @apply bg-neural-surface border border-neural-hover text-text-primary;
+  }
+  
+  .message-cortex {
+    @apply bg-cortex-active/10 border border-cortex-active/30;
+  }
+  
+  .message-medulla {
+    @apply bg-medulla-active/10 border border-medulla-active/30;
+  }
+  
+  /* Waveform animation */
+  .waveform {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 24px;
+  }
+  
+  .waveform-bar {
+    @apply bg-accent-primary w-1 rounded-full;
+    animation: waveform 1s ease-in-out infinite;
+  }
+  
+  @keyframes waveform {
+    0%, 100% { height: 20%; }
+    50% { height: 100%; }
+  }
+  
+  .waveform-bar:nth-child(1) { animation-delay: 0ms; }
+  .waveform-bar:nth-child(2) { animation-delay: 100ms; }
+  .waveform-bar:nth-child(3) { animation-delay: 200ms; }
+  .waveform-bar:nth-child(4) { animation-delay: 300ms; }
+  .waveform-bar:nth-child(5) { animation-delay: 400ms; }
+}
+
+@layer utilities {
+  /* Gradient text */
+  .text-gradient-neural {
+    @apply bg-gradient-to-r from-accent-primary to-state-creative bg-clip-text text-transparent;
+  }
+  
+  /* No drag for Tauri */
+  .no-drag {
+    -webkit-app-region: no-drag;
+  }
+  
+  .drag {
+    -webkit-app-region: drag;
+  }
+}

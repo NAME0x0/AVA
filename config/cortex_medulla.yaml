@@ -1,0 +1,277 @@
+# ============================================================================
+# AVA v3 CORTEX-MEDULLA ARCHITECTURE CONFIGURATION
+# ============================================================================
+# Biomimetic cognitive architecture for autonomous operation
+# Target Hardware: NVIDIA RTX A2000 (4GB VRAM)
+#
+# VRAM Budget:
+#   - System Overhead:    ~300 MB
+#   - Medulla (Mamba):    ~800 MB
+#   - Titans Memory:      ~200 MB
+#   - Bridge Adapter:     ~50 MB
+#   - Cortex Buffer:      ~1,600 MB (paged)
+#   - Total:              ~2,950 MB / 4,096 MB
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# SYSTEM CONFIGURATION
+# ----------------------------------------------------------------------------
+system:
+  data_dir: "data"
+  log_level: "INFO"
+  
+  # Main loop timing
+  main_loop_interval: 0.1      # 100ms for responsive interaction
+  idle_loop_interval: 1.0      # 1s when waiting for input
+  
+  # Safety
+  max_cortex_time: 300.0       # 5 min max per Cortex call
+  emergency_shutdown_phrase: "ava shutdown"
+  autosave_interval: 100       # Save every 100 interactions
+
+# ----------------------------------------------------------------------------
+# MEDULLA - The Reflexive Core (VRAM Resident)
+# ----------------------------------------------------------------------------
+# Always-on sensory processing using 1-bit State Space Models
+# Target VRAM: ~1.5 GB
+# ----------------------------------------------------------------------------
+medulla:
+  # Model Selection
+  # Options: slender-mamba-2.7b, bi-mamba-1.3b (smaller), bitnet-3b-reflex
+  monitor_model: "slender-mamba-2.7b"    # 1-bit Mamba SSM for sensing
+  talker_model: "bitnet-3b"               # 1.58-bit BitNet for reflexes
+  
+  # State Space Dimensions
+  hidden_dim: 2560              # Mamba hidden state dimension
+  state_dim: 16                 # SSM state dimension
+  
+  # Surprise Thresholds
+  low_surprise_threshold: 0.3   # Below = routine, Medulla handles
+  high_surprise_threshold: 2.0  # Above = invoke Cortex
+  
+  # Response Configuration
+  max_reflex_tokens: 32         # Quick response length
+  reflex_timeout_ms: 200        # Target latency < 200ms
+  
+  # State Persistence
+  state_save_path: "data/memory/medulla_state.npz"
+  state_save_interval: 100
+  
+  # Device
+  device: "cuda"
+  use_fp16: true
+
+# ----------------------------------------------------------------------------
+# CORTEX - The Reflective Core (System RAM Paged)
+# ----------------------------------------------------------------------------
+# Deep reasoning via AirLLM layer-wise inference
+# Model Size: 70B parameters (40GB at 4-bit)
+# VRAM per layer: ~1.6 GB
+# ----------------------------------------------------------------------------
+cortex:
+  # Model Selection (AirLLM supported)
+  model_name: "meta-llama/Meta-Llama-3-70B-Instruct"
+  compression: "4bit"           # Block-wise quantization
+  
+  # Alternative smaller models for testing:
+  # model_name: "meta-llama/Meta-Llama-3-8B-Instruct"
+  # model_name: "mistralai/Mixtral-8x7B-Instruct-v0.1"
+  
+  # AirLLM Configuration
+  prefetch_layers: 1            # Limited by VRAM
+  use_safetensors: true         # Zero-copy memory mapping
+  use_flash_attention: true
+  
+  # Generation Parameters
+  max_new_tokens: 512
+  temperature: 0.7
+  top_p: 0.9
+  top_k: 40
+  repetition_penalty: 1.1
+  
+  # Context Limits
+  max_context_length: 4096
+  max_input_tokens: 2048
+  
+  # Storage
+  offload_to_disk: false
+  disk_offload_path: "data/.cortex_cache"
+  
+  # Performance
+  batch_size: 1                 # Always 1 for layer-wise
+  pin_memory: true
+  
+  # Device
+  device: "cuda"
+  gpu_id: 0
+
+# ----------------------------------------------------------------------------
+# BRIDGE - Neural State Projection
+# ----------------------------------------------------------------------------
+# Projects Medulla (Mamba) hidden state to Cortex (Transformer) embeddings
+# Enables instant context handoff without pre-fill
+# Memory: ~50 MB
+# ----------------------------------------------------------------------------
+bridge:
+  # Projection Dimensions
+  medulla_state_dim: 2560       # Must match medulla.hidden_dim
+  cortex_embedding_dim: 8192    # Llama-3 70B hidden size
+  
+  # For smaller models:
+  # cortex_embedding_dim: 4096  # Llama-3 8B hidden size
+  
+  # Projection MLP Architecture
+  hidden_dims: [4096, 4096]     # Two hidden layers
+  
+  # Soft Prompt Configuration
+  num_soft_tokens: 32           # Virtual context tokens
+  
+  # Training
+  learning_rate: 0.0001
+  dropout: 0.1
+  use_layer_norm: true
+  use_residual: true
+  
+  # Storage
+  adapter_path: "models/fine_tuned_adapters/bridge"
+
+# ----------------------------------------------------------------------------
+# AGENCY - Active Inference Controller
+# ----------------------------------------------------------------------------
+# Free Energy Principle implementation for autonomous behavior
+# Drives proactive action through VFE minimization
+# ----------------------------------------------------------------------------
+agency:
+  # Free Energy Thresholds
+  action_threshold: 0.3         # Min G reduction to act
+  urgency_threshold: 0.7        # High urgency triggers immediate action
+  
+  # Time Constants
+  idle_uncertainty_rate: 0.01   # Uncertainty growth per second of silence
+  max_wait_time: 300.0          # Max seconds before proactive action (5 min)
+  
+  # Policy Weights
+  pragmatic_weight: 0.6         # Weight for goal achievement
+  epistemic_weight: 0.4         # Weight for information gain
+  
+  # Cost Parameters
+  cortex_effort_cost: 0.5       # Penalty for invoking Cortex (slow)
+  tool_effort_cost: 0.2         # Penalty for tool use
+  
+  # Learning
+  belief_learning_rate: 0.1
+  preference_adaptation: true
+  
+  # Storage
+  state_save_path: "data/memory/agency_state.json"
+
+# ----------------------------------------------------------------------------
+# TITANS - Neural Memory Module
+# ----------------------------------------------------------------------------
+# Test-time learning for infinite context compression
+# Memory: ~200 MB (fixed regardless of history length)
+# Reference: "Titans: Learning to Memorize at Test Time" (2025)
+# ----------------------------------------------------------------------------
+titans:
+  # Architecture
+  input_dim: 768                # Embedding dimension
+  hidden_dim: 1024              # Memory MLP hidden
+  output_dim: 768
+  num_layers: 3
+  use_layer_norm: true
+  dropout: 0.1
+  
+  # Test-Time Learning
+  learning_rate: 0.001          # Weight update rate
+  momentum: 0.9                 # Gradient momentum
+  forget_alpha: 0.01            # Forgetting rate
+  
+  # Surprise-Driven Updates
+  surprise_threshold: 0.5       # Min surprise for update
+  high_surprise_threshold: 2.0  # Threshold for episodic storage
+  
+  # Storage
+  max_stored_episodes: 1000
+  state_save_path: "data/memory/titans_state.pkl"
+
+# ----------------------------------------------------------------------------
+# HARDWARE PROFILE: NVIDIA RTX A2000 (4GB)
+# ----------------------------------------------------------------------------
+# Reference specifications for the target deployment hardware
+# ----------------------------------------------------------------------------
+hardware:
+  # GPU Specifications
+  gpu_name: "NVIDIA RTX A2000"
+  vram_total_mb: 4096
+  memory_bandwidth_gbps: 192
+  cuda_cores: 3328
+  tensor_cores: true            # Ampere architecture
+  
+  # Bus Configuration
+  pcie_gen: 4
+  pcie_lanes: 16
+  effective_bandwidth_gbps: 12  # Practical PCIe bandwidth
+  
+  # Power
+  tdp_watts: 70
+  
+  # Expected Performance (Layer-Wise Inference)
+  layer_transfer_time_seconds: 0.04    # Per Llama-3 70B layer
+  tokens_per_second_cortex: 0.3        # ~3.3s per token
+  tokens_per_second_medulla: 50        # Reflexive responses
+
+# ----------------------------------------------------------------------------
+# SENSORY INPUTS
+# ----------------------------------------------------------------------------
+sensory:
+  # Audio Input (requires faster-whisper)
+  enable_audio_input: false
+  audio_sample_rate: 16000
+  audio_chunk_ms: 100
+  whisper_model: "base.en"      # Quantized Whisper
+  
+  # System Log Monitoring
+  enable_log_monitoring: true
+  log_sources:
+    - "/var/log/syslog"
+    - "~/.local/share/ava/logs"
+  
+  # Environmental Awareness
+  monitor_cpu_temp: true
+  monitor_gpu_temp: true
+  monitor_memory: true
+
+# ----------------------------------------------------------------------------
+# OUTPUT CONFIGURATION
+# ----------------------------------------------------------------------------
+output:
+  # Voice Synthesis (requires TTS)
+  enable_voice_output: false
+  tts_model: "piper-tts"
+  voice_speed: 1.0
+  
+  # Text Output
+  enable_rich_formatting: true
+  max_response_length: 2048
+
+# ----------------------------------------------------------------------------
+# DEVELOPMENT MODE
+# ----------------------------------------------------------------------------
+# Settings for development and testing without full hardware
+# ----------------------------------------------------------------------------
+development:
+  # Simulation Mode (no real models)
+  simulation_mode: true         # Set false for production
+  
+  # Reduced Models for Testing
+  use_small_models: true
+  small_cortex_model: "meta-llama/Meta-Llama-3-8B-Instruct"
+  
+  # Logging
+  verbose_logging: true
+  log_agency_decisions: true
+  log_surprise_signals: true
+  
+  # Performance Profiling
+  enable_profiling: false
+  profile_output_path: "data/profiles"

@@ -114,6 +114,24 @@ db.sqlite3
 ./data/*
 *.db
 
+# Node.js / npm
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+.yarn/
+package-lock.json
+yarn.lock
+.pnpm-store/
+
+# UI build outputs
+ui/out/
+ui/dist/
+ui/.next/
+ui/build/
+
 # rust build files
 /target/
 **/target/

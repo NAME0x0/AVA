@@ -89,6 +89,37 @@ mypy>=1.8.0,<2.0.0
 # scikit-learn>=1.3.0,<2.0.0  # For additional ML utilities
 
 # ============================================================================
+# AVA v3 Cortex-Medulla Architecture (Advanced)
+# ============================================================================
+# These dependencies enable the full Cortex-Medulla architecture
+# Requires NVIDIA GPU with CUDA support
+
+# AirLLM - Layer-wise inference for large models on limited VRAM
+# Enables running 70B models on 4GB GPU via layer paging
+# pip install airllm
+
+# Mamba SSM - State Space Models for O(N) inference
+# Enables always-on processing without KV cache growth
+# pip install mamba-ssm
+# pip install causal-conv1d>=1.2.0
+
+# BitNet - 1-bit LLM inference
+# Extreme memory efficiency for the Medulla
+# pip install bitnet-cpp  # When available
+# Alternative: Use GGUF quantized models via llama-cpp-python
+
+# Active Inference - Free Energy Principle implementation
+# Drives autonomous behavior through VFE minimization
+# pip install pymdp
+
+# Titans Neural Memory - Test-time learning
+# pip install titans-pytorch
+
+# faster-whisper - Efficient speech recognition
+# For audio input processing in the Medulla
+# pip install faster-whisper
+
+# ============================================================================
 # Notes:
 # ============================================================================
 # 1. CUDA-specific PyTorch installation:

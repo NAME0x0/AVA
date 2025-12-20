@@ -1,0 +1,95 @@
+# ==========================================================
+# AVA Configuration
+# ==========================================================
+# Copy this file to config/ava.yaml and customize
+# ==========================================================
+
+# Engine settings
+engine:
+  ollama:
+    host: "http://localhost:11434"
+    timeout: 120
+    
+    # Model selection
+    # Use smaller models for faster responses, larger for better quality
+    # Options: gemma3:4b, phi3:mini, llama3:8b, mistral:7b
+    fast_model: "gemma3:4b"    # Quick responses (Medulla)
+    deep_model: "gemma3:4b"    # Deep thinking (Cortex)
+    embedding_model: "gemma3:4b"
+  
+  # Routing thresholds
+  # Higher values = less Cortex usage = faster but less thoughtful
+  cortex_surprise_threshold: 0.5    # Novelty threshold (0-1)
+  cortex_complexity_threshold: 0.4  # Complexity threshold (0-1)
+  
+  # Keywords that trigger deep thinking
+  cortex_keywords:
+    - "analyze"
+    - "explain"
+    - "compare"
+    - "why"
+    - "how does"
+    - "what if"
+    - "step by step"
+    - "think carefully"
+  
+  # Response generation
+  max_tokens: 2048
+  temperature: 0.7
+  
+  # Accuracy features
+  verify_responses: true    # Double-check important responses
+  use_reflection: true      # Allow self-correction
+
+# Tool settings
+tools:
+  enabled: true
+  
+  # Built-in tools
+  enable_calculator: true
+  enable_web_search: true
+  enable_file_access: true
+  
+  # MCP servers (Model Context Protocol)
+  # Uncomment to add external tools
+  mcp_enabled: false
+  mcp_servers: []
+  # Example:
+  # mcp_servers:
+  #   - name: "filesystem"
+  #     command: "mcp-server-filesystem"
+  #     args: ["--root", "/path/to/files"]
+  #   - name: "database"
+  #     command: "mcp-server-sqlite"
+  #     args: ["--db", "data/ava.db"]
+  
+  # Execution settings
+  timeout_seconds: 30
+  max_retries: 2
+
+# Memory settings
+memory:
+  max_history: 50           # Messages to remember
+  context_window: 8192      # Token limit
+  
+  # Persistence
+  persist_conversations: true
+  data_dir: "data/conversations"
+  
+  # Learning (future feature)
+  enable_learning: true
+  learning_data_dir: "data/learning"
+
+# Server settings
+ui:
+  host: "127.0.0.1"
+  port: 8085
+  enable_cors: true
+  enable_streaming: true
+
+# Logging
+log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+# log_file: "ava.log"  # Uncomment to log to file
+
+# Data directory
+data_dir: "data"
