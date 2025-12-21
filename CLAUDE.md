@@ -4,215 +4,202 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AVA is a **Developmental AI** - an artificial intelligence that matures like a human child. It starts as an "infant" with poor articulation but underlying LLM knowledge. Through interaction, it develops better communication, gains tool access, forms memories, and learns continuously.
+AVA is a **research-grade AI assistant** with a **biomimetic dual-brain architecture** inspired by the human nervous system. It runs locally on constrained hardware (4GB VRAM) and prioritizes accuracy over speed.
 
-**Core Paradigm:** Treat AI as an artificial human - slow, progressive learning with emotional states influencing behavior.
+**Core Paradigm:** Cortex-Medulla Architecture - fast reflexive responses for simple queries, deep reasoning for complex ones.
 
-## Key Concepts
+## Architecture (v3)
 
-### Developmental Stages
-- **INFANT** (0-30 days): 20% clarity, garbled speech, baby-safe tools
-- **TODDLER** (30-90 days): 40% clarity, simple sentences
-- **CHILD** (90-365 days): 70% clarity, conversations
-- **ADOLESCENT** (365-730 days): 85% clarity, opinions
-- **YOUNG_ADULT** (730-1825 days): 95% clarity, complex topics
-- **MATURE** (1825+ days): 100% clarity, full capability, development caps
+### Dual-Brain System
 
-### Emotional System
-Five emotions influence behavior:
-- **Hope**: +learning rate, optimistic responses
-- **Fear**: -learning rate, cautious responses
-- **Joy**: +learning, enthusiastic responses
-- **Surprise**: temporary boost, curious responses
-- **Ambition**: +learning, goal-oriented responses
+```
+User Input
+    │
+    ▼
+┌─────────────────────────────────────────────────────────┐
+│  MEDULLA (Reflexive Core) - Always On                  │
+│  - Mamba SSM for O(1) memory sensing                   │
+│  - 1-bit BitNet for quick responses                    │
+│  - Calculates "surprise" signal                        │
+│  - VRAM: ~800 MB (resident)                            │
+└─────────────────────────────────────────────────────────┘
+    │                              │
+    │ Low Surprise                 │ High Surprise
+    ▼                              ▼
+┌─────────────┐             ┌─────────────────────────────┐
+│Quick Reply  │             │  CORTEX (Reflective Core)   │
+│(<200ms)     │             │  - 70B model via AirLLM     │
+└─────────────┘             │  - Layer-wise paging        │
+                            │  - ~3.3s per token          │
+                            │  - VRAM: ~1.6 GB (paged)    │
+                            └─────────────────────────────┘
+```
 
-### Tool Safety Levels
-Tools are gated by developmental stage (like not giving knives to babies):
-- Level 0 (Infant): echo, time, simple_math
-- Level 1 (Toddler): calculator, word_count
-- Level 2 (Child): web_search, file_read
-- Level 3 (Adolescent): file_write, note_save
-- Level 4 (Young Adult): code_execute, api_call
-- Level 5 (Mature): system_command
+### Key Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| **Medulla** | `src/core/medulla.py` | Always-on sensory processing, surprise calculation |
+| **Cortex** | `src/core/cortex_engine.py` | Deep reasoning via 70B models on 4GB GPU |
+| **Bridge** | `src/core/bridge.py` | Projects Medulla state to Cortex embeddings |
+| **Agency** | `src/core/agency.py` | Active Inference for autonomous behavior |
+| **Titans** | `src/hippocampus/titans.py` | Test-time learning, infinite context |
+| **Core Loop** | `src/core/core_loop.py` | Orchestrates all components |
+| **Clean API** | `src/ava/` | Simplified interface for external use |
+
+### VRAM Budget (RTX A2000 4GB)
+
+```
+System Overhead:    300 MB
+Medulla (Mamba):    800 MB
+Titans Memory:      200 MB
+Bridge Adapter:      50 MB
+Cortex Buffer:    1,600 MB (paged on-demand)
+────────────────────────────
+Total Resident:   2,050 MB
+Peak (Cortex):    3,650 MB
+Headroom:           446 MB
+```
 
 ## Commands
 
 ### Installation
-```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# Install dependencies
+```bash
+python -m venv venv
+venv\Scripts\activate  # Windows
 pip install -r requirements.txt
 
 # Ensure Ollama is running
-ollama pull llama3.2
+ollama pull gemma3:4b
 ```
 
-### Running AVA
+### Running
+
 ```bash
-# Start CLI
-python -m src.cli
+# HTTP API Server (primary)
+python server.py
+python server.py --host 0.0.0.0 --port 8080
 
-# With options
-python -m src.cli --model llama3.2 --data-dir ./data
+# Core System with full architecture
+python run_core.py --simulation
+
+# Legacy developmental CLI
+python -m src.cli
 ```
 
-### CLI Commands
-- `/help` - Show commands
-- `/status` - Show AVA's status
-- `/stage` - Show developmental stage
-- `/emotions` - Show emotional state
-- `/good` / `/bad` - Feedback on last response
-- `/correct <text>` - Provide correction
-- `/quit` - Exit
+### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Health check |
+| `/status` | GET | System status |
+| `/chat` | POST | Send message (auto-routes Medulla/Cortex) |
+| `/think` | POST | Force deep thinking (Cortex) |
+| `/tools` | GET | List available tools |
+| `/ws` | WebSocket | Streaming chat |
 
 ### Testing
+
 ```bash
 pytest tests/
+pytest --cov=src tests/
 ```
 
-## Architecture
+### Python API
 
-### Directory Structure
-```
-src/
-├── developmental/    # Stage tracking & milestones
-│   ├── stages.py     # DevelopmentalStage enum, StageProperties
-│   ├── tracker.py    # DevelopmentTracker, state persistence
-│   └── milestones.py # Milestone definitions and checking
-│
-├── emotional/        # Emotion processing
-│   ├── models.py     # EmotionVector, EmotionalState, triggers
-│   ├── engine.py     # EmotionalEngine, decay, processing
-│   └── modulation.py # How emotions affect learning/responses
-│
-├── memory/           # Memory systems
-│   ├── episodic.py   # Event-based memories
-│   ├── semantic.py   # Factual knowledge
-│   ├── consolidation.py # Decay and strengthening
-│   └── manager.py    # Memory orchestration
-│
-├── learning/         # Continual learning
-│   ├── continual.py  # Sample collection
-│   ├── fine_tuning.py # QLoRA scheduling
-│   └── nested.py     # Meta-learning contexts
-│
-├── inference/        # Test-time compute
-│   ├── thinking.py   # Extended reasoning
-│   └── reflection.py # Self-critique
-│
-├── tools/            # Tool system with safety
-│   ├── registry.py   # Tool registration with levels
-│   ├── progression.py # Tool unlocking logic
-│   └── base_tools.py # Tool implementations
-│
-├── output/           # Developmental filtering
-│   ├── articulation.py # Speech development simulation
-│   └── filter.py     # Vocabulary & complexity constraints
-│
-├── agent.py          # Main DevelopmentalAgent
-└── cli.py            # CLI interface
+```python
+from ava import AVA
+import asyncio
+
+async def main():
+    ava = AVA()
+    await ava.start()
+
+    response = await ava.chat("What is Python?")  # Auto-routes
+    response = await ava.think("Explain quantum computing")  # Force Cortex
+
+    await ava.stop()
+
+asyncio.run(main())
 ```
 
-### Main Interaction Loop (agent.py)
-1. Apply emotion decay
-2. Get developmental state & stage properties
-3. Process emotional triggers from input
-4. Retrieve relevant memories
-5. Calculate thinking budget based on stage
-6. Execute extended reasoning (test-time compute)
-7. Check if tools needed → filter by safety level
-8. Generate raw response from Ollama
-9. Apply self-reflection (if mature enough)
-10. Apply developmental filter (articulation, vocabulary)
-11. Store episode in memory
-12. Record learning sample
-13. Update developmental metrics
-14. Check milestones & stage transitions
-15. Check fine-tuning triggers
-16. Update emotions based on outcome
+## Configuration
 
-### LLM Integration
-- Backend: Ollama (local)
-- Default model: llama3.2
-- Learning: QLoRA fine-tuning from collected samples
+### Main Config: `config/cortex_medulla.yaml`
 
-### Configuration Files
-- `config/development_stages.yaml` - Stage thresholds
-- `config/emotions.yaml` - Emotion parameters
-- `config/tools.yaml` - Tool definitions
-- `config/learning.yaml` - Fine-tuning settings
+Key settings:
+- `development.simulation_mode` - Enable/disable simulation (testing mode)
+- `search_first.enabled` - Web search as default for informational queries
+- `thermal.max_gpu_power_percent` - GPU power limit (15% for RTX A2000)
+- `agency.epistemic_weight` - Curiosity-driven behavior (0.6 = high curiosity)
 
-### Data Persistence
-- `data/developmental/state.json` - Developmental state
-- `data/emotional/state.json` - Emotional state
-- `data/memory/` - Episodic and semantic memories
-- `data/learning/samples/` - Training samples
+### Search-First Paradigm
+
+Web search is the DEFAULT action for informational queries:
+- Question words trigger search: "what", "when", "where", "who", "how", "why"
+- Minimum 3 sources, 70% agreement threshold for facts
+- Falls back to internal generation if search fails
 
 ## Key Implementation Details
 
-### Articulation Model
-At low clarity (INFANT/TODDLER), output is transformed:
-- Letter substitutions: r→w, th→f ("rabbit"→"wabbit")
-- Word dropping and simplification
-- Sentence shortening
-- Filler words added
+### Active Inference (Agency)
 
-### Fine-Tuning Triggers
-- 100+ quality samples accumulated
-- 7+ days since last fine-tune
-- Stage transition occurred
-- High ambition + joy (emotional boost)
-- Performance degradation detected
+The system uses Free Energy Principle for autonomous behavior:
+- **Belief States**: Probabilistic distributions over user intent
+- **Policy Selection**: Minimizes Expected Free Energy G(π)
+- **Available Policies**: `PRIMARY_SEARCH`, `REFLEX_REPLY`, `DEEP_THOUGHT`, `WEB_BROWSE`, `SELF_MONITOR`, `THERMAL_CHECK`, `SYSTEM_COMMAND`
 
-### Memory Consolidation
-Memories decay and strengthen over time:
-- Recent memories are stronger
-- Emotionally tagged memories persist longer
-- Frequently accessed memories strengthen
-- Sleep/consolidation cycles process memories
+### Titans Neural Memory
+
+Test-time learning for infinite context:
+- 3-layer MLP that learns during inference
+- Fixed 200MB footprint regardless of conversation length
+- Surprise-weighted gradient updates
+
+### Thermal Self-Preservation
+
+GPU monitoring with automatic throttling:
+- Warning: 75°C, Throttle: 80°C, Pause: 85°C
+- Power capped at 15% (10.5W on RTX A2000)
+
+### System Command Safety
+
+All system commands require explicit user confirmation:
+```yaml
+blocked_system_commands:
+  - "rm -rf", "del /f", "format", "shutdown", "reboot"
+```
 
 ## Development Guidelines
 
+### When modifying the core loop:
+1. Changes affect `src/core/core_loop.py` (AVACoreSystem)
+2. Component initialization order: Titans → Medulla → Cortex → Bridge → Agency → Thermal → Episodic
+3. Policy handlers registered via `_register_action_callbacks()`
+
 ### When adding new tools:
-1. Define safety level (0-5)
-2. Add to `base_tools.py`
-3. Register in `registry.py`
-4. Add unlock conditions in `tools.yaml`
+1. Add tool class to `src/ava/tools.py` inheriting from `Tool`
+2. Implement `execute()` async method
+3. Register via `ToolManager`
 
-### When modifying developmental behavior:
-1. Check `STAGE_PROPERTIES` in `stages.py`
-2. Update `development_stages.yaml` if needed
-3. Ensure milestones align with stage transitions
+### When modifying routing logic:
+1. Surprise thresholds in `config/cortex_medulla.yaml` → `medulla.low_surprise_threshold` / `high_surprise_threshold`
+2. Policy costs in `agency.cortex_effort_cost`, `search_effort_cost`
 
-### When working with emotions:
-1. Triggers go through `EmotionalEngine.process_trigger()`
-2. Modulation factors come from `modulation.py`
-3. Baseline personality defined in `emotions.yaml`
-- **GUI** - Open WebUI integration planned
+## Legacy Systems
 
-### MCP Integration (`src/mcp_integration/`)
+The codebase includes legacy "Developmental AI" modules (emotions, stages, articulation) that are not active in v3:
+- `src/developmental/` - Stage tracking (INFANT→MATURE)
+- `src/emotional/` - Emotion processing
+- `src/output/` - Articulation filtering
 
-Model Context Protocol host for direct file/API access without RAG embeddings.
+These may be integrated in future versions.
 
 ## Key Constraints
 
 **4GB VRAM Limit**: All design decisions prioritize minimal VRAM usage:
-- 4-bit quantization is mandatory
-- Use QLoRA for fine-tuning
-- Knowledge distillation from larger teacher models
-- Monitor VRAM with `nvidia-smi` during development
-
-## Configuration
-
-- `config/base_config.yaml` - Default settings
-- `config/user_config.yaml.example` - User config template
-- `.env` - API keys (copy from `.env.example`)
-
-## Development Notes
-
-- Python 3.10 recommended
-- Ollama must be running for full functionality (localhost:11434)
-- When Ollama unavailable, Agent falls back to simulated responses for testing
+- 4-bit quantization mandatory
+- Layer-wise inference via AirLLM
+- 1-bit models for Medulla
+- Knowledge distillation for efficiency

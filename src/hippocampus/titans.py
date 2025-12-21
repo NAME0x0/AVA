@@ -649,3 +649,367 @@ def create_titans_sidecar(
     )
     
     return TitansSidecar(config, device=device)
+
+
+# =============================================================================
+# EPISODIC MEMORY STORE WITH JSON TIMESTAMPS
+# =============================================================================
+
+@dataclass
+class EpisodicMemory:
+    """A single episodic memory with semantic timestamp."""
+    id: str                                    # Unique memory ID
+    content: str                               # The memory content
+    embedding: Optional[np.ndarray] = None     # Embedding vector
+    surprise: float = 0.0                      # Surprise when recorded
+    source: str = "interaction"                # Source: interaction, search, system
+    tags: List[str] = field(default_factory=list)  # Semantic tags
+    
+    # Timestamps
+    created_at: datetime = field(default_factory=datetime.now)
+    accessed_at: datetime = field(default_factory=datetime.now)
+    access_count: int = 0
+    
+    # Confidence and reliability
+    confidence: float = 1.0                    # 0-1 confidence score
+    source_reliability: float = 1.0            # Source reliability score
+    is_fact: bool = False                      # Fact vs opinion
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to JSON-serializable dictionary."""
+        return {
+            "id": self.id,
+            "content": self.content,
+            "embedding": self.embedding.tolist() if self.embedding is not None else None,
+            "surprise": self.surprise,
+            "source": self.source,
+            "tags": self.tags,
+            "created_at": self.created_at.isoformat(),
+            "accessed_at": self.accessed_at.isoformat(),
+            "access_count": self.access_count,
+            "confidence": self.confidence,
+            "source_reliability": self.source_reliability,
+            "is_fact": self.is_fact,
+        }
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "EpisodicMemory":
+        """Create from JSON dictionary."""
+        embedding = None
+        if data.get("embedding"):
+            embedding = np.array(data["embedding"], dtype=np.float32)
+        
+        return cls(
+            id=data["id"],
+            content=data["content"],
+            embedding=embedding,
+            surprise=data.get("surprise", 0.0),
+            source=data.get("source", "interaction"),
+            tags=data.get("tags", []),
+            created_at=datetime.fromisoformat(data["created_at"]),
+            accessed_at=datetime.fromisoformat(data["accessed_at"]),
+            access_count=data.get("access_count", 0),
+            confidence=data.get("confidence", 1.0),
+            source_reliability=data.get("source_reliability", 1.0),
+            is_fact=data.get("is_fact", False),
+        )
+
+
+class EpisodicMemoryStore:
+    """
+    JSON-based Episodic Memory Store with semantic timestamps.
+    
+    Stores episodic memories with rich metadata including:
+    - Precise timestamps for temporal recall
+    - Source tracking for reliability
+    - Confidence scores
+    - Fact vs opinion classification
+    
+    Memories are persisted to JSON for durability and portability.
+    """
+    
+    def __init__(
+        self,
+        storage_path: str = "data/memory/episodic",
+        max_memories: int = 10000,
+        embedding_dim: int = 768,
+    ):
+        """
+        Initialize the episodic memory store.
+        
+        Args:
+            storage_path: Directory for JSON storage
+            max_memories: Maximum memories to retain
+            embedding_dim: Dimension of embeddings
+        """
+        self.storage_path = Path(storage_path)
+        self.storage_path.mkdir(parents=True, exist_ok=True)
+        
+        self.max_memories = max_memories
+        self.embedding_dim = embedding_dim
+        
+        # In-memory cache
+        self.memories: Dict[str, EpisodicMemory] = {}
+        
+        # Index for fast lookup
+        self.by_date: Dict[str, List[str]] = {}  # date -> memory ids
+        self.by_tag: Dict[str, List[str]] = {}   # tag -> memory ids
+        
+        # Load existing memories
+        self._load_all()
+        
+        logger.info(f"EpisodicMemoryStore initialized with {len(self.memories)} memories")
+    
+    def store(
+        self,
+        content: str,
+        embedding: Optional[np.ndarray] = None,
+        surprise: float = 0.0,
+        source: str = "interaction",
+        tags: Optional[List[str]] = None,
+        confidence: float = 1.0,
+        is_fact: bool = False,
+        source_reliability: float = 1.0,
+    ) -> str:
+        """
+        Store a new episodic memory.
+        
+        Args:
+            content: Memory content
+            embedding: Embedding vector
+            surprise: Surprise signal
+            source: Source of memory
+            tags: Semantic tags
+            confidence: Confidence score
+            is_fact: Whether this is a fact
+            source_reliability: Source reliability
+            
+        Returns:
+            Memory ID
+        """
+        import uuid
+        
+        memory_id = str(uuid.uuid4())[:8]
+        now = datetime.now()
+        
+        memory = EpisodicMemory(
+            id=memory_id,
+            content=content,
+            embedding=embedding,
+            surprise=surprise,
+            source=source,
+            tags=tags or [],
+            created_at=now,
+            accessed_at=now,
+            access_count=0,
+            confidence=confidence,
+            source_reliability=source_reliability,
+            is_fact=is_fact,
+        )
+        
+        self.memories[memory_id] = memory
+        
+        # Update indices
+        date_key = now.strftime("%Y-%m-%d")
+        if date_key not in self.by_date:
+            self.by_date[date_key] = []
+        self.by_date[date_key].append(memory_id)
+        
+        for tag in memory.tags:
+            if tag not in self.by_tag:
+                self.by_tag[tag] = []
+            self.by_tag[tag].append(memory_id)
+        
+        # Persist to JSON
+        self._save_memory(memory)
+        
+        # Evict old memories if needed
+        if len(self.memories) > self.max_memories:
+            self._evict_oldest()
+        
+        logger.debug(f"Stored memory {memory_id}: {content[:50]}...")
+        return memory_id
+    
+    def retrieve(self, memory_id: str) -> Optional[EpisodicMemory]:
+        """Retrieve a memory by ID and update access time."""
+        memory = self.memories.get(memory_id)
+        if memory:
+            memory.accessed_at = datetime.now()
+            memory.access_count += 1
+            self._save_memory(memory)
+        return memory
+    
+    def retrieve_by_date(
+        self,
+        date: datetime,
+        range_days: int = 0,
+    ) -> List[EpisodicMemory]:
+        """
+        Retrieve memories from a specific date or range.
+        
+        Args:
+            date: Target date
+            range_days: Days before/after to include
+            
+        Returns:
+            List of memories
+        """
+        memories = []
+        
+        for day_offset in range(-range_days, range_days + 1):
+            target_date = date + timedelta(days=day_offset)
+            date_key = target_date.strftime("%Y-%m-%d")
+            
+            if date_key in self.by_date:
+                for memory_id in self.by_date[date_key]:
+                    if memory_id in self.memories:
+                        memories.append(self.memories[memory_id])
+        
+        return sorted(memories, key=lambda m: m.created_at)
+    
+    def retrieve_by_tag(self, tag: str) -> List[EpisodicMemory]:
+        """Retrieve memories with a specific tag."""
+        if tag not in self.by_tag:
+            return []
+        
+        return [
+            self.memories[mid] 
+            for mid in self.by_tag[tag] 
+            if mid in self.memories
+        ]
+    
+    def search_semantic(
+        self,
+        query_embedding: np.ndarray,
+        top_k: int = 5,
+    ) -> List[Tuple[EpisodicMemory, float]]:
+        """
+        Search memories by semantic similarity.
+        
+        Args:
+            query_embedding: Query embedding vector
+            top_k: Number of results
+            
+        Returns:
+            List of (memory, similarity) tuples
+        """
+        results = []
+        
+        for memory in self.memories.values():
+            if memory.embedding is not None:
+                # Cosine similarity
+                sim = np.dot(query_embedding, memory.embedding) / (
+                    np.linalg.norm(query_embedding) * np.linalg.norm(memory.embedding) + 1e-8
+                )
+                results.append((memory, float(sim)))
+        
+        # Sort by similarity descending
+        results.sort(key=lambda x: x[1], reverse=True)
+        return results[:top_k]
+    
+    def get_recent(self, n: int = 10) -> List[EpisodicMemory]:
+        """Get most recent memories."""
+        sorted_memories = sorted(
+            self.memories.values(),
+            key=lambda m: m.created_at,
+            reverse=True,
+        )
+        return sorted_memories[:n]
+    
+    def get_high_surprise(self, threshold: float = 1.5) -> List[EpisodicMemory]:
+        """Get high-surprise memories."""
+        return [m for m in self.memories.values() if m.surprise >= threshold]
+    
+    def _save_memory(self, memory: EpisodicMemory) -> None:
+        """Save a memory to JSON file."""
+        import json
+        
+        file_path = self.storage_path / f"{memory.id}.json"
+        with open(file_path, "w") as f:
+            json.dump(memory.to_dict(), f, indent=2)
+    
+    def _load_all(self) -> None:
+        """Load all memories from storage."""
+        import json
+        
+        for file_path in self.storage_path.glob("*.json"):
+            try:
+                with open(file_path, "r") as f:
+                    data = json.load(f)
+                    memory = EpisodicMemory.from_dict(data)
+                    self.memories[memory.id] = memory
+                    
+                    # Rebuild indices
+                    date_key = memory.created_at.strftime("%Y-%m-%d")
+                    if date_key not in self.by_date:
+                        self.by_date[date_key] = []
+                    self.by_date[date_key].append(memory.id)
+                    
+                    for tag in memory.tags:
+                        if tag not in self.by_tag:
+                            self.by_tag[tag] = []
+                        self.by_tag[tag].append(memory.id)
+                        
+            except Exception as e:
+                logger.error(f"Failed to load memory {file_path}: {e}")
+    
+    def _evict_oldest(self) -> None:
+        """Evict oldest, least-accessed memories."""
+        # Score memories (higher = more likely to evict)
+        scored = []
+        for memory in self.memories.values():
+            age_days = (datetime.now() - memory.created_at).days
+            access_score = 1 / (memory.access_count + 1)
+            recency_score = (datetime.now() - memory.accessed_at).days
+            
+            # Lower surprise = more likely to evict
+            surprise_score = 1 / (memory.surprise + 0.1)
+            
+            evict_score = age_days * 0.3 + access_score * 0.3 + recency_score * 0.2 + surprise_score * 0.2
+            scored.append((memory.id, evict_score))
+        
+        # Sort by evict score (highest first)
+        scored.sort(key=lambda x: x[1], reverse=True)
+        
+        # Remove top candidates
+        to_evict = len(self.memories) - self.max_memories + 100  # Remove 100 extra
+        for memory_id, _ in scored[:to_evict]:
+            self._delete_memory(memory_id)
+    
+    def _delete_memory(self, memory_id: str) -> None:
+        """Delete a memory."""
+        if memory_id in self.memories:
+            memory = self.memories.pop(memory_id)
+            
+            # Clean up indices
+            date_key = memory.created_at.strftime("%Y-%m-%d")
+            if date_key in self.by_date:
+                self.by_date[date_key] = [
+                    mid for mid in self.by_date[date_key] if mid != memory_id
+                ]
+            
+            for tag in memory.tags:
+                if tag in self.by_tag:
+                    self.by_tag[tag] = [
+                        mid for mid in self.by_tag[tag] if mid != memory_id
+                    ]
+            
+            # Delete file
+            file_path = self.storage_path / f"{memory_id}.json"
+            if file_path.exists():
+                file_path.unlink()
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """Get memory store statistics."""
+        return {
+            "total_memories": len(self.memories),
+            "dates_covered": len(self.by_date),
+            "tags_used": len(self.by_tag),
+            "avg_surprise": np.mean([m.surprise for m in self.memories.values()]) if self.memories else 0,
+            "facts_count": sum(1 for m in self.memories.values() if m.is_fact),
+            "storage_path": str(self.storage_path),
+        }
+
+
+# Add timedelta import at the top
+from datetime import datetime, timedelta

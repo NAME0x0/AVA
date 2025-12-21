@@ -14,9 +14,12 @@ Components:
 - Monitor: Bi-Mamba SSM for continuous sensory ingestion
 - Talker: BitNet 3B for reflexive responses
 - Neural Memory: Titans module for test-time learning
+- ThermalMonitor: GPU thermal awareness for stability
 
 The Medulla maintains a fixed-size hidden state that encapsulates
 the entire interaction history, eliminating KV cache growth.
+
+THERMAL-AWARE: GPU power capped at 15% for long-term stability.
 """
 
 import asyncio
@@ -30,6 +33,13 @@ from pathlib import Path
 
 import numpy as np
 
+# Optional: GPU monitoring via pynvml
+try:
+    import pynvml
+    NVML_AVAILABLE = True
+except ImportError:
+    NVML_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -40,6 +50,151 @@ class MedullaState(Enum):
     PERCEIVING = "perceiving"        # Processing text/visual input
     RESPONDING = "responding"        # Generating reflexive response
     ROUTING = "routing"              # Deciding action (Medulla vs Cortex)
+    THERMAL_THROTTLED = "thermal_throttled"  # Reduced operation due to heat
+    THERMAL_PAUSED = "thermal_paused"        # Paused due to critical temperature
+
+
+@dataclass
+class ThermalStatus:
+    """Current thermal status of the GPU."""
+    temperature: float = 0.0          # Current temperature in °C
+    power_draw_watts: float = 0.0     # Current power draw in watts
+    power_limit_watts: float = 0.0    # Max power limit in watts
+    power_percent: float = 0.0        # Power draw as percentage
+    is_throttled: bool = False        # Whether throttling is active
+    is_paused: bool = False           # Whether processing is paused
+    timestamp: datetime = field(default_factory=datetime.now)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "temperature": self.temperature,
+            "power_draw_watts": self.power_draw_watts,
+            "power_limit_watts": self.power_limit_watts,
+            "power_percent": self.power_percent,
+            "is_throttled": self.is_throttled,
+            "is_paused": self.is_paused,
+            "timestamp": self.timestamp.isoformat(),
+        }
+
+
+class ThermalMonitor:
+    """
+    GPU Thermal Monitor for the Medulla.
+    
+    Monitors GPU temperature and power draw to ensure long-term
+    stability during always-on operation. Caps power at configured
+    percentage (default 15%) and throttles/pauses as needed.
+    
+    This is critical for the "Sentinel" mode where the Medulla
+    runs continuously 24/7.
+    """
+    
+    def __init__(
+        self,
+        max_power_percent: float = 15.0,
+        warning_temp: float = 75.0,
+        throttle_temp: float = 80.0,
+        pause_temp: float = 85.0,
+        gpu_id: int = 0,
+    ):
+        """
+        Initialize the thermal monitor.
+        
+        Args:
+            max_power_percent: Maximum GPU power as percentage
+            warning_temp: Temperature to log warnings
+            throttle_temp: Temperature to start throttling
+            pause_temp: Temperature to pause processing
+            gpu_id: GPU device ID
+        """
+        self.max_power_percent = max_power_percent
+        self.warning_temp = warning_temp
+        self.throttle_temp = throttle_temp
+        self.pause_temp = pause_temp
+        self.gpu_id = gpu_id
+        
+        self._initialized = False
+        self._handle = None
+        
+        # Initialize NVML if available
+        if NVML_AVAILABLE:
+            try:
+                pynvml.nvmlInit()
+                self._handle = pynvml.nvmlDeviceGetHandleByIndex(gpu_id)
+                self._initialized = True
+                logger.info(f"ThermalMonitor initialized for GPU {gpu_id}")
+            except Exception as e:
+                logger.warning(f"Failed to initialize NVML: {e}")
+        else:
+            logger.warning("pynvml not available - thermal monitoring disabled")
+    
+    def get_status(self) -> ThermalStatus:
+        """
+        Get current thermal status.
+        
+        Returns:
+            ThermalStatus with current readings
+        """
+        status = ThermalStatus()
+        
+        if not self._initialized or self._handle is None:
+            return status
+        
+        try:
+            # Get temperature
+            status.temperature = pynvml.nvmlDeviceGetTemperature(
+                self._handle, pynvml.NVML_TEMPERATURE_GPU
+            )
+            
+            # Get power draw
+            power_mw = pynvml.nvmlDeviceGetPowerUsage(self._handle)
+            status.power_draw_watts = power_mw / 1000.0
+            
+            # Get power limit
+            power_limit_mw = pynvml.nvmlDeviceGetPowerManagementLimit(self._handle)
+            status.power_limit_watts = power_limit_mw / 1000.0
+            
+            # Calculate percentage
+            if status.power_limit_watts > 0:
+                status.power_percent = (status.power_draw_watts / status.power_limit_watts) * 100
+            
+            # Check thresholds
+            status.is_throttled = status.temperature >= self.throttle_temp
+            status.is_paused = status.temperature >= self.pause_temp
+            
+            status.timestamp = datetime.now()
+            
+            # Log warnings
+            if status.temperature >= self.warning_temp:
+                logger.warning(f"GPU temperature warning: {status.temperature}°C")
+            
+        except Exception as e:
+            logger.error(f"Failed to get thermal status: {e}")
+        
+        return status
+    
+    def should_throttle(self) -> bool:
+        """Check if we should throttle processing."""
+        status = self.get_status()
+        return status.is_throttled
+    
+    def should_pause(self) -> bool:
+        """Check if we should pause processing."""
+        status = self.get_status()
+        return status.is_paused
+    
+    def is_power_exceeded(self) -> bool:
+        """Check if power draw exceeds configured limit."""
+        status = self.get_status()
+        return status.power_percent > self.max_power_percent
+    
+    def cleanup(self) -> None:
+        """Cleanup NVML resources."""
+        if self._initialized:
+            try:
+                pynvml.nvmlShutdown()
+            except Exception:
+                pass
 
 
 @dataclass
@@ -52,6 +207,9 @@ class MedullaConfig:
     - Talker (BitNet 3B 1.58-bit): ~700 MB
     - Neural Memory (Titans): ~200 MB
     - Activation buffers: ~150 MB
+    
+    THERMAL-AWARE: GPU power capped at 15% for stability.
+    Target: Always-on operation without thermal throttling.
     """
     
     # Model Configuration
@@ -77,6 +235,9 @@ class MedullaConfig:
     max_reflex_tokens: int = 32                 # Max tokens for quick response
     reflex_timeout_ms: int = 200                # Target reflex latency
     
+    # Target token velocity
+    min_tokens_per_second: float = 15.0         # 15 tok/sec minimum for "instant" feel
+    
     # Sensory Input Configuration
     audio_sample_rate: int = 16000
     audio_chunk_ms: int = 100                   # Process audio in chunks
@@ -84,6 +245,20 @@ class MedullaConfig:
     # State Persistence
     state_save_path: str = "data/memory/medulla_state.pkl"
     state_save_interval: int = 100              # Save every N interactions
+    
+    # State Management
+    state_flush_interval: int = 5               # Flush state every N user interactions
+    
+    # THERMAL-AWARE Configuration
+    thermal_aware: bool = True                  # Enable thermal monitoring
+    max_gpu_power_percent: float = 15.0         # Cap GPU at 15% power draw
+    thermal_check_interval: float = 10.0        # Check temp every 10 seconds
+    thermal_warning_temp: float = 75.0          # Warn at 75°C
+    thermal_throttle_temp: float = 80.0         # Throttle at 80°C
+    thermal_pause_temp: float = 85.0            # Pause at 85°C
+    
+    # Context length (longer than average for better performance)
+    max_context_length: int = 8192              # Extended context window
     
     # Device Configuration
     device: str = "cuda"
@@ -220,40 +395,55 @@ class Medulla:
     ):
         """
         Initialize the Medulla.
-        
+
         Args:
             config: Medulla configuration
             titans_memory: External Titans neural memory module
         """
         self.config = config or MedullaConfig()
         self.titans_memory = titans_memory
-        
+
         # Current state
         self.state = MedullaState.IDLE
         self.is_initialized = False
-        
+
         # Initialize SSM state manager
         self.state_manager = MambaStateManager(
             hidden_dim=self.config.hidden_dim,
             state_dim=self.config.state_dim,
         )
-        
+
         # Surprise tracking
         self.surprise_history: List[SurpriseSignal] = []
         self.max_surprise_history = 1000
-        
+
         # Interaction counters
         self.interaction_count = 0
         self.cortex_invocations = 0
         self.reflex_responses = 0
-        
+        self.thermal_throttle_count = 0
+        self.thermal_pause_count = 0
+
         # Placeholders for models (initialized lazily)
         self._monitor_model = None
         self._talker_model = None
-        
+
         # Callbacks for Cortex activation
         self._cortex_callback: Optional[Callable] = None
-        
+
+        # THERMAL-AWARE: Initialize thermal monitor
+        self._thermal_monitor: Optional[ThermalMonitor] = None
+        self._last_thermal_check = datetime.now()
+        if self.config.thermal_aware:
+            self._thermal_monitor = ThermalMonitor(
+                max_power_percent=self.config.max_gpu_power_percent,
+                warning_temp=self.config.thermal_warning_temp,
+                throttle_temp=self.config.thermal_throttle_temp,
+                pause_temp=self.config.thermal_pause_temp,
+            )
+            logger.info(f"ThermalMonitor enabled: max {self.config.max_gpu_power_percent}% power, "
+                       f"throttle at {self.config.thermal_throttle_temp}°C")
+
         logger.info(f"Medulla initialized with config: {self.config}")
     
     async def initialize(self) -> None:
@@ -356,19 +546,37 @@ class Medulla:
     ) -> Tuple[SurpriseSignal, Optional[str]]:
         """
         Process sensory input and return surprise signal.
-        
+
         This is the main entry point for sensory processing. The Medulla
         ingests the input, updates its hidden state, calculates surprise,
         and optionally generates a reflexive response.
-        
+
+        THERMAL-AWARE: Checks GPU thermal status before processing.
+        Will throttle or pause if temperature exceeds thresholds.
+
         Args:
             input_text: Text input from user or logs
             input_audio: Raw audio waveform
             input_embeddings: Pre-computed embeddings
-            
+
         Returns:
             Tuple of (SurpriseSignal, Optional reflexive response)
         """
+        # THERMAL CHECK: Before processing, verify GPU is safe
+        thermal_status = await self._check_thermal_status()
+        if thermal_status:
+            if thermal_status.is_paused:
+                self.state = MedullaState.THERMAL_PAUSED
+                self.thermal_pause_count += 1
+                logger.warning(f"THERMAL PAUSE: GPU at {thermal_status.temperature}°C - waiting for cooldown")
+                # Return a pause response
+                return SurpriseSignal(value=0, requires_cortex=False), \
+                    f"System paused for thermal protection (GPU: {thermal_status.temperature}°C). Please wait..."
+            elif thermal_status.is_throttled:
+                self.state = MedullaState.THERMAL_THROTTLED
+                self.thermal_throttle_count += 1
+                logger.warning(f"THERMAL THROTTLE: GPU at {thermal_status.temperature}°C - reducing activity")
+
         self.state = MedullaState.PERCEIVING
         self.interaction_count += 1
         
@@ -627,11 +835,35 @@ class Medulla:
         """
         return self.state_manager.get_projection_vector()
     
+    async def _check_thermal_status(self) -> Optional[ThermalStatus]:
+        """
+        Check GPU thermal status if monitoring is enabled.
+
+        Returns:
+            ThermalStatus if monitoring is enabled, None otherwise
+        """
+        if not self._thermal_monitor:
+            return None
+
+        # Only check at configured interval to avoid overhead
+        elapsed = (datetime.now() - self._last_thermal_check).total_seconds()
+        if elapsed < self.config.thermal_check_interval:
+            return None
+
+        self._last_thermal_check = datetime.now()
+        return self._thermal_monitor.get_status()
+
+    def get_thermal_status(self) -> Optional[ThermalStatus]:
+        """Get current thermal status (synchronous)."""
+        if self._thermal_monitor:
+            return self._thermal_monitor.get_status()
+        return None
+
     def get_stats(self) -> Dict[str, Any]:
         """Get Medulla statistics."""
         recent_surprises = [s.value for s in self.surprise_history[-100:]]
-        
-        return {
+
+        stats = {
             "state": self.state.value,
             "interaction_count": self.interaction_count,
             "cortex_invocations": self.cortex_invocations,
@@ -640,7 +872,17 @@ class Medulla:
             "avg_surprise": np.mean(recent_surprises) if recent_surprises else 0.0,
             "max_surprise": np.max(recent_surprises) if recent_surprises else 0.0,
             "state_update_count": self.state_manager.update_count,
+            # Thermal stats
+            "thermal_throttle_count": self.thermal_throttle_count,
+            "thermal_pause_count": self.thermal_pause_count,
         }
+
+        # Add current thermal status if available
+        if self._thermal_monitor:
+            thermal = self._thermal_monitor.get_status()
+            stats["thermal"] = thermal.to_dict()
+
+        return stats
     
     def _save_state(self) -> None:
         """Save Medulla state to disk."""
@@ -656,12 +898,17 @@ class Medulla:
         """Clean shutdown of the Medulla."""
         logger.info("Shutting down Medulla...")
         self._save_state()
-        
+
+        # Cleanup thermal monitor
+        if self._thermal_monitor:
+            self._thermal_monitor.cleanup()
+            logger.info("ThermalMonitor cleaned up")
+
         # Cleanup models
         if self._monitor_model is not None:
             del self._monitor_model
         if self._talker_model is not None:
             del self._talker_model
-            
+
         self.is_initialized = False
         logger.info("Medulla shutdown complete")

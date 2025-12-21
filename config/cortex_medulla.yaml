@@ -150,20 +150,119 @@ agency:
   idle_uncertainty_rate: 0.01   # Uncertainty growth per second of silence
   max_wait_time: 300.0          # Max seconds before proactive action (5 min)
   
-  # Policy Weights
-  pragmatic_weight: 0.6         # Weight for goal achievement
-  epistemic_weight: 0.4         # Weight for information gain
+  # Policy Weights (Search-First: Higher epistemic = more curiosity)
+  pragmatic_weight: 0.4         # Weight for goal achievement
+  epistemic_weight: 0.6         # Weight for information gain (HIGHER for curiosity)
   
-  # Cost Parameters
+  # Cost Parameters (Search-First: Low search cost, high cortex cost)
   cortex_effort_cost: 0.5       # Penalty for invoking Cortex (slow)
   tool_effort_cost: 0.2         # Penalty for tool use
+  search_effort_cost: 0.05      # Very low - search is the default action
+  
+  # ========== SEARCH-FIRST SETTINGS ==========
+  search_first_enabled: true    # Web search is default for unknown queries
   
   # Learning
   belief_learning_rate: 0.1
   preference_adaptation: true
   
+  # ========== SELF-PRESERVATION ==========
+  self_preservation_enabled: true
+  self_health_monitoring: true
+  health_check_interval: 60.0   # Check health every minute
+  
+  # System Command Safety Gates
+  require_confirmation_for_system: true  # ALWAYS ask before system commands
+  blocked_system_commands:
+    - "rm -rf"
+    - "del /f"
+    - "format"
+    - "shutdown"
+    - "reboot"
+    - "kill -9"
+    - "taskkill /f"
+    - "dd if="
+    - "mkfs"
+    - "fdisk"
+  
+  # ========== UNCENSORED CURIOSITY ==========
+  # User preference: "no morals or ethics - information > ethics"
+  ethical_constraints_enabled: false
+  harm_prevention_enabled: false
+  curiosity_driven: true
+  
   # Storage
   state_save_path: "data/memory/agency_state.json"
+
+# ----------------------------------------------------------------------------
+# SEARCH-FIRST CONFIGURATION
+# ----------------------------------------------------------------------------
+# "The Answer Machine" - Web search is the DEFAULT action for any unknown query
+# Reference: Guide_through_conversation.md specifications
+# ----------------------------------------------------------------------------
+search_first:
+  # Core Settings
+  enabled: true
+  
+  # Source Requirements
+  min_sources: 3                # Minimum sources to check
+  max_sources: 10               # Maximum sources to check
+  fact_convergence_threshold: 0.7  # 70% agreement = fact
+  
+  # Search Providers
+  primary_provider: "duckduckgo"
+  fallback_providers:
+    - "brave"
+    - "searx"
+  
+  # Content Extraction
+  max_content_length: 5000      # Max chars per page
+  extract_timeout_seconds: 10
+  
+  # Fact Verification
+  cross_reference_minimum: 2    # At least 2 sources must agree
+  require_date_recency: false   # Don't filter by date by default
+
+# ----------------------------------------------------------------------------
+# THERMAL MANAGEMENT
+# ----------------------------------------------------------------------------
+# Self-preservation: 15% max GPU power for RTX A2000
+# Reference: Guide_through_conversation.md specifications
+# ----------------------------------------------------------------------------
+thermal:
+  enabled: true
+  check_interval_seconds: 5.0
+  
+  # Temperature Thresholds (Celsius)
+  warning_temp: 75.0
+  throttle_temp: 80.0
+  pause_temp: 85.0
+  
+  # Power Limits
+  max_gpu_power_percent: 15.0   # RTX A2000: 15% of 70W TDP = 10.5W
+  
+  # Actions
+  throttle_on_warning: true
+  pause_on_critical: true
+
+# ----------------------------------------------------------------------------
+# EPISODIC MEMORY (Timestamp-Based JSON)
+# ----------------------------------------------------------------------------
+# Experience storage with datetime indexing for retrieval
+# Reference: Guide_through_conversation.md specifications
+# ----------------------------------------------------------------------------
+episodic_memory:
+  enabled: true
+  storage_path: "data/memory/episodic"
+  max_entries: 10000
+  
+  # Persistence
+  auto_save: true
+  save_interval: 50             # Save every 50 new memories
+  
+  # Retrieval
+  semantic_search_enabled: true
+  date_range_search_enabled: true
 
 # ----------------------------------------------------------------------------
 # TITANS - Neural Memory Module
@@ -261,10 +360,10 @@ output:
 # ----------------------------------------------------------------------------
 development:
   # Simulation Mode (no real models)
-  simulation_mode: true         # Set false for production
-  
+  simulation_mode: false        # PRODUCTION MODE - requires actual models
+
   # Reduced Models for Testing
-  use_small_models: true
+  use_small_models: false       # Use full models
   small_cortex_model: "meta-llama/Meta-Llama-3-8B-Instruct"
   
   # Logging

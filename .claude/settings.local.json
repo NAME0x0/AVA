@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(del \"C:\\Users\\Afsah\\OneDrive\\Documents\\AVA\\src\\agent.py\")",
+      "Bash(del \"C:\\Users\\Afsah\\OneDrive\\Documents\\AVA\\src\\cortex\\executive.py\")",
+      "Bash(del \"C:\\Users\\Afsah\\OneDrive\\Documents\\AVA\\run_frankensystem.py\")",
+      "Bash(del \"C:\\Users\\Afsah\\OneDrive\\Documents\\AVA\\run_node.py\")",
+      "Bash(rm:*)"
+    ]
+  }
+}

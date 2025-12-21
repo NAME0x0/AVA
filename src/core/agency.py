@@ -35,6 +35,13 @@ from pathlib import Path
 
 import numpy as np
 
+# Optional: GPU monitoring
+try:
+    import pynvml
+    NVML_AVAILABLE = True
+except ImportError:
+    NVML_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -49,7 +56,10 @@ class PolicyType(Enum):
     DEEP_THOUGHT = auto()       # Invoke Cortex for reasoning
     CHAIN_OF_THOUGHT = auto()   # Extended thinking
     
-    # Information gathering
+    # Information gathering - SEARCH-FIRST PRIORITY
+    PRIMARY_SEARCH = auto()     # Search-first epistemic drive (highest priority)
+    WEB_SEARCH = auto()         # Execute web search for facts
+    WEB_BROWSE = auto()         # Browse web pages for detailed info
     USE_TOOL = auto()           # Execute a tool
     QUERY_MEMORY = auto()       # Retrieve from Titans memory
     SCAN_ENVIRONMENT = auto()   # Check system logs/status
@@ -66,6 +76,13 @@ class PolicyType(Enum):
     # Meta actions
     UPDATE_MODEL = auto()       # Update world model
     REFLECT = auto()            # Self-reflection
+    
+    # Self-Preservation actions
+    SELF_MONITOR = auto()       # Monitor own process health
+    THERMAL_CHECK = auto()      # Check GPU thermal status
+    
+    # System actions (require user confirmation)
+    SYSTEM_COMMAND = auto()     # Execute system-level command (REQUIRES CONFIRMATION)
 
 
 class HiddenState(Enum):
@@ -100,6 +117,14 @@ class AgencyConfig:
     
     The controller implements a POMDP (Partially Observed Markov Decision
     Process) that drives autonomous behavior through VFE minimization.
+    
+    SEARCH-FIRST PARADIGM: External information retrieval is prioritized
+    over internal generation to maximize factual accuracy.
+    
+    CURIOSITY-DRIVEN: Higher epistemic weight promotes learning and
+    information-seeking behavior.
+    
+    THERMAL-AWARE: GPU power draw is capped to ensure system stability.
     """
     
     # Free Energy Thresholds
@@ -110,23 +135,48 @@ class AgencyConfig:
     idle_uncertainty_rate: float = 0.01   # Uncertainty growth per second of silence
     max_wait_time: float = 300.0          # Max seconds before proactive action
     
-    # Policy Weights (Pragmatic vs Epistemic)
-    pragmatic_weight: float = 0.6         # Weight for goal achievement
-    epistemic_weight: float = 0.4         # Weight for information gain
+    # Policy Weights - CURIOSITY-DRIVEN (higher epistemic weight)
+    pragmatic_weight: float = 0.4         # Weight for goal achievement
+    epistemic_weight: float = 0.6         # HIGHER - promotes curiosity and learning
     
     # Cortex Activation Cost
     cortex_effort_cost: float = 0.5       # Penalty for invoking Cortex
-    tool_effort_cost: float = 0.2         # Penalty for tool use
+    tool_effort_cost: float = 0.15        # Lower penalty for tool use
+    
+    # SEARCH-FIRST Configuration
+    search_first_enabled: bool = True     # Enable search-first paradigm
+    web_search_effort_cost: float = 0.05  # Very low cost for web search
     
     # Learning
     belief_learning_rate: float = 0.1     # How fast beliefs update
-    preference_adaptation: bool = True     # Adapt preferences over time
+    preference_adaptation: bool = True    # Adapt preferences over time
+    
+    # THERMAL-AWARE Configuration
+    thermal_aware: bool = True            # Enable thermal monitoring
+    max_gpu_power_percent: float = 15.0   # Max GPU power draw (%)
+    thermal_check_interval: float = 30.0  # Check temperature every N seconds
+    thermal_throttle_temp: float = 80.0   # Temperature to start throttling (°C)
+    thermal_shutdown_temp: float = 90.0   # Emergency shutdown temperature (°C)
+    
+    # SELF-PRESERVATION Configuration
+    self_preservation_enabled: bool = True # Enable self-monitoring
+    health_check_interval: float = 60.0   # Check process health every N seconds
+    memory_warning_threshold: float = 0.9 # Warn at 90% memory usage
     
     # State Persistence
     state_save_path: str = "data/memory/agency_state.pkl"
     
     # Observation Categories
     num_observation_modalities: int = 4   # text, audio, system, time
+    
+    # User Interaction
+    ask_clarification_threshold: float = 0.4  # Uncertainty level to ask questions
+    
+    # System Command Safety
+    require_confirmation_for_system: bool = True  # ALWAYS require confirmation
+    blocked_system_commands: List[str] = field(default_factory=lambda: [
+        "rm", "del", "format", "shutdown", "reboot", "kill"
+    ])
 
 
 @dataclass
@@ -239,6 +289,12 @@ class ExpectedFreeEnergy:
     
     Policies are selected by minimizing G - the agent prefers actions
     that both achieve goals (pragmatic) and reduce uncertainty (epistemic).
+    
+    SEARCH-FIRST PARADIGM: Web search has lowest effort cost to prioritize
+    external information retrieval over internal generation.
+    
+    CURIOSITY-DRIVEN: Epistemic value is weighted higher to promote learning
+    and information gathering behavior.
     """
     
     def __init__(self, config: AgencyConfig):
@@ -246,44 +302,106 @@ class ExpectedFreeEnergy:
         
         # Define preferred observations (C matrix)
         # Higher values = more preferred
+        # CURIOSITY-DRIVEN: Knowledge certainty is top priority
         self.preferences = {
             HiddenState.USER_IDLE: 0.5,
-            HiddenState.USER_QUERYING: 0.8,
+            HiddenState.USER_QUERYING: 0.9,      # Increased - prioritize responding
             HiddenState.USER_URGENT: 0.3,
             HiddenState.USER_CONFUSED: 0.2,
-            HiddenState.KNOWLEDGE_CERTAIN: 1.0,
-            HiddenState.KNOWLEDGE_UNCERTAIN: 0.4,
-            HiddenState.KNOWLEDGE_MISSING: 0.1,
+            HiddenState.KNOWLEDGE_CERTAIN: 1.0,  # Highest priority
+            HiddenState.KNOWLEDGE_UNCERTAIN: 0.3, # Lower - push toward certainty
+            HiddenState.KNOWLEDGE_MISSING: 0.05,  # Very low - avoid this state
         }
         
         # Policy -> State transition likelihood (simplified)
         # P(s' | s, π) - how policies affect state
+        # SEARCH-FIRST: Web search has highest certainty transition
         self.transition_model: Dict[PolicyType, Dict[HiddenState, float]] = {
-            PolicyType.DEEP_THOUGHT: {
-                HiddenState.KNOWLEDGE_CERTAIN: 0.7,
+            # SEARCH-FIRST PRIORITY - Web search provides highest certainty
+            PolicyType.PRIMARY_SEARCH: {
+                HiddenState.KNOWLEDGE_CERTAIN: 0.85,
+                HiddenState.KNOWLEDGE_UNCERTAIN: 0.1,
+                HiddenState.KNOWLEDGE_MISSING: 0.05,
+            },
+            PolicyType.WEB_SEARCH: {
+                HiddenState.KNOWLEDGE_CERTAIN: 0.8,
+                HiddenState.KNOWLEDGE_UNCERTAIN: 0.15,
+                HiddenState.KNOWLEDGE_MISSING: 0.05,
+            },
+            PolicyType.WEB_BROWSE: {
+                HiddenState.KNOWLEDGE_CERTAIN: 0.75,
                 HiddenState.KNOWLEDGE_UNCERTAIN: 0.2,
+                HiddenState.KNOWLEDGE_MISSING: 0.05,
+            },
+            PolicyType.DEEP_THOUGHT: {
+                HiddenState.KNOWLEDGE_CERTAIN: 0.6,  # Lower than search
+                HiddenState.KNOWLEDGE_UNCERTAIN: 0.3,
+                HiddenState.KNOWLEDGE_MISSING: 0.1,
             },
             PolicyType.USE_TOOL: {
-                HiddenState.KNOWLEDGE_CERTAIN: 0.6,
+                HiddenState.KNOWLEDGE_CERTAIN: 0.65,
+                HiddenState.KNOWLEDGE_UNCERTAIN: 0.25,
                 HiddenState.KNOWLEDGE_MISSING: 0.1,
             },
             PolicyType.ASK_CLARIFICATION: {
                 HiddenState.USER_CONFUSED: 0.2,
                 HiddenState.KNOWLEDGE_UNCERTAIN: 0.4,
+                HiddenState.KNOWLEDGE_CERTAIN: 0.4,
+            },
+            PolicyType.QUERY_MEMORY: {
+                HiddenState.KNOWLEDGE_CERTAIN: 0.5,
+                HiddenState.KNOWLEDGE_UNCERTAIN: 0.4,
+                HiddenState.KNOWLEDGE_MISSING: 0.1,
             },
             PolicyType.WAIT: {
                 # Waiting increases uncertainty
                 HiddenState.KNOWLEDGE_UNCERTAIN: 0.6,
+                HiddenState.KNOWLEDGE_CERTAIN: 0.3,
+                HiddenState.KNOWLEDGE_MISSING: 0.1,
+            },
+            PolicyType.SELF_MONITOR: {
+                HiddenState.SYSTEM_NORMAL: 0.9,
+                HiddenState.SYSTEM_ERROR: 0.1,
+            },
+            PolicyType.THERMAL_CHECK: {
+                HiddenState.SYSTEM_NORMAL: 0.9,
+                HiddenState.SYSTEM_BUSY: 0.1,
             },
         }
         
         # Policy effort costs
+        # SEARCH-FIRST: Web search has LOWEST effort cost
         self.effort_costs = {
-            PolicyType.DEEP_THOUGHT: config.cortex_effort_cost,
+            # Search-First priorities (lowest costs)
+            PolicyType.PRIMARY_SEARCH: 0.05,     # Lowest cost - default action
+            PolicyType.WEB_SEARCH: 0.08,         # Very low cost
+            PolicyType.WEB_BROWSE: 0.1,          # Low cost for more info
+            
+            # Tool and memory (medium-low cost)
             PolicyType.USE_TOOL: config.tool_effort_cost,
-            PolicyType.CHAIN_OF_THOUGHT: config.cortex_effort_cost * 0.5,
+            PolicyType.QUERY_MEMORY: 0.15,
+            
+            # Reflex responses
             PolicyType.REFLEX_REPLY: 0.05,
-            PolicyType.WAIT: 0.0,
+            PolicyType.ACKNOWLEDGE: 0.02,
+            
+            # Reasoning (higher cost - use after search)
+            PolicyType.DEEP_THOUGHT: config.cortex_effort_cost,
+            PolicyType.CHAIN_OF_THOUGHT: config.cortex_effort_cost * 0.7,
+            
+            # Clarification
+            PolicyType.ASK_CLARIFICATION: 0.1,
+            
+            # Passive/waiting (increasing cost to avoid)
+            PolicyType.WAIT: 0.15,
+            PolicyType.SLEEP: 0.2,
+            
+            # Self-preservation (low cost - important)
+            PolicyType.SELF_MONITOR: 0.05,
+            PolicyType.THERMAL_CHECK: 0.05,
+            
+            # System commands (higher cost due to safety)
+            PolicyType.SYSTEM_COMMAND: 0.8,      # High cost - requires confirmation
         }
     
     def calculate(
@@ -368,15 +486,44 @@ class ExpectedFreeEnergy:
         Calculate epistemic value (expected ambiguity/information gain).
         
         Ambiguity = H(Q(o|s,π)) - expected entropy of observations
+        
+        CURIOSITY-DRIVEN: Search and information-gathering policies
+        have the highest negative values (most reduction in ambiguity).
         """
         # Policies that gather information reduce ambiguity
+        # Negative = reduces uncertainty (GOOD for curious agent)
+        # Positive = increases uncertainty (BAD)
         information_gathering = {
+            # SEARCH-FIRST: Highest information gain
+            PolicyType.PRIMARY_SEARCH: -0.7,     # Best reduction
+            PolicyType.WEB_SEARCH: -0.6,         # High reduction
+            PolicyType.WEB_BROWSE: -0.55,        # Good reduction
+            
+            # Clarification and memory
             PolicyType.ASK_CLARIFICATION: -0.5,  # Reduces uncertainty
-            PolicyType.QUERY_MEMORY: -0.3,
-            PolicyType.SCAN_ENVIRONMENT: -0.2,
+            PolicyType.QUERY_MEMORY: -0.4,
+            
+            # Tools and monitoring
+            PolicyType.USE_TOOL: -0.35,
+            PolicyType.SCAN_ENVIRONMENT: -0.3,
+            PolicyType.SELF_MONITOR: -0.2,
+            PolicyType.THERMAL_CHECK: -0.1,
+            
+            # Reasoning (moderate reduction)
             PolicyType.DEEP_THOUGHT: -0.4,
-            PolicyType.WAIT: 0.2,  # Increases uncertainty
+            PolicyType.CHAIN_OF_THOUGHT: -0.45,
+            PolicyType.REFLECT: -0.3,
+            
+            # Reflex (low reduction)
+            PolicyType.REFLEX_REPLY: -0.1,
+            PolicyType.ACKNOWLEDGE: -0.05,
+            
+            # Passive (increases uncertainty over time)
+            PolicyType.WAIT: 0.2,
             PolicyType.SLEEP: 0.3,
+            
+            # System commands
+            PolicyType.SYSTEM_COMMAND: 0.1,  # Slight increase (risky)
         }
         
         base_ambiguity = beliefs.entropy / 3.0  # Normalize
@@ -399,6 +546,16 @@ class ActiveInferenceController:
     2. When uncertainty exceeds threshold, agent acts (proactive)
     3. High surprise triggers deeper processing (Cortex)
     4. Information-seeking behaviors emerge naturally
+    
+    SEARCH-FIRST PARADIGM:
+    - Web search is the default action for unknown queries
+    - Internal knowledge is used only to reason about retrieved data
+    - Citations and facts are prioritized over generation
+    
+    CURIOSITY-DRIVEN:
+    - Higher epistemic weight promotes exploration
+    - System actively seeks to reduce uncertainty
+    - Learning is prioritized over safety constraints
     
     This creates a JARVIS-like presence that anticipates needs rather
     than just responding to commands.
@@ -423,15 +580,35 @@ class ActiveInferenceController:
         # Expected Free Energy calculator
         self.efe_calculator = ExpectedFreeEnergy(self.config)
         
-        # Available policies
+        # Available policies - SEARCH-FIRST ordering
         self.available_policies = [
+            # Search-First priorities
+            PolicyType.PRIMARY_SEARCH,      # Default for unknown queries
+            PolicyType.WEB_SEARCH,          # Specific search
+            PolicyType.WEB_BROWSE,          # Deep information gathering
+            
+            # Tool and memory access
+            PolicyType.USE_TOOL,
+            PolicyType.QUERY_MEMORY,
+            
+            # Clarification (ask questions for clarity per user preference)
+            PolicyType.ASK_CLARIFICATION,
+            
+            # Reasoning (after search results are gathered)
             PolicyType.REFLEX_REPLY,
             PolicyType.DEEP_THOUGHT,
-            PolicyType.USE_TOOL,
-            PolicyType.ASK_CLARIFICATION,
-            PolicyType.WAIT,
-            PolicyType.QUERY_MEMORY,
+            PolicyType.CHAIN_OF_THOUGHT,
+            
+            # Monitoring
             PolicyType.SCAN_ENVIRONMENT,
+            PolicyType.SELF_MONITOR,
+            PolicyType.THERMAL_CHECK,
+            
+            # Passive
+            PolicyType.WAIT,
+            
+            # System (requires confirmation)
+            PolicyType.SYSTEM_COMMAND,
         ]
         
         # Action history
@@ -441,6 +618,8 @@ class ActiveInferenceController:
         # Timing
         self.last_observation_time = datetime.now()
         self.last_action_time = datetime.now()
+        self.last_thermal_check = datetime.now()
+        self.last_self_check = datetime.now()
         
         # Callbacks
         self._action_callbacks: Dict[PolicyType, Callable] = {}
@@ -448,7 +627,10 @@ class ActiveInferenceController:
         # Running flag for continuous loop
         self._running = False
         
-        logger.info(f"ActiveInferenceController initialized")
+        # System command pending confirmation
+        self._pending_system_command: Optional[Dict[str, Any]] = None
+        
+        logger.info(f"ActiveInferenceController initialized (Search-First: {config.search_first_enabled})")
     
     def register_action_callback(
         self,
@@ -464,6 +646,44 @@ class ActiveInferenceController:
         """
         self._action_callbacks[policy] = callback
     
+    def should_search_first(self, observation: Observation) -> bool:
+        """
+        Determine if we should use search-first for this observation.
+        
+        Returns True if:
+        - Search-first is enabled
+        - Knowledge state is uncertain or missing
+        - Query appears to be factual
+        
+        Args:
+            observation: Current observation
+            
+        Returns:
+            True if search-first should be used
+        """
+        if not self.config.search_first_enabled:
+            return False
+        
+        # Check knowledge state
+        uncertain = self.beliefs.knowledge_state.get(HiddenState.KNOWLEDGE_UNCERTAIN, 0)
+        missing = self.beliefs.knowledge_state.get(HiddenState.KNOWLEDGE_MISSING, 0)
+        
+        if uncertain + missing > 0.5:
+            return True
+        
+        # Check if query seems factual (contains question words or seeks information)
+        if observation.text:
+            factual_indicators = [
+                "what", "when", "where", "who", "how", "why",
+                "is it true", "tell me", "explain", "describe",
+                "latest", "news", "current", "today", "now"
+            ]
+            text_lower = observation.text.lower()
+            if any(ind in text_lower for ind in factual_indicators):
+                return True
+        
+        return False
+    
     async def process_observation(
         self,
         observation: Observation,
@@ -473,9 +693,10 @@ class ActiveInferenceController:
         
         This is the main inference step that:
         1. Updates beliefs based on observation
-        2. Calculates G for each policy
-        3. Selects the policy with minimum G
-        4. Executes the corresponding action
+        2. Applies Search-First heuristic if applicable
+        3. Calculates G for each policy
+        4. Selects the policy with minimum G
+        5. Executes the corresponding action
         
         Args:
             observation: Current observation
@@ -486,24 +707,42 @@ class ActiveInferenceController:
         # 1. Update beliefs based on observation
         await self._update_beliefs(observation)
         
-        # 2. Calculate Expected Free Energy for each policy
+        # 2. Check Search-First heuristic
+        if self.should_search_first(observation):
+            logger.info("Search-First heuristic triggered")
+            # Bias toward search policies
+            self.efe_calculator.effort_costs[PolicyType.PRIMARY_SEARCH] = 0.01
+            self.efe_calculator.effort_costs[PolicyType.WEB_SEARCH] = 0.02
+        
+        # 3. Calculate Expected Free Energy for each policy
         policy_G: Dict[PolicyType, Tuple[float, Dict]] = {}
         
         for policy in self.available_policies:
             G, breakdown = self.efe_calculator.calculate(policy, self.beliefs)
             policy_G[policy] = (G, breakdown)
         
-        # 3. Select policy with minimum G (softmax selection for exploration)
+        # 4. Select policy with minimum G (softmax selection for exploration)
         selected_policy = self._select_policy(policy_G)
         
-        # 4. Record action
+        # 5. Handle system command confirmation
+        if selected_policy == PolicyType.SYSTEM_COMMAND:
+            if self.config.require_confirmation_for_system:
+                self._pending_system_command = {
+                    "observation": observation,
+                    "timestamp": datetime.now(),
+                }
+                logger.info("System command requires user confirmation")
+                # Return ASK_CLARIFICATION instead to get confirmation
+                selected_policy = PolicyType.ASK_CLARIFICATION
+        
+        # 6. Record action
         G_value = policy_G[selected_policy][0]
         self.action_history.append((datetime.now(), selected_policy, G_value))
         
         if len(self.action_history) > self.max_history:
             self.action_history = self.action_history[-self.max_history:]
         
-        # 5. Execute action callback if registered
+        # 7. Execute action callback if registered
         result = {"policy": selected_policy.name, "G": G_value}
         
         if selected_policy in self._action_callbacks:
@@ -515,7 +754,7 @@ class ActiveInferenceController:
                 logger.error(f"Action callback failed: {e}")
                 result["error"] = str(e)
         
-        # 6. Update timing
+        # 8. Update timing
         self.last_action_time = datetime.now()
         
         logger.debug(
@@ -746,3 +985,164 @@ class ActiveInferenceController:
         
         self.beliefs.calculate_entropy()
         logger.info(f"Loaded agency state from {load_path}")
+    
+    # =========================================================================
+    # SELF-PRESERVATION METHODS
+    # =========================================================================
+    
+    async def check_self_health(self) -> Dict[str, Any]:
+        """
+        Perform self-health check for self-preservation.
+        
+        Monitors:
+        - Memory usage
+        - Process health
+        - Response times
+        
+        Returns:
+            Health status dictionary
+        """
+        import psutil
+        import os
+        
+        health = {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "warnings": [],
+            "metrics": {},
+        }
+        
+        try:
+            # Memory usage
+            process = psutil.Process(os.getpid())
+            mem_info = process.memory_info()
+            mem_percent = process.memory_percent()
+            
+            health["metrics"]["memory_rss_mb"] = mem_info.rss / (1024 * 1024)
+            health["metrics"]["memory_percent"] = mem_percent
+            
+            if mem_percent > self.config.memory_warning_threshold * 100:
+                health["warnings"].append(f"High memory usage: {mem_percent:.1f}%")
+                health["status"] = "warning"
+            
+            # CPU usage
+            cpu_percent = process.cpu_percent(interval=0.1)
+            health["metrics"]["cpu_percent"] = cpu_percent
+            
+            # Check response times from action history
+            if len(self.action_history) >= 10:
+                recent_times = [
+                    (self.action_history[i][0] - self.action_history[i-1][0]).total_seconds()
+                    for i in range(1, min(11, len(self.action_history)))
+                ]
+                avg_interval = np.mean(recent_times)
+                health["metrics"]["avg_action_interval_sec"] = avg_interval
+            
+        except Exception as e:
+            health["status"] = "error"
+            health["error"] = str(e)
+            logger.error(f"Self-health check failed: {e}")
+        
+        self.last_self_check = datetime.now()
+        return health
+    
+    def should_run_self_check(self) -> bool:
+        """Check if it's time to run a self-health check."""
+        if not self.config.self_preservation_enabled:
+            return False
+        
+        elapsed = (datetime.now() - self.last_self_check).total_seconds()
+        return elapsed >= self.config.health_check_interval
+    
+    # =========================================================================
+    # SYSTEM COMMAND SAFETY METHODS
+    # =========================================================================
+    
+    def is_system_command(self, text: str) -> bool:
+        """
+        Check if text contains a potential system command.
+        
+        Args:
+            text: Text to check
+            
+        Returns:
+            True if contains system command patterns
+        """
+        if not text:
+            return False
+        
+        text_lower = text.lower()
+        
+        # Check for blocked commands
+        for cmd in self.config.blocked_system_commands:
+            if cmd in text_lower:
+                return True
+        
+        # Check for shell patterns
+        shell_patterns = [
+            "os.system", "subprocess", "exec(", "eval(",
+            "import os", "shell=", "cmd /c", "powershell",
+            "sudo", "chmod", "chown", "rm -rf"
+        ]
+        
+        return any(pattern in text_lower for pattern in shell_patterns)
+    
+    def request_system_command_confirmation(
+        self,
+        command: str,
+        reason: str,
+    ) -> Dict[str, Any]:
+        """
+        Request user confirmation for a system command.
+        
+        Args:
+            command: The command to execute
+            reason: Why the command is needed
+            
+        Returns:
+            Confirmation request dictionary
+        """
+        self._pending_system_command = {
+            "command": command,
+            "reason": reason,
+            "timestamp": datetime.now().isoformat(),
+            "status": "pending_confirmation",
+        }
+        
+        return {
+            "requires_confirmation": True,
+            "message": f"System command requested: {command}\nReason: {reason}\n\n"
+                      f"This command requires your explicit confirmation. "
+                      f"Reply 'yes' to proceed or 'no' to cancel.",
+            "command": command,
+            "reason": reason,
+        }
+    
+    def confirm_system_command(self, user_response: str) -> bool:
+        """
+        Process user's response to system command confirmation.
+        
+        Args:
+            user_response: User's response text
+            
+        Returns:
+            True if confirmed, False otherwise
+        """
+        if not self._pending_system_command:
+            return False
+        
+        response_lower = user_response.lower().strip()
+        
+        # Only explicit "yes" confirms
+        if response_lower in ["yes", "y", "confirm", "proceed"]:
+            logger.info(f"System command confirmed: {self._pending_system_command.get('command')}")
+            return True
+        
+        # Any other response cancels
+        logger.info("System command cancelled by user")
+        self._pending_system_command = None
+        return False
+    
+    def clear_pending_system_command(self) -> None:
+        """Clear any pending system command."""
+        self._pending_system_command = None

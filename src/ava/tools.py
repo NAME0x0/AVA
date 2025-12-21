@@ -196,59 +196,321 @@ class FileReadTool(Tool):
 
 
 class WebSearchTool(Tool):
-    """Search the web using DuckDuckGo."""
+    """
+    Search-First Web Search Tool.
+    
+    Primary epistemic action for the Answer Machine paradigm.
+    Uses multiple search providers for fact convergence.
+    """
     
     name = "web_search"
-    description = "Search the web for information"
+    description = "Search the web for factual information (PRIMARY action for queries)"
     parameters = {
         "query": {"type": "string", "description": "Search query"},
-        "num_results": {"type": "integer", "description": "Number of results (default 5)"}
+        "num_results": {"type": "integer", "description": "Number of results (default 10)"},
+        "provider": {"type": "string", "description": "Search provider: duckduckgo, brave (default duckduckgo)"}
     }
     required_params = ["query"]
     
-    async def execute(self, query: str = "", num_results: int = 5, **kwargs) -> ToolResult:
+    # Search providers
+    PROVIDERS = {
+        "duckduckgo": "https://html.duckduckgo.com/html/",
+        "brave": "https://search.brave.com/search",
+    }
+    
+    async def execute(
+        self,
+        query: str = "",
+        num_results: int = 10,
+        provider: str = "duckduckgo",
+        **kwargs
+    ) -> ToolResult:
         import time
         start = time.time()
         
         try:
-            # Use DuckDuckGo Lite API
+            results = await self._search_provider(query, num_results, provider)
+            
+            if not results:
+                # Fallback to alternative provider
+                alt_provider = "brave" if provider == "duckduckgo" else "duckduckgo"
+                results = await self._search_provider(query, num_results, alt_provider)
+            
+            return ToolResult(
+                success=len(results) > 0,
+                output={
+                    "query": query,
+                    "provider": provider,
+                    "results": results,
+                    "num_results": len(results),
+                },
+                error=None if results else "No results found",
+                execution_time_ms=(time.time() - start) * 1000
+            )
+            
+        except Exception as e:
+            return ToolResult(success=False, output=None, error=str(e))
+    
+    async def _search_provider(
+        self,
+        query: str,
+        num_results: int,
+        provider: str,
+    ) -> List[Dict[str, str]]:
+        """Execute search on a specific provider."""
+        import re
+        
+        results = []
+        
+        try:
+            async with httpx.AsyncClient() as client:
+                if provider == "duckduckgo":
+                    response = await client.get(
+                        self.PROVIDERS["duckduckgo"],
+                        params={"q": query},
+                        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+                        timeout=15.0
+                    )
+                    
+                    if response.status_code == 200:
+                        text = response.text
+                        
+                        # Extract results
+                        snippets = re.findall(r'<a class="result__snippet"[^>]*>([^<]+)</a>', text)
+                        titles = re.findall(r'<a class="result__a"[^>]*href="([^"]+)"[^>]*>([^<]+)</a>', text)
+                        
+                        for i, ((url, title), snippet) in enumerate(zip(titles[:num_results], snippets[:num_results])):
+                            results.append({
+                                "title": title.strip(),
+                                "snippet": snippet.strip(),
+                                "url": url,
+                                "source": "duckduckgo",
+                            })
+                
+                elif provider == "brave":
+                    response = await client.get(
+                        self.PROVIDERS["brave"],
+                        params={"q": query, "source": "web"},
+                        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+                        timeout=15.0
+                    )
+                    
+                    if response.status_code == 200:
+                        text = response.text
+                        
+                        # Extract from Brave's HTML
+                        # Simplified extraction
+                        desc_matches = re.findall(r'<p class="snippet-description"[^>]*>([^<]+)</p>', text)
+                        title_matches = re.findall(r'<a class="result-header"[^>]*href="([^"]+)"[^>]*>([^<]+)</a>', text)
+                        
+                        for i, ((url, title), desc) in enumerate(zip(title_matches[:num_results], desc_matches[:num_results])):
+                            results.append({
+                                "title": title.strip(),
+                                "snippet": desc.strip(),
+                                "url": url,
+                                "source": "brave",
+                            })
+        
+        except Exception as e:
+            logger.error(f"Search provider {provider} failed: {e}")
+        
+        return results
+
+
+class WebBrowseTool(Tool):
+    """
+    Web browsing tool for detailed information retrieval.
+    
+    Fetches and extracts content from web pages for deeper
+    information gathering in the Answer Machine workflow.
+    """
+    
+    name = "web_browse"
+    description = "Browse a web page and extract its content"
+    parameters = {
+        "url": {"type": "string", "description": "URL to browse"},
+        "extract_type": {"type": "string", "description": "What to extract: text, links, structured (default text)"},
+        "max_chars": {"type": "integer", "description": "Maximum characters to return (default 5000)"}
+    }
+    required_params = ["url"]
+    
+    async def execute(
+        self,
+        url: str = "",
+        extract_type: str = "text",
+        max_chars: int = 5000,
+        **kwargs
+    ) -> ToolResult:
+        import time
+        start = time.time()
+        
+        try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    "https://html.duckduckgo.com/html/",
-                    params={"q": query},
-                    headers={"User-Agent": "Mozilla/5.0"},
-                    timeout=10.0
+                    url,
+                    headers={
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    },
+                    timeout=20.0,
+                    follow_redirects=True,
                 )
                 
                 if response.status_code != 200:
                     return ToolResult(
-                        success=False, output=None,
-                        error=f"Search failed: {response.status_code}"
+                        success=False,
+                        output=None,
+                        error=f"Failed to fetch URL: {response.status_code}"
                     )
                 
-                # Parse results (simple extraction)
-                results = []
-                text = response.text
-                
-                # Extract result snippets (simplified)
-                import re
-                snippets = re.findall(r'<a class="result__snippet"[^>]*>([^<]+)</a>', text)
-                titles = re.findall(r'<a class="result__a"[^>]*>([^<]+)</a>', text)
-                
-                for i, (title, snippet) in enumerate(zip(titles[:num_results], snippets[:num_results])):
-                    results.append({
-                        "title": title.strip(),
-                        "snippet": snippet.strip()
-                    })
+                content = response.text
+                extracted = self._extract_content(content, extract_type, max_chars)
                 
                 return ToolResult(
                     success=True,
-                    output=results,
+                    output={
+                        "url": url,
+                        "extract_type": extract_type,
+                        "content": extracted,
+                        "content_length": len(extracted),
+                    },
                     execution_time_ms=(time.time() - start) * 1000
                 )
                 
         except Exception as e:
             return ToolResult(success=False, output=None, error=str(e))
+    
+    def _extract_content(
+        self,
+        html: str,
+        extract_type: str,
+        max_chars: int,
+    ) -> str:
+        """Extract content from HTML."""
+        import re
+        
+        # Remove script and style tags
+        html = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL | re.IGNORECASE)
+        html = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.DOTALL | re.IGNORECASE)
+        
+        if extract_type == "text":
+            # Extract plain text
+            text = re.sub(r'<[^>]+>', ' ', html)
+            text = re.sub(r'\s+', ' ', text)
+            text = text.strip()
+            return text[:max_chars]
+        
+        elif extract_type == "links":
+            # Extract links
+            links = re.findall(r'href="([^"]+)"', html)
+            return "\n".join(links[:100])
+        
+        elif extract_type == "structured":
+            # Extract structured content (headings, paragraphs)
+            result = []
+            
+            # Headings
+            for h_tag in ['h1', 'h2', 'h3']:
+                headings = re.findall(f'<{h_tag}[^>]*>([^<]+)</{h_tag}>', html, re.IGNORECASE)
+                for h in headings[:5]:
+                    result.append(f"## {h.strip()}")
+            
+            # Paragraphs
+            paragraphs = re.findall(r'<p[^>]*>([^<]+)</p>', html, re.IGNORECASE)
+            for p in paragraphs[:20]:
+                if len(p.strip()) > 50:
+                    result.append(p.strip())
+            
+            return "\n\n".join(result)[:max_chars]
+        
+        return html[:max_chars]
+
+
+class FactVerificationTool(Tool):
+    """
+    Tool for verifying facts across multiple sources.
+    
+    Implements the Audit-Verify-Research-Update workflow
+    for the Answer Machine paradigm.
+    """
+    
+    name = "verify_fact"
+    description = "Verify a fact by checking multiple sources"
+    parameters = {
+        "claim": {"type": "string", "description": "The claim to verify"},
+        "num_sources": {"type": "integer", "description": "Number of sources to check (default 3)"}
+    }
+    required_params = ["claim"]
+    
+    async def execute(
+        self,
+        claim: str = "",
+        num_sources: int = 3,
+        **kwargs
+    ) -> ToolResult:
+        import time
+        start = time.time()
+        
+        try:
+            # Search for verification
+            search_tool = WebSearchTool()
+            search_result = await search_tool.execute(
+                query=f"fact check {claim}",
+                num_results=num_sources * 2,
+            )
+            
+            if not search_result.success:
+                return search_result
+            
+            # Analyze results for convergence
+            results = search_result.output.get("results", [])
+            
+            verification = {
+                "claim": claim,
+                "sources_checked": len(results),
+                "sources": results,
+                "convergence": self._calculate_convergence(results, claim),
+                "confidence": 0.0,
+            }
+            
+            # Calculate confidence based on convergence
+            verification["confidence"] = verification["convergence"]
+            
+            return ToolResult(
+                success=True,
+                output=verification,
+                execution_time_ms=(time.time() - start) * 1000
+            )
+            
+        except Exception as e:
+            return ToolResult(success=False, output=None, error=str(e))
+    
+    def _calculate_convergence(
+        self,
+        results: List[Dict],
+        claim: str,
+    ) -> float:
+        """
+        Calculate fact convergence across sources.
+        
+        Higher convergence = more sources agree.
+        """
+        if not results:
+            return 0.0
+        
+        # Simple keyword matching for convergence
+        claim_words = set(claim.lower().split())
+        
+        matches = 0
+        for result in results:
+            snippet = result.get("snippet", "").lower()
+            snippet_words = set(snippet.split())
+            
+            overlap = len(claim_words & snippet_words) / len(claim_words) if claim_words else 0
+            if overlap > 0.3:
+                matches += 1
+        
+        return matches / len(results) if results else 0.0
 
 
 # =============================================================================
@@ -445,7 +707,10 @@ class ToolManager:
             CalculatorTool(),
             DateTimeTool(),
             FileReadTool(),
+            # Search-First tools (priority order)
             WebSearchTool(),
+            WebBrowseTool(),
+            FactVerificationTool(),
         ]
         for tool in builtins:
             self._tools[tool.name] = tool
@@ -523,32 +788,58 @@ class ToolManager:
     async def auto_execute(self, query: str) -> List[ToolResult]:
         """
         Automatically determine and execute relevant tools.
-        
-        This analyzes the query and runs appropriate tools.
+
+        SEARCH-FIRST PARADIGM: Web search is the PRIMARY action for
+        informational queries. We prioritize external data over generation.
         """
         results = []
         query_lower = query.lower()
-        
-        # Calculator for math
+
+        # SEARCH-FIRST: Check for informational queries FIRST
+        # These trigger web search as the PRIMARY action
+        informational_indicators = [
+            # Question words
+            "what", "when", "where", "who", "how", "why", "which",
+            # Information seeking
+            "tell me", "explain", "describe", "is it true", "define",
+            # Current events / facts
+            "latest", "news", "current", "today", "recent", "update",
+            # Lookup patterns
+            "search", "find", "look up", "what is", "who is",
+        ]
+
+        # Check if this is an informational query (Search-First trigger)
+        is_informational = (
+            "?" in query or  # Any question
+            any(ind in query_lower for ind in informational_indicators)
+        )
+
+        if is_informational:
+            # PRIMARY ACTION: Web search first
+            result = await self.execute("web_search", query=query, num_results=10)
+            results.append(result)
+
+            # If search returned results, optionally verify facts
+            if result.success and result.output.get("num_results", 0) >= 3:
+                # Extract key claim for verification if needed
+                pass  # Fact verification happens at a higher level
+
+        # Calculator for math (specific, not informational)
         if any(op in query for op in ["+", "-", "*", "/", "calculate", "compute"]):
-            # Extract expression (simplified)
             import re
             expr_match = re.search(r'[\d\s\+\-\*\/\.\(\)]+', query)
             if expr_match:
                 result = await self.execute("calculator", expression=expr_match.group().strip())
                 if result.success:
                     results.append(result)
-        
+
         # DateTime for time queries
-        if any(word in query_lower for word in ["time", "date", "today", "now", "day"]):
-            result = await self.execute("datetime")
-            results.append(result)
-        
-        # Web search for information queries
-        if any(word in query_lower for word in ["search", "find", "what is", "who is", "look up"]):
-            result = await self.execute("web_search", query=query)
-            results.append(result)
-        
+        if any(word in query_lower for word in ["time", "date", "day"]):
+            # Only if asking about current time, not general time questions
+            if not is_informational or any(w in query_lower for w in ["what time", "current time", "now"]):
+                result = await self.execute("datetime")
+                results.append(result)
+
         return results
     
     async def shutdown(self):
