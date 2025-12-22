@@ -649,7 +649,7 @@ class AVACoreSystem:
             elif self._thermal_monitor.should_throttle():
                 result["status"] = "warning"
                 result["action"] = "reduce_load"
-            elif self._thermal_monitor.is_power_exceeded(self.config.max_gpu_power_percent):
+            elif self._thermal_monitor.is_power_exceeded():
                 result["status"] = "power_limit"
                 result["action"] = "reduce_power"
             
@@ -940,12 +940,22 @@ class AVACoreSystem:
             conversation_history=self.conversation_history,
         )
         
-        # 3. Generate with Cortex
-        result = await self._cortex.generate(
-            prompt=cortex_input["text_prompt"],
-            projected_state=cortex_input["soft_prompts"],
-        )
-        
+        # 3. Generate with Cortex (with timeout protection)
+        try:
+            result = await asyncio.wait_for(
+                self._cortex.generate(
+                    prompt=cortex_input["text_prompt"],
+                    projected_state=cortex_input["soft_prompts"],
+                ),
+                timeout=self.config.max_cortex_time if hasattr(self.config, 'max_cortex_time') else 300.0
+            )
+        except asyncio.TimeoutError:
+            logger.error(f"Cortex generation timed out after {self.config.max_cortex_time}s")
+            return "I'm sorry, but that thought took too long. Please try a simpler question or try again."
+        except Exception as e:
+            logger.exception(f"Cortex generation failed: {e}")
+            return f"I encountered an error while thinking: {type(e).__name__}"
+
         if result.error:
             logger.error(f"Cortex generation error: {result.error}")
             return f"I had trouble thinking about that: {result.error}"
@@ -1049,7 +1059,7 @@ class AVACoreSystem:
                             )
                     
                     # Check power limit (15% max for RTX A2000)
-                    if self._thermal_monitor.is_power_exceeded(self.config.max_gpu_power_percent):
+                    if self._thermal_monitor.is_power_exceeded():
                         logger.warning(
                             f"[THERMAL] Power limit exceeded: {thermal_status.power_percent:.1f}% > "
                             f"{self.config.max_gpu_power_percent}%"

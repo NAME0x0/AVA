@@ -92,10 +92,14 @@ export function ChatInput() {
           }
           disabled={!connected || isGenerating}
           rows={1}
+          aria-label="Message input"
+          aria-describedby="input-hint"
+          aria-disabled={!connected || isGenerating}
           className={cn(
             "flex-1 bg-transparent px-4 py-3 text-sm text-text-primary",
             "placeholder:text-text-muted resize-none outline-none",
-            "max-h-[200px] min-h-[44px]"
+            "max-h-[200px] min-h-[44px]",
+            "focus:ring-0 focus:outline-none"
           )}
         />
 
@@ -103,28 +107,31 @@ export function ChatInput() {
         <motion.button
           onClick={handleSubmit}
           disabled={!inputValue.trim() || isGenerating || !connected}
+          aria-label={isGenerating ? "Generating response" : "Send message"}
+          aria-busy={isGenerating}
           className={cn(
             "m-2 p-2.5 rounded-xl transition-all duration-200",
             inputValue.trim() && connected
               ? "bg-accent-primary text-neural-void hover:bg-accent-dim"
-              : "bg-neural-hover text-text-muted cursor-not-allowed"
+              : "bg-neural-hover text-text-muted cursor-not-allowed",
+            "focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-2 focus:ring-offset-neural-elevated"
           )}
           whileHover={inputValue.trim() && connected ? { scale: 1.05 } : {}}
           whileTap={inputValue.trim() && connected ? { scale: 0.95 } : {}}
         >
           {isGenerating ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
           ) : (
-            <Send className="w-4 h-4" />
+            <Send className="w-4 h-4" aria-hidden="true" />
           )}
         </motion.button>
       </motion.div>
 
       {/* Hint text */}
-      <div className="flex items-center justify-between mt-2 text-[10px] text-text-muted">
+      <div id="input-hint" className="flex items-center justify-between mt-2 text-[10px] text-text-muted">
         <span>Press Enter to send, Shift+Enter for new line</span>
         {isGenerating && (
-          <span className="text-accent-primary animate-pulse">
+          <span className="text-accent-primary animate-pulse" role="status" aria-live="polite">
             Generating response...
           </span>
         )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain,
@@ -12,6 +12,7 @@ import {
   Sparkles,
   CircuitBoard,
   Loader2,
+  X,
 } from "lucide-react";
 import { useCoreStore } from "@/stores/core";
 import { cn, getCognitiveStateBgColor, getCognitiveStateColor, formatNumber, getComponentColor } from "@/lib/utils";
@@ -27,8 +28,8 @@ const NeuralBrain = lazy(() =>
 
 function BrainLoader() {
   return (
-    <div className="w-full h-[200px] flex items-center justify-center bg-neural-surface/30 rounded-xl">
-      <Loader2 className="w-6 h-6 text-primary animate-spin" />
+    <div className="w-full h-[150px] sm:h-[200px] flex items-center justify-center bg-neural-surface/30 rounded-xl">
+      <Loader2 className="w-6 h-6 text-accent-primary animate-spin" />
     </div>
   );
 }
@@ -38,21 +39,63 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen }: SidebarProps) {
-  const { cognitiveState, memoryStats, systemState, beliefState, forceCortex, forceSleep } = useCoreStore();
+  const { cognitiveState, memoryStats, systemState, beliefState, forceCortex, forceSleep, toggleSidebar } = useCoreStore();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const componentColors = getComponentColor(systemState.activeComponent);
+
+  // Mobile: Full-screen overlay | Desktop: Side panel
+  const sidebarWidth = isMobile ? "100%" : 300;
 
   return (
     <AnimatePresence mode="wait">
       {isOpen && (
-        <motion.aside
-          initial={{ width: 0, opacity: 0 }}
-          animate={{ width: 300, opacity: 1 }}
-          exit={{ width: 0, opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="h-full bg-neural-surface/50 backdrop-blur-sm border-r border-neural-hover overflow-hidden shrink-0"
-        >
-          <div className="w-[300px] h-full overflow-y-auto p-4 space-y-4">
+        <>
+          {/* Mobile backdrop */}
+          {isMobile && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+              onClick={toggleSidebar}
+            />
+          )}
+
+          <motion.aside
+            initial={{ width: 0, opacity: 0, x: isMobile ? -100 : 0 }}
+            animate={{ width: sidebarWidth, opacity: 1, x: 0 }}
+            exit={{ width: 0, opacity: 0, x: isMobile ? -100 : 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className={cn(
+              "h-full bg-neural-surface/50 backdrop-blur-sm border-r border-neural-hover overflow-hidden shrink-0",
+              isMobile && "fixed left-0 top-0 z-50 bg-neural-surface"
+            )}
+            role="complementary"
+            aria-label="System metrics sidebar"
+          >
+            <div className={cn(
+              "h-full overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4",
+              isMobile ? "w-full" : "w-[300px]"
+            )}>
+              {/* Mobile close button */}
+              {isMobile && (
+                <button
+                  onClick={toggleSidebar}
+                  className="absolute top-3 right-3 p-2 rounded-lg bg-neural-elevated hover:bg-neural-hover transition-colors z-10"
+                  aria-label="Close sidebar"
+                >
+                  <X className="w-5 h-5 text-text-muted" />
+                </button>
+              )}
             {/* 3D Neural Brain Visualization */}
             <section className="relative">
               <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-2 py-1 bg-neural-surface/80 backdrop-blur-sm rounded-lg">

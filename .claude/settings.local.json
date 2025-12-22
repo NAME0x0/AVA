@@ -11,7 +11,12 @@
       "Bash(wc:*)",
       "Bash(ls:*)",
       "Bash(python -c:*)",
-      "Bash(python -m py_compile:*)"
+      "Bash(python -m py_compile:*)",
+      "Bash(del \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\tests\\\\test_audio.py\")",
+      "Bash(del \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\tests\\\\test_commands.py\")",
+      "Bash(del \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\tests\\\\test_text_gen.py\")",
+      "Bash(findstr:*)",
+      "Bash(grep:*)"
     ]
   }
 }

@@ -218,42 +218,103 @@ async def tools_handler(request: web.Request) -> web.Response:
 
 
 async def websocket_handler(request: web.Request) -> web.WebSocketResponse:
-    """WebSocket for streaming chat."""
+    """WebSocket for streaming chat with token-by-token updates."""
     ws = web.WebSocketResponse()
     await ws.prepare(request)
-    
+
+    logger.info(f"WebSocket connection established from {request.remote}")
+
     async for msg in ws:
         if msg.type == aiohttp.WSMsgType.TEXT:
             try:
                 data = json.loads(msg.data)
                 message = data.get("message", "")
-                
-                if message:
-                    ava = await get_ava()
-                    if ava:
-                        # TODO: Implement streaming
-                        result = await ava.chat(message)
-                        await ws.send_json({
-                            "type": "response",
-                            "text": result.text,
-                            "used_cortex": result.used_cortex,
-                            "done": True
-                        })
+                force_deep = data.get("force_deep", False)
+
+                if not message:
+                    await ws.send_json({
+                        "type": "error",
+                        "message": "No message provided"
+                    })
+                    continue
+
+                ava = await get_ava()
+                if not ava:
+                    await ws.send_json({
+                        "type": "error",
+                        "message": "AVA not initialized. Please wait and try again."
+                    })
+                    continue
+
+                # Send processing started
+                await ws.send_json({
+                    "type": "status",
+                    "status": "processing",
+                    "message": "Analyzing your request..."
+                })
+
+                try:
+                    # Get response (with streaming simulation for now)
+                    if force_deep:
+                        result = await ava.think(message)
                     else:
+                        result = await ava.chat(message)
+
+                    # Stream the response in chunks for better UX
+                    response_text = result.text
+                    chunk_size = 20  # Characters per chunk
+
+                    for i in range(0, len(response_text), chunk_size):
+                        chunk = response_text[i:i + chunk_size]
                         await ws.send_json({
-                            "type": "error",
-                            "message": "AVA not initialized"
+                            "type": "chunk",
+                            "text": chunk,
+                            "done": False
                         })
-                        
-            except Exception as e:
+                        await asyncio.sleep(0.02)  # Small delay for streaming effect
+
+                    # Send completion message
+                    await ws.send_json({
+                        "type": "response",
+                        "text": response_text,
+                        "used_cortex": result.used_cortex,
+                        "cognitive_state": result.cognitive_state if hasattr(result, 'cognitive_state') else None,
+                        "response_time_ms": result.response_time_ms if hasattr(result, 'response_time_ms') else None,
+                        "done": True
+                    })
+
+                except asyncio.TimeoutError:
+                    await ws.send_json({
+                        "type": "error",
+                        "message": "Request timed out. Please try a simpler question.",
+                        "error_type": "timeout"
+                    })
+                except Exception as e:
+                    logger.exception(f"Error processing WebSocket message: {e}")
+                    await ws.send_json({
+                        "type": "error",
+                        "message": f"An error occurred: {type(e).__name__}",
+                        "error_type": "processing_error"
+                    })
+
+            except json.JSONDecodeError:
                 await ws.send_json({
                     "type": "error",
-                    "message": str(e)
+                    "message": "Invalid JSON format",
+                    "error_type": "parse_error"
                 })
-                
+            except Exception as e:
+                logger.exception(f"Unexpected WebSocket error: {e}")
+                await ws.send_json({
+                    "type": "error",
+                    "message": "An unexpected error occurred",
+                    "error_type": "unknown"
+                })
+
         elif msg.type == aiohttp.WSMsgType.ERROR:
             logger.error(f"WebSocket error: {ws.exception()}")
-    
+
+    logger.info(f"WebSocket connection closed from {request.remote}")
     return ws
 
 

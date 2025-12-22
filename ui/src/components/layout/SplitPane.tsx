@@ -96,7 +96,7 @@ export function SplitPane({
       <div
         className={`
           relative w-1 flex-shrink-0 cursor-col-resize
-          bg-surface-lighter hover:bg-primary/50
+          bg-neural-hover hover:bg-primary/50
           transition-colors duration-150
           ${isDragging ? "bg-primary" : ""}
         `}

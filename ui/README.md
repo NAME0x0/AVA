@@ -18,7 +18,7 @@ A modern, performant UI for the AVA Cortex-Medulla architecture built with **Nex
 │  ├── System tray integration                                 │
 │  └── IPC bridge to Python backend                            │
 ├─────────────────────────────────────────────────────────────┤
-│  Python Backend (api_server_v3.py)                           │
+│  Python Backend (server.py)                                  │
 │  ├── HTTP REST API                                           │
 │  ├── WebSocket streaming                                     │
 │  └── Cortex-Medulla integration                              │

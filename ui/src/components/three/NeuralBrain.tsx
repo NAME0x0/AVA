@@ -1,9 +1,39 @@
 "use client";
 
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo, useEffect, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Sphere, Line, Float } from "@react-three/drei";
 import * as THREE from "three";
+
+// Check WebGL availability
+function isWebGLAvailable(): boolean {
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+    );
+  } catch {
+    return false;
+  }
+}
+
+// Fallback component when WebGL is unavailable
+function WebGLFallback({ className = "" }: { className?: string }) {
+  return (
+    <div className={`flex items-center justify-center ${className}`}>
+      <div className="text-center p-4 bg-neural-elevated/50 rounded-lg border border-neural-hover">
+        <div className="text-2xl mb-2">🧠</div>
+        <p className="text-text-muted text-sm">
+          3D visualization unavailable
+        </p>
+        <p className="text-text-muted text-xs mt-1">
+          WebGL not supported in this browser
+        </p>
+      </div>
+    </div>
+  );
+}
 
 interface NeuronProps {
   position: [number, number, number];
@@ -263,12 +293,30 @@ export function NeuralBrain({
   activity = 0.5,
   className = "",
 }: NeuralBrainProps) {
+  const [webGLSupported, setWebGLSupported] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setWebGLSupported(isWebGLAvailable());
+  }, []);
+
+  // Show fallback if WebGL not supported or if there was a render error
+  if (!webGLSupported || hasError) {
+    return <WebGLFallback className={className} />;
+  }
+
   return (
     <div className={`w-full h-full ${className}`}>
       <Canvas
         camera={{ position: [0, 0, 5], fov: 50 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: "transparent" }}
+        onCreated={({ gl }) => {
+          // Check for context loss
+          gl.domElement.addEventListener("webglcontextlost", () => {
+            setHasError(true);
+          });
+        }}
       >
         <NeuralNetwork
           activeComponent={activeComponent}

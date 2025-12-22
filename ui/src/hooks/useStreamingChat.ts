@@ -2,6 +2,15 @@
  * WebSocket Hook for Streaming Responses
  * 
  * Provides real-time streaming of responses from the AVA backend
+ * 
+ * TODO: This hook is currently exported but not integrated into the main chat flow.
+ * Future integration plan:
+ * - Replace HTTP polling in useCoreStore with WebSocket streaming
+ * - Add automatic reconnection with exponential backoff
+ * - Support streaming for both Medulla (fast) and Cortex (slow) responses
+ * - Track streaming progress for UI indicators
+ * 
+ * @see useCoreStore for current HTTP-based implementation
  */
 
 import { useRef, useCallback, useState } from "react";

@@ -32,7 +32,11 @@ export function NeuralActivity({ entropy, varentropy, className }: NeuralActivit
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    // Safety check for browsers that may not support 2D context
+    if (!ctx) {
+      console.warn("NeuralActivity: Canvas 2D context not available");
+      return;
+    }
 
     const draw = () => {
       const { width, height } = canvas;

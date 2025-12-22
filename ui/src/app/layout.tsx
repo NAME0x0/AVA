@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -15,6 +16,15 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "AVA • Cortex-Medulla Interface",
   description: "Adaptive Virtual Agent - Biomimetic Neural Architecture",
+  keywords: ["AI", "assistant", "neural", "cortex", "medulla", "AVA"],
+  authors: [{ name: "Muhammad Afsah Mumtaz" }],
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#00D4C8",
 };
 
 export default function RootLayout({
@@ -27,7 +37,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans min-h-screen bg-neural-void overflow-hidden`}
       >
-        {children}
+        <ErrorBoundary>{children}</ErrorBoundary>
       </body>
     </html>
   );

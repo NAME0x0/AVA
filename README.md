@@ -4,6 +4,13 @@
   <img src="docs/assets/ava_logo.png" alt="AVA Logo" width="150" />
 </p>
 
+<p align="center">
+  <a href="https://github.com/NAME0x0/AVA/actions"><img src="https://img.shields.io/github/actions/workflow/status/NAME0x0/AVA/ci.yml?branch=main&style=flat-square&logo=github&label=CI" alt="CI Status"></a>
+  <a href="https://github.com/NAME0x0/AVA"><img src="https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+"></a>
+  <a href="https://github.com/NAME0x0/AVA/blob/main/LICENSE"><img src="https://img.shields.io/github/license/NAME0x0/AVA?style=flat-square" alt="License"></a>
+  <a href="https://github.com/NAME0x0/AVA/releases"><img src="https://img.shields.io/github/v/release/NAME0x0/AVA?style=flat-square&include_prereleases" alt="Release"></a>
+</p>
+
 **AVA v3** is a research-grade AI assistant with a **biomimetic dual-brain architecture** inspired by the human nervous system. It runs locally on constrained hardware (4GB VRAM) and prioritizes accuracy over speed.
 
 ## What's New in v3
