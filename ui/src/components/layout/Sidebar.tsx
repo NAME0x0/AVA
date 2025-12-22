@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense, lazy } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain,
@@ -10,6 +11,7 @@ import {
   TrendingUp,
   Sparkles,
   CircuitBoard,
+  Loader2,
 } from "lucide-react";
 import { useCoreStore } from "@/stores/core";
 import { cn, getCognitiveStateBgColor, getCognitiveStateColor, formatNumber, getComponentColor } from "@/lib/utils";
@@ -17,6 +19,19 @@ import { CognitiveStateCard } from "@/components/metrics/CognitiveStateCard";
 import { MetricCard } from "@/components/metrics/MetricCard";
 import { NeuralActivity } from "@/components/metrics/NeuralActivity";
 import { BeliefStateCard } from "@/components/metrics/BeliefStateCard";
+
+// Lazy load Three.js component for performance
+const NeuralBrain = lazy(() =>
+  import("@/components/three/NeuralBrain").then((mod) => ({ default: mod.NeuralBrain }))
+);
+
+function BrainLoader() {
+  return (
+    <div className="w-full h-[200px] flex items-center justify-center bg-neural-surface/30 rounded-xl">
+      <Loader2 className="w-6 h-6 text-primary animate-spin" />
+    </div>
+  );
+}
 
 interface SidebarProps {
   isOpen: boolean;
@@ -38,6 +53,30 @@ export function Sidebar({ isOpen }: SidebarProps) {
           className="h-full bg-neural-surface/50 backdrop-blur-sm border-r border-neural-hover overflow-hidden shrink-0"
         >
           <div className="w-[300px] h-full overflow-y-auto p-4 space-y-4">
+            {/* 3D Neural Brain Visualization */}
+            <section className="relative">
+              <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-2 py-1 bg-neural-surface/80 backdrop-blur-sm rounded-lg">
+                <div className={cn(
+                  "w-2 h-2 rounded-full animate-pulse",
+                  systemState.activeComponent === "cortex" ? "bg-cortex-active" :
+                  systemState.activeComponent === "medulla" ? "bg-primary" : "bg-text-muted"
+                )} />
+                <span className="text-[10px] text-text-muted uppercase tracking-wider">
+                  Live Neural Activity
+                </span>
+              </div>
+              <div className="h-[200px] rounded-xl overflow-hidden border border-neural-hover bg-neural-surface/30">
+                <Suspense fallback={<BrainLoader />}>
+                  <NeuralBrain
+                    activeComponent={systemState.activeComponent}
+                    cognitiveState={cognitiveState.label}
+                    entropy={cognitiveState.entropy}
+                    activity={cognitiveState.confidence}
+                  />
+                </Suspense>
+              </div>
+            </section>
+
             {/* Active Component Indicator */}
             <motion.div
               className={cn(

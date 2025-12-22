@@ -15,6 +15,9 @@ Reference Papers:
 - Nested Learning (Hinton, 2025)
 - Toolformer: Language Models Teach Themselves to Use Tools (2023)
 - Distilling Step-by-Step! (ACL Findings, 2023)
+
+NOTE: Some tests require legacy modules that have been archived.
+These tests will be skipped if the legacy modules are unavailable.
 """
 
 import pytest
@@ -29,17 +32,36 @@ from pathlib import Path
 
 # Add src to path for imports
 src_path = Path(__file__).parent.parent.parent / "src"
+legacy_path = Path(__file__).parent.parent.parent / "legacy"
 sys.path.insert(0, str(src_path))
+sys.path.insert(0, str(legacy_path))
+
+# Check for legacy module availability
+try:
+    from memory.models import TitansMemory
+    LEGACY_MEMORY_AVAILABLE = True
+except ImportError:
+    LEGACY_MEMORY_AVAILABLE = False
+
+try:
+    from output.articulation import ChainOfThoughtEnforcer
+    LEGACY_OUTPUT_AVAILABLE = True
+except ImportError:
+    LEGACY_OUTPUT_AVAILABLE = False
 
 
+@pytest.mark.skipif(not LEGACY_MEMORY_AVAILABLE, reason="Legacy memory module archived")
 class TestTitansMemorySurprise:
     """
     Test TitansMemory's surprise-driven update mechanism.
-    
+
     Key verification: High surprise (prediction error) should trigger
     stronger memory updates, as specified in Titans (2025).
+
+    NOTE: These tests use the legacy TitansMemory implementation.
+    For v3, use hippocampus.titans.TitansSidecar instead.
     """
-    
+
     def test_memory_imports(self):
         """Verify TitansMemory can be imported."""
         from memory.models import TitansMemory
@@ -306,13 +328,16 @@ class TestToolformerParser:
         assert "4" in augmented, "Result should be included in augmented text"
 
 
+@pytest.mark.skipif(not LEGACY_OUTPUT_AVAILABLE, reason="Legacy output module archived")
 class TestChainOfThoughtEnforcer:
     """
     Test ChainOfThoughtEnforcer for reasoning extraction.
-    
+
     Key verification: Extract and structure intermediate reasoning steps.
+
+    NOTE: These tests use the legacy articulation implementation.
     """
-    
+
     def test_enforcer_imports(self):
         """Verify ChainOfThoughtEnforcer can be imported."""
         from output.articulation import ChainOfThoughtEnforcer

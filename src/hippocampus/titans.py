@@ -23,6 +23,7 @@ Reference: arXiv:2501.00663 (Titans: Learning to Memorize at Test Time)
 import logging
 import math
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -648,6 +649,32 @@ def create_titans_sidecar(
         momentum=momentum,
     )
     
+    return TitansSidecar(config, device=device)
+
+
+# Backward compatibility alias
+def create_titans_memory(
+    input_dim: int = 768,
+    memory_dim: int = 2048,
+    learning_rate: float = 0.01,
+    momentum_decay: float = 0.99,
+    surprise_threshold: float = 0.5,
+    use_torch: bool = None,
+    device: str = "cpu",
+) -> TitansSidecar:
+    """
+    Legacy factory function for backward compatibility.
+
+    Use create_titans_sidecar() for new code.
+    """
+    config = TitansSidecarConfig(
+        input_dim=input_dim,
+        hidden_dim=memory_dim,
+        output_dim=input_dim,
+        learning_rate=learning_rate,
+        momentum=momentum_decay,
+        surprise_threshold=surprise_threshold,
+    )
     return TitansSidecar(config, device=device)
 
 

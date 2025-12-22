@@ -1,136 +1,328 @@
-# AVA System Architecture: Local Agentic AI Daily Driver
+# AVA v3 Architecture
 
-**Project Vision:** To establish AVA as a compact, powerful, and locally-run agentic AI model capable of serving as a daily driver for advanced tasks on an NVIDIA RTX A2000 GPU with 4GB VRAM. AVA is designed for complex agentic tasks, seamless user experience (CLI and GUI), and remote access via token broadcasting.
+This document describes the internal architecture of AVA's Cortex-Medulla dual-brain system.
 
-This document details the architecture of AVA, focusing on achieving high performance and advanced capabilities within significant hardware constraints.
+## Overview
+
+AVA implements a **biomimetic architecture** inspired by the human nervous system:
+
+- **Medulla** (brainstem): Always-on, fast reflexive processing
+- **Cortex** (neocortex): Deep reasoning, activated on-demand
+- **Hippocampus** (Titans): Long-term memory via test-time learning
+- **Agency**: Autonomous behavior using Active Inference
 
 ## I. Core Challenge: 4GB VRAM Limitation
 
-The NVIDIA RTX A2000 (Ampere Architecture) typically features 6GB or 12GB GDDR6 memory. The project's specific 4GB VRAM constraint necessitates an exceptionally aggressive approach to model selection, optimization, and fine-tuning. This limitation drives all architectural decisions.
+The system is optimized for NVIDIA RTX A2000 (4GB VRAM) through:
 
-## II. Foundational Layers
+- **Dual-model architecture**: Fast small model (Medulla) + Large paged model (Cortex)
+- **Layer-wise inference**: Cortex loads one layer at a time via AirLLM
+- **Aggressive quantization**: 4-bit for Medulla, 1-bit BitNet where possible
+- **Test-time learning**: Titans memory with fixed 200MB footprint
 
-### A. Base Model Selection
+## II. System Flow
 
-*   **Constraint:** Strict 4GB VRAM limit.
-*   **Strategy:** Prioritize ultra-small, highly efficient LLM architectures.
-*   **Viable Candidates (Post-Quantization):**
-    *   **Gemma 3n 4B:** Requires ~2.3-2.6GB VRAM (4-bit quantized). Chosen for its balance of capability and small footprint.
-    *   **Gemma 3n 1B:** Requires ~0.5GB VRAM (4-bit quantized). An alternative for even tighter constraints or simpler tasks.
-*   **Rationale:** Larger models (e.g., DeepSeek 7B+) are infeasible. Gemma models are engineered for efficiency on consumer hardware, featuring Per-Layer Embeddings (PLE) and MatFormer architecture for dynamic memory footprint reduction.
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           USER INPUT                                     │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        MEDULLA (Always Active)                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐    │
+│  │ Tokenizer   │→ │ Mamba SSM   │→ │ Surprise    │→ │ Quick       │    │
+│  │             │  │ (State)     │  │ Calculator  │  │ Response    │    │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘    │
+│                                           │                              │
+│                         High Surprise? ───┘                              │
+└───────────────────────────────│──────────────────────────────────────────┘
+                                │
+                    ┌───────────┴───────────┐
+                    │                       │
+              Low Surprise             High Surprise
+                    │                       │
+                    ▼                       ▼
+           ┌──────────────┐        ┌──────────────────────────────────────┐
+           │ Quick Reply  │        │               CORTEX                 │
+           │ (Medulla)    │        │  ┌─────────┐  ┌─────────┐  ┌─────┐  │
+           └──────────────┘        │  │ AirLLM  │→ │ 70B     │→ │Deep │  │
+                                   │  │ Loader  │  │ Model   │  │Reply│  │
+                                   │  └─────────┘  └─────────┘  └─────┘  │
+                                   └──────────────────────────────────────┘
+```
 
-### B. Core Optimization Strategies
+## III. Component Details
 
-1.  **Aggressive Model Compression:**
-    *   **4-bit Quantization (INT4):** Essential for fitting the model into VRAM. Reduces numerical precision of weights/activations. Implemented using libraries like `bitsandbytes` (provides `LLM.int8()` and QLoRA for 4-bit) which is well-suited for Ampere GPUs.
-    *   **Knowledge Distillation:** A smaller "student" model (AVA) learns from a larger, more capable "teacher" model. AVA learns from the teacher's soft probabilities and internal representations, enabling it to approximate superior performance with fewer parameters. This is key to AVA being "more advanced" in specific capabilities.
-    *   **Pruning & Sparsification:** Systematically removing redundant parameters (weights, connections) using techniques like structured pruning or SparseGPT. Models can be exported to optimized formats like ONNX.
+### A. Medulla (`src/core/medulla.py`)
 
-2.  **Parameter-Efficient Fine-Tuning (PEFT):**
-    *   **QLoRA (Quantized Low-Rank Adaptation):** Freezes most of the pre-trained LLM's 4-bit quantized weights and introduces a small set of trainable low-rank adaptation (LoRA) weights. This drastically reduces computational/storage costs of fine-tuning and prevents catastrophic forgetting. Implemented using libraries like `trl`, `unsloth`, `peft`, and `bitsandbytes`.
-    *   **High-Quality Synthetic Dataset Generation:** Leverage LLMs (e.g., using tools like Gretel Navigator or custom workflows) to create task-specific instruction data (question-answer pairs, step-by-step evaluations). This overcomes data scarcity for specialized agentic tasks.
+The Medulla is AVA's "fast brain" - always active and handling routine queries.
 
-## III. Agentic Capabilities Architecture
+**Responsibilities:**
+- Initial input processing
+- Surprise calculation (embedding distance from known patterns)
+- Quick response generation for low-complexity queries
+- Routing decisions to Cortex
 
-AVA's agentic workflow relies on sophisticated Natural Language Understanding (NLU), Dialogue Management (DM), and Natural Language Generation (NLG), with memory-enhanced architectures for long-term context.
+**Key Configuration:**
+```python
+class MedullaConfig:
+    low_surprise_threshold: float = 0.3   # Below: Medulla responds
+    high_surprise_threshold: float = 0.7  # Above: Cortex activates
+    model_name: str = "gemma3:4b"         # Fast model
+```
 
-### A. Core Agentic Components
+**Memory Usage:** ~800 MB resident
 
-1.  **Function Calling & Tool Use:**
-    *   AVA will be fine-tuned to recognize when external tools/APIs are needed and output structured JSON with arguments for execution.
-    *   Enables dynamic access to real-time data (weather, databases) and actions (scheduling, code generation).
+### B. Cortex (`src/core/cortex.py`)
 
-2.  **Structured Output:**
-    *   Ensures AVA produces reliable, parsable outputs (JSON, formatted SQL) for downstream processing and interoperability.
-    *   Utilizes libraries like LlamaIndex (Pydantic Programs, Output Parsers) leveraging native function calling or post-processing text completions.
+The Cortex handles complex reasoning using large models on constrained hardware.
 
-3.  **Reasoning Mechanisms:**
-    *   **Chain-of-Thought (CoT) Prompting:** Instructing the LLM to generate explicit step-by-step reasoning.
-    *   **Advanced Reasoning (e.g., RL-of-Thoughts - RLoT):** Potential for training a lightweight "navigator" model via reinforcement learning to adaptively select and combine reasoning blocks for complex tasks.
+**Responsibilities:**
+- Deep reasoning for complex queries
+- Multi-step planning and problem decomposition
+- Verification of factual claims
+- Tool orchestration for complex tasks
 
-### B. Model Context Protocol (MCP) Integration
+**Key Features:**
+- Layer-wise paging via AirLLM
+- 70B+ models on 4GB VRAM
+- ~3.3 seconds per token generation
 
-*   **Concept:** An open standard allowing AVA (as an MCP Host) to directly access files, APIs, and tools via lightweight MCP Servers, bypassing traditional RAG embeddings/vector searches.
-*   **Benefits:**
-    *   **Direct, Real-time Data Access:** Reduces computational load, improves data freshness, and minimizes hallucinations.
-    *   **Streamlined Tool Orchestration:** Simplifies adding new data sources/tools by standardizing the interface (N+M vs N x M integration complexity).
-    *   **Enhanced Security:** Minimizes data movement and storage.
+**Memory Usage:** ~1.6 GB (paged on-demand)
 
-## IV. User Experience (UX) and Connectivity
+### C. Bridge (`src/core/bridge.py`)
 
-### A. User Interfaces
+The Bridge connects Medulla and Cortex, enabling smooth transitions.
 
-1.  **Command Line Interface (CLI):**
-    *   For direct control, scripting, and advanced users.
-    *   Allows prompt input, function execution, tool interaction, and structured output in the terminal.
+**Responsibilities:**
+- Project Medulla hidden states to Cortex embedding space
+- Maintain context continuity across components
+- Enable efficient cross-attention
 
-2.  **Graphical User Interface (GUI):**
-    *   **Recommended Foundation:** Open WebUI – a self-hosted, offline-capable AI platform supporting Ollama and OpenAI-compatible APIs.
-    *   **Key Open WebUI Features:** ChatGPT-style interface, LLM selector, parameter playground, knowledge collections (document upload), live web search, GPU acceleration via Docker.
-    *   **Advanced Agentic UI Inspirations (from OpenAI Codex, Claude Code Terminal):**
-        *   Interactive code snippets.
-        *   Project context awareness.
-        *   Actionable outputs (e.g., diffs, follow-up tasks).
-        *   User configurability (agent behavior, permissions).
-        *   Feedback mechanisms.
+### D. Agency (`src/core/agency.py`)
 
-### B. Remote Access & Token Broadcasting
+The Agency module implements Active Inference for autonomous behavior.
 
-1.  **Secure Tunneling for Local Inference:**
-    *   Expose AVA's local server (e.g., running on a specific port) to the internet via a secure public URL using tools like `Localtonet` or `ngrok`.
-    *   Crucial for privacy and cost-saving (data remains local).
-    *   Requires security features: basic authentication, IP whitelisting.
+**Available Policies:**
+| Policy | Description | Effort Cost |
+|--------|-------------|-------------|
+| `PRIMARY_SEARCH` | Web search (default for questions) | 0.1 |
+| `REFLEX_REPLY` | Quick Medulla response | 0.05 |
+| `DEEP_THOUGHT` | Cortex reasoning | 0.3 |
+| `WEB_BROWSE` | Extended web research | 0.2 |
+| `SELF_MONITOR` | System introspection | 0.1 |
+| `THERMAL_CHECK` | GPU temperature monitoring | 0.05 |
+| `SYSTEM_COMMAND` | Execute commands (confirmed) | 0.4 |
 
-2.  **Token Streaming for Responsive UI:**
-    *   Incrementally send generated tokens to the client as they become available, eliminating long load times.
-    *   **Recommended Method:** Server-Sent Events (SSE) for efficient, uni-directional streaming of text data over HTTP.
-    *   Alternative: WebSockets for bi-directional streaming if more interactive communication is needed.
+**Free Energy Minimization:**
+```python
+G(π) = D_KL[Q(s|π) || P(s|C)] - E_Q[log P(o|s)]
+     ≈ pragmatic_value + epistemic_value - effort_cost
+```
 
-## V. System Overview Diagram
+### E. Titans Memory (`src/hippocampus/titans.py`)
+
+Titans provides infinite context via test-time learning.
+
+**Responsibilities:**
+- Long-term memory storage
+- Surprise-weighted gradient updates
+- Semantic context retrieval
+
+**Key Features:**
+- 3-layer MLP learned during inference
+- Fixed 200 MB footprint regardless of history length
+- Automatic forgetting of low-importance memories
+
+### F. System Orchestrator (`src/core/system.py`)
+
+The main orchestrator that coordinates all components.
+
+**Initialization Order:**
+1. Titans Memory
+2. Medulla
+3. Cortex (lazy loaded)
+4. Bridge
+5. Agency
+6. Thermal Monitor
+7. Episodic Buffer
+
+## IV. VRAM Management
+
+AVA is optimized for 4GB VRAM GPUs:
+
+```
+Component           │ Resident │ Peak
+────────────────────┼──────────┼─────────
+System Overhead     │   300 MB │   300 MB
+Medulla (Mamba)     │   800 MB │   800 MB
+Titans Memory       │   200 MB │   200 MB
+Bridge Adapter      │    50 MB │    50 MB
+Cortex Buffer       │     0 MB │ 1,600 MB
+────────────────────┼──────────┼─────────
+Total               │ 1,350 MB │ 2,950 MB
+Headroom            │ 2,650 MB │   446 MB
+```
+
+**Memory Strategies:**
+- Medulla stays resident for fast response
+- Cortex loads layer-by-layer (paging)
+- Titans uses gradient checkpointing
+- Aggressive garbage collection between Cortex calls
+
+## V. Thermal Management
+
+AVA monitors GPU temperature for self-preservation:
+
+| Temperature | Action |
+|-------------|--------|
+| < 75°C | Normal operation |
+| 75-80°C | Warning logged |
+| 80-85°C | Throttle Cortex |
+| > 85°C | Pause Cortex, Medulla only |
+
+**Configuration:**
+```yaml
+thermal:
+  max_gpu_power_percent: 15  # 10.5W on RTX A2000
+  warning_temp_c: 75
+  throttle_temp_c: 80
+  pause_temp_c: 85
+```
+
+## VI. Search-First Paradigm
+
+Web search is the DEFAULT action for informational queries.
+
+**Trigger Words:**
+- what, when, where, who, how, why
+- define, explain, describe
+- current, latest, recent
+
+**Verification Process:**
+1. Query parsed for question type
+2. Minimum 3 sources retrieved
+3. 70% agreement threshold for facts
+4. Cross-reference with internal knowledge
+5. Confidence score assigned
+
+## VII. Request Flow Examples
+
+### Simple Query (Medulla Path)
+```
+User: "What is the capital of France?"
+
+1. Medulla receives input
+2. Tokenization and embedding
+3. Surprise calculated: 0.15 (low)
+4. Agency selects: PRIMARY_SEARCH
+5. Web search returns: Paris (100% agreement)
+6. Quick response via Medulla
+7. Titans stores with low surprise weight
+```
+
+### Complex Query (Cortex Path)
+```
+User: "Explain Gödel's incompleteness theorems philosophically"
+
+1. Medulla receives input
+2. Surprise calculated: 0.85 (high)
+3. Agency selects: DEEP_THOUGHT
+4. Cortex activated (layer-wise loading)
+5. Multi-step reasoning (~45 seconds)
+6. Response generated
+7. Titans stores with high surprise weight
+```
+
+## VIII. API Endpoints
+
+| Endpoint | Purpose | Component |
+|----------|---------|-----------|
+| `POST /chat` | General chat | Medulla → Agency → Response |
+| `POST /think` | Force deep thought | Cortex directly |
+| `POST /search` | Force search | Agency → Web |
+| `GET /status` | System state | All components |
+| `WS /ws` | Streaming | Medulla/Cortex |
+
+## IX. Extension Points
+
+### Adding New Policies
+
+```python
+# In src/core/agency.py
+class CustomPolicy(Policy):
+    name = "CUSTOM_ACTION"
+    effort_cost = 0.2
+
+    async def execute(self, context: Dict) -> PolicyResult:
+        # Implementation
+        pass
+
+# Register
+agency.register_policy(CustomPolicy())
+```
+
+### Adding New Tools
+
+```python
+# In src/ava/tools.py
+class MyTool(Tool):
+    name = "my_tool"
+    description = "Does something useful"
+
+    async def execute(self, args: Dict) -> ToolResult:
+        # Implementation
+        pass
+
+# Register
+tool_manager.register(MyTool())
+```
+
+## X. Performance Characteristics
+
+| Metric | Medulla | Cortex |
+|--------|---------|--------|
+| First token latency | ~100ms | ~3.3s |
+| Tokens per second | ~30 | ~0.3 |
+| Memory footprint | 800 MB | 1.6 GB (paged) |
+| Query complexity | Simple | Complex |
+| Tool orchestration | Basic | Advanced |
+
+## XI. System Diagram
 
 ```mermaid
 graph TD
-    A[User (CLI / GUI / Remote)] --> B{AVA Core};
+    A[User Input] --> B{Medulla}
+    B -->|Tokenize| C[Embedding]
+    C --> D{Surprise Calculator}
+    D -->|Low| E[Quick Reply]
+    D -->|High| F{Agency}
+    F -->|SEARCH| G[Web Search]
+    F -->|THINK| H[Cortex]
+    F -->|REPLY| E
+    G --> I[Verification]
+    H --> I
+    I --> J[Response]
+    J --> K[Titans Memory]
+    K --> L[User Output]
 
-    subgraph AVA Core
-        C[Interface Manager (CLI/GUI Adapters)] --> D{Dialogue Manager};
-        D -- User Input --> E[NLU Engine];
-        E --> F[Optimized LLM (Gemma 3n 4B + QLoRA)];
-        F -- Internal Thought/Reasoning --> F;
-        F -- Structured Output/Function Call --> G{Agentic Engine};
-        G -- Needs Tool/Data --> H{Tool & MCP Interface};
-        H --> I[Local Files (via MCP)];
-        H --> J[External APIs (Weather, Calendar etc.)];
-        H --> K[Databases (via MCP)];
-        I --> H;
-        J --> H;
-        K --> H;
-        H -- Tool/Data Response --> G;
-        G -- Action/Response Plan --> L[NLG Engine];
-        L -- Formatted Response --> C;
+    subgraph Memory
+        M[Episodic Buffer]
+        K
     end
 
-    B -- Token Stream (SSE) --> A;
-    M[Synthetic Data Generation Workflow] -.-> F;
-    N[Knowledge Distillation Teacher Model] -.-> F;
-
-    subgraph External Services
-        O[MCP Servers]
-        P[External APIs]
-        Q[Databases]
+    subgraph Thermal
+        N[GPU Monitor]
+        N -->|Hot| O[Throttle]
+        O --> H
     end
-
-    H <--> O;
-    H <--> P;
-    H <--> Q;
-
-    R[Secure Tunnel (e.g., Localtonet)] <--> B;
 ```
 
-## VI. Implementation Roadmap Summary
+## XII. Future Directions
 
-1.  **Phase 1: Foundation & Optimization:** Base model selection (Gemma 3n 4B), 4-bit quantization, QLoRA setup, synthetic dataset pipeline.
-2.  **Phase 2: Agentic Core Development:** Function calling, structured output, reasoning mechanisms (CoT), MCP integration.
-3.  **Phase 3: Interface & Connectivity:** CLI development, GUI (Open WebUI base), secure tunneling, token streaming.
-
-**Continuous Improvement:** Establish feedback loops (user ratings, interaction analysis) for ongoing model refinement, prompt adjustments, and tool integration updates. 
+- **Sparse Attention**: Further reduce Cortex memory via sparse patterns
+- **Speculative Decoding**: Medulla drafts, Cortex verifies for speed
+- **Multi-Modal**: Image understanding via CLIP integration
+- **Federated Learning**: Privacy-preserving model updates
+- **Edge Deployment**: ARM optimization for mobile devices

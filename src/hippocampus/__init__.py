@@ -12,8 +12,8 @@ The hippocampus serves as the bridge between:
 2. The Subconscious Dreamer (offline consolidation)
 """
 
-from .titans import TitansSidecar, TitansSidecarConfig
-from .episodic_buffer import EpisodicBuffer, Episode, BufferConfig
+from .titans import TitansSidecar, TitansSidecarConfig, create_titans_memory, create_titans_sidecar
+from .buffer import EpisodicBuffer, Episode, BufferConfig
 
 __all__ = [
     "TitansSidecar",

@@ -49,8 +49,8 @@ class ProcessingMode(Enum):
 
 
 @dataclass
-class EngineResponse:
-    """Response from the engine."""
+class _EngineResponse:
+    """Internal response from the engine. Use Response from src.ava for public API."""
     text: str = ""
     used_cortex: bool = False
     cognitive_state: CognitiveState = CognitiveState.FLOW
@@ -175,7 +175,7 @@ class AVAEngine:
         tools = None,
         force_cortex: bool = False,
         verify: bool = None,
-    ) -> EngineResponse:
+    ) -> _EngineResponse:
         """
         Process user input and generate response.
         
@@ -195,13 +195,13 @@ class AVAEngine:
             verify: Override verification setting
             
         Returns:
-            EngineResponse with text and metadata
+            _EngineResponse with text and metadata
         """
         if not self.is_initialized:
             await self.initialize()
         
         start_time = time.time()
-        result = EngineResponse()
+        result = _EngineResponse()
         
         try:
             # 1. Analyze the query

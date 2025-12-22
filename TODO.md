@@ -261,17 +261,52 @@ src/
 - [ ] Configure real model paths
 - [ ] Set appropriate log levels
 
-### 9.2 Model Downloads
-- [ ] Download Slender-Mamba 2.7B
-- [ ] Download BitNet 3B
-- [ ] Download Llama-3 70B (or 8B for testing)
-- [ ] Download embedding model
+### 9.2 One-Click Setup Scripts - COMPLETE
+- [x] Create `setup_ava.py` - Cross-platform Python setup script
+- [x] Create `setup_ava.ps1` - PowerShell script for Windows
+- [x] Update `start.sh` - Bash script for Linux/macOS
+- [x] Automatic model downloads via Ollama:
+  - Minimal mode: `gemma3:4b`, `nomic-embed-text`
+  - Standard mode: + `llama3.2:latest`
+  - Full mode: + `llama3.1:70b-instruct-q4_0`
+- [x] Virtual environment creation
+- [x] Dependency installation from `requirements.txt`
+- [x] Directory structure creation
+- [x] Installation validation
 
-### 9.3 Directory Setup
-- [ ] Create `data/memory/episodic/`
-- [ ] Create `data/memory/medulla_state.npz`
-- [ ] Create `models/fine_tuned_adapters/bridge/`
-- [ ] Create `models/fine_tuned_adapters/experts/`
+**Usage:**
+```bash
+# Python (cross-platform)
+python setup_ava.py              # Standard setup
+python setup_ava.py --minimal    # Small models only
+python setup_ava.py --full       # All models including 70B
+python setup_ava.py --check      # Validate installation
+
+# Windows PowerShell
+.\setup_ava.ps1
+.\setup_ava.ps1 -Minimal
+
+# Linux/macOS Bash
+./start.sh
+./start.sh --minimal
+```
+
+### 9.3 Advanced Model Downloads (Future)
+- [ ] Download Slender-Mamba 2.7B (Medulla Monitor)
+- [ ] Download BitNet 3B (Medulla Talker)
+- [ ] Download Llama-3 70B via AirLLM (Cortex)
+- [ ] HuggingFace integration for advanced models
+
+### 9.4 Directory Setup - COMPLETE
+- [x] Create `data/memory/episodic/`
+- [x] Create `data/learning/samples/`
+- [x] Create `data/learning/checkpoints/`
+- [x] Create `data/conversations/`
+- [x] Create `models/fine_tuned_adapters/bridge/`
+- [x] Create `models/fine_tuned_adapters/experts/`
+- [x] Create `config/`
+- [x] Create `logs/`
+- [ ] Create `data/memory/medulla_state.npz` (runtime)
 
 ---
 
@@ -279,7 +314,13 @@ src/
 
 | Purpose | File |
 |---------|------|
+| **Setup Scripts** | |
+| Python Setup (cross-platform) | `setup_ava.py` |
+| Windows PowerShell | `setup_ava.ps1` |
+| Linux/macOS Bash | `start.sh` |
+| **Configuration** | |
 | Main Config | `config/cortex_medulla.yaml` |
+| **Core System** | |
 | HTTP Server | `server.py` |
 | Core Orchestrator | `src/core/core_loop.py` |
 | Medulla | `src/core/medulla.py` |

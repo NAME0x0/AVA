@@ -91,6 +91,21 @@ interface CoreStore {
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
 
+  // Command Palette
+  commandPaletteOpen: boolean;
+  setCommandPaletteOpen: (open: boolean) => void;
+  toggleCommandPalette: () => void;
+
+  // Split Pane
+  splitPaneMode: "chat-only" | "chat-metrics" | "chat-code";
+  splitPaneRatio: number;
+  setSplitPaneMode: (mode: "chat-only" | "chat-metrics" | "chat-code") => void;
+  setSplitPaneRatio: (ratio: number) => void;
+
+  // Thinking State
+  thinkingStage: "idle" | "perceiving" | "routing" | "searching" | "generating" | "verifying";
+  setThinkingStage: (stage: "idle" | "perceiving" | "routing" | "searching" | "generating" | "verifying") => void;
+
   // Input
   inputValue: string;
   setInputValue: (value: string) => void;
@@ -200,6 +215,21 @@ export const useCoreStore = create<CoreStore>()(
     sidebarOpen: true,
     toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
     setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
+
+    // Command Palette
+    commandPaletteOpen: false,
+    setCommandPaletteOpen: (commandPaletteOpen) => set({ commandPaletteOpen }),
+    toggleCommandPalette: () => set((s) => ({ commandPaletteOpen: !s.commandPaletteOpen })),
+
+    // Split Pane
+    splitPaneMode: "chat-metrics",
+    splitPaneRatio: 0.65,
+    setSplitPaneMode: (splitPaneMode) => set({ splitPaneMode }),
+    setSplitPaneRatio: (splitPaneRatio) => set({ splitPaneRatio }),
+
+    // Thinking State
+    thinkingStage: "idle",
+    setThinkingStage: (thinkingStage) => set({ thinkingStage }),
 
     // Input
     inputValue: "",

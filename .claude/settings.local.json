@@ -5,7 +5,13 @@
       "Bash(del \"C:\\Users\\Afsah\\OneDrive\\Documents\\AVA\\src\\cortex\\executive.py\")",
       "Bash(del \"C:\\Users\\Afsah\\OneDrive\\Documents\\AVA\\run_frankensystem.py\")",
       "Bash(del \"C:\\Users\\Afsah\\OneDrive\\Documents\\AVA\\run_node.py\")",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(ls:*)",
+      "Bash(python -c:*)",
+      "Bash(python -m py_compile:*)"
     ]
   }
 }

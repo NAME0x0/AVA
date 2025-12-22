@@ -55,7 +55,7 @@ import numpy as np
 
 # Import architecture components
 from .medulla import Medulla, MedullaConfig, SurpriseSignal, ThermalMonitor
-from .cortex_engine import Cortex, CortexConfig, GenerationResult
+from .cortex import Cortex, CortexConfig, GenerationResult
 from .bridge import Bridge, BridgeConfig
 from .agency import (
     ActiveInferenceController, AgencyConfig, 

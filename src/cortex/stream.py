@@ -202,7 +202,7 @@ class ConsciousStream:
     def _initialize_neural_memory(self):
         """Initialize Titans Neural Memory."""
         try:
-            from ..memory.models import create_titans_memory
+            from ..hippocampus.titans import create_titans_memory
             
             return create_titans_memory(
                 input_dim=self.config.model_dim,

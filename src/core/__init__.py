@@ -44,15 +44,12 @@ Reference Papers:
 """
 
 from .medulla import Medulla, MedullaConfig
-from .cortex_engine import Cortex, CortexConfig
+from .cortex import Cortex, CortexConfig
 from .bridge import Bridge, BridgeConfig
 from .agency import ActiveInferenceController, AgencyConfig, PolicyType
-from .core_loop import AVACoreSystem, CoreConfig
+from .system import AVACoreSystem, CoreConfig
 
-# V2 - Working implementations with Ollama
-from .medulla_v2 import MedullaV2, MedullaConfig as MedullaConfigV2, CognitiveState, CognitiveLabel
-from .cortex_v2 import CortexV2, CortexConfig as CortexConfigV2
-from .core_v2 import AVACoreV2, CoreConfig as CoreConfigV2, ProcessResult, get_core, shutdown_core
+# Note: V2 implementations have been archived to legacy/v2_core/
 
 __all__ = [
     # Medulla (Reflexive Core)

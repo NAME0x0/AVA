@@ -5,9 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCoreStore } from "@/stores/core";
 import { MessageBubble } from "./MessageBubble";
 import { ChatInput } from "./ChatInput";
+import { ThinkingIndicator } from "@/components/indicators/ThinkingIndicator";
 
 export function ChatArea() {
-  const { messages, isGenerating } = useCoreStore();
+  const { messages, isGenerating, thinkingStage } = useCoreStore();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom on new messages
@@ -15,7 +16,7 @@ export function ChatArea() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isGenerating]);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -38,23 +39,15 @@ export function ChatArea() {
           ))}
         </AnimatePresence>
 
-        {/* Typing indicator when generating */}
+        {/* Neural thinking indicator when generating */}
         <AnimatePresence>
           {isGenerating && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="flex items-center gap-2 text-text-muted"
             >
-              <div className="waveform">
-                <div className="waveform-bar" />
-                <div className="waveform-bar" />
-                <div className="waveform-bar" />
-                <div className="waveform-bar" />
-                <div className="waveform-bar" />
-              </div>
-              <span className="text-sm">Processing...</span>
+              <ThinkingIndicator stage={thinkingStage} />
             </motion.div>
           )}
         </AnimatePresence>

@@ -40,11 +40,11 @@ User Input
 | Component | Location | Purpose |
 |-----------|----------|---------|
 | **Medulla** | `src/core/medulla.py` | Always-on sensory processing, surprise calculation |
-| **Cortex** | `src/core/cortex_engine.py` | Deep reasoning via 70B models on 4GB GPU |
+| **Cortex** | `src/core/cortex.py` | Deep reasoning via 70B models on 4GB GPU |
 | **Bridge** | `src/core/bridge.py` | Projects Medulla state to Cortex embeddings |
 | **Agency** | `src/core/agency.py` | Active Inference for autonomous behavior |
 | **Titans** | `src/hippocampus/titans.py` | Test-time learning, infinite context |
-| **Core Loop** | `src/core/core_loop.py` | Orchestrates all components |
+| **System** | `src/core/system.py` | Orchestrates all components (AVACoreSystem) |
 | **Clean API** | `src/ava/` | Simplified interface for external use |
 
 ### VRAM Budget (RTX A2000 4GB)
@@ -81,11 +81,15 @@ ollama pull gemma3:4b
 python server.py
 python server.py --host 0.0.0.0 --port 8080
 
+# Terminal UI (power users)
+python run_tui.py
+python run_tui.py --backend http://localhost:8085 --debug
+
 # Core System with full architecture
 python run_core.py --simulation
 
-# Legacy developmental CLI
-python -m src.cli
+# Desktop GUI (Tauri + Next.js)
+cd ui && npm run tauri dev
 ```
 
 ### API Endpoints
@@ -174,7 +178,7 @@ blocked_system_commands:
 ## Development Guidelines
 
 ### When modifying the core loop:
-1. Changes affect `src/core/core_loop.py` (AVACoreSystem)
+1. Changes affect `src/core/system.py` (AVACoreSystem)
 2. Component initialization order: Titans → Medulla → Cortex → Bridge → Agency → Thermal → Episodic
 3. Policy handlers registered via `_register_action_callbacks()`
 
@@ -189,12 +193,15 @@ blocked_system_commands:
 
 ## Legacy Systems
 
-The codebase includes legacy "Developmental AI" modules (emotions, stages, articulation) that are not active in v3:
-- `src/developmental/` - Stage tracking (INFANT→MATURE)
-- `src/emotional/` - Emotion processing
-- `src/output/` - Articulation filtering
+Legacy code from v1/v2 has been archived to the `legacy/` directory:
+- `legacy/developmental/` - Stage tracking (INFANT→MATURE)
+- `legacy/emotional/` - Emotion processing
+- `legacy/output/` - Articulation filtering
+- `legacy/memory/` - Old memory system (replaced by Titans)
+- `legacy/v2_core/` - V2 Cortex/Medulla implementations
+- `legacy/old_servers/` - Previous API server versions
 
-These may be integrated in future versions.
+These are preserved for reference but not active in v3.
 
 ## Key Constraints
 

@@ -1,0 +1,416 @@
+/*
+ * AVA TUI Base Styles
+ * ===================
+ *
+ * Premium neural-themed color palette for the terminal interface.
+ * Designed for maximum readability and aesthetic appeal.
+ */
+
+/* Root variables - Neural color palette */
+$primary: #00D4C8;
+$primary-dim: #00A89E;
+$secondary: #8B5CF6;
+$secondary-dim: #7C3AED;
+$accent: #00B4A8;
+$surface: #0A0A10;
+$surface-darken-1: #050508;
+$surface-lighten-1: #12121A;
+$surface-lighten-2: #1A1A24;
+$text: #F0F0F5;
+$text-muted: #6B6B80;
+$text-dim: #45455A;
+$error: #EF4444;
+$warning: #F59E0B;
+$success: #10B981;
+$info: #3B82F6;
+
+/* Screen - Dark void background */
+Screen {
+    background: $surface;
+    color: $text;
+}
+
+/* Main container */
+#main {
+    layout: vertical;
+    height: 100%;
+}
+
+/* Split view layout */
+#split-view {
+    layout: horizontal;
+    height: 1fr;
+}
+
+/* Chat container - Primary focus area */
+#chat-container {
+    width: 2fr;
+    layout: vertical;
+    background: $surface;
+}
+
+/* Chat panel with neural glow */
+#chat {
+    height: 1fr;
+    border: solid $primary;
+    border-title-color: $primary;
+    border-title-align: center;
+    border-title-style: bold;
+    background: $surface-darken-1;
+    scrollbar-background: $surface-lighten-1;
+    scrollbar-color: $primary-dim;
+    scrollbar-color-hover: $primary;
+}
+
+/* Chat title styling */
+#chat:focus {
+    border: solid $accent;
+}
+
+/* Input box - Premium styling */
+#input {
+    dock: bottom;
+    height: auto;
+    max-height: 10;
+    min-height: 3;
+    border: solid $accent;
+    border-title-color: $accent;
+    margin-top: 1;
+    padding: 0 1;
+    background: $surface-lighten-1;
+}
+
+#input:focus {
+    border: double $primary;
+    background: $surface-lighten-2;
+}
+
+#input > .input--cursor {
+    color: $primary;
+    background: $primary;
+}
+
+/* Metrics panel - System status */
+#metrics {
+    width: 40;
+    border: solid $secondary;
+    border-title-color: $secondary;
+    border-title-align: center;
+    padding: 1;
+    background: $surface-darken-1;
+}
+
+#metrics:focus {
+    border: solid $secondary-dim;
+}
+
+/* Status bar - Bottom info strip */
+#status {
+    dock: bottom;
+    height: 1;
+    background: $surface-darken-1;
+    color: $text-muted;
+    padding: 0 2;
+    border-top: solid $surface-lighten-1;
+}
+
+/* Thinking indicator container */
+#thinking {
+    height: auto;
+    padding: 0;
+    background: transparent;
+}
+
+/* Message styles with visual hierarchy */
+.user-message {
+    background: $surface-lighten-2;
+    padding: 1 2;
+    margin: 1 2;
+    border-left: thick $primary;
+    border-radius: 1;
+}
+
+.assistant-message {
+    background: $surface-lighten-1;
+    padding: 1 2;
+    margin: 1 2;
+    border-left: thick $secondary;
+    border-radius: 1;
+}
+
+.assistant-message.cortex {
+    border-left: thick $secondary;
+    background: $surface-lighten-2;
+}
+
+.assistant-message.medulla {
+    border-left: thick $primary;
+}
+
+.error-message {
+    background: $error 15%;
+    border-left: thick $error;
+    padding: 1 2;
+    margin: 1 2;
+    color: $error;
+}
+
+.system-message {
+    background: $info 15%;
+    border-left: thick $info;
+    padding: 1 2;
+    margin: 1 2;
+    color: $info;
+}
+
+/* Header customization */
+Header {
+    background: $surface-darken-1;
+    color: $primary;
+    text-style: bold;
+    border-bottom: solid $surface-lighten-1;
+    height: 3;
+}
+
+Header.-tall {
+    height: 3;
+}
+
+/* Footer with keybinding hints */
+Footer {
+    background: $surface-darken-1;
+    border-top: solid $surface-lighten-1;
+}
+
+FooterKey {
+    background: transparent;
+    color: $text-dim;
+}
+
+FooterKey > .footer-key--key {
+    background: $surface-lighten-2;
+    color: $primary;
+    text-style: bold;
+}
+
+FooterKey:hover {
+    background: $surface-lighten-1;
+}
+
+FooterKey.-active {
+    background: $primary;
+    color: $surface;
+}
+
+/* Button styling */
+Button {
+    background: $surface-lighten-1;
+    color: $text;
+    border: solid $surface-lighten-2;
+    padding: 0 2;
+    height: 3;
+}
+
+Button:hover {
+    background: $surface-lighten-2;
+    border: solid $primary-dim;
+}
+
+Button:focus {
+    border: solid $primary;
+}
+
+Button.-primary {
+    background: $primary;
+    color: $surface;
+    border: solid $primary;
+}
+
+Button.-primary:hover {
+    background: $primary-dim;
+}
+
+/* Progress bars */
+ProgressBar {
+    color: $primary;
+    background: $surface-lighten-1;
+}
+
+ProgressBar > .bar--bar {
+    color: $primary;
+    background: $primary;
+}
+
+/* Scrollbars */
+Scrollbar {
+    background: $surface-lighten-1;
+}
+
+Scrollbar > .scrollbar--grip {
+    background: $primary-dim;
+}
+
+Scrollbar > .scrollbar--grip:hover {
+    background: $primary;
+}
+
+/* Metrics card styles */
+.metric-card {
+    background: $surface-lighten-1;
+    border: solid $surface-lighten-2;
+    padding: 1;
+    margin: 0 0 1 0;
+}
+
+.metric-card:hover {
+    border: solid $primary-dim;
+}
+
+.metric-label {
+    color: $text-muted;
+    text-style: none;
+}
+
+.metric-value {
+    color: $text;
+    text-style: bold;
+}
+
+.metric-value.high {
+    color: $warning;
+}
+
+.metric-value.critical {
+    color: $error;
+}
+
+.metric-value.good {
+    color: $success;
+}
+
+/* Cognitive state indicators */
+.state-flow {
+    color: $success;
+    background: $success 15%;
+}
+
+.state-hesitation {
+    color: $warning;
+    background: $warning 15%;
+}
+
+.state-confusion {
+    color: $error;
+    background: $error 15%;
+}
+
+.state-creative {
+    color: $info;
+    background: $info 15%;
+}
+
+.state-verifying {
+    color: $secondary;
+    background: $secondary 15%;
+}
+
+/* Component indicators */
+.component-medulla {
+    color: $primary;
+}
+
+.component-cortex {
+    color: $secondary;
+}
+
+.component-bridge {
+    color: $accent;
+}
+
+.component-idle {
+    color: $text-muted;
+}
+
+/* Notification toasts */
+Toast {
+    background: $surface-lighten-2;
+    border: solid $surface-lighten-1;
+    color: $text;
+}
+
+Toast.-information {
+    border-left: thick $info;
+}
+
+Toast.-warning {
+    border-left: thick $warning;
+}
+
+Toast.-error {
+    border-left: thick $error;
+}
+
+/* Help screen */
+.help-panel {
+    background: $surface-lighten-1;
+    border: solid $secondary;
+    padding: 2;
+}
+
+.help-title {
+    color: $primary;
+    text-style: bold;
+}
+
+.help-key {
+    background: $surface-lighten-2;
+    color: $primary;
+    padding: 0 1;
+}
+
+/* Loading states */
+.loading {
+    color: $text-muted;
+    text-style: italic;
+}
+
+/* Code blocks */
+.code-block {
+    background: $surface-darken-1;
+    border: solid $surface-lighten-1;
+    padding: 1;
+}
+
+/* Markdown content */
+.markdown-h1 {
+    color: $primary;
+    text-style: bold;
+}
+
+.markdown-h2 {
+    color: $secondary;
+    text-style: bold;
+}
+
+.markdown-code {
+    background: $surface-lighten-1;
+    color: $accent;
+}
+
+.markdown-link {
+    color: $info;
+    text-style: underline;
+}
+
+/* Animation helpers */
+.pulse {
+    text-style: bold;
+}
+
+.glow-primary {
+    color: $primary;
+}
+
+.glow-secondary {
+    color: $secondary;
+}

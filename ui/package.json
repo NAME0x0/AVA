@@ -17,6 +17,8 @@
     "@radix-ui/react-scroll-area": "^1.2.2",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.4",
+    "@react-three/fiber": "^8.15.0",
+    "@react-three/drei": "^9.88.0",
     "@tauri-apps/api": "^1.6.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -25,8 +27,10 @@
     "next": "^16.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-window": "^1.8.10",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.5.5",
+    "three": "^0.160.0",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

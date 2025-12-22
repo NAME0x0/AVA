@@ -12,18 +12,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from .config import MemoryConfig  # Import from config to avoid duplication
+
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class MemoryConfig:
-    """Memory configuration."""
-    max_history: int = 50
-    context_window: int = 8192
-    persist_conversations: bool = True
-    data_dir: str = "data/conversations"
-    enable_learning: bool = True
-    learning_data_dir: str = "data/learning"
 
 
 @dataclass

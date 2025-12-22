@@ -1,271 +1,295 @@
-# AVA - Your Personal AI Research Assistant
+# AVA - Autonomous Virtual Assistant
 
 <p align="center">
   <img src="docs/assets/ava_logo.png" alt="AVA Logo" width="150" />
 </p>
 
-**AVA** is a research-grade AI assistant that runs completely on your computer. It's designed for accuracy over speed, using a "think-before-speaking" architecture inspired by the human brain.
+**AVA v3** is a research-grade AI assistant with a **biomimetic dual-brain architecture** inspired by the human nervous system. It runs locally on constrained hardware (4GB VRAM) and prioritizes accuracy over speed.
 
-## ✨ What Makes AVA Special
+## What's New in v3
 
-- 🧠 **Dual-Brain Architecture**: Quick responses for simple questions, deep thinking for complex ones
-- 🎯 **Accuracy First**: Verifies important responses before answering
-- 🔧 **Tool Use**: Can search the web, do calculations, read files, and more
-- 🔌 **MCP Support**: Connect to external tools via Model Context Protocol
-- 🔒 **Private**: Everything runs locally on your machine
-- 💻 **Works on 4GB VRAM**: Optimized for consumer GPUs
+- **Cortex-Medulla Architecture**: Fast reflexive responses for simple queries, deep reasoning for complex ones
+- **Desktop App**: Native Tauri + Next.js GUI with real-time neural activity visualization
+- **Terminal UI**: Phenomenal TUI for power users built with Textual
+- **Search-First Paradigm**: Web search as default for informational queries
+- **Titans Neural Memory**: Infinite context through test-time learning
+- **Active Inference**: Autonomous behavior using Free Energy Principle
 
 ---
 
-## 🚀 Quick Start (5 Minutes)
+## Quick Start
 
 ### Prerequisites
 
 1. **Python 3.10+** - [Download Python](https://www.python.org/downloads/)
 2. **Ollama** - [Download Ollama](https://ollama.ai/)
+3. **Node.js 18+** (for GUI) - [Download Node.js](https://nodejs.org/)
 
-### Step 1: Install Ollama and Download a Model
+### One-Click Setup
 
-```bash
-# After installing Ollama, open a terminal and run:
-ollama pull gemma3:4b
+**Windows:**
+```powershell
+.\setup_ava.ps1
 ```
 
-This downloads a 4B parameter model (~3GB). For better quality, try `ollama pull llama3:8b` (~5GB).
+**macOS/Linux:**
+```bash
+chmod +x start.sh && ./start.sh
+```
 
-### Step 2: Download AVA
+### Manual Setup
 
 ```bash
+# Clone repository
 git clone https://github.com/NAME0x0/AVA.git
 cd AVA
-```
 
-Or download as ZIP from GitHub and extract.
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-### Step 3: Install Dependencies
-
-```bash
+# Install dependencies
 pip install -r requirements.txt
-```
 
-### Step 4: Start AVA
+# Download model
+ollama pull gemma3:4b
 
-```bash
-# Make sure Ollama is running first (it usually starts automatically)
+# Start server
 python server.py
 ```
 
-You should see:
-```
-AVA API SERVER
-============================================================
-Starting on http://127.0.0.1:8085
-Server ready. Press Ctrl+C to stop.
-```
+---
 
-### Step 5: Chat with AVA
+## Running AVA
 
-Open another terminal:
-
+### HTTP API Server (Primary)
 ```bash
-# Simple chat
-curl -X POST http://localhost:8085/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Hello! What can you help me with?"}'
-
-# Force deep thinking
-curl -X POST http://localhost:8085/think \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Explain how transformers work in AI"}'
+python server.py
+# Runs on http://localhost:8085
 ```
 
-Or open `http://localhost:8085/health` in your browser to verify it's running.
+### Terminal UI (Power Users)
+```bash
+python run_tui.py
+# Full-featured terminal interface with keybindings
+```
+
+### Desktop App (GUI)
+```bash
+cd ui
+npm install
+npm run tauri dev
+```
+
+### Core System (Direct)
+```bash
+python run_core.py --simulation
+```
 
 ---
 
-## 💬 Using AVA
+## Architecture
+
+```
+User Input
+    │
+    ▼
+┌─────────────────────────────────────────────────────────┐
+│  MEDULLA (Reflexive Core) - Always On                  │
+│  - Mamba SSM for O(1) memory sensing                   │
+│  - 1-bit BitNet for quick responses                    │
+│  - Calculates "surprise" signal                        │
+│  - VRAM: ~800 MB (resident)                            │
+└─────────────────────────────────────────────────────────┘
+    │                              │
+    │ Low Surprise                 │ High Surprise
+    ▼                              ▼
+┌─────────────┐             ┌─────────────────────────────┐
+│Quick Reply  │             │  CORTEX (Reflective Core)   │
+│(<200ms)     │             │  - 70B model via AirLLM     │
+└─────────────┘             │  - Layer-wise paging        │
+                            │  - ~3.3s per token          │
+                            │  - VRAM: ~1.6 GB (paged)    │
+                            └─────────────────────────────┘
+```
+
+### Key Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| **Medulla** | `src/core/medulla.py` | Always-on sensory processing |
+| **Cortex** | `src/core/cortex.py` | Deep reasoning (70B on 4GB) |
+| **Bridge** | `src/core/bridge.py` | Projects Medulla → Cortex |
+| **Agency** | `src/core/agency.py` | Active Inference |
+| **Titans** | `src/hippocampus/titans.py` | Test-time learning |
+| **System** | `src/core/system.py` | Orchestration |
+
+---
+
+## API Reference
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Health check |
+| `/status` | GET | System status with metrics |
+| `/chat` | POST | Send message (auto-routes Medulla/Cortex) |
+| `/think` | POST | Force deep thinking (Cortex) |
+| `/tools` | GET | List available tools |
+| `/ws` | WebSocket | Streaming chat |
 
 ### Python API
 
 ```python
+from ava import AVA
 import asyncio
-from src.ava import AVA
 
 async def main():
     ava = AVA()
     await ava.start()
-    
-    # Simple chat
-    response = await ava.chat("What is the capital of France?")
+
+    # Auto-routes based on complexity
+    response = await ava.chat("What is Python?")
     print(response.text)
-    
-    # Force deep thinking for complex questions
-    response = await ava.think("Compare Python and Rust for systems programming")
+
+    # Force deep thinking
+    response = await ava.think("Explain quantum computing")
     print(response.text)
-    
+
     await ava.stop()
 
 asyncio.run(main())
 ```
 
-### HTTP API
+---
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/health` | GET | Check if AVA is running |
-| `/status` | GET | Get system status |
-| `/chat` | POST | Send a message |
-| `/think` | POST | Force deep thinking |
-| `/tools` | GET | List available tools |
-| `/ws` | WebSocket | Streaming chat |
+## TUI Keybindings
 
-### Example: Chat with JSON
-
-```python
-import requests
-
-response = requests.post(
-    "http://localhost:8085/chat",
-    json={"message": "What is 25 * 17?"}
-)
-print(response.json()["text"])
-```
+| Key | Action |
+|-----|--------|
+| `Ctrl+K` | Command palette |
+| `Ctrl+L` | Clear chat |
+| `Ctrl+T` | Toggle metrics |
+| `Ctrl+S` | Force search |
+| `Ctrl+D` | Deep think |
+| `F1` | Help |
+| `Ctrl+Q` | Quit |
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
-Create `config/ava.yaml` to customize:
+Main config: `config/cortex_medulla.yaml`
 
 ```yaml
-engine:
-  ollama:
-    host: "http://localhost:11434"
-    fast_model: "gemma3:4b"    # For quick responses
-    deep_model: "llama3:8b"    # For deep thinking (if available)
-  
-  # When to use deep thinking
-  cortex_surprise_threshold: 0.5
-  cortex_complexity_threshold: 0.4
-  
-  # Enable response verification for accuracy
-  verify_responses: true
+development:
+  simulation_mode: true  # For testing without models
 
-tools:
-  enable_calculator: true
-  enable_web_search: true
-  enable_file_access: true
+search_first:
+  enabled: true
+  min_sources: 3
+  agreement_threshold: 0.7
 
-ui:
-  port: 8085
+thermal:
+  max_gpu_power_percent: 15  # RTX A2000 safe limit
+  warning_temp_c: 75
+  throttle_temp_c: 80
+
+agency:
+  epistemic_weight: 0.6  # High curiosity
 ```
 
 ---
 
-## 🔧 Available Tools
-
-AVA can use these tools automatically:
-
-| Tool | Description |
-|------|-------------|
-| `calculator` | Safe math evaluation |
-| `datetime` | Current date/time |
-| `web_search` | Search the web |
-| `read_file` | Read files (restricted directories) |
-
-### Adding MCP Tools
-
-AVA supports [Model Context Protocol](https://modelcontextprotocol.io/) for external tools:
-
-```yaml
-# In config/ava.yaml
-tools:
-  mcp_servers:
-    - name: "filesystem"
-      command: "mcp-server-filesystem"
-      args: ["--root", "/path/to/files"]
-```
-
----
-
-## 🧪 For Researchers
-
-AVA implements several cutting-edge concepts:
-
-- **Cortex-Medulla Architecture**: Inspired by human brain structure
-- **Surprise-Based Routing**: Uses embedding distance to detect novel queries
-- **Response Verification**: Double-checks factual claims
-- **Test-Time Adaptation**: Adjusts processing based on query complexity
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for technical details.
-
----
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 AVA/
-├── server.py           # Main API server
+├── config/              # Configuration files
+├── data/                # Runtime data
+├── docs/                # Documentation
+├── legacy/              # Archived v2 code
+├── models/              # Model adapters
 ├── src/
-│   ├── ava/           # New clean API
-│   │   ├── engine.py  # Core brain
-│   │   ├── tools.py   # Tool system + MCP
-│   │   ├── memory.py  # Conversation memory
-│   │   └── config.py  # Configuration
-│   └── core/          # Cortex-Medulla (legacy)
-├── config/            # Configuration files
-├── data/              # Data storage
-└── docs/              # Documentation
+│   ├── ava/             # Clean public API
+│   ├── core/            # Cortex-Medulla system
+│   ├── hippocampus/     # Titans memory
+│   ├── cortex/          # Utilities
+│   ├── inference/       # LLM inference
+│   ├── learning/        # QLoRA training
+│   ├── subconscious/    # Background processing
+│   └── tools/           # Tool implementations
+├── tests/               # Test suite
+├── tui/                 # Terminal UI (Textual)
+├── ui/                  # Desktop GUI (Next.js + Tauri)
+├── server.py            # HTTP API server
+├── run_core.py          # Direct core CLI
+└── run_tui.py           # TUI entry point
 ```
 
 ---
 
-## 🐛 Troubleshooting
+## VRAM Budget (RTX A2000 4GB)
+
+```
+System Overhead:    300 MB
+Medulla (Mamba):    800 MB
+Titans Memory:      200 MB
+Bridge Adapter:      50 MB
+Cortex Buffer:    1,600 MB (paged on-demand)
+────────────────────────────
+Total Resident:   2,050 MB
+Peak (Cortex):    3,650 MB
+Headroom:           446 MB
+```
+
+---
+
+## Troubleshooting
 
 ### "Ollama is not running"
 ```bash
-# Start Ollama
 ollama serve
 ```
 
 ### "No models available"
 ```bash
-# Download a model
 ollama pull gemma3:4b
 ```
 
-### "Connection refused"
-- Make sure Ollama is running: `ollama serve`
-- Check if the port is available: `netstat -an | findstr 11434`
-
 ### Slow Responses
-- Responses take 5-30 seconds depending on your hardware
 - First response is slower (model loading)
-- Use a smaller model: `ollama pull phi3:mini`
+- Deep thinking takes 5-30 seconds
+- Use `--simulation` flag for testing
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE).
 
 ---
 
-## 🙏 Credits
+## Credits
 
 Built with:
 - [Ollama](https://ollama.ai/) - Local LLM inference
-- [aiohttp](https://docs.aiohttp.org/) - Async HTTP
-- Research papers: Titans (2025), Entropix (2024), Active Inference
+- [Textual](https://textual.textualize.io/) - TUI framework
+- [Tauri](https://tauri.app/) - Desktop apps
+- [Next.js](https://nextjs.org/) - React framework
+
+Research papers:
+- Titans (2025) - Test-time learning
+- Entropix (2024) - Entropy-guided routing
+- Active Inference - Free Energy Principle
 
 ---
 
 <p align="center">
-Made with 💜 for the research community
+Made with care for the research community
 </p>
