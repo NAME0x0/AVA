@@ -95,10 +95,7 @@ setup(
     extras_require=extras_require,
     entry_points={
         "console_scripts": [
-            "ava=cli.main:app",
-            "ava-cli=cli.main:app",
-            "ava-quantize=scripts.quantize_model:main",
-            "ava-generate-data=scripts.generate_synthetic_data:main",
+            "ava=ava.cli:main",
         ],
     },
     include_package_data=True,
