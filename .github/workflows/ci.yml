@@ -88,7 +88,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          pytest tests/unit -v --cov=src --cov-report=xml --cov-report=term-missing
+          pytest tests/unit -v --cov=src --cov-report=xml --cov-report=term-missing --cov-fail-under=70
         env:
           AVA_SIMULATION_MODE: "true"
 
@@ -144,11 +144,16 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install bandit
-        run: pip install bandit
+      - name: Install security tools
+        run: pip install bandit pip-audit
 
-      - name: Run Bandit
-        run: bandit -r src/ -ll -ii || true
+      - name: Run Bandit (static analysis)
+        run: bandit -r src/ -ll -ii -f txt
+
+      - name: Run pip-audit (dependency vulnerabilities)
+        run: |
+          pip install -r requirements.txt
+          pip-audit --strict --desc
 
   # ============================================================================
   # Build Check

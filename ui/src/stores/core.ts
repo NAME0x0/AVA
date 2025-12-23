@@ -1,12 +1,24 @@
 /**
  * AVA Core State Store
- * 
+ *
  * Centralized state management using Zustand for the Cortex-Medulla UI.
  * Handles all system state, chat messages, and UI state.
+ *
+ * Features:
+ * - State persistence for UI preferences (sidebar, split pane)
+ * - Environment variable support for backend URL
+ *
+ * TODO: WebSocket streaming will be integrated when real-time streaming
+ * is implemented in the backend (currently uses polling + chunked response).
  */
 
 import { create } from "zustand";
-import { subscribeWithSelector } from "zustand/middleware";
+import { persist, subscribeWithSelector } from "zustand/middleware";
+
+// Backend URL from environment or default
+const DEFAULT_BACKEND_URL =
+  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_BACKEND_URL) ||
+  "http://localhost:8085";
 
 // Types
 export interface CognitiveState {
@@ -121,12 +133,13 @@ interface CoreStore {
 const generateId = () => Math.random().toString(36).substring(2, 15);
 
 export const useCoreStore = create<CoreStore>()(
-  subscribeWithSelector((set, get) => ({
-    // Connection
-    connected: false,
-    backendUrl: "http://localhost:8085",
-    setConnected: (connected) => set({ connected }),
-    setBackendUrl: (backendUrl) => set({ backendUrl }),
+  persist(
+    subscribeWithSelector((set, get) => ({
+      // Connection
+      connected: false,
+      backendUrl: DEFAULT_BACKEND_URL,
+      setConnected: (connected) => set({ connected }),
+      setBackendUrl: (backendUrl) => set({ backendUrl }),
 
     // System State
     systemState: {
@@ -361,5 +374,16 @@ export const useCoreStore = create<CoreStore>()(
         console.error("Failed to force sleep:", error);
       }
     },
-  }))
+  })),
+    {
+      name: "ava-ui-preferences",
+      // Only persist UI preferences, not transient state
+      partialize: (state) => ({
+        sidebarOpen: state.sidebarOpen,
+        splitPaneMode: state.splitPaneMode,
+        splitPaneRatio: state.splitPaneRatio,
+        backendUrl: state.backendUrl,
+      }),
+    }
+  )
 );

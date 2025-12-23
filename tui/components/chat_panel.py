@@ -3,6 +3,12 @@ Chat Panel Component
 ====================
 
 Displays chat messages with markdown rendering and code highlighting.
+
+Accessibility Features:
+- Focusable with Tab navigation
+- Arrow keys for message navigation
+- Page Up/Down for scrolling
+- Home/End to jump to top/bottom
 """
 
 from datetime import datetime
@@ -11,6 +17,7 @@ from typing import Optional
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.text import Text
+from textual.binding import Binding
 from textual.containers import ScrollableContainer
 from textual.widgets import Static
 
@@ -68,12 +75,31 @@ class MessageWidget(Static):
 class ChatPanel(ScrollableContainer):
     """Panel displaying chat messages with scrolling."""
 
+    # Enable focus for keyboard navigation
+    can_focus = True
+
+    # Keyboard bindings for accessibility
+    BINDINGS = [
+        Binding("up", "scroll_up", "Scroll up", show=False),
+        Binding("down", "scroll_down", "Scroll down", show=False),
+        Binding("j", "scroll_down", "Scroll down", show=False),  # Vim-style
+        Binding("k", "scroll_up", "Scroll up", show=False),  # Vim-style
+    ]
+
     DEFAULT_CSS = """
     ChatPanel {
         height: 1fr;
         border: solid $primary;
         border-title-color: $primary;
         padding: 1;
+    }
+
+    ChatPanel:focus {
+        border: double $primary;
+    }
+
+    ChatPanel:focus-within {
+        border: solid $accent;
     }
 
     ChatPanel > MessageWidget {
@@ -101,6 +127,14 @@ class ChatPanel(ScrollableContainer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.border_title = "Conversation"
+
+    def action_scroll_up(self) -> None:
+        """Scroll up by one line."""
+        self.scroll_up(animate=False)
+
+    def action_scroll_down(self) -> None:
+        """Scroll down by one line."""
+        self.scroll_down(animate=False)
 
     def add_user_message(self, content: str) -> None:
         """Add a user message to the chat."""

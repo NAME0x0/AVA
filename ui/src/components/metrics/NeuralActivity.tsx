@@ -38,13 +38,41 @@ export function NeuralActivity({ entropy, varentropy, className }: NeuralActivit
       return;
     }
 
+    // Polyfill for roundRect (not supported in older browsers)
+    const drawRoundRect = (
+      context: CanvasRenderingContext2D,
+      x: number,
+      y: number,
+      w: number,
+      h: number,
+      r: number
+    ) => {
+      if (context.roundRect) {
+        context.roundRect(x, y, w, h, r);
+      } else {
+        // Fallback for older browsers
+        context.beginPath();
+        context.moveTo(x + r, y);
+        context.lineTo(x + w - r, y);
+        context.quadraticCurveTo(x + w, y, x + w, y + r);
+        context.lineTo(x + w, y + h - r);
+        context.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        context.lineTo(x + r, y + h);
+        context.quadraticCurveTo(x, y + h, x, y + h - r);
+        context.lineTo(x, y + r);
+        context.quadraticCurveTo(x, y, x + r, y);
+        context.closePath();
+      }
+    };
+
     const draw = () => {
       const { width, height } = canvas;
       ctx.clearRect(0, 0, width, height);
 
       // Background
       ctx.fillStyle = "rgba(14, 14, 20, 0.8)";
-      ctx.roundRect(0, 0, width, height, 8);
+      ctx.beginPath();
+      drawRoundRect(ctx, 0, 0, width, height, 8);
       ctx.fill();
 
       // Draw waveform

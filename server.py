@@ -46,25 +46,33 @@ logging.basicConfig(
 )
 logger = logging.getLogger("ava-server")
 
-# Global AVA instance
+# Global AVA instance (thread-safe initialization)
 _ava = None
+_ava_lock = asyncio.Lock()
 _start_time = time.time()
 
 
 async def get_ava():
-    """Get or create AVA instance."""
+    """Get or create AVA instance (thread-safe singleton)."""
     global _ava
-    
-    if _ava is None:
-        try:
-            from ava import AVA
-            _ava = AVA()
-            await _ava.start()
-            logger.info("AVA initialized successfully")
-        except Exception as e:
-            logger.error(f"Failed to initialize AVA: {e}")
-            return None
-    
+
+    # Fast path: already initialized
+    if _ava is not None:
+        return _ava
+
+    # Slow path: acquire lock and initialize
+    async with _ava_lock:
+        # Double-check after acquiring lock
+        if _ava is None:
+            try:
+                from ava import AVA
+                _ava = AVA()
+                await _ava.start()
+                logger.info("AVA initialized successfully")
+            except Exception as e:
+                logger.error(f"Failed to initialize AVA: {e}")
+                return None
+
     return _ava
 
 
@@ -359,6 +367,37 @@ def create_app() -> web.Application:
     return app
 
 
+def print_banner(host: str, port: int):
+    """Print startup banner."""
+    banner = """
+\033[96m╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║     █████╗ ██╗   ██╗ █████╗     ███████╗███████╗██████╗ ██╗   ██╗███████╗██████╗  ║
+║    ██╔══██╗██║   ██║██╔══██╗    ██╔════╝██╔════╝██╔══██╗██║   ██║██╔════╝██╔══██╗ ║
+║    ███████║██║   ██║███████║    ███████╗█████╗  ██████╔╝██║   ██║█████╗  ██████╔╝ ║
+║    ██╔══██║╚██╗ ██╔╝██╔══██║    ╚════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██╔══██╗ ║
+║    ██║  ██║ ╚████╔╝ ██║  ██║    ███████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║ ║
+║    ╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝    ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝ ║
+║                                                                              ║
+║\033[0m\033[97m                    Cortex-Medulla Architecture v3.1.0                       \033[96m║
+╚══════════════════════════════════════════════════════════════════════════════╝\033[0m
+"""
+    print(banner)
+    print(f"\033[93m  ⚡ Server:\033[0m    http://{host}:{port}")
+    print(f"\033[93m  📡 WebSocket:\033[0m ws://{host}:{port}/ws")
+    print()
+    print("\033[96m  ┌─────────────────────────────────────────────────────────┐\033[0m")
+    print("\033[96m  │\033[0m  \033[97mEndpoints:\033[0m                                            \033[96m│\033[0m")
+    print("\033[96m  │\033[0m    \033[92mGET\033[0m   /health  ─  Health check                      \033[96m│\033[0m")
+    print("\033[96m  │\033[0m    \033[92mGET\033[0m   /status  ─  System status                     \033[96m│\033[0m")
+    print("\033[96m  │\033[0m    \033[93mPOST\033[0m  /chat    ─  Send message                      \033[96m│\033[0m")
+    print("\033[96m  │\033[0m    \033[93mPOST\033[0m  /think   ─  Force deep thinking              \033[96m│\033[0m")
+    print("\033[96m  │\033[0m    \033[92mGET\033[0m   /tools   ─  List available tools             \033[96m│\033[0m")
+    print("\033[96m  │\033[0m    \033[95mWS\033[0m    /ws      ─  WebSocket streaming              \033[96m│\033[0m")
+    print("\033[96m  └─────────────────────────────────────────────────────────┘\033[0m")
+    print()
+
+
 async def main():
     """Run the server."""
     parser = argparse.ArgumentParser(description="AVA API Server")
@@ -368,19 +407,7 @@ async def main():
     
     app = create_app()
     
-    logger.info("=" * 60)
-    logger.info("AVA API SERVER")
-    logger.info("=" * 60)
-    logger.info(f"Starting on http://{args.host}:{args.port}")
-    logger.info("")
-    logger.info("Endpoints:")
-    logger.info("  GET  /health  - Health check")
-    logger.info("  GET  /status  - System status")
-    logger.info("  POST /chat    - Send message")
-    logger.info("  POST /think   - Force deep thinking")
-    logger.info("  GET  /tools   - List tools")
-    logger.info("  WS   /ws      - WebSocket streaming")
-    logger.info("=" * 60)
+    print_banner(args.host, args.port)
     
     runner = web.AppRunner(app)
     await runner.setup()

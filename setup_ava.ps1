@@ -18,14 +18,17 @@ $ErrorActionPreference = "Continue"
 # Banner
 Write-Host ""
 Write-Host "================================================================================" -ForegroundColor Cyan
-Write-Host "     ___ _    ___   _    ____  _____ _____ _   _ ____" -ForegroundColor Cyan
-Write-Host "    / _ \ \  / / \ | |  / ___|| ____|_   _| | | |  _ \" -ForegroundColor Cyan
-Write-Host "   | |_| \ \/ / _ \| | | \___ |  _|   | | | | | | |_) |" -ForegroundColor Cyan
-Write-Host "   |  _  ||  / ___ \ |  ___) | |___  | | | |_| |  __/" -ForegroundColor Cyan
-Write-Host "   |_| |_||_/_/   \_\_| |____/|_____| |_|  \___/|_|" -ForegroundColor Cyan
-Write-Host "" -ForegroundColor Cyan
-Write-Host "    Cortex-Medulla Architecture v3" -ForegroundColor White
-Write-Host "    One-Click Setup for Windows" -ForegroundColor White
+Write-Host ""
+Write-Host "       █████╗ ██╗   ██╗ █████╗     ███████╗███████╗████████╗██╗   ██╗██████╗ " -ForegroundColor Cyan
+Write-Host "      ██╔══██╗██║   ██║██╔══██╗    ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗" -ForegroundColor Cyan
+Write-Host "      ███████║██║   ██║███████║    ███████╗█████╗     ██║   ██║   ██║██████╔╝" -ForegroundColor Cyan
+Write-Host "      ██╔══██║╚██╗ ██╔╝██╔══██║    ╚════██║██╔══╝     ██║   ██║   ██║██╔═══╝ " -ForegroundColor Cyan
+Write-Host "      ██║  ██║ ╚████╔╝ ██║  ██║    ███████║███████╗   ██║   ╚██████╔╝██║     " -ForegroundColor Cyan
+Write-Host "      ╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝    ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝     " -ForegroundColor Cyan
+Write-Host ""
+Write-Host "                      Cortex-Medulla Architecture v3" -ForegroundColor White
+Write-Host "                        One-Click Setup for Windows" -ForegroundColor White
+Write-Host ""
 Write-Host "================================================================================" -ForegroundColor Cyan
 Write-Host ""
 

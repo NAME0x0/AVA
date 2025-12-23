@@ -16,7 +16,9 @@
       "Bash(del \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\tests\\\\test_commands.py\")",
       "Bash(del \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\tests\\\\test_text_gen.py\")",
       "Bash(findstr:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(dir:*)",
+      "Bash(dir /s \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\ui\\\\src\")"
     ]
   }
 }

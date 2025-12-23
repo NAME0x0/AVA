@@ -3,14 +3,27 @@ Chat Input Component
 ====================
 
 Multi-line input with command history and auto-complete.
+
+Accessibility Features:
+- Auto-focused on app start
+- Up/Down arrows for command history
+- Clear placeholder text for screen readers
+- Ctrl+1 quick access
 """
 
+from textual.binding import Binding
 from textual.widgets import Input
 from textual.message import Message
 
 
 class ChatInput(Input):
     """Chat input with history support."""
+
+    # Keyboard bindings for history navigation
+    BINDINGS = [
+        Binding("up", "history_prev", "Previous history", show=False),
+        Binding("down", "history_next", "Next history", show=False),
+    ]
 
     DEFAULT_CSS = """
     ChatInput {
@@ -23,7 +36,8 @@ class ChatInput(Input):
     }
 
     ChatInput:focus {
-        border: solid $primary;
+        border: double $primary;
+        background: $surface-lighten-1;
     }
     """
 

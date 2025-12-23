@@ -34,7 +34,7 @@ export function ThinkingIndicator({
       <div className="relative w-16 h-16">
         {/* Outer ring - slow pulse */}
         <motion.div
-          className="absolute inset-0 rounded-full border-2 border-primary/30"
+          className="absolute inset-0 rounded-full border-2 border-accent-primary/30"
           animate={{
             scale: [1, 1.1, 1],
             opacity: [0.3, 0.6, 0.3],
@@ -48,7 +48,7 @@ export function ThinkingIndicator({
 
         {/* Middle ring */}
         <motion.div
-          className="absolute inset-2 rounded-full border-2 border-secondary/40"
+          className="absolute inset-2 rounded-full border-2 border-accent-dim/40"
           animate={{
             scale: [1, 1.15, 1],
             opacity: [0.4, 0.7, 0.4],
@@ -63,7 +63,7 @@ export function ThinkingIndicator({
 
         {/* Inner core */}
         <motion.div
-          className="absolute inset-4 rounded-full bg-gradient-to-br from-primary to-secondary"
+          className="absolute inset-4 rounded-full bg-gradient-to-br from-accent-primary to-accent-dim"
           animate={{
             scale: [0.9, 1.1, 0.9],
             opacity: [0.7, 1, 0.7],
@@ -79,7 +79,7 @@ export function ThinkingIndicator({
         {[0, 60, 120, 180, 240, 300].map((angle, i) => (
           <motion.div
             key={angle}
-            className="absolute w-1 h-1 rounded-full bg-primary"
+            className="absolute w-1 h-1 rounded-full bg-accent-primary"
             style={{
               top: "50%",
               left: "50%",
@@ -114,7 +114,7 @@ export function ThinkingIndicator({
         {[0, 1, 2].map((i) => (
           <motion.div
             key={i}
-            className="w-1.5 h-1.5 rounded-full bg-primary"
+            className="w-1.5 h-1.5 rounded-full bg-accent-primary"
             animate={{
               scale: [1, 1.5, 1],
               opacity: [0.3, 1, 0.3],

@@ -126,7 +126,7 @@ npm run dev
 
 # In another terminal, start Python backend
 cd ..
-python api_server_v3.py
+python server.py
 ```
 
 Then open http://localhost:3000 in your browser.
@@ -193,7 +193,7 @@ colors: {
 
 ## API Endpoints
 
-The UI expects these endpoints from `api_server_v3.py`:
+The UI expects these endpoints from `server.py`:
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -238,7 +238,7 @@ Release build with:
 
 1. Ensure Python backend is running:
    ```bash
-   python api_server_v3.py
+   python server.py
    ```
 
 2. Check CORS - backend should allow `http://localhost:3000`

@@ -83,19 +83,79 @@ class Tool(ABC):
 # =============================================================================
 
 class CalculatorTool(Tool):
-    """Safe math calculator."""
-    
+    """Safe math calculator using AST parsing (no eval)."""
+
     name = "calculator"
     description = "Evaluate mathematical expressions safely"
     parameters = {"expression": {"type": "string", "description": "Math expression to evaluate"}}
     required_params = ["expression"]
-    
+
+    # Safe operators for arithmetic
+    _SAFE_OPERATORS = {
+        "+": lambda a, b: a + b,
+        "-": lambda a, b: a - b,
+        "*": lambda a, b: a * b,
+        "/": lambda a, b: a / b if b != 0 else float('inf'),
+        "%": lambda a, b: a % b if b != 0 else 0,
+        "**": lambda a, b: a ** b if b < 100 else float('inf'),  # Limit exponent
+    }
+
+    def _safe_eval(self, expression: str) -> float:
+        """Safely evaluate arithmetic expression using AST."""
+        import ast
+        import operator
+
+        # Supported AST node types
+        operators = {
+            ast.Add: operator.add,
+            ast.Sub: operator.sub,
+            ast.Mult: operator.mul,
+            ast.Div: operator.truediv,
+            ast.Mod: operator.mod,
+            ast.Pow: operator.pow,
+            ast.USub: operator.neg,
+            ast.UAdd: operator.pos,
+        }
+
+        def _eval_node(node):
+            if isinstance(node, ast.Constant):  # Python 3.8+
+                if isinstance(node.value, (int, float)):
+                    return node.value
+                raise ValueError(f"Unsupported constant: {node.value}")
+            elif isinstance(node, ast.Num):  # Python 3.7 compatibility
+                return node.n
+            elif isinstance(node, ast.BinOp):
+                left = _eval_node(node.left)
+                right = _eval_node(node.right)
+                op = operators.get(type(node.op))
+                if op is None:
+                    raise ValueError(f"Unsupported operator: {type(node.op).__name__}")
+                # Safety limits
+                if isinstance(node.op, ast.Pow) and right > 100:
+                    raise ValueError("Exponent too large (max 100)")
+                if isinstance(node.op, (ast.Div, ast.Mod)) and right == 0:
+                    raise ValueError("Division by zero")
+                return op(left, right)
+            elif isinstance(node, ast.UnaryOp):
+                operand = _eval_node(node.operand)
+                op = operators.get(type(node.op))
+                if op is None:
+                    raise ValueError(f"Unsupported unary operator: {type(node.op).__name__}")
+                return op(operand)
+            elif isinstance(node, ast.Expression):
+                return _eval_node(node.body)
+            else:
+                raise ValueError(f"Unsupported expression type: {type(node).__name__}")
+
+        tree = ast.parse(expression, mode='eval')
+        return _eval_node(tree)
+
     async def execute(self, expression: str = "", **kwargs) -> ToolResult:
         import time
         start = time.time()
-        
+
         try:
-            # Safe evaluation - only allow math operations
+            # Validate input characters (extra safety layer)
             allowed = set("0123456789+-*/().% ")
             if not all(c in allowed for c in expression):
                 return ToolResult(
@@ -103,15 +163,17 @@ class CalculatorTool(Tool):
                     output=None,
                     error="Expression contains invalid characters"
                 )
-            
-            result = eval(expression)
+
+            result = self._safe_eval(expression)
             return ToolResult(
                 success=True,
                 output=result,
                 execution_time_ms=(time.time() - start) * 1000
             )
-        except Exception as e:
+        except (ValueError, SyntaxError) as e:
             return ToolResult(success=False, output=None, error=str(e))
+        except Exception as e:
+            return ToolResult(success=False, output=None, error=f"Calculation error: {e}")
 
 
 class DateTimeTool(Tool):
@@ -127,12 +189,13 @@ class DateTimeTool(Tool):
     async def execute(self, format: str = None, **kwargs) -> ToolResult:
         import time
         start = time.time()
-        
+
         now = datetime.now()
         if format:
             try:
                 output = now.strftime(format)
-            except:
+            except (ValueError, TypeError):
+                # Invalid format string - fall back to ISO format
                 output = now.isoformat()
         else:
             output = {
@@ -150,8 +213,8 @@ class DateTimeTool(Tool):
 
 
 class FileReadTool(Tool):
-    """Read files from allowed directories."""
-    
+    """Read files from allowed directories (path traversal protected)."""
+
     name = "read_file"
     description = "Read contents of a file"
     parameters = {
@@ -159,38 +222,71 @@ class FileReadTool(Tool):
         "lines": {"type": "integer", "description": "Max lines to read (optional)"}
     }
     required_params = ["path"]
-    
-    # Allowed directories (security)
+
+    # Allowed directories (security) - resolved to absolute paths
     allowed_dirs: List[str] = ["data", "docs", "config"]
-    
+
+    def _is_path_allowed(self, file_path: Path) -> bool:
+        """Check if path is within allowed directories (path traversal safe)."""
+        # Resolve to absolute path to prevent /../ traversal attacks
+        try:
+            resolved = file_path.resolve()
+        except (OSError, ValueError):
+            return False
+
+        # Get current working directory
+        cwd = Path.cwd()
+
+        # Check if resolved path is under any allowed directory
+        for allowed_dir in self.allowed_dirs:
+            allowed_path = (cwd / allowed_dir).resolve()
+            try:
+                # is_relative_to is the safe way to check containment
+                resolved.relative_to(allowed_path)
+                return True
+            except ValueError:
+                # Not relative to this allowed directory
+                continue
+
+        return False
+
     async def execute(self, path: str = "", lines: int = None, **kwargs) -> ToolResult:
         import time
         start = time.time()
-        
+
         try:
             file_path = Path(path)
-            
-            # Security check
-            if not any(file_path.is_relative_to(d) or str(file_path).startswith(d) 
-                      for d in self.allowed_dirs):
+
+            # Security check (path traversal safe)
+            if not self._is_path_allowed(file_path):
                 return ToolResult(
                     success=False,
                     output=None,
                     error=f"Access denied. Allowed directories: {self.allowed_dirs}"
                 )
-            
-            if not file_path.exists():
+
+            # Resolve to prevent symlink attacks
+            resolved_path = file_path.resolve()
+
+            if not resolved_path.exists():
                 return ToolResult(success=False, output=None, error="File not found")
-            
-            content = file_path.read_text()
+
+            if not resolved_path.is_file():
+                return ToolResult(success=False, output=None, error="Not a file")
+
+            content = resolved_path.read_text()
             if lines:
                 content = "\n".join(content.split("\n")[:lines])
-            
+
             return ToolResult(
                 success=True,
                 output=content,
                 execution_time_ms=(time.time() - start) * 1000
             )
+        except PermissionError:
+            return ToolResult(success=False, output=None, error="Permission denied")
+        except UnicodeDecodeError:
+            return ToolResult(success=False, output=None, error="File is not text/UTF-8")
         except Exception as e:
             return ToolResult(success=False, output=None, error=str(e))
 

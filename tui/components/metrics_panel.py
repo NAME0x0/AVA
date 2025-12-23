@@ -3,6 +3,11 @@ Metrics Panel Component
 =======================
 
 Real-time display of system metrics and cognitive state.
+
+Accessibility Features:
+- Focusable with Tab navigation
+- Ctrl+3 quick access
+- Screen reader friendly labels
 """
 
 from typing import Any, Dict
@@ -17,6 +22,9 @@ from textual.widgets import Static
 class MetricsPanel(Static):
     """Real-time system metrics display."""
 
+    # Enable focus for keyboard navigation
+    can_focus = True
+
     DEFAULT_CSS = """
     MetricsPanel {
         width: 35;
@@ -24,6 +32,10 @@ class MetricsPanel(Static):
         border: solid $secondary;
         border-title-color: $secondary;
         padding: 1;
+    }
+
+    MetricsPanel:focus {
+        border: double $secondary;
     }
     """
 

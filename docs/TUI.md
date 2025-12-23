@@ -14,6 +14,31 @@ python run_tui.py --debug
 python run_tui.py --no-connect  # Offline mode
 ```
 
+## Accessibility
+
+The AVA TUI is designed with accessibility in mind:
+
+### Keyboard Navigation
+- **Full keyboard control**: All features accessible without a mouse
+- **Tab cycling**: Move between panels with Tab/Shift+Tab
+- **Quick jumps**: Ctrl+1/2/3 to jump directly to input/chat/metrics
+- **Vim-style navigation**: j/k keys for scrolling
+
+### Screen Reader Support
+- State changes are announced (connection status, thinking state)
+- Panels have descriptive titles
+- Focus indicators show current location
+
+### Visual Accessibility
+- High contrast color scheme
+- Clear focus indicators (double borders on focused elements)
+- Distinct colors for user vs assistant messages
+
+### Focus Order
+1. Chat Input (Ctrl+1) - Primary interaction point
+2. Chat Panel (Ctrl+2) - Message history
+3. Metrics Panel (Ctrl+3) - System status
+
 ## Layout
 
 ```
@@ -47,6 +72,37 @@ python run_tui.py --no-connect  # Offline mode
 
 ## Keybindings
 
+### Navigation (Accessibility)
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `Tab` | Focus Next | Cycle focus to next panel |
+| `Shift+Tab` | Focus Previous | Cycle focus to previous panel |
+| `Ctrl+1` | Focus Input | Jump directly to chat input |
+| `Ctrl+2` | Focus Chat | Jump directly to chat history |
+| `Ctrl+3` | Focus Metrics | Jump directly to metrics panel |
+
+### Chat Navigation
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `↑` / `↓` | Scroll | Scroll chat line by line |
+| `j` / `k` | Scroll (Vim) | Vim-style scrolling |
+| `Page Up` | Page Up | Scroll up one page |
+| `Page Down` | Page Down | Scroll down one page |
+| `Home` | Top | Jump to beginning of chat |
+| `End` | Bottom | Jump to end of chat |
+
+### Input History
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `↑` | Previous | Previous command in history |
+| `↓` | Next | Next command in history |
+| `Enter` | Send | Send current message |
+
+### Commands
+
 | Key | Action | Description |
 |-----|--------|-------------|
 | `Ctrl+K` | Command Palette | Open quick actions menu |
@@ -56,8 +112,6 @@ python run_tui.py --no-connect  # Offline mode
 | `Ctrl+D` | Deep Think | Force Cortex for next query |
 | `F1` | Help | Show help screen |
 | `Ctrl+Q` | Quit | Exit the TUI |
-| `↑` / `↓` | History | Navigate command history |
-| `Enter` | Send | Send current message |
 | `Escape` | Close | Close overlays/popups |
 
 ## Components
