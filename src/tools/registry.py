@@ -6,10 +6,11 @@ Tools are gated by developmental stage to ensure age-appropriate access.
 """
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import IntEnum
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -43,28 +44,28 @@ class ToolDefinition:
     function: Callable
 
     # Parameter schema
-    parameters: Dict[str, Any] = field(default_factory=dict)
-    required_params: List[str] = field(default_factory=list)
+    parameters: dict[str, Any] = field(default_factory=dict)
+    required_params: list[str] = field(default_factory=list)
 
     # Return type description
     return_type: str = "str"
 
     # Developmental requirements beyond safety level
-    required_milestones: List[str] = field(default_factory=list)
-    minimum_competencies: Dict[str, float] = field(default_factory=dict)
+    required_milestones: list[str] = field(default_factory=list)
+    minimum_competencies: dict[str, float] = field(default_factory=dict)
 
     # Usage tracking
     times_used: int = 0
     success_count: int = 0
     failure_count: int = 0
-    last_used: Optional[datetime] = None
+    last_used: datetime | None = None
 
     # Learning benefits
-    teaches_competencies: List[str] = field(default_factory=list)
+    teaches_competencies: list[str] = field(default_factory=list)
 
     # Emotional impact of using this tool
-    success_emotions: Dict[str, float] = field(default_factory=dict)
-    failure_emotions: Dict[str, float] = field(default_factory=dict)
+    success_emotions: dict[str, float] = field(default_factory=dict)
+    failure_emotions: dict[str, float] = field(default_factory=dict)
 
     # Example usage for LLM context
     example_usage: str = ""
@@ -99,8 +100,8 @@ class ToolAccessDecision:
     allowed: bool
     tool_name: str
     reason: str
-    missing_requirements: List[str] = field(default_factory=list)
-    suggested_alternatives: List[str] = field(default_factory=list)
+    missing_requirements: list[str] = field(default_factory=list)
+    suggested_alternatives: list[str] = field(default_factory=list)
 
 
 class ToolRegistry:
@@ -113,7 +114,7 @@ class ToolRegistry:
 
     def __init__(self):
         """Initialize the tool registry."""
-        self.tools: Dict[str, ToolDefinition] = {}
+        self.tools: dict[str, ToolDefinition] = {}
         self._register_default_tools()
         logger.info(f"ToolRegistry initialized with {len(self.tools)} tools")
 
@@ -128,8 +129,8 @@ class ToolRegistry:
         function: Callable,
         description: str,
         safety_level: ToolSafetyLevel,
-        parameters: Optional[Dict[str, Any]] = None,
-        required_params: Optional[List[str]] = None,
+        parameters: dict[str, Any] | None = None,
+        required_params: list[str] | None = None,
         **kwargs
     ) -> ToolDefinition:
         """
@@ -159,7 +160,7 @@ class ToolRegistry:
 
         return tool
 
-    def get_tool(self, name: str) -> Optional[ToolDefinition]:
+    def get_tool(self, name: str) -> ToolDefinition | None:
         """Get a tool by name."""
         return self.tools.get(name)
 
@@ -167,8 +168,8 @@ class ToolRegistry:
         self,
         tool_name: str,
         current_stage: int,
-        achieved_milestones: Optional[List[str]] = None,
-        competencies: Optional[Dict[str, float]] = None,
+        achieved_milestones: list[str] | None = None,
+        competencies: dict[str, float] | None = None,
     ) -> ToolAccessDecision:
         """
         Check if a tool can be accessed at the current developmental stage.
@@ -232,8 +233,8 @@ class ToolRegistry:
     def get_available_tools(
         self,
         max_safety_level: int,
-        filter_by_competencies: Optional[Dict[str, float]] = None,
-    ) -> List[ToolDefinition]:
+        filter_by_competencies: dict[str, float] | None = None,
+    ) -> list[ToolDefinition]:
         """
         Get all tools available at or below the given safety level.
 
@@ -264,10 +265,10 @@ class ToolRegistry:
     def execute(
         self,
         tool_name: str,
-        arguments: Dict[str, Any],
+        arguments: dict[str, Any],
         validate_access: bool = True,
         current_stage: int = 5,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute a tool with the given arguments.
 
@@ -384,7 +385,7 @@ class ToolRegistry:
 
         return ""
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get usage statistics for all tools."""
         stats = {
             "total_tools": len(self.tools),

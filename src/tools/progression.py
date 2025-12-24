@@ -7,9 +7,9 @@ milestones, and competencies.
 
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from .registry import ToolRegistry, ToolSafetyLevel, ToolAccessDecision
+from .registry import ToolRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -30,15 +30,15 @@ class ToolProgressionManager:
             registry: The tool registry to manage
         """
         self.registry = registry
-        self.unlock_history: List[Dict[str, Any]] = []
+        self.unlock_history: list[dict[str, Any]] = []
 
     def get_accessible_tools(
         self,
         stage: int,
-        milestones: Optional[List[str]] = None,
-        competencies: Optional[Dict[str, float]] = None,
-        emotional_bias: Optional[Dict[str, float]] = None,
-    ) -> List[str]:
+        milestones: list[str] | None = None,
+        competencies: dict[str, float] | None = None,
+        emotional_bias: dict[str, float] | None = None,
+    ) -> list[str]:
         """
         Get list of tool names accessible at current development level.
 
@@ -86,9 +86,9 @@ class ToolProgressionManager:
 
     def _sort_by_emotional_preference(
         self,
-        tool_names: List[str],
-        emotional_bias: Dict[str, float],
-    ) -> List[str]:
+        tool_names: list[str],
+        emotional_bias: dict[str, float],
+    ) -> list[str]:
         """Sort tools by emotional preference."""
         safe_pref = emotional_bias.get("safe_preference", 0.5)
         complexity_pref = emotional_bias.get("complexity_preference", 0.5)
@@ -111,9 +111,9 @@ class ToolProgressionManager:
     def get_next_unlockable_tools(
         self,
         current_stage: int,
-        milestones: List[str],
-        competencies: Dict[str, float],
-    ) -> List[Dict[str, Any]]:
+        milestones: list[str],
+        competencies: dict[str, float],
+    ) -> list[dict[str, Any]]:
         """
         Get tools that could be unlocked next with progress.
 
@@ -219,7 +219,7 @@ class ToolProgressionManager:
         self,
         safety_level: int,
         min_success_rate: float = 0.8,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Check mastery of tools at a given safety level.
 
@@ -281,9 +281,9 @@ class ToolProgressionManager:
     def suggest_tool_for_task(
         self,
         task_description: str,
-        accessible_tools: List[str],
-        emotional_bias: Optional[Dict[str, float]] = None,
-    ) -> Optional[str]:
+        accessible_tools: list[str],
+        emotional_bias: dict[str, float] | None = None,
+    ) -> str | None:
         """
         Suggest the best tool for a given task.
 
@@ -341,9 +341,9 @@ class ToolProgressionManager:
     def get_progression_summary(
         self,
         current_stage: int,
-        milestones: List[str],
-        competencies: Dict[str, float],
-    ) -> Dict[str, Any]:
+        milestones: list[str],
+        competencies: dict[str, float],
+    ) -> dict[str, Any]:
         """Get a summary of tool progression status."""
         accessible = self.get_accessible_tools(current_stage, milestones, competencies)
         total_tools = len(self.registry.tools)

@@ -5,27 +5,25 @@ Production-Ready Web Search with Multiple Engines and Advanced Features
 """
 
 import asyncio
-import aiohttp
-import json
 import logging
 import os
 import re
 import time
+import warnings
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Optional, Union
-from urllib.parse import quote, urljoin
-import warnings
+from typing import Any
+from urllib.parse import quote
+
+import aiohttp
 
 # Optional imports with fallbacks
 try:
-    import requests
     HAS_REQUESTS = True
 except ImportError:
     HAS_REQUESTS = False
 
 try:
-    from bs4 import BeautifulSoup
     HAS_BS4 = True
 except ImportError:
     HAS_BS4 = False
@@ -87,7 +85,7 @@ class SearchResult:
     snippet: str = ""
     domain: str = ""
     rank: int = 0
-    published_date: Optional[str] = None
+    published_date: str | None = None
     content_type: str = "webpage"
     relevance_score: float = 0.0
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -102,7 +100,7 @@ class SearchResponse:
     results: list[SearchResult] = field(default_factory=list)
     total_results: int = 0
     search_time_ms: float = 0.0
-    error: Optional[str] = None
+    error: str | None = None
     warnings: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -153,7 +151,7 @@ class EnhancedWebSearch:
     def __init__(
         self,
         primary_engine: SearchEngine = SearchEngine.DUCKDUCKGO,
-        api_keys: Optional[Dict[str, str]] = None,
+        api_keys: dict[str, str] | None = None,
         rate_limit_requests: int = 100,
         rate_limit_window: int = 3600
     ):
@@ -229,7 +227,7 @@ class EnhancedWebSearch:
         query: str,
         num_results: int = 5,
         search_type: SearchType = SearchType.WEB,
-        engine: Optional[SearchEngine] = None,
+        engine: SearchEngine | None = None,
         safety_level: SafetyLevel = SafetyLevel.MODERATE
     ) -> SearchResponse:
         """
