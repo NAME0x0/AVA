@@ -46,7 +46,8 @@ Reference Papers:
 from .medulla import Medulla, MedullaConfig
 from .cortex import Cortex, CortexConfig
 from .bridge import Bridge, BridgeConfig
-from .agency import ActiveInferenceController, AgencyConfig, PolicyType
+from .agency import ActiveInferenceController, AgencyConfig, PolicyType, VerificationResult
+from .adapter_manager import AdapterManager, AdapterConfig, AdapterType
 from .system import AVACoreSystem, CoreConfig
 
 # Note: V2 implementations have been archived to legacy/v2_core/
@@ -55,20 +56,26 @@ __all__ = [
     # Medulla (Reflexive Core)
     "Medulla",
     "MedullaConfig",
-    
-    # Cortex (Reflective Core)  
+
+    # Cortex (Reflective Core)
     "Cortex",
     "CortexConfig",
-    
+
     # Bridge (State Projection)
     "Bridge",
     "BridgeConfig",
-    
+
     # Agency (Active Inference)
     "ActiveInferenceController",
     "AgencyConfig",
     "PolicyType",
-    
+    "VerificationResult",
+
+    # Adapter Manager (Specialist LoRA Swapping)
+    "AdapterManager",
+    "AdapterConfig",
+    "AdapterType",
+
     # Core System
     "AVACoreSystem",
     "CoreConfig",

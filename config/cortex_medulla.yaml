@@ -136,6 +136,29 @@ bridge:
   adapter_path: "models/fine_tuned_adapters/bridge"
 
 # ----------------------------------------------------------------------------
+# SPECIALIST ADAPTERS - Dynamic LoRA Expert Swapping
+# ----------------------------------------------------------------------------
+# Domain-specific LoRA adapters for improved performance
+# Adapters are hot-swapped during inference based on query classification
+# ----------------------------------------------------------------------------
+adapters:
+  enabled: true
+  base_path: "models/adapters"
+
+  # Specialist adapter names
+  specialists:
+    coding: "coding_expert"      # Software development, debugging
+    logic: "logic_expert"        # Logical reasoning, proofs
+    butler: "butler_expert"      # Conversational assistance
+
+  # Selection thresholds
+  confidence_threshold: 0.6      # Min confidence to use specialist
+  fallback_to_general: true      # Use base model if adapter fails
+
+  # Performance tracking
+  track_performance: true
+
+# ----------------------------------------------------------------------------
 # AGENCY - Active Inference Controller
 # ----------------------------------------------------------------------------
 # Free Energy Principle implementation for autonomous behavior
@@ -203,7 +226,8 @@ agency:
 search_first:
   # Core Settings
   enabled: true
-  
+  gate_enabled: true            # Mandatory search gate (skips G calculation for factual queries)
+
   # Source Requirements
   min_sources: 3                # Minimum sources to check
   max_sources: 10               # Maximum sources to check

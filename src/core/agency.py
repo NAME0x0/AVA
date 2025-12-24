@@ -145,6 +145,7 @@ class AgencyConfig:
     
     # SEARCH-FIRST Configuration
     search_first_enabled: bool = True     # Enable search-first paradigm
+    search_gate_enabled: bool = True      # Mandatory search gate (skips G calculation)
     web_search_effort_cost: float = 0.05  # Very low cost for web search
     
     # Learning
@@ -279,6 +280,34 @@ class Observation:
             features.extend([0.0, 0.0, 0.0])
         
         return np.array(features, dtype=np.float32)
+
+
+@dataclass
+class VerificationResult:
+    """
+    Result of verifying a response against search snippets.
+
+    Used for hallucination prevention by auditing generated responses
+    against retrieved information.
+    """
+
+    confidence: float = 0.0           # Fraction of claims verified
+    verified_claims: List[str] = field(default_factory=list)
+    unverified_claims: List[str] = field(default_factory=list)
+    needs_revision: bool = False      # True if confidence < 70%
+    search_snippets_used: int = 0
+    total_claims_found: int = 0
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for JSON serialization."""
+        return {
+            "confidence": self.confidence,
+            "verified_claims": self.verified_claims,
+            "unverified_claims": self.unverified_claims,
+            "needs_revision": self.needs_revision,
+            "search_snippets_used": self.search_snippets_used,
+            "total_claims_found": self.total_claims_found,
+        }
 
 
 class ExpectedFreeEnergy:
@@ -683,7 +712,109 @@ class ActiveInferenceController:
                 return True
         
         return False
-    
+
+    def _is_factual_query(self, observation: Observation) -> bool:
+        """
+        Search-First Gate: Determine if query is factual and MUST use search.
+
+        This is the mandatory gate that fires BEFORE G calculation.
+        Unlike should_search_first(), this returns True for any query
+        that requires external information.
+
+        Triggers on:
+        - Question words (what, when, where, who, how, why)
+        - Information-seeking phrases
+        - Current events / time-sensitive queries
+        - Explicit search requests
+
+        Does NOT trigger on:
+        - Greetings and small talk
+        - Commands and instructions
+        - Self-referential questions ("who are you?")
+        - Pure math or logic problems
+
+        Args:
+            observation: Current observation
+
+        Returns:
+            True if search gate should fire
+        """
+        if not self.config.search_gate_enabled:
+            return False
+
+        if not observation.text:
+            return False
+
+        text = observation.text.strip()
+        text_lower = text.lower()
+
+        # Skip greetings and small talk
+        greetings = ["hello", "hi ", "hey", "good morning", "good evening",
+                     "how are you", "what's up", "thanks", "thank you", "bye"]
+        if any(text_lower.startswith(g) or text_lower == g.strip() for g in greetings):
+            return False
+
+        # Skip self-referential questions
+        self_refs = ["who are you", "what are you", "what can you", "your name",
+                     "about yourself", "introduce yourself"]
+        if any(ref in text_lower for ref in self_refs):
+            return False
+
+        # Skip pure commands
+        commands = ["set ", "turn ", "enable ", "disable ", "run ", "execute ",
+                    "open ", "close ", "start ", "stop ", "clear "]
+        if any(text_lower.startswith(cmd) for cmd in commands):
+            return False
+
+        # Skip pure math/calculation
+        if text.replace(" ", "").replace("+", "").replace("-", "").replace("*", "").replace("/", "").replace(".", "").isdigit():
+            return False
+
+        # ===== TRIGGER CONDITIONS =====
+
+        # Question words - STRONG indicator
+        question_words = ["what is", "what are", "what was", "what were",
+                         "who is", "who are", "who was",
+                         "when is", "when was", "when did", "when will",
+                         "where is", "where are", "where was",
+                         "why is", "why are", "why did", "why does",
+                         "how does", "how do", "how did", "how is", "how to",
+                         "which is", "which are"]
+        if any(qw in text_lower for qw in question_words):
+            logger.debug(f"Search gate: Question word detected")
+            return True
+
+        # Information-seeking phrases
+        info_phrases = ["tell me about", "explain", "describe", "define",
+                       "what does", "meaning of", "definition of",
+                       "information about", "details about", "facts about",
+                       "learn about", "teach me", "show me"]
+        if any(phrase in text_lower for phrase in info_phrases):
+            logger.debug(f"Search gate: Info phrase detected")
+            return True
+
+        # Time-sensitive / current events
+        current_phrases = ["latest", "recent", "current", "today", "yesterday",
+                          "this week", "this month", "this year", "right now",
+                          "news about", "update on", "status of"]
+        if any(phrase in text_lower for phrase in current_phrases):
+            logger.debug(f"Search gate: Time-sensitive query detected")
+            return True
+
+        # Explicit search request
+        search_phrases = ["search for", "look up", "find out", "google",
+                         "search the web", "find information"]
+        if any(phrase in text_lower for phrase in search_phrases):
+            logger.debug(f"Search gate: Explicit search request")
+            return True
+
+        # Ends with question mark and is substantive
+        if text.endswith("?") and len(text) > 15:
+            logger.debug(f"Search gate: Substantive question detected")
+            return True
+
+        return False
+
     async def process_observation(
         self,
         observation: Observation,
@@ -706,15 +837,40 @@ class ActiveInferenceController:
         """
         # 1. Update beliefs based on observation
         await self._update_beliefs(observation)
-        
-        # 2. Check Search-First heuristic
+
+        # 2. SEARCH-FIRST GATE: Check if this is a factual query
+        # This fires BEFORE G calculation - mandatory search for factual queries
+        if self._is_factual_query(observation):
+            logger.info("Search-First Gate triggered - bypassing G calculation")
+
+            # Record action
+            self.action_history.append((datetime.now(), PolicyType.PRIMARY_SEARCH, 0.0))
+            if len(self.action_history) > self.max_history:
+                self.action_history = self.action_history[-self.max_history:]
+
+            # Execute callback if registered
+            result = {"policy": PolicyType.PRIMARY_SEARCH.name, "G": 0.0, "gate_triggered": True}
+
+            if PolicyType.PRIMARY_SEARCH in self._action_callbacks:
+                callback = self._action_callbacks[PolicyType.PRIMARY_SEARCH]
+                try:
+                    action_result = await callback(observation, self.beliefs)
+                    result["action_result"] = action_result
+                except Exception as e:
+                    logger.error(f"Search action callback failed: {e}")
+                    result["error"] = str(e)
+
+            self.last_action_time = datetime.now()
+            return PolicyType.PRIMARY_SEARCH, result
+
+        # 3. Check Search-First heuristic (soft bias for other queries)
         if self.should_search_first(observation):
             logger.info("Search-First heuristic triggered")
             # Bias toward search policies
             self.efe_calculator.effort_costs[PolicyType.PRIMARY_SEARCH] = 0.01
             self.efe_calculator.effort_costs[PolicyType.WEB_SEARCH] = 0.02
-        
-        # 3. Calculate Expected Free Energy for each policy
+
+        # 4. Calculate Expected Free Energy for each policy
         policy_G: Dict[PolicyType, Tuple[float, Dict]] = {}
         
         for policy in self.available_policies:
@@ -1146,3 +1302,188 @@ class ActiveInferenceController:
     def clear_pending_system_command(self) -> None:
         """Clear any pending system command."""
         self._pending_system_command = None
+
+    # =========================================================================
+    # VERIFICATION LOOP - Hallucination Prevention
+    # =========================================================================
+
+    async def verify_response(
+        self,
+        response: str,
+        search_snippets: List[str],
+        original_query: str,
+    ) -> VerificationResult:
+        """
+        Verify a generated response against search snippets.
+
+        This is the hallucination prevention system. It extracts claims
+        from the response and checks if they appear in the search results.
+        If too many claims are unverified (confidence < 70%), the response
+        is flagged for revision.
+
+        Args:
+            response: Generated response text
+            search_snippets: List of search result snippets
+            original_query: Original user query
+
+        Returns:
+            VerificationResult with confidence score and claim analysis
+        """
+        result = VerificationResult()
+        result.search_snippets_used = len(search_snippets)
+
+        if not search_snippets or not response:
+            # No verification possible without snippets
+            result.confidence = 1.0  # Assume valid if no search was done
+            return result
+
+        # Extract claims from response
+        claims = self._extract_claims(response)
+        result.total_claims_found = len(claims)
+
+        if not claims:
+            # No verifiable claims found
+            result.confidence = 1.0
+            return result
+
+        # Check each claim against snippets
+        for claim in claims:
+            if self._claim_in_snippets(claim, search_snippets):
+                result.verified_claims.append(claim)
+            else:
+                result.unverified_claims.append(claim)
+
+        # Calculate confidence
+        result.confidence = len(result.verified_claims) / len(claims)
+
+        # Flag if too many unverified claims
+        result.needs_revision = result.confidence < 0.7
+
+        if result.needs_revision:
+            logger.warning(
+                f"Verification failed: {result.confidence:.0%} confidence "
+                f"({len(result.unverified_claims)} unverified claims)"
+            )
+        else:
+            logger.info(f"Verification passed: {result.confidence:.0%} confidence")
+
+        return result
+
+    def _extract_claims(self, response: str) -> List[str]:
+        """
+        Extract verifiable claims from a response.
+
+        Claims are statements that can be checked against external sources:
+        - Sentences with specific facts (numbers, names, dates)
+        - Assertions about how things work
+        - Historical or current events
+
+        Args:
+            response: Response text to analyze
+
+        Returns:
+            List of extracted claim strings
+        """
+        import re
+
+        claims = []
+
+        # Split into sentences
+        sentences = re.split(r'[.!?]+', response)
+
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if not sentence or len(sentence) < 10:
+                continue
+
+            # Skip meta-commentary
+            skip_patterns = [
+                r"^(I think|I believe|In my opinion|It seems|Maybe|Perhaps)",
+                r"^(However|But|Also|Additionally|Furthermore)",
+                r"^(Let me|I'll|I will|Allow me)",
+                r"^(Yes|No|Sure|Of course|Definitely)",
+            ]
+            if any(re.match(p, sentence, re.IGNORECASE) for p in skip_patterns):
+                continue
+
+            # Look for claim indicators
+            claim_indicators = [
+                r'\d+',           # Contains numbers
+                r'[A-Z][a-z]+',   # Contains proper nouns
+                r'(is|are|was|were|has|have|had)\s+\w+',  # Assertions
+                r'(according to|based on|research shows)',  # References
+                r'(first|second|third|finally|originally)',  # Sequences
+            ]
+
+            if any(re.search(p, sentence) for p in claim_indicators):
+                claims.append(sentence)
+
+        return claims[:20]  # Limit to 20 claims for efficiency
+
+    def _claim_in_snippets(self, claim: str, snippets: List[str]) -> bool:
+        """
+        Check if a claim is supported by any search snippet.
+
+        Uses fuzzy matching to account for paraphrasing:
+        - Extract key terms from claim
+        - Check if majority of terms appear in snippets
+
+        Args:
+            claim: Claim to verify
+            snippets: Search snippets to check against
+
+        Returns:
+            True if claim is supported by snippets
+        """
+        import re
+
+        # Extract key terms (nouns, verbs, numbers, proper nouns)
+        # Simple extraction: words longer than 3 chars, not common words
+        common_words = {
+            "the", "and", "that", "this", "with", "from", "have", "been",
+            "were", "they", "what", "when", "which", "their", "about",
+            "into", "more", "other", "than", "then", "these", "some",
+            "very", "just", "also", "being", "over", "such", "through",
+        }
+
+        words = re.findall(r'\b\w+\b', claim.lower())
+        key_terms = [w for w in words if len(w) > 3 and w not in common_words]
+
+        if not key_terms:
+            return True  # No verifiable terms
+
+        # Combine all snippets into searchable text
+        combined_snippets = " ".join(snippets).lower()
+
+        # Count how many key terms appear in snippets
+        found_terms = sum(1 for term in key_terms if term in combined_snippets)
+
+        # Require majority of terms to match
+        match_ratio = found_terms / len(key_terms)
+        return match_ratio >= 0.5
+
+    def add_verification_warning(
+        self,
+        response: str,
+        verification: VerificationResult,
+    ) -> str:
+        """
+        Add a warning to a response that failed verification.
+
+        Args:
+            response: Original response
+            verification: Verification result
+
+        Returns:
+            Response with warning prepended
+        """
+        if not verification.needs_revision:
+            return response
+
+        warning = (
+            f"[Note: This response has {verification.confidence:.0%} verification "
+            f"confidence. {len(verification.unverified_claims)} claim(s) could not "
+            f"be verified against search results.]\n\n"
+        )
+
+        return warning + response

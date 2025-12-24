@@ -593,8 +593,8 @@ class Medulla:
         if new_state is not None:
             self.state_manager.update(new_state)
         
-        # Calculate surprise
-        surprise = self._calculate_surprise(logits, embeddings)
+        # Calculate surprise (thermal-aware: threshold may be raised if throttled)
+        surprise = self._calculate_surprise(logits, embeddings, thermal_status)
         self.surprise_history.append(surprise)
         
         # Trim history if needed
@@ -692,19 +692,24 @@ class Medulla:
         self,
         logits: Optional[np.ndarray],
         embeddings: np.ndarray,
+        thermal_status: Optional["ThermalStatus"] = None,
     ) -> SurpriseSignal:
         """
         Calculate surprise from the prediction error.
-        
+
         Surprise = -log P(x_t | h_{t-1})
-        
+
         High surprise indicates the input was unexpected given the
         current hidden state, suggesting novel information.
-        
+
+        THERMAL-AWARE: When GPU is throttled, the threshold for Cortex
+        invocation is raised by 50% to reduce expensive operations.
+
         Args:
             logits: Model output logits
             embeddings: Input embeddings
-            
+            thermal_status: Current GPU thermal status
+
         Returns:
             SurpriseSignal with calculated metrics
         """
@@ -714,23 +719,32 @@ class Medulla:
         else:
             # Calculate prediction error as proxy for surprise
             # In full implementation, this would use proper likelihood
-            
+
             # Normalize logits to probabilities (softmax over sample)
             exp_logits = np.exp(logits - logits.max())
             probs = exp_logits / exp_logits.sum()
-            
+
             # Entropy as surprise proxy
             entropy = -np.sum(probs * np.log(probs + 1e-10))
             raw_surprise = float(entropy)
-        
+
+        # THERMAL-AWARE THRESHOLD ADJUSTMENT
+        # When throttled, raise the threshold to avoid invoking Cortex
+        effective_threshold = self.config.high_surprise_threshold  # Default: 2.0
+
+        if thermal_status and thermal_status.is_throttled:
+            # Raise threshold by 50% when throttled (2.0 -> 3.0)
+            effective_threshold *= 1.5
+            logger.info(f"Thermal throttle: Raised surprise threshold to {effective_threshold:.1f}")
+
         # Normalize to [0, ~5] range
-        normalized = raw_surprise / (self.config.high_surprise_threshold * 2)
+        normalized = raw_surprise / (effective_threshold * 2)
         normalized = min(normalized, 1.0)
-        
-        # Determine thresholds
-        is_high = raw_surprise >= self.config.high_surprise_threshold
-        requires_cortex = raw_surprise >= self.config.high_surprise_threshold
-        
+
+        # Determine thresholds using effective (possibly raised) threshold
+        is_high = raw_surprise >= effective_threshold
+        requires_cortex = raw_surprise >= effective_threshold
+
         return SurpriseSignal(
             value=raw_surprise,
             normalized=normalized,

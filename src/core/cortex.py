@@ -303,39 +303,51 @@ class Cortex:
         max_tokens: Optional[int] = None,
         temperature: Optional[float] = None,
         stop_sequences: Optional[List[str]] = None,
+        thermal_status: Optional[Any] = None,
     ) -> GenerationResult:
         """
         Generate a response using layer-wise inference.
-        
+
         This is the main entry point for Cortex reasoning. The method:
         1. Tokenizes and optionally prepends projected Medulla state
         2. Performs layer-by-layer forward passes
         3. Generates tokens autoregressively
         4. Returns the complete response
-        
+
+        THERMAL-AWARE: When GPU is throttled, max tokens is reduced to 128
+        to minimize thermal load.
+
         Args:
             prompt: Input prompt text
             projected_state: Optional Medulla state projection (soft prompts)
             max_tokens: Override max_new_tokens
             temperature: Override temperature
             stop_sequences: Sequences that stop generation
-            
+            thermal_status: Optional thermal status for throttling
+
         Returns:
             GenerationResult with response and metrics
         """
         if not self.is_initialized:
             await self.initialize()
-        
+
         result = GenerationResult()
         start_time = time.time()
-        
+
         try:
             self.state = CortexState.PROCESSING
             self.transfer_monitor.reset()
-            
+
             # Configure generation parameters
             gen_max_tokens = max_tokens or self.config.max_new_tokens
             gen_temperature = temperature or self.config.temperature
+
+            # THERMAL-AWARE TOKEN LIMITING
+            # Reduce max tokens when GPU is throttled to minimize thermal load
+            if thermal_status and hasattr(thermal_status, 'is_throttled') and thermal_status.is_throttled:
+                original_tokens = gen_max_tokens
+                gen_max_tokens = min(gen_max_tokens, 128)  # Cap at 128 when throttled
+                logger.info(f"Thermal throttle: Limited tokens from {original_tokens} to {gen_max_tokens}")
             
             if self._model is not None:
                 # Real AirLLM generation
