@@ -600,3 +600,11 @@ class Cortex:
         self.state = CortexState.DORMANT
         self.is_initialized = False
         logger.info("Cortex shutdown complete")
+
+
+# =============================================================================
+# ALIASES FOR BACKWARD COMPATIBILITY
+# =============================================================================
+
+# Alias for tests expecting 'CortexEngine' instead of 'Cortex'
+CortexEngine = Cortex

@@ -122,7 +122,7 @@ yarn-debug.log*
 yarn-error.log*
 .npm/
 .yarn/
-package-lock.json
+# Note: package-lock.json is needed for CI caching - do not ignore
 yarn.lock
 .pnpm-store/
 

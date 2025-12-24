@@ -1991,3 +1991,13 @@ class ActiveInferenceController:
         )
 
         return warning + response
+
+# =============================================================================
+# ALIASES FOR BACKWARD COMPATIBILITY
+# =============================================================================
+
+# Alias for tests expecting 'Policy' instead of 'PolicyType'
+Policy = PolicyType
+
+# Alias for tests expecting 'AgencyModule' instead of 'ActiveInferenceController'
+AgencyModule = ActiveInferenceController

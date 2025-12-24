@@ -926,3 +926,30 @@ class Medulla:
 
         self.is_initialized = False
         logger.info("Medulla shutdown complete")
+
+
+# =============================================================================
+# RE-EXPORTS FOR BACKWARD COMPATIBILITY
+# =============================================================================
+
+# Re-export CognitiveState from cortex.entropix for tests
+try:
+    from ..cortex.entropix import CognitiveState
+except ImportError:
+    # Fallback definition if cortex module not available
+    from dataclasses import dataclass
+    from enum import Enum
+
+    class CognitiveStateLabel(Enum):
+        FLOW = "flow"
+        HESITATION = "hesitation"
+        CONFUSION = "confusion"
+        CREATIVE = "creative"
+        NEUTRAL = "neutral"
+
+    @dataclass
+    class CognitiveState:
+        label: CognitiveStateLabel = CognitiveStateLabel.NEUTRAL
+        entropy: float = 0.0
+        varentropy: float = 0.0
+        confidence: float = 1.0

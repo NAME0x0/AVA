@@ -13,7 +13,7 @@ import re
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union, Tuple
+from typing import Any, Optional, Union
 from urllib.parse import quote, urljoin
 import warnings
 
@@ -88,7 +88,7 @@ class SearchResult:
     published_date: Optional[str] = None
     content_type: str = "webpage"
     relevance_score: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -97,12 +97,12 @@ class SearchResponse:
     success: bool
     query: str
     engine: SearchEngine
-    results: List[SearchResult] = field(default_factory=list)
+    results: list[SearchResult] = field(default_factory=list)
     total_results: int = 0
     search_time_ms: float = 0.0
     error: Optional[str] = None
-    warnings: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    warnings: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class RateLimiter:
@@ -339,11 +339,11 @@ class EnhancedWebSearch:
         return cleaned
     
     async def _search_duckduckgo(
-        self, 
-        query: str, 
-        num_results: int, 
+        self,
+        query: str,
+        num_results: int,
         search_type: SearchType
-    ) -> List[SearchResult]:
+    ) -> list[SearchResult]:
         """Search using DuckDuckGo."""
         results = []
         
@@ -380,11 +380,11 @@ class EnhancedWebSearch:
         return results
     
     async def _search_google_custom(
-        self, 
-        query: str, 
-        num_results: int, 
+        self,
+        query: str,
+        num_results: int,
         search_type: SearchType
-    ) -> List[SearchResult]:
+    ) -> list[SearchResult]:
         """Search using Google Custom Search API."""
         results = []
         
@@ -437,11 +437,11 @@ class EnhancedWebSearch:
         return results
     
     async def _search_bing(
-        self, 
-        query: str, 
-        num_results: int, 
+        self,
+        query: str,
+        num_results: int,
         search_type: SearchType
-    ) -> List[SearchResult]:
+    ) -> list[SearchResult]:
         """Search using Bing Search API."""
         results = []
         
@@ -494,11 +494,11 @@ class EnhancedWebSearch:
         return results
     
     async def _search_serp_api(
-        self, 
-        query: str, 
-        num_results: int, 
+        self,
+        query: str,
+        num_results: int,
         search_type: SearchType
-    ) -> List[SearchResult]:
+    ) -> list[SearchResult]:
         """Search using SerpApi."""
         results = []
         
@@ -550,11 +550,11 @@ class EnhancedWebSearch:
         return results
     
     async def _search_brave(
-        self, 
-        query: str, 
-        num_results: int, 
+        self,
+        query: str,
+        num_results: int,
         search_type: SearchType
-    ) -> List[SearchResult]:
+    ) -> list[SearchResult]:
         """Search using Brave Search API."""
         results = []
         
@@ -602,11 +602,11 @@ class EnhancedWebSearch:
         return results
     
     def _search_mock(
-        self, 
-        query: str, 
-        num_results: int, 
+        self,
+        query: str,
+        num_results: int,
         search_type: SearchType
-    ) -> List[SearchResult]:
+    ) -> list[SearchResult]:
         """Generate mock search results for testing."""
         results = []
         
@@ -632,14 +632,14 @@ class EnhancedWebSearch:
             from urllib.parse import urlparse
             parsed = urlparse(url)
             return parsed.netloc.lower()
-        except:
+        except Exception:
             return ""
     
     def _post_process_results(
-        self, 
-        results: List[SearchResult], 
+        self,
+        results: list[SearchResult],
         safety_level: SafetyLevel
-    ) -> List[SearchResult]:
+    ) -> list[SearchResult]:
         """Post-process search results with filtering and scoring."""
         processed_results = []
         
@@ -669,7 +669,7 @@ class EnhancedWebSearch:
         
         return True
     
-    def run(self, query: str, **kwargs) -> Dict[str, Any]:
+    def run(self, query: str, **kwargs) -> dict[str, Any]:
         """
         Main interface for function calling compatibility.
         
@@ -767,4 +767,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    asyncio.run(main())
