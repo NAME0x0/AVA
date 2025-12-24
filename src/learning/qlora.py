@@ -253,23 +253,25 @@ class QLoRATrainer:
         )
 
         # Load tokenizer with revision pinning for security
+        # nosec B615 - revision parameter added for version pinning
         self._tokenizer = AutoTokenizer.from_pretrained(
             self.config.base_model,
             revision=self.config.model_revision,
             trust_remote_code=True,
-        )
+        )  # nosec B615
 
         if self._tokenizer.pad_token is None:
             self._tokenizer.pad_token = self._tokenizer.eos_token
 
         # Load model with revision pinning for security
+        # nosec B615 - revision parameter added for version pinning
         self._model = AutoModelForCausalLM.from_pretrained(
             self.config.base_model,
             revision=self.config.model_revision,
             quantization_config=bnb_config,
             device_map="auto",
             trust_remote_code=True,
-        )
+        )  # nosec B615
 
         # Prepare for k-bit training
         self._model = prepare_model_for_kbit_training(self._model)

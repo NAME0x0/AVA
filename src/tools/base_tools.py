@@ -101,6 +101,7 @@ class SafeMathEvaluator(ast.NodeVisitor):
         evaluator = cls()
         return evaluator.visit(tree.body)
 
+
 # =============================================================================
 # LEVEL 0 - Baby Safe Tools
 # =============================================================================

@@ -5,6 +5,9 @@ Production-Ready Web Search with Multiple Engines and Advanced Features
 """
 
 import asyncio
+
+# Optional imports with fallbacks - use find_spec to avoid unused import warnings
+import importlib.util
 import logging
 import os
 import re
@@ -17,20 +20,8 @@ from urllib.parse import quote
 
 import aiohttp
 
-# Optional imports with fallbacks
-try:
-    import requests
-
-    HAS_REQUESTS = True
-except ImportError:
-    HAS_REQUESTS = False
-
-try:
-    from bs4 import BeautifulSoup
-
-    HAS_BS4 = True
-except ImportError:
-    HAS_BS4 = False
+HAS_REQUESTS = importlib.util.find_spec("requests") is not None
+HAS_BS4 = importlib.util.find_spec("bs4") is not None
 
 try:
     from duckduckgo_search import DDGS
