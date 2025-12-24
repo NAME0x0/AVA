@@ -2,6 +2,9 @@
 AGENCY - Active Inference Controller for Autonomous Behavior
 =============================================================
 
+ASEA (AVA Sentience & Efficiency Algorithm) Implementation
+----------------------------------------------------------
+
 The Agency module implements the Free Energy Principle (FEP) via Active
 Inference using the pymdp library. This provides AVA with intrinsic
 motivation to act, resolving the "passive inference limitation."
@@ -11,15 +14,25 @@ Core Principle:
 - Active Inference agents minimize Variational Free Energy (proactive)
 - VFE = Complexity - Accuracy ≈ Surprise + Expected Information Gain
 
-The agent maintains a generative model of the world and acts to reduce
-uncertainty (Expected Information Gain) and achieve preferred states
-(Pragmatic Value). This creates JARVIS-like autonomous behavior.
+ASEA Unified Objective Function:
+    L_ASEA = λ₁·VFE + λ₂·Thermal_Cost + λ₃·(1 - VRAM_Slack)
+    
+Where:
+    - VFE: Variational Free Energy (drives curiosity and accuracy)
+    - Thermal_Cost: GPU temperature penalty (prevents throttling)
+    - VRAM_Slack: Available VRAM headroom (prevents OOM)
+    - λ₁=1.0, λ₂=0.3, λ₃=0.5 (tunable weights)
 
 Key Concepts:
 - Hidden States (S): True world state (User_Intent, System_Status, etc.)
 - Observations (O): Sensory inputs (text, logs, audio)
 - Policies (π): Action sequences (Reply, Think, Wait, Query)
 - Preferences (C): Desired observations (User_Satisfied, Knowledge_Certain)
+
+Search-First Paradigm:
+- WEB_SEARCH has effort_cost=0.05 (lowest - PREFERRED action)
+- INTERNAL_GENERATE has effort_cost=0.5 (higher - use after search)
+- Agent always grounds responses in retrieved facts before generating
 
 Reference: "Active Inference: The Free Energy Principle in Mind, Brain, and Behavior"
 """
@@ -41,6 +54,13 @@ try:
     NVML_AVAILABLE = True
 except ImportError:
     NVML_AVAILABLE = False
+
+# Optional: PyTorch for VRAM monitoring
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -308,6 +328,490 @@ class VerificationResult:
             "search_snippets_used": self.search_snippets_used,
             "total_claims_found": self.total_claims_found,
         }
+
+
+# =============================================================================
+# ASEA: AVA Sentience & Efficiency Algorithm
+# =============================================================================
+
+@dataclass
+class ASEAConfig:
+    """
+    Configuration for the ASEA (AVA Sentience & Efficiency Algorithm).
+    
+    ASEA Unified Objective:
+        L_ASEA = λ₁·VFE + λ₂·Thermal_Cost + λ₃·(1 - VRAM_Slack)
+    
+    This configuration tunes the balance between:
+    1. Epistemic drive (curiosity, information seeking)
+    2. Hardware constraints (thermal, memory)
+    3. Response quality (accuracy, groundedness)
+    """
+    
+    # ASEA Weight Coefficients
+    lambda_vfe: float = 1.0           # VFE weight (primary driver)
+    lambda_thermal: float = 0.3       # Thermal cost weight
+    lambda_vram: float = 0.5          # VRAM slack weight
+    
+    # Hardware Targets (RTX A2000 4GB)
+    target_vram_mb: int = 3000        # Target max VRAM usage
+    total_vram_mb: int = 4096         # Total available VRAM
+    vram_headroom_mb: int = 1000      # Desired headroom
+    
+    # Thermal Targets
+    target_temp_c: float = 70.0       # Target max temperature
+    critical_temp_c: float = 85.0     # Critical temperature (pause)
+    max_power_watts: float = 70.0     # RTX A2000 TDP
+    target_power_percent: float = 15.0  # Target power usage %
+    
+    # Search-First Inversion Weights
+    # Lower = more preferred (inverted from typical effort costs)
+    search_preference: float = 0.05   # WEB_SEARCH - highest preference
+    browse_preference: float = 0.08   # WEB_BROWSE 
+    tool_preference: float = 0.15     # USE_TOOL
+    memory_preference: float = 0.20   # QUERY_MEMORY
+    generate_preference: float = 0.50 # INTERNAL_GENERATE - lowest preference
+    cortex_preference: float = 0.60   # DEEP_THOUGHT - expensive
+    
+    # Self-Correction Loop
+    audit_enabled: bool = True        # Enable response auditing
+    audit_confidence_threshold: float = 0.7  # Min confidence to pass
+    max_revision_attempts: int = 2    # Max times to revise a response
+    
+    # Distillation (Learning from verification)
+    distillation_enabled: bool = True
+    distillation_success_threshold: float = 0.85  # High bar for learning
+
+
+@dataclass
+class ASEAState:
+    """
+    Runtime state for the ASEA algorithm.
+    
+    Tracks hardware metrics, verification results, and learning signals.
+    """
+    
+    # Hardware Metrics
+    current_temp_c: float = 0.0
+    current_power_watts: float = 0.0
+    current_vram_mb: float = 0.0
+    vram_slack: float = 1.0           # 1.0 = all headroom available
+    thermal_pressure: float = 0.0     # 0.0 = cool, 1.0 = critical
+    
+    # ASEA Loss Components
+    vfe_component: float = 0.0
+    thermal_component: float = 0.0
+    vram_component: float = 0.0
+    total_loss: float = 0.0
+    
+    # Verification State
+    last_verification: Optional[VerificationResult] = None
+    revision_count: int = 0
+    
+    # Distillation Signals
+    successful_strategies: List[str] = field(default_factory=list)
+    failed_strategies: List[str] = field(default_factory=list)
+    
+    # Timestamps
+    last_update: datetime = field(default_factory=datetime.now)
+
+
+class ASEAController:
+    """
+    ASEA (AVA Sentience & Efficiency Algorithm) Controller.
+    
+    Implements the unified objective function:
+        L_ASEA = λ₁·VFE + λ₂·Thermal_Cost + λ₃·(1 - VRAM_Slack)
+    
+    This controller wraps the ActiveInferenceController and adds:
+    1. Real-time hardware monitoring (thermal, VRAM)
+    2. Dynamic policy weight adjustment based on constraints
+    3. Self-correction loop (Search → Summarize → Audit → Distill)
+    4. Learning signal extraction for Titans memory
+    
+    The ASEA algorithm ensures AVA operates optimally within the
+    RTX A2000's physical constraints while maximizing intelligence.
+    """
+    
+    def __init__(
+        self,
+        config: Optional[ASEAConfig] = None,
+        agency_config: Optional[AgencyConfig] = None,
+    ):
+        """
+        Initialize the ASEA controller.
+        
+        Args:
+            config: ASEA-specific configuration
+            agency_config: Base Active Inference configuration
+        """
+        self.config = config or ASEAConfig()
+        self.agency_config = agency_config or AgencyConfig()
+        
+        # Apply ASEA search-first weights to agency config
+        self._apply_search_first_weights()
+        
+        # Runtime state
+        self.state = ASEAState()
+        
+        # NVML handle for GPU monitoring
+        self._nvml_handle = None
+        self._nvml_initialized = False
+        self._init_nvml()
+        
+        logger.info("ASEA Controller initialized")
+        logger.info(f"  λ_VFE={self.config.lambda_vfe}, λ_thermal={self.config.lambda_thermal}, λ_VRAM={self.config.lambda_vram}")
+        logger.info(f"  Search preference: {self.config.search_preference} (lowest = most preferred)")
+    
+    def _apply_search_first_weights(self) -> None:
+        """Apply ASEA search-first preference weights to agency config."""
+        # These weights INVERT the typical "effort cost" model
+        # Lower values = MORE preferred actions
+        self.agency_config.web_search_effort_cost = self.config.search_preference
+        self.agency_config.tool_effort_cost = self.config.tool_preference
+        self.agency_config.cortex_effort_cost = self.config.cortex_preference
+        
+        # Increase epistemic weight to drive curiosity
+        self.agency_config.epistemic_weight = 0.65  # Higher = more curious
+        self.agency_config.pragmatic_weight = 0.35
+        
+        logger.debug("Search-First weights applied to AgencyConfig")
+    
+    def _init_nvml(self) -> None:
+        """Initialize NVIDIA Management Library for GPU monitoring."""
+        if not NVML_AVAILABLE:
+            logger.warning("pynvml not available - hardware monitoring disabled")
+            return
+        
+        try:
+            pynvml.nvmlInit()
+            self._nvml_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+            self._nvml_initialized = True
+            logger.info("NVML initialized for ASEA hardware monitoring")
+        except Exception as e:
+            logger.warning(f"Failed to initialize NVML: {e}")
+    
+    def update_hardware_state(self) -> None:
+        """
+        Update hardware metrics (temperature, power, VRAM).
+        
+        Called periodically to keep ASEA state current.
+        """
+        # GPU Temperature and Power
+        if self._nvml_initialized and self._nvml_handle:
+            try:
+                # Temperature
+                temp = pynvml.nvmlDeviceGetTemperature(
+                    self._nvml_handle, pynvml.NVML_TEMPERATURE_GPU
+                )
+                self.state.current_temp_c = float(temp)
+                
+                # Power
+                power_mw = pynvml.nvmlDeviceGetPowerUsage(self._nvml_handle)
+                self.state.current_power_watts = power_mw / 1000.0
+                
+            except Exception as e:
+                logger.debug(f"Failed to read GPU metrics: {e}")
+        
+        # VRAM Usage
+        if TORCH_AVAILABLE and torch.cuda.is_available():
+            try:
+                vram_allocated = torch.cuda.memory_allocated(0) / (1024 * 1024)
+                self.state.current_vram_mb = vram_allocated
+            except Exception:
+                pass
+        
+        # Calculate derived metrics
+        self._calculate_pressure_metrics()
+        self.state.last_update = datetime.now()
+    
+    def _calculate_pressure_metrics(self) -> None:
+        """Calculate thermal pressure and VRAM slack from raw metrics."""
+        # Thermal pressure: 0.0 (cool) to 1.0 (critical)
+        if self.state.current_temp_c > 0:
+            temp_range = self.config.critical_temp_c - self.config.target_temp_c
+            temp_above_target = max(0, self.state.current_temp_c - self.config.target_temp_c)
+            self.state.thermal_pressure = min(1.0, temp_above_target / temp_range)
+        
+        # VRAM slack: 1.0 (full headroom) to 0.0 (at limit)
+        if self.state.current_vram_mb > 0:
+            used_fraction = self.state.current_vram_mb / self.config.target_vram_mb
+            self.state.vram_slack = max(0.0, 1.0 - used_fraction)
+    
+    def calculate_asea_loss(self, vfe: float) -> Tuple[float, Dict[str, float]]:
+        """
+        Calculate the unified ASEA loss function.
+        
+        L_ASEA = λ₁·VFE + λ₂·Thermal_Cost + λ₃·(1 - VRAM_Slack)
+        
+        Args:
+            vfe: Variational Free Energy from Active Inference
+            
+        Returns:
+            Tuple of (total_loss, breakdown_dict)
+        """
+        # Update hardware state first
+        self.update_hardware_state()
+        
+        # Component 1: VFE (normalized)
+        vfe_component = self.config.lambda_vfe * vfe
+        
+        # Component 2: Thermal cost (0 when cool, high when hot)
+        thermal_component = self.config.lambda_thermal * self.state.thermal_pressure
+        
+        # Component 3: VRAM constraint (0 when slack, high when tight)
+        vram_component = self.config.lambda_vram * (1.0 - self.state.vram_slack)
+        
+        # Total ASEA loss
+        total_loss = vfe_component + thermal_component + vram_component
+        
+        # Update state
+        self.state.vfe_component = vfe_component
+        self.state.thermal_component = thermal_component
+        self.state.vram_component = vram_component
+        self.state.total_loss = total_loss
+        
+        breakdown = {
+            "vfe": vfe_component,
+            "thermal": thermal_component,
+            "vram": vram_component,
+            "total": total_loss,
+            "temp_c": self.state.current_temp_c,
+            "vram_mb": self.state.current_vram_mb,
+            "thermal_pressure": self.state.thermal_pressure,
+            "vram_slack": self.state.vram_slack,
+        }
+        
+        return total_loss, breakdown
+    
+    def should_throttle(self) -> bool:
+        """
+        Check if ASEA recommends throttling due to hardware pressure.
+        
+        Returns:
+            True if thermal or VRAM pressure is high
+        """
+        return (
+            self.state.thermal_pressure > 0.7 or
+            self.state.vram_slack < 0.2
+        )
+    
+    def should_pause(self) -> bool:
+        """
+        Check if ASEA recommends pausing due to critical conditions.
+        
+        Returns:
+            True if conditions are critical
+        """
+        return (
+            self.state.current_temp_c >= self.config.critical_temp_c or
+            self.state.vram_slack <= 0.05
+        )
+    
+    def get_policy_adjustment(self, base_policy: "PolicyType") -> float:
+        """
+        Get ASEA-adjusted effort cost for a policy.
+        
+        When hardware is constrained, ASEA increases cost of expensive
+        policies (DEEP_THOUGHT) and decreases cost of efficient ones.
+        
+        Args:
+            base_policy: The policy type
+            
+        Returns:
+            Adjusted effort cost multiplier
+        """
+        # Base multiplier
+        multiplier = 1.0
+        
+        # Under thermal pressure, penalize heavy computation
+        if self.state.thermal_pressure > 0.3:
+            if base_policy.name in ["DEEP_THOUGHT", "CHAIN_OF_THOUGHT"]:
+                multiplier *= (1.0 + self.state.thermal_pressure)
+            elif base_policy.name in ["PRIMARY_SEARCH", "WEB_SEARCH"]:
+                multiplier *= (1.0 - 0.3 * self.state.thermal_pressure)
+        
+        # Under VRAM pressure, avoid Cortex
+        if self.state.vram_slack < 0.3:
+            if base_policy.name in ["DEEP_THOUGHT", "CHAIN_OF_THOUGHT"]:
+                multiplier *= (1.0 + (1.0 - self.state.vram_slack))
+        
+        return max(0.01, multiplier)  # Never go below 0.01
+    
+    async def audit_response(
+        self,
+        response: str,
+        search_snippets: List[str],
+    ) -> VerificationResult:
+        """
+        Audit a response against search snippets for hallucination detection.
+        
+        This is the "Audit" step in the Search → Summarize → Audit → Distill loop.
+        
+        Args:
+            response: Generated response text
+            search_snippets: Retrieved search snippets to verify against
+            
+        Returns:
+            VerificationResult with confidence and claims analysis
+        """
+        if not self.config.audit_enabled or not search_snippets:
+            return VerificationResult(confidence=1.0)
+        
+        # Simple claim extraction (split by sentences)
+        claims = [s.strip() for s in response.split('.') if len(s.strip()) > 10]
+        
+        verified = []
+        unverified = []
+        
+        # Check each claim against snippets
+        snippets_text = ' '.join(search_snippets).lower()
+        
+        for claim in claims:
+            # Extract key terms from claim
+            claim_lower = claim.lower()
+            key_terms = [w for w in claim_lower.split() if len(w) > 4]
+            
+            # Count how many key terms appear in snippets
+            matches = sum(1 for term in key_terms if term in snippets_text)
+            coverage = matches / max(1, len(key_terms))
+            
+            if coverage >= 0.5:  # At least 50% of terms found
+                verified.append(claim)
+            else:
+                unverified.append(claim)
+        
+        # Calculate confidence
+        total_claims = len(verified) + len(unverified)
+        confidence = len(verified) / max(1, total_claims)
+        
+        result = VerificationResult(
+            confidence=confidence,
+            verified_claims=verified,
+            unverified_claims=unverified,
+            needs_revision=confidence < self.config.audit_confidence_threshold,
+            search_snippets_used=len(search_snippets),
+            total_claims_found=total_claims,
+        )
+        
+        self.state.last_verification = result
+        
+        if result.needs_revision:
+            self.state.revision_count += 1
+            logger.info(f"Response needs revision (confidence: {confidence:.2f})")
+        else:
+            self.state.revision_count = 0
+            logger.debug(f"Response verified (confidence: {confidence:.2f})")
+        
+        return result
+    
+    def extract_distillation_signal(
+        self,
+        query: str,
+        search_results: List[str],
+        verification: VerificationResult,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Extract a learning signal for Titans memory distillation.
+        
+        This is the "Distill" step - when verification succeeds, we extract
+        the strategy ("how I searched and verified") for future use.
+        
+        Args:
+            query: Original user query
+            search_results: Snippets that were retrieved
+            verification: Result of auditing
+            
+        Returns:
+            Distillation signal dict if successful, None otherwise
+        """
+        if not self.config.distillation_enabled:
+            return None
+        
+        if verification.confidence < self.config.distillation_success_threshold:
+            # Not confident enough to learn from
+            self.state.failed_strategies.append(query[:50])
+            return None
+        
+        # Extract successful strategy
+        signal = {
+            "query_type": self._classify_query(query),
+            "search_terms_used": self._extract_search_terms(query),
+            "snippet_count": verification.search_snippets_used,
+            "confidence": verification.confidence,
+            "verified_claim_count": len(verification.verified_claims),
+            "timestamp": datetime.now().isoformat(),
+        }
+        
+        self.state.successful_strategies.append(query[:50])
+        logger.info(f"Distillation signal extracted: {signal['query_type']}")
+        
+        return signal
+    
+    def _classify_query(self, query: str) -> str:
+        """Classify query type for distillation."""
+        query_lower = query.lower()
+        
+        if any(w in query_lower for w in ["what is", "who is", "define"]):
+            return "factual"
+        elif any(w in query_lower for w in ["how to", "how do", "how can"]):
+            return "procedural"
+        elif any(w in query_lower for w in ["why", "explain", "reason"]):
+            return "explanatory"
+        elif any(w in query_lower for w in ["compare", "difference", "versus"]):
+            return "comparative"
+        elif any(w in query_lower for w in ["latest", "recent", "current", "news"]):
+            return "temporal"
+        else:
+            return "general"
+    
+    def _extract_search_terms(self, query: str) -> List[str]:
+        """Extract key search terms from query."""
+        # Remove common words
+        stopwords = {"what", "is", "the", "a", "an", "how", "to", "do", "can", 
+                     "why", "when", "where", "who", "which", "of", "for", "in",
+                     "on", "at", "by", "with", "about", "me", "tell", "explain"}
+        
+        words = query.lower().split()
+        return [w for w in words if w not in stopwords and len(w) > 2]
+    
+    def get_state_summary(self) -> Dict[str, Any]:
+        """Get a summary of current ASEA state for logging/display."""
+        return {
+            "asea_loss": {
+                "total": round(self.state.total_loss, 4),
+                "vfe": round(self.state.vfe_component, 4),
+                "thermal": round(self.state.thermal_component, 4),
+                "vram": round(self.state.vram_component, 4),
+            },
+            "hardware": {
+                "temp_c": round(self.state.current_temp_c, 1),
+                "power_w": round(self.state.current_power_watts, 1),
+                "vram_mb": round(self.state.current_vram_mb, 1),
+                "thermal_pressure": round(self.state.thermal_pressure, 3),
+                "vram_slack": round(self.state.vram_slack, 3),
+            },
+            "verification": {
+                "last_confidence": round(self.state.last_verification.confidence, 3) if self.state.last_verification else None,
+                "revision_count": self.state.revision_count,
+            },
+            "distillation": {
+                "successful_count": len(self.state.successful_strategies),
+                "failed_count": len(self.state.failed_strategies),
+            },
+            "recommendations": {
+                "should_throttle": self.should_throttle(),
+                "should_pause": self.should_pause(),
+            },
+        }
+    
+    def cleanup(self) -> None:
+        """Cleanup NVML resources."""
+        if self._nvml_initialized:
+            try:
+                pynvml.nvmlShutdown()
+            except Exception:
+                pass
 
 
 class ExpectedFreeEnergy:

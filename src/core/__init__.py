@@ -46,7 +46,10 @@ Reference Papers:
 from .medulla import Medulla, MedullaConfig
 from .cortex import Cortex, CortexConfig
 from .bridge import Bridge, BridgeConfig
-from .agency import ActiveInferenceController, AgencyConfig, PolicyType, VerificationResult
+from .agency import (
+    ActiveInferenceController, AgencyConfig, PolicyType, VerificationResult,
+    ASEAController, ASEAConfig, ASEAState,  # ASEA Algorithm
+)
 from .adapter_manager import AdapterManager, AdapterConfig, AdapterType
 from .system import AVACoreSystem, CoreConfig
 
@@ -70,6 +73,11 @@ __all__ = [
     "AgencyConfig",
     "PolicyType",
     "VerificationResult",
+    
+    # ASEA (AVA Sentience & Efficiency Algorithm)
+    "ASEAController",
+    "ASEAConfig",
+    "ASEAState",
 
     # Adapter Manager (Specialist LoRA Swapping)
     "AdapterManager",
