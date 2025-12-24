@@ -33,11 +33,12 @@ logger = logging.getLogger(__name__)
 
 class CognitiveStateLabel(Enum):
     """Labels for cognitive states based on entropy/varentropy quadrants."""
-    FLOW = "flow"               # Low H, Low V - Confident, fast execution
-    HESITATION = "hesitation"   # Low H, High V - Mostly sure, some conflict
-    CONFUSION = "confusion"     # High H, Low V - Uniformly uncertain
-    CREATIVE = "creative"       # High H, High V - Divergent, exploratory
-    NEUTRAL = "neutral"         # Default/unknown state
+
+    FLOW = "flow"  # Low H, Low V - Confident, fast execution
+    HESITATION = "hesitation"  # Low H, High V - Mostly sure, some conflict
+    CONFUSION = "confusion"  # High H, Low V - Uniformly uncertain
+    CREATIVE = "creative"  # High H, High V - Divergent, exploratory
+    NEUTRAL = "neutral"  # Default/unknown state
 
 
 @dataclass
@@ -48,10 +49,11 @@ class CognitiveState:
     This represents the model's "mental state" during inference,
     derived from analysis of the token probability distribution.
     """
+
     label: CognitiveStateLabel = CognitiveStateLabel.NEUTRAL
-    entropy: float = 0.0           # Shannon entropy H(X)
-    varentropy: float = 0.0        # Variance of entropy V(X)
-    confidence: float = 1.0        # Derived confidence (inverse of normalized entropy)
+    entropy: float = 0.0  # Shannon entropy H(X)
+    varentropy: float = 0.0  # Variance of entropy V(X)
+    confidence: float = 1.0  # Derived confidence (inverse of normalized entropy)
 
     # Action recommendations
     should_use_tools: bool = False
@@ -88,17 +90,17 @@ class EntropixConfig:
     """Configuration for Entropix thresholds and behavior."""
 
     # Entropy thresholds (based on empirical tuning)
-    low_entropy_threshold: float = 0.5      # Below this = very confident
-    high_entropy_threshold: float = 3.0     # Above this = confused/creative
+    low_entropy_threshold: float = 0.5  # Below this = very confident
+    high_entropy_threshold: float = 3.0  # Above this = confused/creative
 
     # Varentropy thresholds
-    low_varentropy_threshold: float = 0.5   # Below this = uniform distribution
+    low_varentropy_threshold: float = 0.5  # Below this = uniform distribution
     high_varentropy_threshold: float = 2.0  # Above this = competing peaks
 
     # Temperature adjustments
     base_temperature: float = 0.7
-    confusion_temperature: float = 0.3      # Lower temp when confused
-    creative_temperature: float = 1.2       # Higher temp for creativity
+    confusion_temperature: float = 0.3  # Lower temp when confused
+    creative_temperature: float = 1.2  # Higher temp for creativity
 
     # Tool/CoT triggers
     confusion_triggers_tools: bool = True
@@ -289,15 +291,12 @@ class Entropix:
         # Determine action recommendations
         cfg = self.config
 
-        should_use_tools = (
-            cfg.confusion_triggers_tools and
-            label == CognitiveStateLabel.CONFUSION
-        )
+        should_use_tools = cfg.confusion_triggers_tools and label == CognitiveStateLabel.CONFUSION
 
-        should_use_cot = (
-            cfg.hesitation_triggers_cot and
-            label in [CognitiveStateLabel.HESITATION, CognitiveStateLabel.CONFUSION]
-        )
+        should_use_cot = cfg.hesitation_triggers_cot and label in [
+            CognitiveStateLabel.HESITATION,
+            CognitiveStateLabel.CONFUSION,
+        ]
 
         should_increase_temp = label == CognitiveStateLabel.CREATIVE
 
@@ -325,7 +324,7 @@ class Entropix:
         # Track history
         self.history.append(state)
         if len(self.history) > self.max_history:
-            self.history = self.history[-self.max_history:]
+            self.history = self.history[-self.max_history :]
 
         logger.debug(f"Entropix diagnosis: {state}")
 
@@ -390,12 +389,10 @@ class Entropix:
             "avg_varentropy": float(avg_varentropy),
             "avg_confidence": float(avg_confidence),
             "state_distribution": state_counts,
-            "tool_trigger_rate": sum(
-                1 for s in self.history if s.should_use_tools
-            ) / len(self.history),
-            "cot_trigger_rate": sum(
-                1 for s in self.history if s.should_use_cot
-            ) / len(self.history),
+            "tool_trigger_rate": sum(1 for s in self.history if s.should_use_tools)
+            / len(self.history),
+            "cot_trigger_rate": sum(1 for s in self.history if s.should_use_cot)
+            / len(self.history),
         }
 
     def reset_history(self):
@@ -406,6 +403,7 @@ class Entropix:
 # =============================================================================
 # Utility Functions
 # =============================================================================
+
 
 def diagnose_from_ollama_response(
     response: dict[str, Any],

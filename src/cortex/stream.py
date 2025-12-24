@@ -37,12 +37,13 @@ logger = logging.getLogger(__name__)
 
 class StreamState(Enum):
     """Current state of the conscious stream."""
+
     IDLE = "idle"
-    PERCEIVING = "perceiving"      # Processing input
-    REMEMBERING = "remembering"    # Retrieving from memory
-    THINKING = "thinking"          # LLM inference
-    ACTING = "acting"              # Tool execution
-    REFLECTING = "reflecting"      # Post-interaction assessment
+    PERCEIVING = "perceiving"  # Processing input
+    REMEMBERING = "remembering"  # Retrieving from memory
+    THINKING = "thinking"  # LLM inference
+    ACTING = "acting"  # Tool execution
+    REFLECTING = "reflecting"  # Post-interaction assessment
 
 
 @dataclass
@@ -254,9 +255,7 @@ class ConsciousStream:
             input_embedding = await self._get_embedding(user_input)
             surprise_metrics = await self._update_neural_memory(input_embedding)
 
-            self.current_interaction.surprise_value = surprise_metrics.get(
-                "surprise_value", 0.0
-            )
+            self.current_interaction.surprise_value = surprise_metrics.get("surprise_value", 0.0)
 
             # ============================================
             # STEP B: REMEMBERING - Retrieve relevant context
@@ -446,10 +445,12 @@ class ConsciousStream:
         prompt_parts = []
 
         # System header
-        prompt_parts.append("""[SYSTEM]
+        prompt_parts.append(
+            """[SYSTEM]
 You are AVA, an advanced AI assistant with neural memory capabilities.
 You can learn in real-time and adapt to new information.
-Think step by step before responding. Use tools when helpful.""")
+Think step by step before responding. Use tools when helpful."""
+        )
 
         # Neural memory context
         if neural_context:
@@ -539,7 +540,9 @@ Think step by step before responding. Use tools when helpful.""")
                 break
 
         if not final_response:
-            final_response = response if response else "I apologize, I couldn't generate a response."
+            final_response = (
+                response if response else "I apologize, I couldn't generate a response."
+            )
 
         return final_response, reasoning_steps
 
@@ -569,16 +572,18 @@ Think step by step before responding. Use tools when helpful.""")
         """
         import re
 
-        tool_pattern = r'\[(\w+):([^\]]+)\]'
+        tool_pattern = r"\[(\w+):([^\]]+)\]"
         matches = re.findall(tool_pattern, response)
 
         calls = []
         for tool_name, args in matches:
-            calls.append({
-                "name": tool_name,
-                "args": args.strip(),
-                "timestamp": datetime.now().isoformat(),
-            })
+            calls.append(
+                {
+                    "name": tool_name,
+                    "args": args.strip(),
+                    "timestamp": datetime.now().isoformat(),
+                }
+            )
 
         return calls
 
@@ -599,32 +604,40 @@ Think step by step before responding. Use tools when helpful.""")
                         ),
                         timeout=self.config.tool_execution_timeout,
                     )
-                    results.append({
-                        "name": call["name"],
-                        "output": str(result),
-                        "success": True,
-                    })
+                    results.append(
+                        {
+                            "name": call["name"],
+                            "output": str(result),
+                            "success": True,
+                        }
+                    )
                 else:
-                    results.append({
-                        "name": call["name"],
-                        "output": "[Tool registry not available]",
-                        "success": False,
-                    })
+                    results.append(
+                        {
+                            "name": call["name"],
+                            "output": "[Tool registry not available]",
+                            "success": False,
+                        }
+                    )
 
                 self.session_stats["tool_calls"] += 1
 
             except asyncio.TimeoutError:
-                results.append({
-                    "name": call["name"],
-                    "output": "[Tool execution timed out]",
-                    "success": False,
-                })
+                results.append(
+                    {
+                        "name": call["name"],
+                        "output": "[Tool execution timed out]",
+                        "success": False,
+                    }
+                )
             except Exception as e:
-                results.append({
-                    "name": call["name"],
-                    "output": f"[Error: {str(e)}]",
-                    "success": False,
-                })
+                results.append(
+                    {
+                        "name": call["name"],
+                        "output": f"[Error: {str(e)}]",
+                        "success": False,
+                    }
+                )
 
         return results
 
@@ -636,9 +649,7 @@ Think step by step before responding. Use tools when helpful.""")
         observations = []
         for result in results:
             status = "✓" if result.get("success") else "✗"
-            observations.append(
-                f"{status} {result['name']}: {result['output']}"
-            )
+            observations.append(f"{status} {result['name']}: {result['output']}")
         return "\n".join(observations)
 
     def _evaluate_quality(self, response: str) -> float:
@@ -698,7 +709,7 @@ Think step by step before responding. Use tools when helpful.""")
                     key=lambda x: x.combined_quality(),
                     reverse=True,
                 )
-                self.replay_buffer = self.replay_buffer[:self.max_replay_buffer_size // 2]
+                self.replay_buffer = self.replay_buffer[: self.max_replay_buffer_size // 2]
 
             # Also record to weight manager if available
             if self.weight_manager:
@@ -722,16 +733,12 @@ Think step by step before responding. Use tools when helpful.""")
         # Running average of surprise
         old_avg_surprise = self.session_stats["avg_surprise"]
         new_surprise = self.current_interaction.surprise_value
-        self.session_stats["avg_surprise"] = (
-            (old_avg_surprise * n + new_surprise) / (n + 1)
-        )
+        self.session_stats["avg_surprise"] = (old_avg_surprise * n + new_surprise) / (n + 1)
 
         # Running average of quality
         old_avg_quality = self.session_stats["avg_quality"]
         new_quality = self.current_interaction.quality_score
-        self.session_stats["avg_quality"] = (
-            (old_avg_quality * n + new_quality) / (n + 1)
-        )
+        self.session_stats["avg_quality"] = (old_avg_quality * n + new_quality) / (n + 1)
 
         if new_surprise > 0.5:
             self.session_stats["total_surprises"] += 1

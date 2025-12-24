@@ -30,9 +30,11 @@ logger = logging.getLogger(__name__)
 # Base Tool Interface
 # =============================================================================
 
+
 @dataclass
 class ToolResult:
     """Result from tool execution."""
+
     success: bool
     output: Any
     error: str | None = None
@@ -42,6 +44,7 @@ class ToolResult:
 @dataclass
 class ToolDefinition:
     """Definition of a tool."""
+
     name: str
     description: str
     parameters: dict[str, Any] = field(default_factory=dict)
@@ -50,8 +53,7 @@ class ToolDefinition:
     def to_prompt_format(self) -> str:
         """Format for including in prompts."""
         params = ", ".join(
-            f"{name}: {info.get('type', 'any')}"
-            for name, info in self.parameters.items()
+            f"{name}: {info.get('type', 'any')}" for name, info in self.parameters.items()
         )
         return f"{self.name}({params}) - {self.description}"
 
@@ -74,13 +76,14 @@ class Tool(ABC):
             name=self.name,
             description=self.description,
             parameters=self.parameters,
-            required_params=self.required_params
+            required_params=self.required_params,
         )
 
 
 # =============================================================================
 # Built-in Tools
 # =============================================================================
+
 
 class CalculatorTool(Tool):
     """Safe math calculator using AST parsing (no eval)."""
@@ -95,9 +98,9 @@ class CalculatorTool(Tool):
         "+": lambda a, b: a + b,
         "-": lambda a, b: a - b,
         "*": lambda a, b: a * b,
-        "/": lambda a, b: a / b if b != 0 else float('inf'),
+        "/": lambda a, b: a / b if b != 0 else float("inf"),
         "%": lambda a, b: a % b if b != 0 else 0,
-        "**": lambda a, b: a ** b if b < 100 else float('inf'),  # Limit exponent
+        "**": lambda a, b: a**b if b < 100 else float("inf"),  # Limit exponent
     }
 
     def _safe_eval(self, expression: str) -> float:
@@ -147,11 +150,12 @@ class CalculatorTool(Tool):
             else:
                 raise ValueError(f"Unsupported expression type: {type(node).__name__}")
 
-        tree = ast.parse(expression, mode='eval')
+        tree = ast.parse(expression, mode="eval")
         return _eval_node(tree)
 
     async def execute(self, expression: str = "", **kwargs) -> ToolResult:
         import time
+
         start = time.time()
 
         try:
@@ -159,16 +163,12 @@ class CalculatorTool(Tool):
             allowed = set("0123456789+-*/().% ")
             if not all(c in allowed for c in expression):
                 return ToolResult(
-                    success=False,
-                    output=None,
-                    error="Expression contains invalid characters"
+                    success=False, output=None, error="Expression contains invalid characters"
                 )
 
             result = self._safe_eval(expression)
             return ToolResult(
-                success=True,
-                output=result,
-                execution_time_ms=(time.time() - start) * 1000
+                success=True, output=result, execution_time_ms=(time.time() - start) * 1000
             )
         except (ValueError, SyntaxError) as e:
             return ToolResult(success=False, output=None, error=str(e))
@@ -183,11 +183,12 @@ class DateTimeTool(Tool):
     description = "Get current date, time, or perform date calculations"
     parameters = {
         "format": {"type": "string", "description": "Output format (optional)"},
-        "timezone": {"type": "string", "description": "Timezone (optional)"}
+        "timezone": {"type": "string", "description": "Timezone (optional)"},
     }
 
     async def execute(self, format: str = None, **kwargs) -> ToolResult:
         import time
+
         start = time.time()
 
         now = datetime.now()
@@ -202,13 +203,11 @@ class DateTimeTool(Tool):
                 "date": now.strftime("%Y-%m-%d"),
                 "time": now.strftime("%H:%M:%S"),
                 "day": now.strftime("%A"),
-                "iso": now.isoformat()
+                "iso": now.isoformat(),
             }
 
         return ToolResult(
-            success=True,
-            output=output,
-            execution_time_ms=(time.time() - start) * 1000
+            success=True, output=output, execution_time_ms=(time.time() - start) * 1000
         )
 
 
@@ -219,7 +218,7 @@ class FileReadTool(Tool):
     description = "Read contents of a file"
     parameters = {
         "path": {"type": "string", "description": "Path to file"},
-        "lines": {"type": "integer", "description": "Max lines to read (optional)"}
+        "lines": {"type": "integer", "description": "Max lines to read (optional)"},
     }
     required_params = ["path"]
 
@@ -252,6 +251,7 @@ class FileReadTool(Tool):
 
     async def execute(self, path: str = "", lines: int = None, **kwargs) -> ToolResult:
         import time
+
         start = time.time()
 
         try:
@@ -262,7 +262,7 @@ class FileReadTool(Tool):
                 return ToolResult(
                     success=False,
                     output=None,
-                    error=f"Access denied. Allowed directories: {self.allowed_dirs}"
+                    error=f"Access denied. Allowed directories: {self.allowed_dirs}",
                 )
 
             # Resolve to prevent symlink attacks
@@ -279,9 +279,7 @@ class FileReadTool(Tool):
                 content = "\n".join(content.split("\n")[:lines])
 
             return ToolResult(
-                success=True,
-                output=content,
-                execution_time_ms=(time.time() - start) * 1000
+                success=True, output=content, execution_time_ms=(time.time() - start) * 1000
             )
         except PermissionError:
             return ToolResult(success=False, output=None, error="Permission denied")
@@ -304,7 +302,10 @@ class WebSearchTool(Tool):
     parameters = {
         "query": {"type": "string", "description": "Search query"},
         "num_results": {"type": "integer", "description": "Number of results (default 10)"},
-        "provider": {"type": "string", "description": "Search provider: duckduckgo, brave (default duckduckgo)"}
+        "provider": {
+            "type": "string",
+            "description": "Search provider: duckduckgo, brave (default duckduckgo)",
+        },
     }
     required_params = ["query"]
 
@@ -315,13 +316,10 @@ class WebSearchTool(Tool):
     }
 
     async def execute(
-        self,
-        query: str = "",
-        num_results: int = 10,
-        provider: str = "duckduckgo",
-        **kwargs
+        self, query: str = "", num_results: int = 10, provider: str = "duckduckgo", **kwargs
     ) -> ToolResult:
         import time
+
         start = time.time()
 
         try:
@@ -341,7 +339,7 @@ class WebSearchTool(Tool):
                     "num_results": len(results),
                 },
                 error=None if results else "No results found",
-                execution_time_ms=(time.time() - start) * 1000
+                execution_time_ms=(time.time() - start) * 1000,
             )
 
         except Exception as e:
@@ -364,8 +362,10 @@ class WebSearchTool(Tool):
                     response = await client.get(
                         self.PROVIDERS["duckduckgo"],
                         params={"q": query},
-                        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
-                        timeout=15.0
+                        headers={
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                        },
+                        timeout=15.0,
                     )
 
                     if response.status_code == 200:
@@ -373,22 +373,30 @@ class WebSearchTool(Tool):
 
                         # Extract results
                         snippets = re.findall(r'<a class="result__snippet"[^>]*>([^<]+)</a>', text)
-                        titles = re.findall(r'<a class="result__a"[^>]*href="([^"]+)"[^>]*>([^<]+)</a>', text)
+                        titles = re.findall(
+                            r'<a class="result__a"[^>]*href="([^"]+)"[^>]*>([^<]+)</a>', text
+                        )
 
-                        for _i, ((url, title), snippet) in enumerate(zip(titles[:num_results], snippets[:num_results], strict=False)):
-                            results.append({
-                                "title": title.strip(),
-                                "snippet": snippet.strip(),
-                                "url": url,
-                                "source": "duckduckgo",
-                            })
+                        for _i, ((url, title), snippet) in enumerate(
+                            zip(titles[:num_results], snippets[:num_results], strict=False)
+                        ):
+                            results.append(
+                                {
+                                    "title": title.strip(),
+                                    "snippet": snippet.strip(),
+                                    "url": url,
+                                    "source": "duckduckgo",
+                                }
+                            )
 
                 elif provider == "brave":
                     response = await client.get(
                         self.PROVIDERS["brave"],
                         params={"q": query, "source": "web"},
-                        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
-                        timeout=15.0
+                        headers={
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                        },
+                        timeout=15.0,
                     )
 
                     if response.status_code == 200:
@@ -396,16 +404,28 @@ class WebSearchTool(Tool):
 
                         # Extract from Brave's HTML
                         # Simplified extraction
-                        desc_matches = re.findall(r'<p class="snippet-description"[^>]*>([^<]+)</p>', text)
-                        title_matches = re.findall(r'<a class="result-header"[^>]*href="([^"]+)"[^>]*>([^<]+)</a>', text)
+                        desc_matches = re.findall(
+                            r'<p class="snippet-description"[^>]*>([^<]+)</p>', text
+                        )
+                        title_matches = re.findall(
+                            r'<a class="result-header"[^>]*href="([^"]+)"[^>]*>([^<]+)</a>', text
+                        )
 
-                        for _i, ((url, title), desc) in enumerate(zip(title_matches[:num_results], desc_matches[:num_results], strict=False)):
-                            results.append({
-                                "title": title.strip(),
-                                "snippet": desc.strip(),
-                                "url": url,
-                                "source": "brave",
-                            })
+                        for _i, ((url, title), desc) in enumerate(
+                            zip(
+                                title_matches[:num_results],
+                                desc_matches[:num_results],
+                                strict=False,
+                            )
+                        ):
+                            results.append(
+                                {
+                                    "title": title.strip(),
+                                    "snippet": desc.strip(),
+                                    "url": url,
+                                    "source": "brave",
+                                }
+                            )
 
         except Exception as e:
             logger.error(f"Search provider {provider} failed: {e}")
@@ -425,19 +445,22 @@ class WebBrowseTool(Tool):
     description = "Browse a web page and extract its content"
     parameters = {
         "url": {"type": "string", "description": "URL to browse"},
-        "extract_type": {"type": "string", "description": "What to extract: text, links, structured (default text)"},
-        "max_chars": {"type": "integer", "description": "Maximum characters to return (default 5000)"}
+        "extract_type": {
+            "type": "string",
+            "description": "What to extract: text, links, structured (default text)",
+        },
+        "max_chars": {
+            "type": "integer",
+            "description": "Maximum characters to return (default 5000)",
+        },
     }
     required_params = ["url"]
 
     async def execute(
-        self,
-        url: str = "",
-        extract_type: str = "text",
-        max_chars: int = 5000,
-        **kwargs
+        self, url: str = "", extract_type: str = "text", max_chars: int = 5000, **kwargs
     ) -> ToolResult:
         import time
+
         start = time.time()
 
         try:
@@ -456,7 +479,7 @@ class WebBrowseTool(Tool):
                     return ToolResult(
                         success=False,
                         output=None,
-                        error=f"Failed to fetch URL: {response.status_code}"
+                        error=f"Failed to fetch URL: {response.status_code}",
                     )
 
                 content = response.text
@@ -470,7 +493,7 @@ class WebBrowseTool(Tool):
                         "content": extracted,
                         "content_length": len(extracted),
                     },
-                    execution_time_ms=(time.time() - start) * 1000
+                    execution_time_ms=(time.time() - start) * 1000,
                 )
 
         except Exception as e:
@@ -486,13 +509,13 @@ class WebBrowseTool(Tool):
         import re
 
         # Remove script and style tags
-        html = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL | re.IGNORECASE)
-        html = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.DOTALL | re.IGNORECASE)
+        html = re.sub(r"<script[^>]*>.*?</script>", "", html, flags=re.DOTALL | re.IGNORECASE)
+        html = re.sub(r"<style[^>]*>.*?</style>", "", html, flags=re.DOTALL | re.IGNORECASE)
 
         if extract_type == "text":
             # Extract plain text
-            text = re.sub(r'<[^>]+>', ' ', html)
-            text = re.sub(r'\s+', ' ', text)
+            text = re.sub(r"<[^>]+>", " ", html)
+            text = re.sub(r"\s+", " ", text)
             text = text.strip()
             return text[:max_chars]
 
@@ -506,13 +529,13 @@ class WebBrowseTool(Tool):
             result = []
 
             # Headings
-            for h_tag in ['h1', 'h2', 'h3']:
-                headings = re.findall(f'<{h_tag}[^>]*>([^<]+)</{h_tag}>', html, re.IGNORECASE)
+            for h_tag in ["h1", "h2", "h3"]:
+                headings = re.findall(f"<{h_tag}[^>]*>([^<]+)</{h_tag}>", html, re.IGNORECASE)
                 for h in headings[:5]:
                     result.append(f"## {h.strip()}")
 
             # Paragraphs
-            paragraphs = re.findall(r'<p[^>]*>([^<]+)</p>', html, re.IGNORECASE)
+            paragraphs = re.findall(r"<p[^>]*>([^<]+)</p>", html, re.IGNORECASE)
             for p in paragraphs[:20]:
                 if len(p.strip()) > 50:
                     result.append(p.strip())
@@ -534,17 +557,13 @@ class FactVerificationTool(Tool):
     description = "Verify a fact by checking multiple sources"
     parameters = {
         "claim": {"type": "string", "description": "The claim to verify"},
-        "num_sources": {"type": "integer", "description": "Number of sources to check (default 3)"}
+        "num_sources": {"type": "integer", "description": "Number of sources to check (default 3)"},
     }
     required_params = ["claim"]
 
-    async def execute(
-        self,
-        claim: str = "",
-        num_sources: int = 3,
-        **kwargs
-    ) -> ToolResult:
+    async def execute(self, claim: str = "", num_sources: int = 3, **kwargs) -> ToolResult:
         import time
+
         start = time.time()
 
         try:
@@ -573,9 +592,7 @@ class FactVerificationTool(Tool):
             verification["confidence"] = verification["convergence"]
 
             return ToolResult(
-                success=True,
-                output=verification,
-                execution_time_ms=(time.time() - start) * 1000
+                success=True, output=verification, execution_time_ms=(time.time() - start) * 1000
             )
 
         except Exception as e:
@@ -613,9 +630,11 @@ class FactVerificationTool(Tool):
 # MCP Client
 # =============================================================================
 
+
 @dataclass
 class MCPServer:
     """Configuration for an MCP server."""
+
     name: str
     command: str  # Command to start the server
     args: list[str] = field(default_factory=list)
@@ -647,7 +666,7 @@ class MCPClient:
                     stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
-                    env={**dict(subprocess.os.environ), **server.env}
+                    env={**dict(subprocess.os.environ), **server.env},
                 )
                 self._processes[server.name] = process
 
@@ -658,8 +677,7 @@ class MCPClient:
                 # HTTP-based MCP server
                 async with httpx.AsyncClient() as client:
                     response = await client.post(
-                        f"{server.url}/initialize",
-                        json={"protocolVersion": "0.1.0"}
+                        f"{server.url}/initialize", json={"protocolVersion": "0.1.0"}
                     )
                     if response.status_code != 200:
                         return False
@@ -681,18 +699,14 @@ class MCPClient:
             "method": "initialize",
             "params": {
                 "protocolVersion": "0.1.0",
-                "clientInfo": {"name": "AVA", "version": "3.1.0"}
-            }
+                "clientInfo": {"name": "AVA", "version": "3.1.0"},
+            },
         }
 
         response = await self._send_request(server_name, request)
         if response:
             # Get available tools
-            tools_request = {
-                "jsonrpc": "2.0",
-                "id": 2,
-                "method": "tools/list"
-            }
+            tools_request = {"jsonrpc": "2.0", "id": 2, "method": "tools/list"}
             tools_response = await self._send_request(server_name, tools_request)
             if tools_response and "result" in tools_response:
                 self._tools[server_name] = tools_response["result"].get("tools", [])
@@ -718,34 +732,23 @@ class MCPClient:
             return None
 
     async def call_tool(
-        self,
-        server_name: str,
-        tool_name: str,
-        arguments: dict[str, Any]
+        self, server_name: str, tool_name: str, arguments: dict[str, Any]
     ) -> ToolResult:
         """Call a tool on an MCP server."""
         request = {
             "jsonrpc": "2.0",
             "id": 3,
             "method": "tools/call",
-            "params": {
-                "name": tool_name,
-                "arguments": arguments
-            }
+            "params": {"name": tool_name, "arguments": arguments},
         }
 
         response = await self._send_request(server_name, request)
 
         if response and "result" in response:
-            return ToolResult(
-                success=True,
-                output=response["result"]
-            )
+            return ToolResult(success=True, output=response["result"])
         elif response and "error" in response:
             return ToolResult(
-                success=False,
-                output=None,
-                error=response["error"].get("message", "Unknown error")
+                success=False, output=None, error=response["error"].get("message", "Unknown error")
             )
         else:
             return ToolResult(success=False, output=None, error="No response from server")
@@ -774,6 +777,7 @@ class MCPClient:
 # Tool Manager
 # =============================================================================
 
+
 class ToolManager:
     """
     Manages all tools (built-in and MCP).
@@ -785,7 +789,7 @@ class ToolManager:
     - Aggregate results
     """
 
-    def __init__(self, config = None):
+    def __init__(self, config=None):
         self.config = config
 
         # Built-in tools
@@ -826,11 +830,13 @@ class ToolManager:
 
         # Add MCP tools
         for mcp_tool in self.mcp.get_all_tools():
-            definitions.append(ToolDefinition(
-                name=f"mcp:{mcp_tool['server']}:{mcp_tool['name']}",
-                description=mcp_tool.get("description", ""),
-                parameters=mcp_tool.get("inputSchema", {}).get("properties", {})
-            ))
+            definitions.append(
+                ToolDefinition(
+                    name=f"mcp:{mcp_tool['server']}:{mcp_tool['name']}",
+                    description=mcp_tool.get("description", ""),
+                    parameters=mcp_tool.get("inputSchema", {}).get("properties", {}),
+                )
+            )
 
         return definitions
 
@@ -841,11 +847,7 @@ class ToolManager:
             lines.append(f"- {defn.to_prompt_format()}")
         return "\n".join(lines)
 
-    async def execute(
-        self,
-        tool_name: str,
-        **kwargs
-    ) -> ToolResult:
+    async def execute(self, tool_name: str, **kwargs) -> ToolResult:
         """Execute a tool by name."""
         # Check if it's an MCP tool
         if tool_name.startswith("mcp:"):
@@ -857,29 +859,14 @@ class ToolManager:
         # Built-in tool
         tool = self._tools.get(tool_name)
         if not tool:
-            return ToolResult(
-                success=False,
-                output=None,
-                error=f"Tool not found: {tool_name}"
-            )
+            return ToolResult(success=False, output=None, error=f"Tool not found: {tool_name}")
 
         try:
-            return await asyncio.wait_for(
-                tool.execute(**kwargs),
-                timeout=30.0  # 30 second timeout
-            )
+            return await asyncio.wait_for(tool.execute(**kwargs), timeout=30.0)  # 30 second timeout
         except asyncio.TimeoutError:
-            return ToolResult(
-                success=False,
-                output=None,
-                error="Tool execution timed out"
-            )
+            return ToolResult(success=False, output=None, error="Tool execution timed out")
         except Exception as e:
-            return ToolResult(
-                success=False,
-                output=None,
-                error=str(e)
-            )
+            return ToolResult(success=False, output=None, error=str(e))
 
     async def auto_execute(self, query: str) -> list[ToolResult]:
         """
@@ -895,19 +882,37 @@ class ToolManager:
         # These trigger web search as the PRIMARY action
         informational_indicators = [
             # Question words
-            "what", "when", "where", "who", "how", "why", "which",
+            "what",
+            "when",
+            "where",
+            "who",
+            "how",
+            "why",
+            "which",
             # Information seeking
-            "tell me", "explain", "describe", "is it true", "define",
+            "tell me",
+            "explain",
+            "describe",
+            "is it true",
+            "define",
             # Current events / facts
-            "latest", "news", "current", "today", "recent", "update",
+            "latest",
+            "news",
+            "current",
+            "today",
+            "recent",
+            "update",
             # Lookup patterns
-            "search", "find", "look up", "what is", "who is",
+            "search",
+            "find",
+            "look up",
+            "what is",
+            "who is",
         ]
 
         # Check if this is an informational query (Search-First trigger)
-        is_informational = (
-            "?" in query or  # Any question
-            any(ind in query_lower for ind in informational_indicators)
+        is_informational = "?" in query or any(  # Any question
+            ind in query_lower for ind in informational_indicators
         )
 
         if is_informational:
@@ -923,7 +928,8 @@ class ToolManager:
         # Calculator for math (specific, not informational)
         if any(op in query for op in ["+", "-", "*", "/", "calculate", "compute"]):
             import re
-            expr_match = re.search(r'[\d\s\+\-\*\/\.\(\)]+', query)
+
+            expr_match = re.search(r"[\d\s\+\-\*\/\.\(\)]+", query)
             if expr_match:
                 result = await self.execute("calculator", expression=expr_match.group().strip())
                 if result.success:
@@ -932,7 +938,9 @@ class ToolManager:
         # DateTime for time queries
         if any(word in query_lower for word in ["time", "date", "day"]):
             # Only if asking about current time, not general time questions
-            if not is_informational or any(w in query_lower for w in ["what time", "current time", "now"]):
+            if not is_informational or any(
+                w in query_lower for w in ["what time", "current time", "now"]
+            ):
                 result = await self.execute("datetime")
                 results.append(result)
 

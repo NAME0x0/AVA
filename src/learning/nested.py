@@ -28,11 +28,12 @@ logger = logging.getLogger(__name__)
 
 class LearningScope(Enum):
     """Scope levels for nested learning."""
-    GLOBAL = "global"         # Overall behavioral patterns
-    TOPIC = "topic"           # Topic-specific knowledge
-    TASK = "task"             # Task-specific procedures
-    SESSION = "session"       # Current session only
-    EPHEMERAL = "ephemeral"   # Single interaction
+
+    GLOBAL = "global"  # Overall behavioral patterns
+    TOPIC = "topic"  # Topic-specific knowledge
+    TASK = "task"  # Task-specific procedures
+    SESSION = "session"  # Current session only
+    EPHEMERAL = "ephemeral"  # Single interaction
 
 
 @dataclass
@@ -185,6 +186,7 @@ class NestedLearningContext:
 
         # Create new global context
         import uuid
+
         context = LearningContext(
             id=str(uuid.uuid4())[:8],
             name="global",
@@ -422,7 +424,9 @@ class NestedLearningContext:
 
             parent_id = parent.parent_id
 
-    def get_relevant_context(self, topic: str | None = None, task: str | None = None) -> dict[str, Any]:
+    def get_relevant_context(
+        self, topic: str | None = None, task: str | None = None
+    ) -> dict[str, Any]:
         """
         Get relevant context for the current situation.
 
@@ -468,7 +472,9 @@ class NestedLearningContext:
             "patterns": relevant_patterns,
             "recent_observations": relevant_observations[-5:],
             "global_success_rate": self.global_context.success_rate,
-            "session_success_rate": self.session_context.success_rate if self.session_context else None,
+            "session_success_rate": (
+                self.session_context.success_rate if self.session_context else None
+            ),
         }
 
     def get_learning_summary(self) -> dict[str, Any]:
@@ -555,6 +561,7 @@ class NestedLearningContext:
 @dataclass
 class ReplayBufferSample:
     """A sample stored in the replay buffer."""
+
     id: str = ""
     input_text: str = ""
     output_text: str = ""
@@ -592,7 +599,9 @@ class ReplayBufferSample:
             emotional_context=data.get("emotional_context", {}),
             created_at=datetime.fromisoformat(data["created_at"]),
             access_count=data.get("access_count", 0),
-            last_accessed=datetime.fromisoformat(data["last_accessed"]) if data.get("last_accessed") else None,
+            last_accessed=(
+                datetime.fromisoformat(data["last_accessed"]) if data.get("last_accessed") else None
+            ),
             task_context=data.get("task_context", ""),
             topic_context=data.get("topic_context", ""),
         )
@@ -601,6 +610,7 @@ class ReplayBufferSample:
 @dataclass
 class FastSlowConfig:
     """Configuration for Fast/Slow weight separation."""
+
     # Fast weight settings
     fast_learning_rate: float = 1e-3
     fast_update_interval: int = 1  # Update every N interactions
@@ -708,6 +718,7 @@ class ReplayBuffer:
             return None
 
         import uuid
+
         sample_id = str(uuid.uuid4())[:12]
 
         sample = ReplayBufferSample(
@@ -777,10 +788,7 @@ class ReplayBuffer:
             weights = np.array([s.quality_score for s in candidates])
         elif strategy == "recency_weighted":
             now = datetime.now()
-            weights = np.array([
-                1.0 / (1.0 + (now - s.created_at).days)
-                for s in candidates
-            ])
+            weights = np.array([1.0 / (1.0 + (now - s.created_at).days) for s in candidates])
         else:  # uniform
             weights = np.ones(len(candidates))
 
@@ -836,26 +844,17 @@ class ReplayBuffer:
         current_ids = {s.id for s in self.buffer}
 
         # Prune quality index
-        self._by_quality = {
-            k: v for k, v in self._by_quality.items()
-            if k in current_ids
-        }
+        self._by_quality = {k: v for k, v in self._by_quality.items() if k in current_ids}
 
         # Prune topic index
         for topic in list(self._by_topic.keys()):
-            self._by_topic[topic] = [
-                id for id in self._by_topic[topic]
-                if id in current_ids
-            ]
+            self._by_topic[topic] = [id for id in self._by_topic[topic] if id in current_ids]
             if not self._by_topic[topic]:
                 del self._by_topic[topic]
 
         # Prune task index
         for task in list(self._by_task.keys()):
-            self._by_task[task] = [
-                id for id in self._by_task[task]
-                if id in current_ids
-            ]
+            self._by_task[task] = [id for id in self._by_task[task] if id in current_ids]
             if not self._by_task[task]:
                 del self._by_task[task]
 
@@ -1035,7 +1034,7 @@ class FastSlowWeightManager:
         Returns recent high-quality samples.
         """
         # Use pending samples (most recent interactions)
-        batch = self._pending_samples[-self.config.replay_batch_size:]
+        batch = self._pending_samples[-self.config.replay_batch_size :]
         return batch
 
     def get_slow_update_batch(
@@ -1128,7 +1127,9 @@ class FastSlowWeightManager:
             "slow_updates": self.slow_updates,
             "pending_samples": len(self._pending_samples),
             "has_consolidated_state": self._consolidated_state is not None,
-            "last_consolidation": self.last_consolidation.isoformat() if self.last_consolidation else None,
+            "last_consolidation": (
+                self.last_consolidation.isoformat() if self.last_consolidation else None
+            ),
             "replay_buffer": self.replay_buffer.get_statistics(),
             "config": self.config.to_dict(),
         }
@@ -1142,7 +1143,9 @@ class FastSlowWeightManager:
                 "interaction_count": self.interaction_count,
                 "fast_updates": self.fast_updates,
                 "slow_updates": self.slow_updates,
-                "last_consolidation": self.last_consolidation.isoformat() if self.last_consolidation else None,
+                "last_consolidation": (
+                    self.last_consolidation.isoformat() if self.last_consolidation else None
+                ),
                 "saved_at": datetime.now().isoformat(),
             }
 

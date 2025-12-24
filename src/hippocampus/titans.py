@@ -33,6 +33,7 @@ try:
     import torch
     import torch.nn as nn
     import torch.nn.functional as F
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
@@ -58,15 +59,16 @@ class TitansSidecarConfig:
         use_layer_norm: Whether to use layer normalization
         dropout: Dropout rate during updates
     """
-    input_dim: int = 768           # nomic-embed-text output dimension
-    hidden_dim: int = 1024         # Internal hidden size
-    output_dim: int = 768          # Match input dim for residual
-    num_layers: int = 3            # Depth of memory MLP
-    learning_rate: float = 1e-3    # Test-time learning rate
-    momentum: float = 0.9          # Gradient momentum
-    forget_alpha: float = 0.01     # Forgetting rate
-    surprise_threshold: float = 0.5 # Min surprise for update
-    max_stored_episodes: int = 1000 # Replay buffer size
+
+    input_dim: int = 768  # nomic-embed-text output dimension
+    hidden_dim: int = 1024  # Internal hidden size
+    output_dim: int = 768  # Match input dim for residual
+    num_layers: int = 3  # Depth of memory MLP
+    learning_rate: float = 1e-3  # Test-time learning rate
+    momentum: float = 0.9  # Gradient momentum
+    forget_alpha: float = 0.01  # Forgetting rate
+    surprise_threshold: float = 0.5  # Min surprise for update
+    max_stored_episodes: int = 1000  # Replay buffer size
     use_layer_norm: bool = True
     dropout: float = 0.1
 
@@ -182,7 +184,7 @@ class TitansSidecarNumpy:
 
         # Compute loss (MSE)
         error = output - target
-        loss = np.mean(error ** 2)
+        loss = np.mean(error**2)
 
         # Backward pass
         # dL/dW2 = h.T @ error
@@ -214,8 +216,8 @@ class TitansSidecarNumpy:
         self.b2 -= self.momentum_b2
 
         # Apply forgetting (weight decay)
-        self.W1 *= (1 - cfg.forget_alpha)
-        self.W2 *= (1 - cfg.forget_alpha)
+        self.W1 *= 1 - cfg.forget_alpha
+        self.W2 *= 1 - cfg.forget_alpha
 
         # Update statistics
         self.update_count += 1
@@ -245,6 +247,7 @@ class TitansSidecarNumpy:
 
 
 if TORCH_AVAILABLE:
+
     class TitansSidecarTorch(nn.Module):
         """
         PyTorch-based Titans Neural Memory Sidecar.
@@ -299,7 +302,7 @@ if TORCH_AVAILABLE:
             """Initialize weights with Xavier/He initialization."""
             for module in self.memory_mlp.modules():
                 if isinstance(module, nn.Linear):
-                    nn.init.kaiming_normal_(module.weight, nonlinearity='relu')
+                    nn.init.kaiming_normal_(module.weight, nonlinearity="relu")
                     if module.bias is not None:
                         nn.init.zeros_(module.bias)
 
@@ -393,7 +396,7 @@ if TORCH_AVAILABLE:
                     param.sub_(momentum)
 
                     # Apply forgetting (weight decay)
-                    if 'weight' in name:
+                    if "weight" in name:
                         param.mul_(1 - cfg.forget_alpha)
 
             # Statistics
@@ -455,10 +458,10 @@ class TitansSidecar:
             if device:
                 self._impl = self._impl.to(device)
             elif torch.cuda.is_available():
-                self._impl = self._impl.to('cuda')
-                self.device = 'cuda'
+                self._impl = self._impl.to("cuda")
+                self.device = "cuda"
             else:
-                self.device = 'cpu'
+                self.device = "cpu"
 
             logger.info(f"TitansSidecar using PyTorch backend on {self.device}")
         else:
@@ -517,7 +520,7 @@ class TitansSidecar:
         # Track high-surprise events
         if surprise > self.high_surprise_threshold:
             event = {
-                "timestamp": __import__('datetime').datetime.now().isoformat(),
+                "timestamp": __import__("datetime").datetime.now().isoformat(),
                 "surprise": surprise,
                 "metadata": metadata or {},
             }
@@ -601,7 +604,7 @@ class TitansSidecar:
         else:
             state["model_state"] = self._impl.get_state_dict()
 
-        with open(path, 'wb') as f:
+        with open(path, "wb") as f:
             pickle.dump(state, f)
 
         logger.info(f"TitansSidecar saved to {path}")
@@ -610,7 +613,7 @@ class TitansSidecar:
         """Load sidecar state from disk."""
         import pickle
 
-        with open(path, 'rb') as f:
+        with open(path, "rb") as f:
             state = pickle.load(f)
 
         self.high_surprise_events = state.get("high_surprise_events", [])
@@ -682,14 +685,16 @@ def create_titans_memory(
 # EPISODIC MEMORY STORE WITH JSON TIMESTAMPS
 # =============================================================================
 
+
 @dataclass
 class EpisodicMemory:
     """A single episodic memory with semantic timestamp."""
-    id: str                                    # Unique memory ID
-    content: str                               # The memory content
-    embedding: np.ndarray | None = None     # Embedding vector
-    surprise: float = 0.0                      # Surprise when recorded
-    source: str = "interaction"                # Source: interaction, search, system
+
+    id: str  # Unique memory ID
+    content: str  # The memory content
+    embedding: np.ndarray | None = None  # Embedding vector
+    surprise: float = 0.0  # Surprise when recorded
+    source: str = "interaction"  # Source: interaction, search, system
     tags: list[str] = field(default_factory=list)  # Semantic tags
 
     # Timestamps
@@ -698,9 +703,9 @@ class EpisodicMemory:
     access_count: int = 0
 
     # Confidence and reliability
-    confidence: float = 1.0                    # 0-1 confidence score
-    source_reliability: float = 1.0            # Source reliability score
-    is_fact: bool = False                      # Fact vs opinion
+    confidence: float = 1.0  # 0-1 confidence score
+    source_reliability: float = 1.0  # Source reliability score
+    is_fact: bool = False  # Fact vs opinion
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to JSON-serializable dictionary."""
@@ -780,7 +785,7 @@ class EpisodicMemoryStore:
 
         # Index for fast lookup
         self.by_date: dict[str, list[str]] = {}  # date -> memory ids
-        self.by_tag: dict[str, list[str]] = {}   # tag -> memory ids
+        self.by_tag: dict[str, list[str]] = {}  # tag -> memory ids
 
         # Load existing memories
         self._load_all()
@@ -899,11 +904,7 @@ class EpisodicMemoryStore:
         if tag not in self.by_tag:
             return []
 
-        return [
-            self.memories[mid]
-            for mid in self.by_tag[tag]
-            if mid in self.memories
-        ]
+        return [self.memories[mid] for mid in self.by_tag[tag] if mid in self.memories]
 
     def search_semantic(
         self,
@@ -992,7 +993,9 @@ class EpisodicMemoryStore:
             # Lower surprise = more likely to evict
             surprise_score = 1 / (memory.surprise + 0.1)
 
-            evict_score = age_days * 0.3 + access_score * 0.3 + recency_score * 0.2 + surprise_score * 0.2
+            evict_score = (
+                age_days * 0.3 + access_score * 0.3 + recency_score * 0.2 + surprise_score * 0.2
+            )
             scored.append((memory.id, evict_score))
 
         # Sort by evict score (highest first)
@@ -1011,15 +1014,11 @@ class EpisodicMemoryStore:
             # Clean up indices
             date_key = memory.created_at.strftime("%Y-%m-%d")
             if date_key in self.by_date:
-                self.by_date[date_key] = [
-                    mid for mid in self.by_date[date_key] if mid != memory_id
-                ]
+                self.by_date[date_key] = [mid for mid in self.by_date[date_key] if mid != memory_id]
 
             for tag in memory.tags:
                 if tag in self.by_tag:
-                    self.by_tag[tag] = [
-                        mid for mid in self.by_tag[tag] if mid != memory_id
-                    ]
+                    self.by_tag[tag] = [mid for mid in self.by_tag[tag] if mid != memory_id]
 
             # Delete file
             file_path = self.storage_path / f"{memory_id}.json"
@@ -1032,10 +1031,9 @@ class EpisodicMemoryStore:
             "total_memories": len(self.memories),
             "dates_covered": len(self.by_date),
             "tags_used": len(self.by_tag),
-            "avg_surprise": np.mean([m.surprise for m in self.memories.values()]) if self.memories else 0,
+            "avg_surprise": (
+                np.mean([m.surprise for m in self.memories.values()]) if self.memories else 0
+            ),
             "facts_count": sum(1 for m in self.memories.values() if m.is_fact),
             "storage_path": str(self.storage_path),
         }
-
-
-

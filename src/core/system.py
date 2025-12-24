@@ -85,6 +85,7 @@ logger = logging.getLogger(__name__)
 
 class SystemState(Enum):
     """Overall system operating state."""
+
     INITIALIZING = "initializing"
     RUNNING = "running"
     PAUSED = "paused"
@@ -111,38 +112,38 @@ class CoreConfig:
     log_level: str = "INFO"
 
     # Main Loop Settings
-    main_loop_interval: float = 0.1       # 100ms tick rate
-    idle_loop_interval: float = 1.0       # 1s when idle
+    main_loop_interval: float = 0.1  # 100ms tick rate
+    idle_loop_interval: float = 1.0  # 1s when idle
 
     # Sensory Input Configuration
-    enable_audio_input: bool = False       # Requires faster-whisper
-    enable_log_monitoring: bool = True     # Monitor system logs
+    enable_audio_input: bool = False  # Requires faster-whisper
+    enable_log_monitoring: bool = True  # Monitor system logs
 
     # Output Configuration
-    enable_voice_output: bool = False      # Requires TTS
+    enable_voice_output: bool = False  # Requires TTS
 
     # Safety Settings
-    max_cortex_time: float = 300.0         # 5 min max per Cortex call
+    max_cortex_time: float = 300.0  # 5 min max per Cortex call
     emergency_shutdown_phrase: str = "ava shutdown"
 
     # Persistence
-    autosave_interval: int = 100           # Save state every N interactions
+    autosave_interval: int = 100  # Save state every N interactions
 
     # ========== SEARCH-FIRST SETTINGS ==========
     # Web search is the default action for unknown queries
     search_first_enabled: bool = True
-    search_min_sources: int = 3             # Minimum sources to check
-    search_max_sources: int = 10            # Maximum sources to check
+    search_min_sources: int = 3  # Minimum sources to check
+    search_max_sources: int = 10  # Maximum sources to check
     fact_convergence_threshold: float = 0.7  # Agreement threshold for facts
 
     # ========== THERMAL MANAGEMENT ==========
     thermal_monitoring_enabled: bool = True
-    thermal_check_interval: float = 5.0     # Check every 5 seconds
-    max_gpu_power_percent: float = 15.0     # 15% max GPU power (RTX A2000)
+    thermal_check_interval: float = 5.0  # Check every 5 seconds
+    max_gpu_power_percent: float = 15.0  # 15% max GPU power (RTX A2000)
 
     # ========== SELF-PRESERVATION ==========
     self_health_monitoring: bool = True
-    health_check_interval: float = 60.0     # Check health every minute
+    health_check_interval: float = 60.0  # Check health every minute
 
     # ========== EPISODIC MEMORY ==========
     episodic_memory_enabled: bool = True
@@ -307,7 +308,9 @@ class AVACoreSystem:
             logger.info("=" * 60)
             logger.info("AVA CORE SYSTEM INITIALIZED SUCCESSFULLY")
             logger.info(f"Session ID: {self.session_start.strftime('%Y%m%d_%H%M%S')}")
-            logger.info(f"Search-First: {'ENABLED' if self.config.search_first_enabled else 'DISABLED'}")
+            logger.info(
+                f"Search-First: {'ENABLED' if self.config.search_first_enabled else 'DISABLED'}"
+            )
             logger.info(f"Thermal Monitoring: {'ENABLED' if self._thermal_monitor else 'DISABLED'}")
             logger.info(f"Episodic Memory: {'ENABLED' if self._episodic_store else 'DISABLED'}")
             logger.info("=" * 60)
@@ -361,12 +364,26 @@ class AVACoreSystem:
 
         try:
             self._thermal_monitor = ThermalMonitor(
-                warning_temp=self.config.medulla_config.thermal_warning_temp if hasattr(self.config.medulla_config, 'thermal_warning_temp') else 75.0,
-                throttle_temp=self.config.medulla_config.thermal_throttle_temp if hasattr(self.config.medulla_config, 'thermal_throttle_temp') else 80.0,
-                pause_temp=self.config.medulla_config.thermal_pause_temp if hasattr(self.config.medulla_config, 'thermal_pause_temp') else 85.0,
+                warning_temp=(
+                    self.config.medulla_config.thermal_warning_temp
+                    if hasattr(self.config.medulla_config, "thermal_warning_temp")
+                    else 75.0
+                ),
+                throttle_temp=(
+                    self.config.medulla_config.thermal_throttle_temp
+                    if hasattr(self.config.medulla_config, "thermal_throttle_temp")
+                    else 80.0
+                ),
+                pause_temp=(
+                    self.config.medulla_config.thermal_pause_temp
+                    if hasattr(self.config.medulla_config, "thermal_pause_temp")
+                    else 85.0
+                ),
             )
             status = self._thermal_monitor.get_status()
-            logger.info(f"Thermal Monitor initialized - GPU: {status.temperature:.1f}°C, Power: {status.power_percent:.1f}%")
+            logger.info(
+                f"Thermal Monitor initialized - GPU: {status.temperature:.1f}°C, Power: {status.power_percent:.1f}%"
+            )
         except Exception as e:
             logger.warning(f"Thermal monitoring not available: {e}")
             self._thermal_monitor = None
@@ -392,8 +409,7 @@ class AVACoreSystem:
             storage_path.mkdir(parents=True, exist_ok=True)
 
             self._episodic_store = EpisodicMemoryStore(
-                storage_path=storage_path,
-                max_entries=self.config.episodic_max_entries
+                storage_path=storage_path, max_entries=self.config.episodic_max_entries
             )
 
             count = len(self._episodic_store.memories)
@@ -460,8 +476,7 @@ class AVACoreSystem:
             try:
                 search_tool = WebSearchTool()
                 results = await search_tool.execute(
-                    query=query,
-                    num_results=self.config.search_min_sources
+                    query=query, num_results=self.config.search_min_sources
                 )
 
                 if results.get("error"):
@@ -480,7 +495,7 @@ class AVACoreSystem:
                         context={"results_count": len(search_data)},
                         importance=0.6,
                         emotional_valence=0.0,
-                        is_fact=True
+                        is_fact=True,
                     )
                     self._episodic_store.store(memory)
 
@@ -495,7 +510,7 @@ class AVACoreSystem:
                 return {
                     "response": "\n".join(response_parts),
                     "search_results": search_data,
-                    "sources_count": len(search_data)
+                    "sources_count": len(search_data),
                 }
 
             except Exception as e:
@@ -517,13 +532,12 @@ class AVACoreSystem:
             try:
                 search_tool = WebSearchTool()
                 results = await search_tool.execute(
-                    query=query,
-                    num_results=self.config.search_max_sources
+                    query=query, num_results=self.config.search_max_sources
                 )
 
                 return {
                     "search_results": results.get("results", []),
-                    "sources_count": len(results.get("results", []))
+                    "sources_count": len(results.get("results", [])),
                 }
 
             except Exception as e:
@@ -553,7 +567,7 @@ class AVACoreSystem:
                 return {
                     "content": result.get("content", ""),
                     "title": result.get("title", ""),
-                    "url": url
+                    "url": url,
                 }
 
             except Exception as e:
@@ -570,10 +584,7 @@ class AVACoreSystem:
             """
             logger.info("[SELF-MONITOR] Checking system health...")
 
-            health_report = {
-                "status": "healthy",
-                "checks": {}
-            }
+            health_report = {"status": "healthy", "checks": {}}
 
             # Check thermal status
             if self._thermal_monitor:
@@ -581,7 +592,7 @@ class AVACoreSystem:
                 health_report["checks"]["thermal"] = {
                     "temperature": thermal_status.temperature,
                     "power_percent": thermal_status.power_percent,
-                    "throttled": thermal_status.is_throttled
+                    "throttled": thermal_status.is_throttled,
                 }
                 if thermal_status.is_throttled:
                     health_report["status"] = "throttled"
@@ -589,10 +600,11 @@ class AVACoreSystem:
             # Check memory usage
             try:
                 import psutil
+
                 memory = psutil.virtual_memory()
                 health_report["checks"]["memory"] = {
                     "used_percent": memory.percent,
-                    "available_gb": memory.available / (1024**3)
+                    "available_gb": memory.available / (1024**3),
                 }
                 if memory.percent > 90:
                     health_report["status"] = "warning"
@@ -602,7 +614,7 @@ class AVACoreSystem:
             # Check interaction stats
             health_report["checks"]["interactions"] = {
                 "total": self.total_interactions,
-                "uptime_hours": (datetime.now() - self.session_start).total_seconds() / 3600
+                "uptime_hours": (datetime.now() - self.session_start).total_seconds() / 3600,
             }
 
             # Store health check in episodic memory
@@ -612,7 +624,7 @@ class AVACoreSystem:
                     context=health_report,
                     importance=0.3,
                     emotional_valence=0.0 if health_report["status"] == "healthy" else -0.3,
-                    is_fact=True
+                    is_fact=True,
                 )
                 self._episodic_store.store(memory)
 
@@ -636,7 +648,7 @@ class AVACoreSystem:
                 "power_percent": status.power_percent,
                 "power_watts": status.power_draw_watts,
                 "is_throttled": status.is_throttled,
-                "status": "ok"
+                "status": "ok",
             }
 
             # Check against thresholds
@@ -666,17 +678,29 @@ class AVACoreSystem:
             logger.info(f"[SYSTEM-COMMAND] Request for: {command[:50]}...")
 
             # Check if command is blocked
-            blocked_commands = self.config.agency_config.blocked_system_commands if hasattr(self.config.agency_config, 'blocked_system_commands') else [
-                "rm -rf", "del /f", "format", "shutdown", "reboot",
-                "kill -9", "taskkill /f", "dd if=", "mkfs", "fdisk"
-            ]
+            blocked_commands = (
+                self.config.agency_config.blocked_system_commands
+                if hasattr(self.config.agency_config, "blocked_system_commands")
+                else [
+                    "rm -rf",
+                    "del /f",
+                    "format",
+                    "shutdown",
+                    "reboot",
+                    "kill -9",
+                    "taskkill /f",
+                    "dd if=",
+                    "mkfs",
+                    "fdisk",
+                ]
+            )
 
             for blocked in blocked_commands:
                 if blocked.lower() in command.lower():
                     return {
                         "status": "blocked",
                         "message": f"Command contains blocked operation: {blocked}",
-                        "requires_confirmation": False
+                        "requires_confirmation": False,
                     }
 
             # All non-blocked commands require confirmation
@@ -684,7 +708,7 @@ class AVACoreSystem:
                 "status": "pending_confirmation",
                 "command": command,
                 "message": "This system command requires your explicit confirmation to execute.",
-                "requires_confirmation": True
+                "requires_confirmation": True,
             }
 
         # ========== REGISTER ALL CALLBACKS ==========
@@ -693,7 +717,9 @@ class AVACoreSystem:
         self._agency.register_action_callback(PolicyType.REFLEX_REPLY, handle_reflex)
         self._agency.register_action_callback(PolicyType.DEEP_THOUGHT, handle_deep_thought)
         self._agency.register_action_callback(PolicyType.WAIT, handle_wait)
-        self._agency.register_action_callback(PolicyType.ASK_CLARIFICATION, handle_ask_clarification)
+        self._agency.register_action_callback(
+            PolicyType.ASK_CLARIFICATION, handle_ask_clarification
+        )
 
         # Search-First handlers
         self._agency.register_action_callback(PolicyType.PRIMARY_SEARCH, handle_primary_search)
@@ -773,7 +799,9 @@ class AVACoreSystem:
             is_informational = self._is_informational_query(user_input)
 
             # 4. Select policy with Search-First bias
-            if force_search or (self.config.search_first_enabled and is_informational and not force_cortex):
+            if force_search or (
+                self.config.search_first_enabled and is_informational and not force_cortex
+            ):
                 # Search-First: Try web search first
                 logger.info("[SEARCH-FIRST] Informational query detected, searching...")
 
@@ -786,7 +814,9 @@ class AVACoreSystem:
                 if search_result.get("response"):
                     # Search succeeded - use search results
                     response = search_result["response"]
-                    logger.info(f"[SEARCH-FIRST] Found {search_result.get('sources_count', 0)} sources")
+                    logger.info(
+                        f"[SEARCH-FIRST] Found {search_result.get('sources_count', 0)} sources"
+                    )
                 elif search_result.get("search_failed") or search_result.get("no_results"):
                     # Search failed - fall back to internal generation
                     logger.info("[SEARCH-FIRST] Search failed, falling back to Medulla/Cortex")
@@ -837,11 +867,11 @@ class AVACoreSystem:
                         "response_preview": (response or "")[:200],
                         "policy": record.selected_policy,
                         "surprise": record.surprise_value,
-                        "used_cortex": record.used_cortex
+                        "used_cortex": record.used_cortex,
                     },
                     importance=min(record.surprise_value + 0.3, 1.0),
                     emotional_valence=0.0,
-                    is_fact=False
+                    is_fact=False,
                 )
                 self._episodic_store.store(memory)
 
@@ -869,15 +899,34 @@ class AVACoreSystem:
 
         # Question words that suggest informational queries
         question_indicators = [
-            "what is", "what are", "who is", "who are",
-            "when did", "when was", "when is",
-            "where is", "where are", "where did",
-            "how does", "how do", "how did", "how to",
-            "why is", "why do", "why did",
-            "explain", "define", "describe",
-            "tell me about", "what do you know about",
-            "facts about", "information about",
-            "latest", "recent", "news", "current"
+            "what is",
+            "what are",
+            "who is",
+            "who are",
+            "when did",
+            "when was",
+            "when is",
+            "where is",
+            "where are",
+            "where did",
+            "how does",
+            "how do",
+            "how did",
+            "how to",
+            "why is",
+            "why do",
+            "why did",
+            "explain",
+            "define",
+            "describe",
+            "tell me about",
+            "what do you know about",
+            "facts about",
+            "information about",
+            "latest",
+            "recent",
+            "news",
+            "current",
         ]
 
         # Check for question indicators
@@ -891,10 +940,20 @@ class AVACoreSystem:
 
         # Conversational/command patterns that don't need search
         non_search_patterns = [
-            "hello", "hi ", "hey ", "thanks", "thank you",
-            "please help", "can you", "could you",
-            "i want", "i need", "i feel",
-            "my name", "call me", "remember"
+            "hello",
+            "hi ",
+            "hey ",
+            "thanks",
+            "thank you",
+            "please help",
+            "can you",
+            "could you",
+            "i want",
+            "i need",
+            "i feel",
+            "my name",
+            "call me",
+            "remember",
         ]
 
         for pattern in non_search_patterns:
@@ -944,7 +1003,11 @@ class AVACoreSystem:
                     prompt=cortex_input["text_prompt"],
                     projected_state=cortex_input["soft_prompts"],
                 ),
-                timeout=self.config.max_cortex_time if hasattr(self.config, 'max_cortex_time') else 300.0
+                timeout=(
+                    self.config.max_cortex_time
+                    if hasattr(self.config, "max_cortex_time")
+                    else 300.0
+                ),
             )
         except asyncio.TimeoutError:
             logger.error(f"Cortex generation timed out after {self.config.max_cortex_time}s")
@@ -995,7 +1058,7 @@ class AVACoreSystem:
 
         # Trim history
         if len(self.conversation_history) > self.max_history:
-            self.conversation_history = self.conversation_history[-self.max_history:]
+            self.conversation_history = self.conversation_history[-self.max_history :]
 
     async def run_forever(self) -> None:
         """
@@ -1010,7 +1073,9 @@ class AVACoreSystem:
         6. Never exits until explicitly stopped
         """
         logger.info("Starting AVA Core System continuous operation...")
-        logger.info(f"Search-First: {'ENABLED' if self.config.search_first_enabled else 'DISABLED'}")
+        logger.info(
+            f"Search-First: {'ENABLED' if self.config.search_first_enabled else 'DISABLED'}"
+        )
         self.is_running = True
 
         # Set up signal handlers
@@ -1028,15 +1093,20 @@ class AVACoreSystem:
             try:
                 # ========== THERMAL CHECK (Self-Preservation) ==========
                 current_time = time.time()
-                if (self._thermal_monitor and
-                    current_time - self._last_thermal_check >= self.config.thermal_check_interval):
+                if (
+                    self._thermal_monitor
+                    and current_time - self._last_thermal_check
+                    >= self.config.thermal_check_interval
+                ):
 
                     self._last_thermal_check = current_time
                     thermal_status = self._thermal_monitor.get_status()
 
                     if self._thermal_monitor.should_pause():
                         if not thermal_paused:
-                            logger.warning(f"[THERMAL] Pausing - GPU at {thermal_status.temperature:.1f}°C")
+                            logger.warning(
+                                f"[THERMAL] Pausing - GPU at {thermal_status.temperature:.1f}°C"
+                            )
                             thermal_paused = True
                             if self._output_callback:
                                 self._output_callback(
@@ -1047,7 +1117,9 @@ class AVACoreSystem:
                         continue
                     elif thermal_paused:
                         # Resume from thermal pause
-                        logger.info(f"[THERMAL] Resuming - GPU at {thermal_status.temperature:.1f}°C")
+                        logger.info(
+                            f"[THERMAL] Resuming - GPU at {thermal_status.temperature:.1f}°C"
+                        )
                         thermal_paused = False
                         if self._output_callback:
                             self._output_callback(
@@ -1063,8 +1135,10 @@ class AVACoreSystem:
                         )
 
                 # ========== HEALTH CHECK (Self-Monitoring) ==========
-                if (self.config.self_health_monitoring and
-                    current_time - self._last_health_check >= self.config.health_check_interval):
+                if (
+                    self.config.self_health_monitoring
+                    and current_time - self._last_health_check >= self.config.health_check_interval
+                ):
 
                     self._last_health_check = current_time
 
@@ -1139,7 +1213,7 @@ class AVACoreSystem:
             self._agency.save_state()
 
             # Save episodic memory
-            if self._episodic_store and hasattr(self._episodic_store, 'save'):
+            if self._episodic_store and hasattr(self._episodic_store, "save"):
                 self._episodic_store.save()
 
         except Exception as e:
@@ -1168,7 +1242,7 @@ class AVACoreSystem:
                 await self._cortex.shutdown()
 
             # Save episodic memory one final time
-            if self._episodic_store and hasattr(self._episodic_store, 'save'):
+            if self._episodic_store and hasattr(self._episodic_store, "save"):
                 logger.info("Saving episodic memory...")
                 self._episodic_store.save()
 

@@ -31,12 +31,13 @@ logger = logging.getLogger(__name__)
 
 class FineTuningTrigger(Enum):
     """Reasons for triggering fine-tuning."""
-    SAMPLE_THRESHOLD = "sample_threshold"      # Enough samples accumulated
-    TIME_THRESHOLD = "time_threshold"          # Enough time passed
-    STAGE_TRANSITION = "stage_transition"      # Developmental stage changed
-    EMOTIONAL_BOOST = "emotional_boost"        # High ambition + joy
-    PERFORMANCE_DROP = "performance_drop"      # Detected degradation
-    MANUAL = "manual"                          # User requested
+
+    SAMPLE_THRESHOLD = "sample_threshold"  # Enough samples accumulated
+    TIME_THRESHOLD = "time_threshold"  # Enough time passed
+    STAGE_TRANSITION = "stage_transition"  # Developmental stage changed
+    EMOTIONAL_BOOST = "emotional_boost"  # High ambition + joy
+    PERFORMANCE_DROP = "performance_drop"  # Detected degradation
+    MANUAL = "manual"  # User requested
 
 
 @dataclass
@@ -124,7 +125,9 @@ class FineTuningResult:
         return cls(
             id=data["id"],
             started_at=datetime.fromisoformat(data["started_at"]),
-            completed_at=datetime.fromisoformat(data["completed_at"]) if data.get("completed_at") else None,
+            completed_at=(
+                datetime.fromisoformat(data["completed_at"]) if data.get("completed_at") else None
+            ),
             trigger=FineTuningTrigger(data.get("trigger", "manual")),
             samples_used=data.get("samples_used", 0),
             train_loss=data.get("train_loss", 0.0),
@@ -432,6 +435,7 @@ class FineTuningScheduler:
 # DISTILLATION PIPELINE (Distilling Step-by-Step + Toolformer Integration)
 # ==============================================================================
 
+
 @dataclass
 class DistillationSample:
     """
@@ -440,6 +444,7 @@ class DistillationSample:
     Reference: "Distilling Step-by-Step!" (ACL Findings 2023) emphasizes
     extracting intermediate rationales, not just final predictions.
     """
+
     input_text: str
     output_text: str
     rationale: str | None = None  # Chain-of-thought reasoning
@@ -754,7 +759,7 @@ class DistillationPipeline:
 
             new_samples = []
 
-            for sample in existing_samples[:self.config.max_samples_per_iteration]:
+            for sample in existing_samples[: self.config.max_samples_per_iteration]:
                 # Generate student response
                 student_response = await self._query_model(
                     sample.input_text,
@@ -786,7 +791,9 @@ class DistillationPipeline:
             self.iteration_count += 1
             self.stats["self_distill_iterations"] += 1
 
-            logger.info(f"Self-distillation iteration {self.iteration_count}: {len(new_samples)} new samples")
+            logger.info(
+                f"Self-distillation iteration {self.iteration_count}: {len(new_samples)} new samples"
+            )
 
             return new_samples
 
@@ -860,7 +867,7 @@ class DistillationPipeline:
             start = response.index("<think>") + len("<think>")
             end = response.index("</think>")
             rationale = response[start:end].strip()
-            final_answer = response[end + len("</think>"):].strip()
+            final_answer = response[end + len("</think>") :].strip()
             return rationale, final_answer
 
         # Check for "Therefore" or "So" markers
@@ -959,11 +966,13 @@ class DistillationPipeline:
             if tool_name in tools:
                 for trigger in triggers:
                     if trigger in lower_input:
-                        proposals.append({
-                            "name": tool_name,
-                            "args": input_text,
-                            "position": 0,  # Beginning of output
-                        })
+                        proposals.append(
+                            {
+                                "name": tool_name,
+                                "args": input_text,
+                                "position": 0,  # Beginning of output
+                            }
+                        )
                         break
 
         return proposals[:3]  # Limit proposals
@@ -1024,7 +1033,7 @@ class DistillationPipeline:
                 seen_inputs.add(input_hash)
                 unique_samples.append(sample)
 
-        return unique_samples[:self.config.max_samples_per_iteration]
+        return unique_samples[: self.config.max_samples_per_iteration]
 
     def _save_samples(self):
         """Save pending samples to disk."""

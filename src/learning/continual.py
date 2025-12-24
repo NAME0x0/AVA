@@ -19,11 +19,12 @@ logger = logging.getLogger(__name__)
 
 class SampleQuality(Enum):
     """Quality rating for learning samples."""
-    EXCELLENT = "excellent"    # User explicitly praised
-    GOOD = "good"              # Successful interaction
-    NEUTRAL = "neutral"        # Normal interaction
-    POOR = "poor"              # User corrected AVA
-    BAD = "bad"                # User complained/frustrated
+
+    EXCELLENT = "excellent"  # User explicitly praised
+    GOOD = "good"  # Successful interaction
+    NEUTRAL = "neutral"  # Normal interaction
+    POOR = "poor"  # User corrected AVA
+    BAD = "bad"  # User complained/frustrated
 
 
 @dataclass
@@ -51,7 +52,7 @@ class LearningSample:
 
     # Learning metadata
     learning_weight: float = 1.0  # How much to weight this sample
-    has_been_used: bool = False   # Whether used in fine-tuning
+    has_been_used: bool = False  # Whether used in fine-tuning
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
@@ -382,9 +383,7 @@ class ContinualLearner:
             SampleQuality.EXCELLENT,
         ]
 
-        return quality_order.index(quality) >= quality_order.index(
-            self.min_quality_for_training
-        )
+        return quality_order.index(quality) >= quality_order.index(self.min_quality_for_training)
 
     def mark_samples_used(self, sample_ids: list[str]):
         """Mark samples as used in training."""

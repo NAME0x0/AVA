@@ -45,16 +45,16 @@ class BridgeConfig:
     """
 
     # Input dimension (Mamba hidden state)
-    medulla_state_dim: int = 2560        # Matches Medulla hidden_dim
+    medulla_state_dim: int = 2560  # Matches Medulla hidden_dim
 
     # Output dimension (Transformer embedding)
-    cortex_embedding_dim: int = 8192     # Llama-3 70B hidden size
+    cortex_embedding_dim: int = 8192  # Llama-3 70B hidden size
 
     # Projection MLP architecture
     hidden_dims: list[int] = field(default_factory=lambda: [4096, 4096])
 
     # Number of soft prompt tokens to generate
-    num_soft_tokens: int = 32            # Virtual context tokens
+    num_soft_tokens: int = 32  # Virtual context tokens
 
     # Training configuration (for adapter fine-tuning)
     learning_rate: float = 1e-4
@@ -62,7 +62,7 @@ class BridgeConfig:
     use_layer_norm: bool = True
 
     # Projection modes
-    use_residual: bool = True            # Add residual connection
+    use_residual: bool = True  # Add residual connection
     use_attention_pooling: bool = False  # Use attention to pool state
 
     # State persistence
@@ -98,11 +98,7 @@ class ProjectionAdapter:
         self.output_dim = config.num_soft_tokens * config.cortex_embedding_dim
 
         # Build layer dimensions
-        layer_dims = (
-            [config.medulla_state_dim] +
-            config.hidden_dims +
-            [self.output_dim]
-        )
+        layer_dims = [config.medulla_state_dim] + config.hidden_dims + [self.output_dim]
 
         # Initialize weights (Xavier initialization)
         self.weights: list[np.ndarray] = []
@@ -194,10 +190,9 @@ class ProjectionAdapter:
         alpha = 0.01
 
         self.running_mean = (1 - alpha) * self.running_mean + alpha * medulla_state
-        self.running_var = (
-            (1 - alpha) * self.running_var +
-            alpha * (medulla_state - self.running_mean) ** 2
-        )
+        self.running_var = (1 - alpha) * self.running_var + alpha * (
+            medulla_state - self.running_mean
+        ) ** 2
 
     def save(self, path: str) -> None:
         """Save adapter weights to disk."""
@@ -285,7 +280,11 @@ class ContextCompressor:
                 total_chars += turn_chars
             else:
                 # Summarize remaining history
-                remaining = conversation_history[:-len(context_parts)] if context_parts else conversation_history
+                remaining = (
+                    conversation_history[: -len(context_parts)]
+                    if context_parts
+                    else conversation_history
+                )
                 if remaining:
                     summary = self._summarize_turns(remaining)
                     context_parts.insert(0, f"[Previous context: {summary}]")
@@ -509,7 +508,7 @@ class Bridge:
             np.random.shuffle(training_pairs)
 
             for i in range(0, len(training_pairs), batch_size):
-                batch = training_pairs[i:i + batch_size]
+                batch = training_pairs[i : i + batch_size]
 
                 # Forward pass
                 batch_loss = 0.0
@@ -518,7 +517,7 @@ class Bridge:
 
                     # MSE loss
                     error = predicted.flatten() - target_embedding.flatten()
-                    loss = np.mean(error ** 2)
+                    loss = np.mean(error**2)
                     batch_loss += loss
 
                     # Backward pass (simplified gradient descent)
@@ -527,7 +526,7 @@ class Bridge:
                 batch_loss /= len(batch)
                 epoch_loss += batch_loss
 
-            epoch_loss /= (len(training_pairs) // batch_size)
+            epoch_loss /= len(training_pairs) // batch_size
             losses.append(epoch_loss)
 
             logger.info(f"Epoch {epoch + 1}/{epochs}: loss = {epoch_loss:.4f}")

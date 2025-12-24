@@ -14,6 +14,7 @@ from .registry import ToolRegistry, ToolSafetyLevel
 # LEVEL 0 - Baby Safe Tools
 # =============================================================================
 
+
 def echo(text: str) -> str:
     """Simply repeat back the input text."""
     return text
@@ -78,6 +79,7 @@ def random_number(min_val: int = 1, max_val: int = 100) -> str:
 # =============================================================================
 # LEVEL 1 - Toddler Tools
 # =============================================================================
+
 
 def calculator(expression: str) -> str:
     """
@@ -170,6 +172,7 @@ def temperature_convert(value: float, from_unit: str, to_unit: str) -> str:
 # LEVEL 2 - Child Tools (Read-only external access)
 # =============================================================================
 
+
 def dictionary_lookup(word: str) -> str:
     """
     Look up a word definition (simplified).
@@ -214,6 +217,7 @@ def day_of_week(date_str: str | None = None) -> str:
 # LEVEL 3 - Adolescent Tools (Write access)
 # =============================================================================
 
+
 def note_create(title: str, content: str) -> str:
     """
     Create a note (simulated - actual implementation would write to file).
@@ -230,6 +234,7 @@ def note_create(title: str, content: str) -> str:
 # =============================================================================
 # LEVEL 4 - Young Adult Tools (Powerful)
 # =============================================================================
+
 
 def code_evaluate(code: str, language: str = "python") -> str:
     """
@@ -255,6 +260,7 @@ def code_evaluate(code: str, language: str = "python") -> str:
 # =============================================================================
 # Tool Registration Helpers
 # =============================================================================
+
 
 def register_all_tools(registry: ToolRegistry):
     """Register all base tools with the registry."""

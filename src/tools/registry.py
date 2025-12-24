@@ -21,6 +21,7 @@ class ToolSafetyLevel(IntEnum):
 
     Higher levels require more developmental maturity.
     """
+
     LEVEL_0 = 0  # Baby-safe: echo, simple math, time
     LEVEL_1 = 1  # Toddler: calculator, word count
     LEVEL_2 = 2  # Child: web search, file reading
@@ -36,6 +37,7 @@ class ToolDefinition:
 
     Contains metadata, access requirements, and usage statistics.
     """
+
     name: str
     description: str
     safety_level: ToolSafetyLevel
@@ -88,8 +90,7 @@ class ToolDefinition:
     def to_prompt_description(self) -> str:
         """Generate a description for including in LLM prompts."""
         params_str = ", ".join(
-            f"{name}: {info.get('type', 'any')}"
-            for name, info in self.parameters.items()
+            f"{name}: {info.get('type', 'any')}" for name, info in self.parameters.items()
         )
         return f"{self.name}({params_str}) - {self.description}"
 
@@ -97,6 +98,7 @@ class ToolDefinition:
 @dataclass
 class ToolAccessDecision:
     """Result of checking tool access."""
+
     allowed: bool
     tool_name: str
     reason: str
@@ -131,7 +133,7 @@ class ToolRegistry:
         safety_level: ToolSafetyLevel,
         parameters: dict[str, Any] | None = None,
         required_params: list[str] | None = None,
-        **kwargs
+        **kwargs,
     ) -> ToolDefinition:
         """
         Register a new tool.
@@ -152,7 +154,7 @@ class ToolRegistry:
             safety_level=safety_level,
             parameters=parameters or {},
             required_params=required_params or [],
-            **kwargs
+            **kwargs,
         )
 
         self.tools[name] = tool
@@ -209,7 +211,9 @@ class ToolRegistry:
         for comp, min_level in tool.minimum_competencies.items():
             current_level = competencies.get(comp, 0.0)
             if current_level < min_level:
-                missing.append(f"Competency '{comp}' needs {min_level} (current: {current_level:.2f})")
+                missing.append(
+                    f"Competency '{comp}' needs {min_level} (current: {current_level:.2f})"
+                )
 
         if missing:
             # Find alternative tools at lower levels
@@ -373,15 +377,19 @@ class ToolRegistry:
 
         elif format == "json":
             import json
-            return json.dumps([
-                {
-                    "name": t.name,
-                    "description": t.description,
-                    "parameters": t.parameters,
-                    "required": t.required_params,
-                }
-                for t in tools
-            ], indent=2)
+
+            return json.dumps(
+                [
+                    {
+                        "name": t.name,
+                        "description": t.description,
+                        "parameters": t.parameters,
+                        "required": t.required_params,
+                    }
+                    for t in tools
+                ],
+                indent=2,
+            )
 
         return ""
 

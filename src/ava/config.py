@@ -17,12 +17,13 @@ import yaml
 @dataclass
 class OllamaConfig:
     """Ollama backend configuration."""
+
     host: str = "http://localhost:11434"
     timeout: int = 120
 
     # Model selection
-    fast_model: str = "gemma3:4b"      # Quick responses
-    deep_model: str = "gemma3:4b"      # Deep reasoning (use larger if available)
+    fast_model: str = "gemma3:4b"  # Quick responses
+    deep_model: str = "gemma3:4b"  # Deep reasoning (use larger if available)
     embedding_model: str = "gemma3:4b"  # For embeddings
 
     def __post_init__(self):
@@ -33,30 +34,42 @@ class OllamaConfig:
 @dataclass
 class EngineConfig:
     """Core engine configuration."""
+
     ollama: OllamaConfig = field(default_factory=OllamaConfig)
 
     # Routing thresholds
-    cortex_surprise_threshold: float = 0.5   # When to use deep thinking
+    cortex_surprise_threshold: float = 0.5  # When to use deep thinking
     cortex_complexity_threshold: float = 0.4
 
     # Keywords that trigger deep thinking
-    cortex_keywords: list[str] = field(default_factory=lambda: [
-        "analyze", "explain", "compare", "why", "how does",
-        "what if", "debug", "optimize", "step by step", "think carefully"
-    ])
+    cortex_keywords: list[str] = field(
+        default_factory=lambda: [
+            "analyze",
+            "explain",
+            "compare",
+            "why",
+            "how does",
+            "what if",
+            "debug",
+            "optimize",
+            "step by step",
+            "think carefully",
+        ]
+    )
 
     # Response settings
     max_tokens: int = 2048
     temperature: float = 0.7
 
     # Accuracy settings
-    verify_responses: bool = True       # Double-check important responses
-    use_reflection: bool = True         # Allow self-correction
+    verify_responses: bool = True  # Double-check important responses
+    use_reflection: bool = True  # Allow self-correction
 
 
 @dataclass
 class ToolsConfig:
     """Tool system configuration."""
+
     enabled: bool = True
 
     # Built-in tools
@@ -76,8 +89,9 @@ class ToolsConfig:
 @dataclass
 class MemoryConfig:
     """Memory and context configuration."""
-    max_history: int = 50           # Messages to keep in memory
-    context_window: int = 8192      # Token context window
+
+    max_history: int = 50  # Messages to keep in memory
+    context_window: int = 8192  # Token context window
 
     # Persistence
     persist_conversations: bool = True
@@ -91,6 +105,7 @@ class MemoryConfig:
 @dataclass
 class UIConfig:
     """UI/API server configuration."""
+
     host: str = "127.0.0.1"
     port: int = 8085
     enable_cors: bool = True
@@ -100,6 +115,7 @@ class UIConfig:
 @dataclass
 class AVAConfig:
     """Master configuration for AVA."""
+
     engine: EngineConfig = field(default_factory=EngineConfig)
     tools: ToolsConfig = field(default_factory=ToolsConfig)
     memory: MemoryConfig = field(default_factory=MemoryConfig)

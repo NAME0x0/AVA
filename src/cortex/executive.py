@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 
 class ExecutiveState(Enum):
     """Operating states for the Executive."""
+
     IDLE = "idle"
     ROUTING = "routing"
     COORDINATING = "coordinating"
@@ -48,16 +49,16 @@ class ExecutiveConfig:
 
     # Routing thresholds
     complexity_threshold: float = 0.5  # Route to Cortex above this
-    urgency_threshold: float = 0.7     # Fast-path for urgent requests
+    urgency_threshold: float = 0.7  # Fast-path for urgent requests
 
     # Resource management
     max_concurrent_tasks: int = 3
     timeout_seconds: float = 30.0
 
     # Coordination settings
-    enable_cot: bool = True            # Chain-of-thought reasoning
-    enable_tool_use: bool = True       # Tool augmentation
-    enable_memory: bool = True         # Memory integration
+    enable_cot: bool = True  # Chain-of-thought reasoning
+    enable_tool_use: bool = True  # Tool augmentation
+    enable_memory: bool = True  # Memory integration
 
     # Logging
     log_decisions: bool = True
@@ -81,11 +82,11 @@ class ExecutiveConfig:
 class ExecutiveDecision:
     """Represents a routing/coordination decision."""
 
-    route_to: str = "medulla"          # Target component
-    priority: float = 0.5              # Task priority (0-1)
-    use_tools: bool = False            # Enable tool use
-    use_cot: bool = False              # Enable chain-of-thought
-    query_memory: bool = False         # Query memory systems
+    route_to: str = "medulla"  # Target component
+    priority: float = 0.5  # Task priority (0-1)
+    use_tools: bool = False  # Enable tool use
+    use_cot: bool = False  # Enable chain-of-thought
+    query_memory: bool = False  # Query memory systems
     estimated_complexity: float = 0.0  # Estimated task complexity
     timestamp: datetime = field(default_factory=datetime.now)
 

@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class OllamaConfig:
     """Configuration for Ollama connection."""
+
     host: str = "http://localhost:11434"
     model: str = "llama3.2:latest"
     embedding_model: str = "nomic-embed-text"
@@ -382,9 +383,7 @@ async def create_ollama_interface(
 
     # Validate connection
     if not await interface.health_check():
-        logger.warning(
-            "Ollama is not responding. Make sure it's running with: ollama serve"
-        )
+        logger.warning("Ollama is not responding. Make sure it's running with: ollama serve")
 
     # Check if required models are available
     available = await interface.list_models()

@@ -23,6 +23,7 @@ try:
     from rich.progress import Progress, SpinnerColumn, TextColumn
     from rich.prompt import Prompt
     from rich.table import Table
+
     RICH_AVAILABLE = True
 except ImportError:
     RICH_AVAILABLE = False
@@ -173,9 +174,9 @@ class AVACli:
             return ""
 
         # Extract text from response object
-        text = getattr(result, 'text', str(result))
-        cognitive_state = getattr(result, 'cognitive_state', 'FLOW')
-        used_cortex = getattr(result, 'used_cortex', False)
+        text = getattr(result, "text", str(result))
+        cognitive_state = getattr(result, "cognitive_state", "FLOW")
+        used_cortex = getattr(result, "used_cortex", False)
 
         # Add indicator if Cortex was used
         indicator = "🧠" if used_cortex else "⚡"
@@ -200,7 +201,7 @@ class AVACli:
         # Check for commands
         if user_input.startswith("/"):
             cmd = user_input.split()[0].lower()
-            args = user_input[len(cmd):].strip()
+            args = user_input[len(cmd) :].strip()
 
             if cmd in self.commands:
                 return await self.commands[cmd](args)
@@ -240,7 +241,7 @@ class AVACli:
         print_output("")
 
         # Show tools used if any
-        tools_used = getattr(result, 'tools_used', [])
+        tools_used = getattr(result, "tools_used", [])
         if tools_used:
             print_output(f"[Tools: {', '.join(tools_used)}]", style="dim")
 
@@ -285,8 +286,13 @@ Available Commands:
 
             # Show last response info if available
             if self.last_response:
-                table.add_row("Last Cognitive State", getattr(self.last_response, 'cognitive_state', 'N/A'))
-                table.add_row("Last Used Cortex", "Yes" if getattr(self.last_response, 'used_cortex', False) else "No")
+                table.add_row(
+                    "Last Cognitive State", getattr(self.last_response, "cognitive_state", "N/A")
+                )
+                table.add_row(
+                    "Last Used Cortex",
+                    "Yes" if getattr(self.last_response, "used_cortex", False) else "No",
+                )
 
             console.print(table)
         else:
@@ -309,7 +315,7 @@ Available Commands:
             f"Conversation turns: {len(memory.messages) if hasattr(memory, 'messages') else 'N/A'}\n"
             f"Architecture: Titans Neural Memory (when loaded)",
             "Memory Statistics",
-            "yellow"
+            "yellow",
         )
 
         return True
@@ -321,7 +327,7 @@ Available Commands:
             return True
 
         tools = self.ava._tools
-        available = list(tools.tools.keys()) if hasattr(tools, 'tools') else []
+        available = list(tools.tools.keys()) if hasattr(tools, "tools") else []
 
         if console:
             table = Table(title="Available Tools")
@@ -462,7 +468,9 @@ def main():
 
     parser = argparse.ArgumentParser(description="AVA v3 - Cortex-Medulla AI Assistant")
     parser.add_argument("--data-dir", default="data", help="Data directory")
-    parser.add_argument("--model", default="llama3.2", help="Model name (configured in cortex_medulla.yaml)")
+    parser.add_argument(
+        "--model", default="llama3.2", help="Model name (configured in cortex_medulla.yaml)"
+    )
 
     args = parser.parse_args()
 

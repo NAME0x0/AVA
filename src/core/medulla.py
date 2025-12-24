@@ -35,6 +35,7 @@ import numpy as np
 # Optional: GPU monitoring via pynvml
 try:
     import pynvml
+
     NVML_AVAILABLE = True
 except ImportError:
     NVML_AVAILABLE = False
@@ -44,24 +45,26 @@ logger = logging.getLogger(__name__)
 
 class MedullaState(Enum):
     """Operating states for the Medulla."""
-    IDLE = "idle"                    # Passively monitoring
-    LISTENING = "listening"          # Actively processing audio
-    PERCEIVING = "perceiving"        # Processing text/visual input
-    RESPONDING = "responding"        # Generating reflexive response
-    ROUTING = "routing"              # Deciding action (Medulla vs Cortex)
+
+    IDLE = "idle"  # Passively monitoring
+    LISTENING = "listening"  # Actively processing audio
+    PERCEIVING = "perceiving"  # Processing text/visual input
+    RESPONDING = "responding"  # Generating reflexive response
+    ROUTING = "routing"  # Deciding action (Medulla vs Cortex)
     THERMAL_THROTTLED = "thermal_throttled"  # Reduced operation due to heat
-    THERMAL_PAUSED = "thermal_paused"        # Paused due to critical temperature
+    THERMAL_PAUSED = "thermal_paused"  # Paused due to critical temperature
 
 
 @dataclass
 class ThermalStatus:
     """Current thermal status of the GPU."""
-    temperature: float = 0.0          # Current temperature in °C
-    power_draw_watts: float = 0.0     # Current power draw in watts
-    power_limit_watts: float = 0.0    # Max power limit in watts
-    power_percent: float = 0.0        # Power draw as percentage
-    is_throttled: bool = False        # Whether throttling is active
-    is_paused: bool = False           # Whether processing is paused
+
+    temperature: float = 0.0  # Current temperature in °C
+    power_draw_watts: float = 0.0  # Current power draw in watts
+    power_limit_watts: float = 0.0  # Max power limit in watts
+    power_percent: float = 0.0  # Power draw as percentage
+    is_throttled: bool = False  # Whether throttling is active
+    is_paused: bool = False  # Whether processing is paused
     timestamp: datetime = field(default_factory=datetime.now)
 
     def to_dict(self) -> dict[str, Any]:
@@ -213,55 +216,55 @@ class MedullaConfig:
 
     # Model Configuration
     monitor_model: str = "slender-mamba-2.7b"  # 1-bit Mamba SSM
-    talker_model: str = "bitnet-3b"             # 1.58-bit BitNet for responses
+    talker_model: str = "bitnet-3b"  # 1.58-bit BitNet for responses
 
     # Hidden state dimensions (Mamba state size)
-    hidden_dim: int = 2560                      # Mamba hidden dimension
-    state_dim: int = 16                         # SSM state dimension
+    hidden_dim: int = 2560  # Mamba hidden dimension
+    state_dim: int = 16  # SSM state dimension
 
     # Neural Memory (Titans) Configuration
-    memory_dim: int = 768                       # Memory MLP input/output
-    memory_hidden_dim: int = 1024               # Memory MLP hidden
-    memory_learning_rate: float = 1e-3          # Test-time learning rate
-    memory_momentum: float = 0.9                # Gradient momentum
-    memory_forget_alpha: float = 0.01           # Forgetting rate
+    memory_dim: int = 768  # Memory MLP input/output
+    memory_hidden_dim: int = 1024  # Memory MLP hidden
+    memory_learning_rate: float = 1e-3  # Test-time learning rate
+    memory_momentum: float = 0.9  # Gradient momentum
+    memory_forget_alpha: float = 0.01  # Forgetting rate
 
     # Surprise Thresholds
-    low_surprise_threshold: float = 0.3         # Below = routine/familiar
-    high_surprise_threshold: float = 2.0        # Above = invoke Cortex
+    low_surprise_threshold: float = 0.3  # Below = routine/familiar
+    high_surprise_threshold: float = 2.0  # Above = invoke Cortex
 
     # Response Configuration
-    max_reflex_tokens: int = 32                 # Max tokens for quick response
-    reflex_timeout_ms: int = 200                # Target reflex latency
+    max_reflex_tokens: int = 32  # Max tokens for quick response
+    reflex_timeout_ms: int = 200  # Target reflex latency
 
     # Target token velocity
-    min_tokens_per_second: float = 15.0         # 15 tok/sec minimum for "instant" feel
+    min_tokens_per_second: float = 15.0  # 15 tok/sec minimum for "instant" feel
 
     # Sensory Input Configuration
     audio_sample_rate: int = 16000
-    audio_chunk_ms: int = 100                   # Process audio in chunks
+    audio_chunk_ms: int = 100  # Process audio in chunks
 
     # State Persistence
     state_save_path: str = "data/memory/medulla_state.pkl"
-    state_save_interval: int = 100              # Save every N interactions
+    state_save_interval: int = 100  # Save every N interactions
 
     # State Management
-    state_flush_interval: int = 5               # Flush state every N user interactions
+    state_flush_interval: int = 5  # Flush state every N user interactions
 
     # THERMAL-AWARE Configuration
-    thermal_aware: bool = True                  # Enable thermal monitoring
-    max_gpu_power_percent: float = 15.0         # Cap GPU at 15% power draw
-    thermal_check_interval: float = 10.0        # Check temp every 10 seconds
-    thermal_warning_temp: float = 75.0          # Warn at 75°C
-    thermal_throttle_temp: float = 80.0         # Throttle at 80°C
-    thermal_pause_temp: float = 85.0            # Pause at 85°C
+    thermal_aware: bool = True  # Enable thermal monitoring
+    max_gpu_power_percent: float = 15.0  # Cap GPU at 15% power draw
+    thermal_check_interval: float = 10.0  # Check temp every 10 seconds
+    thermal_warning_temp: float = 75.0  # Warn at 75°C
+    thermal_throttle_temp: float = 80.0  # Throttle at 80°C
+    thermal_pause_temp: float = 85.0  # Pause at 85°C
 
     # Context length (longer than average for better performance)
-    max_context_length: int = 8192              # Extended context window
+    max_context_length: int = 8192  # Extended context window
 
     # Device Configuration
     device: str = "cuda"
-    use_fp16: bool = True                       # Use FP16 for activations
+    use_fp16: bool = True  # Use FP16 for activations
 
 
 @dataclass
@@ -274,10 +277,11 @@ class SurpriseSignal:
     High surprise indicates novel/unexpected input that may require
     the Cortex for deeper processing.
     """
-    value: float = 0.0                          # Raw surprise value
-    normalized: float = 0.0                     # Normalized [0, 1]
-    is_high: bool = False                       # Exceeds threshold
-    requires_cortex: bool = False               # Should invoke Cortex
+
+    value: float = 0.0  # Raw surprise value
+    normalized: float = 0.0  # Normalized [0, 1]
+    is_high: bool = False  # Exceeds threshold
+    requires_cortex: bool = False  # Should invoke Cortex
     timestamp: datetime = field(default_factory=datetime.now)
 
     def to_dict(self) -> dict[str, Any]:
@@ -337,7 +341,9 @@ class MambaStateManager:
         # Exponential moving average
         alpha = 0.01
         self.running_mean = (1 - alpha) * self.running_mean + alpha * state_flat
-        self.running_var = (1 - alpha) * self.running_var + alpha * (state_flat - self.running_mean) ** 2
+        self.running_var = (1 - alpha) * self.running_var + alpha * (
+            state_flat - self.running_mean
+        ) ** 2
 
     def get_projection_vector(self) -> np.ndarray:
         """
@@ -440,8 +446,10 @@ class Medulla:
                 throttle_temp=self.config.thermal_throttle_temp,
                 pause_temp=self.config.thermal_pause_temp,
             )
-            logger.info(f"ThermalMonitor enabled: max {self.config.max_gpu_power_percent}% power, "
-                       f"throttle at {self.config.thermal_throttle_temp}°C")
+            logger.info(
+                f"ThermalMonitor enabled: max {self.config.max_gpu_power_percent}% power, "
+                f"throttle at {self.config.thermal_throttle_temp}°C"
+            )
 
         logger.info(f"Medulla initialized with config: {self.config}")
 
@@ -565,14 +573,20 @@ class Medulla:
             if thermal_status.is_paused:
                 self.state = MedullaState.THERMAL_PAUSED
                 self.thermal_pause_count += 1
-                logger.warning(f"THERMAL PAUSE: GPU at {thermal_status.temperature}°C - waiting for cooldown")
+                logger.warning(
+                    f"THERMAL PAUSE: GPU at {thermal_status.temperature}°C - waiting for cooldown"
+                )
                 # Return a pause response
-                return SurpriseSignal(value=0, requires_cortex=False), \
-                    f"System paused for thermal protection (GPU: {thermal_status.temperature}°C). Please wait..."
+                return (
+                    SurpriseSignal(value=0, requires_cortex=False),
+                    f"System paused for thermal protection (GPU: {thermal_status.temperature}°C). Please wait...",
+                )
             elif thermal_status.is_throttled:
                 self.state = MedullaState.THERMAL_THROTTLED
                 self.thermal_throttle_count += 1
-                logger.warning(f"THERMAL THROTTLE: GPU at {thermal_status.temperature}°C - reducing activity")
+                logger.warning(
+                    f"THERMAL THROTTLE: GPU at {thermal_status.temperature}°C - reducing activity"
+                )
 
         self.state = MedullaState.PERCEIVING
         self.interaction_count += 1
@@ -596,7 +610,7 @@ class Medulla:
 
         # Trim history if needed
         if len(self.surprise_history) > self.max_surprise_history:
-            self.surprise_history = self.surprise_history[-self.max_surprise_history:]
+            self.surprise_history = self.surprise_history[-self.max_surprise_history :]
 
         # Update Titans neural memory if surprise is significant
         if self.titans_memory and surprise.value >= self.config.low_surprise_threshold:

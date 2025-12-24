@@ -51,6 +51,7 @@ import numpy as np
 # Optional: GPU monitoring
 try:
     import pynvml
+
     NVML_AVAILABLE = True
 except ImportError:
     NVML_AVAILABLE = False
@@ -58,6 +59,7 @@ except ImportError:
 # Optional: PyTorch for VRAM monitoring
 try:
     import torch
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
@@ -69,40 +71,40 @@ class PolicyType(Enum):
     """Available action policies for the agent."""
 
     # Immediate actions
-    REFLEX_REPLY = auto()       # Quick Medulla response
-    ACKNOWLEDGE = auto()        # Phatic acknowledgment
+    REFLEX_REPLY = auto()  # Quick Medulla response
+    ACKNOWLEDGE = auto()  # Phatic acknowledgment
 
     # Reasoning actions
-    DEEP_THOUGHT = auto()       # Invoke Cortex for reasoning
-    CHAIN_OF_THOUGHT = auto()   # Extended thinking
+    DEEP_THOUGHT = auto()  # Invoke Cortex for reasoning
+    CHAIN_OF_THOUGHT = auto()  # Extended thinking
 
     # Information gathering - SEARCH-FIRST PRIORITY
-    PRIMARY_SEARCH = auto()     # Search-first epistemic drive (highest priority)
-    WEB_SEARCH = auto()         # Execute web search for facts
-    WEB_BROWSE = auto()         # Browse web pages for detailed info
-    USE_TOOL = auto()           # Execute a tool
-    QUERY_MEMORY = auto()       # Retrieve from Titans memory
-    SCAN_ENVIRONMENT = auto()   # Check system logs/status
+    PRIMARY_SEARCH = auto()  # Search-first epistemic drive (highest priority)
+    WEB_SEARCH = auto()  # Execute web search for facts
+    WEB_BROWSE = auto()  # Browse web pages for detailed info
+    USE_TOOL = auto()  # Execute a tool
+    QUERY_MEMORY = auto()  # Retrieve from Titans memory
+    SCAN_ENVIRONMENT = auto()  # Check system logs/status
 
     # Proactive actions
     ASK_CLARIFICATION = auto()  # Request more info from user
-    SUGGEST_TOPIC = auto()      # Proactively engage
-    CHECK_STATUS = auto()       # Monitor system health
+    SUGGEST_TOPIC = auto()  # Proactively engage
+    CHECK_STATUS = auto()  # Monitor system health
 
     # Passive actions
-    WAIT = auto()               # Continue monitoring
-    SLEEP = auto()              # Enter low-power mode
+    WAIT = auto()  # Continue monitoring
+    SLEEP = auto()  # Enter low-power mode
 
     # Meta actions
-    UPDATE_MODEL = auto()       # Update world model
-    REFLECT = auto()            # Self-reflection
+    UPDATE_MODEL = auto()  # Update world model
+    REFLECT = auto()  # Self-reflection
 
     # Self-Preservation actions
-    SELF_MONITOR = auto()       # Monitor own process health
-    THERMAL_CHECK = auto()      # Check GPU thermal status
+    SELF_MONITOR = auto()  # Monitor own process health
+    THERMAL_CHECK = auto()  # Check GPU thermal status
 
     # System actions (require user confirmation)
-    SYSTEM_COMMAND = auto()     # Execute system-level command (REQUIRES CONFIRMATION)
+    SYSTEM_COMMAND = auto()  # Execute system-level command (REQUIRES CONFIRMATION)
 
 
 class HiddenState(Enum):
@@ -148,56 +150,56 @@ class AgencyConfig:
     """
 
     # Free Energy Thresholds
-    action_threshold: float = 0.3         # Min G reduction to act
-    urgency_threshold: float = 0.7        # High urgency triggers immediate action
+    action_threshold: float = 0.3  # Min G reduction to act
+    urgency_threshold: float = 0.7  # High urgency triggers immediate action
 
     # Time Constants (seconds)
-    idle_uncertainty_rate: float = 0.01   # Uncertainty growth per second of silence
-    max_wait_time: float = 300.0          # Max seconds before proactive action
+    idle_uncertainty_rate: float = 0.01  # Uncertainty growth per second of silence
+    max_wait_time: float = 300.0  # Max seconds before proactive action
 
     # Policy Weights - CURIOSITY-DRIVEN (higher epistemic weight)
-    pragmatic_weight: float = 0.4         # Weight for goal achievement
-    epistemic_weight: float = 0.6         # HIGHER - promotes curiosity and learning
+    pragmatic_weight: float = 0.4  # Weight for goal achievement
+    epistemic_weight: float = 0.6  # HIGHER - promotes curiosity and learning
 
     # Cortex Activation Cost
-    cortex_effort_cost: float = 0.5       # Penalty for invoking Cortex
-    tool_effort_cost: float = 0.15        # Lower penalty for tool use
+    cortex_effort_cost: float = 0.5  # Penalty for invoking Cortex
+    tool_effort_cost: float = 0.15  # Lower penalty for tool use
 
     # SEARCH-FIRST Configuration
-    search_first_enabled: bool = True     # Enable search-first paradigm
-    search_gate_enabled: bool = True      # Mandatory search gate (skips G calculation)
+    search_first_enabled: bool = True  # Enable search-first paradigm
+    search_gate_enabled: bool = True  # Mandatory search gate (skips G calculation)
     web_search_effort_cost: float = 0.05  # Very low cost for web search
 
     # Learning
-    belief_learning_rate: float = 0.1     # How fast beliefs update
-    preference_adaptation: bool = True    # Adapt preferences over time
+    belief_learning_rate: float = 0.1  # How fast beliefs update
+    preference_adaptation: bool = True  # Adapt preferences over time
 
     # THERMAL-AWARE Configuration
-    thermal_aware: bool = True            # Enable thermal monitoring
-    max_gpu_power_percent: float = 15.0   # Max GPU power draw (%)
+    thermal_aware: bool = True  # Enable thermal monitoring
+    max_gpu_power_percent: float = 15.0  # Max GPU power draw (%)
     thermal_check_interval: float = 30.0  # Check temperature every N seconds
-    thermal_throttle_temp: float = 80.0   # Temperature to start throttling (°C)
-    thermal_shutdown_temp: float = 90.0   # Emergency shutdown temperature (°C)
+    thermal_throttle_temp: float = 80.0  # Temperature to start throttling (°C)
+    thermal_shutdown_temp: float = 90.0  # Emergency shutdown temperature (°C)
 
     # SELF-PRESERVATION Configuration
-    self_preservation_enabled: bool = True # Enable self-monitoring
-    health_check_interval: float = 60.0   # Check process health every N seconds
-    memory_warning_threshold: float = 0.9 # Warn at 90% memory usage
+    self_preservation_enabled: bool = True  # Enable self-monitoring
+    health_check_interval: float = 60.0  # Check process health every N seconds
+    memory_warning_threshold: float = 0.9  # Warn at 90% memory usage
 
     # State Persistence
     state_save_path: str = "data/memory/agency_state.pkl"
 
     # Observation Categories
-    num_observation_modalities: int = 4   # text, audio, system, time
+    num_observation_modalities: int = 4  # text, audio, system, time
 
     # User Interaction
     ask_clarification_threshold: float = 0.4  # Uncertainty level to ask questions
 
     # System Command Safety
     require_confirmation_for_system: bool = True  # ALWAYS require confirmation
-    blocked_system_commands: list[str] = field(default_factory=lambda: [
-        "rm", "del", "format", "shutdown", "reboot", "kill"
-    ])
+    blocked_system_commands: list[str] = field(
+        default_factory=lambda: ["rm", "del", "format", "shutdown", "reboot", "kill"]
+    )
 
 
 @dataclass
@@ -210,26 +212,32 @@ class BeliefState:
     """
 
     # User intent belief distribution
-    user_intent: dict[HiddenState, float] = field(default_factory=lambda: {
-        HiddenState.USER_IDLE: 0.7,
-        HiddenState.USER_QUERYING: 0.2,
-        HiddenState.USER_URGENT: 0.05,
-        HiddenState.USER_CONFUSED: 0.05,
-    })
+    user_intent: dict[HiddenState, float] = field(
+        default_factory=lambda: {
+            HiddenState.USER_IDLE: 0.7,
+            HiddenState.USER_QUERYING: 0.2,
+            HiddenState.USER_URGENT: 0.05,
+            HiddenState.USER_CONFUSED: 0.05,
+        }
+    )
 
     # Knowledge state belief distribution
-    knowledge_state: dict[HiddenState, float] = field(default_factory=lambda: {
-        HiddenState.KNOWLEDGE_CERTAIN: 0.5,
-        HiddenState.KNOWLEDGE_UNCERTAIN: 0.3,
-        HiddenState.KNOWLEDGE_MISSING: 0.2,
-    })
+    knowledge_state: dict[HiddenState, float] = field(
+        default_factory=lambda: {
+            HiddenState.KNOWLEDGE_CERTAIN: 0.5,
+            HiddenState.KNOWLEDGE_UNCERTAIN: 0.3,
+            HiddenState.KNOWLEDGE_MISSING: 0.2,
+        }
+    )
 
     # Interaction complexity belief
-    interaction_state: dict[HiddenState, float] = field(default_factory=lambda: {
-        HiddenState.INTERACTION_ROUTINE: 0.6,
-        HiddenState.INTERACTION_NOVEL: 0.3,
-        HiddenState.INTERACTION_COMPLEX: 0.1,
-    })
+    interaction_state: dict[HiddenState, float] = field(
+        default_factory=lambda: {
+            HiddenState.INTERACTION_ROUTINE: 0.6,
+            HiddenState.INTERACTION_NOVEL: 0.3,
+            HiddenState.INTERACTION_COMPLEX: 0.1,
+        }
+    )
 
     # Entropy of current beliefs
     entropy: float = 0.0
@@ -271,10 +279,10 @@ class Observation:
     system_metrics: dict[str, float] | None = None
 
     # Derived features
-    silence_duration: float = 0.0         # Seconds since last user input
-    surprise_signal: float = 0.0          # From Medulla
-    emotional_valence: float = 0.0        # Detected emotion
-    query_complexity: float = 0.0         # Estimated complexity
+    silence_duration: float = 0.0  # Seconds since last user input
+    surprise_signal: float = 0.0  # From Medulla
+    emotional_valence: float = 0.0  # Detected emotion
+    query_complexity: float = 0.0  # Estimated complexity
 
     # Metadata
     timestamp: datetime = field(default_factory=datetime.now)
@@ -291,11 +299,13 @@ class Observation:
         # Add text features if present
         if self.text:
             # Simple text features
-            features.extend([
-                len(self.text) / 1000.0,           # Length
-                self.text.count("?") / 5.0,        # Question marks
-                1.0 if "urgent" in self.text.lower() else 0.0,
-            ])
+            features.extend(
+                [
+                    len(self.text) / 1000.0,  # Length
+                    self.text.count("?") / 5.0,  # Question marks
+                    1.0 if "urgent" in self.text.lower() else 0.0,
+                ]
+            )
         else:
             features.extend([0.0, 0.0, 0.0])
 
@@ -311,10 +321,10 @@ class VerificationResult:
     against retrieved information.
     """
 
-    confidence: float = 0.0           # Fraction of claims verified
+    confidence: float = 0.0  # Fraction of claims verified
     verified_claims: list[str] = field(default_factory=list)
     unverified_claims: list[str] = field(default_factory=list)
-    needs_revision: bool = False      # True if confidence < 70%
+    needs_revision: bool = False  # True if confidence < 70%
     search_snippets_used: int = 0
     total_claims_found: int = 0
 
@@ -334,6 +344,7 @@ class VerificationResult:
 # ASEA: AVA Sentience & Efficiency Algorithm
 # =============================================================================
 
+
 @dataclass
 class ASEAConfig:
     """
@@ -349,34 +360,34 @@ class ASEAConfig:
     """
 
     # ASEA Weight Coefficients
-    lambda_vfe: float = 1.0           # VFE weight (primary driver)
-    lambda_thermal: float = 0.3       # Thermal cost weight
-    lambda_vram: float = 0.5          # VRAM slack weight
+    lambda_vfe: float = 1.0  # VFE weight (primary driver)
+    lambda_thermal: float = 0.3  # Thermal cost weight
+    lambda_vram: float = 0.5  # VRAM slack weight
 
     # Hardware Targets (RTX A2000 4GB)
-    target_vram_mb: int = 3000        # Target max VRAM usage
-    total_vram_mb: int = 4096         # Total available VRAM
-    vram_headroom_mb: int = 1000      # Desired headroom
+    target_vram_mb: int = 3000  # Target max VRAM usage
+    total_vram_mb: int = 4096  # Total available VRAM
+    vram_headroom_mb: int = 1000  # Desired headroom
 
     # Thermal Targets
-    target_temp_c: float = 70.0       # Target max temperature
-    critical_temp_c: float = 85.0     # Critical temperature (pause)
-    max_power_watts: float = 70.0     # RTX A2000 TDP
+    target_temp_c: float = 70.0  # Target max temperature
+    critical_temp_c: float = 85.0  # Critical temperature (pause)
+    max_power_watts: float = 70.0  # RTX A2000 TDP
     target_power_percent: float = 15.0  # Target power usage %
 
     # Search-First Inversion Weights
     # Lower = more preferred (inverted from typical effort costs)
-    search_preference: float = 0.05   # WEB_SEARCH - highest preference
-    browse_preference: float = 0.08   # WEB_BROWSE
-    tool_preference: float = 0.15     # USE_TOOL
-    memory_preference: float = 0.20   # QUERY_MEMORY
-    generate_preference: float = 0.50 # INTERNAL_GENERATE - lowest preference
-    cortex_preference: float = 0.60   # DEEP_THOUGHT - expensive
+    search_preference: float = 0.05  # WEB_SEARCH - highest preference
+    browse_preference: float = 0.08  # WEB_BROWSE
+    tool_preference: float = 0.15  # USE_TOOL
+    memory_preference: float = 0.20  # QUERY_MEMORY
+    generate_preference: float = 0.50  # INTERNAL_GENERATE - lowest preference
+    cortex_preference: float = 0.60  # DEEP_THOUGHT - expensive
 
     # Self-Correction Loop
-    audit_enabled: bool = True        # Enable response auditing
+    audit_enabled: bool = True  # Enable response auditing
     audit_confidence_threshold: float = 0.7  # Min confidence to pass
-    max_revision_attempts: int = 2    # Max times to revise a response
+    max_revision_attempts: int = 2  # Max times to revise a response
 
     # Distillation (Learning from verification)
     distillation_enabled: bool = True
@@ -395,8 +406,8 @@ class ASEAState:
     current_temp_c: float = 0.0
     current_power_watts: float = 0.0
     current_vram_mb: float = 0.0
-    vram_slack: float = 1.0           # 1.0 = all headroom available
-    thermal_pressure: float = 0.0     # 0.0 = cool, 1.0 = critical
+    vram_slack: float = 1.0  # 1.0 = all headroom available
+    thermal_pressure: float = 0.0  # 0.0 = cool, 1.0 = critical
 
     # ASEA Loss Components
     vfe_component: float = 0.0
@@ -460,8 +471,12 @@ class ASEAController:
         self._init_nvml()
 
         logger.info("ASEA Controller initialized")
-        logger.info(f"  λ_VFE={self.config.lambda_vfe}, λ_thermal={self.config.lambda_thermal}, λ_VRAM={self.config.lambda_vram}")
-        logger.info(f"  Search preference: {self.config.search_preference} (lowest = most preferred)")
+        logger.info(
+            f"  λ_VFE={self.config.lambda_vfe}, λ_thermal={self.config.lambda_thermal}, λ_VRAM={self.config.lambda_vram}"
+        )
+        logger.info(
+            f"  Search preference: {self.config.search_preference} (lowest = most preferred)"
+        )
 
     def _apply_search_first_weights(self) -> None:
         """Apply ASEA search-first preference weights to agency config."""
@@ -591,10 +606,7 @@ class ASEAController:
         Returns:
             True if thermal or VRAM pressure is high
         """
-        return (
-            self.state.thermal_pressure > 0.7 or
-            self.state.vram_slack < 0.2
-        )
+        return self.state.thermal_pressure > 0.7 or self.state.vram_slack < 0.2
 
     def should_pause(self) -> bool:
         """
@@ -604,8 +616,8 @@ class ASEAController:
             True if conditions are critical
         """
         return (
-            self.state.current_temp_c >= self.config.critical_temp_c or
-            self.state.vram_slack <= 0.05
+            self.state.current_temp_c >= self.config.critical_temp_c
+            or self.state.vram_slack <= 0.05
         )
 
     def get_policy_adjustment(self, base_policy: "PolicyType") -> float:
@@ -627,14 +639,14 @@ class ASEAController:
         # Under thermal pressure, penalize heavy computation
         if self.state.thermal_pressure > 0.3:
             if base_policy.name in ["DEEP_THOUGHT", "CHAIN_OF_THOUGHT"]:
-                multiplier *= (1.0 + self.state.thermal_pressure)
+                multiplier *= 1.0 + self.state.thermal_pressure
             elif base_policy.name in ["PRIMARY_SEARCH", "WEB_SEARCH"]:
-                multiplier *= (1.0 - 0.3 * self.state.thermal_pressure)
+                multiplier *= 1.0 - 0.3 * self.state.thermal_pressure
 
         # Under VRAM pressure, avoid Cortex
         if self.state.vram_slack < 0.3:
             if base_policy.name in ["DEEP_THOUGHT", "CHAIN_OF_THOUGHT"]:
-                multiplier *= (1.0 + (1.0 - self.state.vram_slack))
+                multiplier *= 1.0 + (1.0 - self.state.vram_slack)
 
         return max(0.01, multiplier)  # Never go below 0.01
 
@@ -659,13 +671,13 @@ class ASEAController:
             return VerificationResult(confidence=1.0)
 
         # Simple claim extraction (split by sentences)
-        claims = [s.strip() for s in response.split('.') if len(s.strip()) > 10]
+        claims = [s.strip() for s in response.split(".") if len(s.strip()) > 10]
 
         verified = []
         unverified = []
 
         # Check each claim against snippets
-        snippets_text = ' '.join(search_snippets).lower()
+        snippets_text = " ".join(search_snippets).lower()
 
         for claim in claims:
             # Extract key terms from claim
@@ -768,9 +780,33 @@ class ASEAController:
     def _extract_search_terms(self, query: str) -> list[str]:
         """Extract key search terms from query."""
         # Remove common words
-        stopwords = {"what", "is", "the", "a", "an", "how", "to", "do", "can",
-                     "why", "when", "where", "who", "which", "of", "for", "in",
-                     "on", "at", "by", "with", "about", "me", "tell", "explain"}
+        stopwords = {
+            "what",
+            "is",
+            "the",
+            "a",
+            "an",
+            "how",
+            "to",
+            "do",
+            "can",
+            "why",
+            "when",
+            "where",
+            "who",
+            "which",
+            "of",
+            "for",
+            "in",
+            "on",
+            "at",
+            "by",
+            "with",
+            "about",
+            "me",
+            "tell",
+            "explain",
+        }
 
         words = query.lower().split()
         return [w for w in words if w not in stopwords and len(w) > 2]
@@ -792,7 +828,11 @@ class ASEAController:
                 "vram_slack": round(self.state.vram_slack, 3),
             },
             "verification": {
-                "last_confidence": round(self.state.last_verification.confidence, 3) if self.state.last_verification else None,
+                "last_confidence": (
+                    round(self.state.last_verification.confidence, 3)
+                    if self.state.last_verification
+                    else None
+                ),
                 "revision_count": self.state.revision_count,
             },
             "distillation": {
@@ -838,11 +878,11 @@ class ExpectedFreeEnergy:
         # CURIOSITY-DRIVEN: Knowledge certainty is top priority
         self.preferences = {
             HiddenState.USER_IDLE: 0.5,
-            HiddenState.USER_QUERYING: 0.9,      # Increased - prioritize responding
+            HiddenState.USER_QUERYING: 0.9,  # Increased - prioritize responding
             HiddenState.USER_URGENT: 0.3,
             HiddenState.USER_CONFUSED: 0.2,
             HiddenState.KNOWLEDGE_CERTAIN: 1.0,  # Highest priority
-            HiddenState.KNOWLEDGE_UNCERTAIN: 0.3, # Lower - push toward certainty
+            HiddenState.KNOWLEDGE_UNCERTAIN: 0.3,  # Lower - push toward certainty
             HiddenState.KNOWLEDGE_MISSING: 0.05,  # Very low - avoid this state
         }
 
@@ -906,35 +946,28 @@ class ExpectedFreeEnergy:
         # SEARCH-FIRST: Web search has LOWEST effort cost
         self.effort_costs = {
             # Search-First priorities (lowest costs)
-            PolicyType.PRIMARY_SEARCH: 0.05,     # Lowest cost - default action
-            PolicyType.WEB_SEARCH: 0.08,         # Very low cost
-            PolicyType.WEB_BROWSE: 0.1,          # Low cost for more info
-
+            PolicyType.PRIMARY_SEARCH: 0.05,  # Lowest cost - default action
+            PolicyType.WEB_SEARCH: 0.08,  # Very low cost
+            PolicyType.WEB_BROWSE: 0.1,  # Low cost for more info
             # Tool and memory (medium-low cost)
             PolicyType.USE_TOOL: config.tool_effort_cost,
             PolicyType.QUERY_MEMORY: 0.15,
-
             # Reflex responses
             PolicyType.REFLEX_REPLY: 0.05,
             PolicyType.ACKNOWLEDGE: 0.02,
-
             # Reasoning (higher cost - use after search)
             PolicyType.DEEP_THOUGHT: config.cortex_effort_cost,
             PolicyType.CHAIN_OF_THOUGHT: config.cortex_effort_cost * 0.7,
-
             # Clarification
             PolicyType.ASK_CLARIFICATION: 0.1,
-
             # Passive/waiting (increasing cost to avoid)
             PolicyType.WAIT: 0.15,
             PolicyType.SLEEP: 0.2,
-
             # Self-preservation (low cost - important)
             PolicyType.SELF_MONITOR: 0.05,
             PolicyType.THERMAL_CHECK: 0.05,
-
             # System commands (higher cost due to safety)
-            PolicyType.SYSTEM_COMMAND: 0.8,      # High cost - requires confirmation
+            PolicyType.SYSTEM_COMMAND: 0.8,  # High cost - requires confirmation
         }
 
     def calculate(
@@ -968,9 +1001,9 @@ class ExpectedFreeEnergy:
 
         # 4. Combine with weights
         G = (
-            self.config.pragmatic_weight * pragmatic_value +
-            self.config.epistemic_weight * epistemic_value +
-            effort
+            self.config.pragmatic_weight * pragmatic_value
+            + self.config.epistemic_weight * epistemic_value
+            + effort
         )
 
         breakdown = {
@@ -1028,33 +1061,27 @@ class ExpectedFreeEnergy:
         # Positive = increases uncertainty (BAD)
         information_gathering = {
             # SEARCH-FIRST: Highest information gain
-            PolicyType.PRIMARY_SEARCH: -0.7,     # Best reduction
-            PolicyType.WEB_SEARCH: -0.6,         # High reduction
-            PolicyType.WEB_BROWSE: -0.55,        # Good reduction
-
+            PolicyType.PRIMARY_SEARCH: -0.7,  # Best reduction
+            PolicyType.WEB_SEARCH: -0.6,  # High reduction
+            PolicyType.WEB_BROWSE: -0.55,  # Good reduction
             # Clarification and memory
             PolicyType.ASK_CLARIFICATION: -0.5,  # Reduces uncertainty
             PolicyType.QUERY_MEMORY: -0.4,
-
             # Tools and monitoring
             PolicyType.USE_TOOL: -0.35,
             PolicyType.SCAN_ENVIRONMENT: -0.3,
             PolicyType.SELF_MONITOR: -0.2,
             PolicyType.THERMAL_CHECK: -0.1,
-
             # Reasoning (moderate reduction)
             PolicyType.DEEP_THOUGHT: -0.4,
             PolicyType.CHAIN_OF_THOUGHT: -0.45,
             PolicyType.REFLECT: -0.3,
-
             # Reflex (low reduction)
             PolicyType.REFLEX_REPLY: -0.1,
             PolicyType.ACKNOWLEDGE: -0.05,
-
             # Passive (increases uncertainty over time)
             PolicyType.WAIT: 0.2,
             PolicyType.SLEEP: 0.3,
-
             # System commands
             PolicyType.SYSTEM_COMMAND: 0.1,  # Slight increase (risky)
         }
@@ -1116,30 +1143,24 @@ class ActiveInferenceController:
         # Available policies - SEARCH-FIRST ordering
         self.available_policies = [
             # Search-First priorities
-            PolicyType.PRIMARY_SEARCH,      # Default for unknown queries
-            PolicyType.WEB_SEARCH,          # Specific search
-            PolicyType.WEB_BROWSE,          # Deep information gathering
-
+            PolicyType.PRIMARY_SEARCH,  # Default for unknown queries
+            PolicyType.WEB_SEARCH,  # Specific search
+            PolicyType.WEB_BROWSE,  # Deep information gathering
             # Tool and memory access
             PolicyType.USE_TOOL,
             PolicyType.QUERY_MEMORY,
-
             # Clarification (ask questions for clarity per user preference)
             PolicyType.ASK_CLARIFICATION,
-
             # Reasoning (after search results are gathered)
             PolicyType.REFLEX_REPLY,
             PolicyType.DEEP_THOUGHT,
             PolicyType.CHAIN_OF_THOUGHT,
-
             # Monitoring
             PolicyType.SCAN_ENVIRONMENT,
             PolicyType.SELF_MONITOR,
             PolicyType.THERMAL_CHECK,
-
             # Passive
             PolicyType.WAIT,
-
             # System (requires confirmation)
             PolicyType.SYSTEM_COMMAND,
         ]
@@ -1163,7 +1184,9 @@ class ActiveInferenceController:
         # System command pending confirmation
         self._pending_system_command: dict[str, Any] | None = None
 
-        logger.info(f"ActiveInferenceController initialized (Search-First: {config.search_first_enabled})")
+        logger.info(
+            f"ActiveInferenceController initialized (Search-First: {config.search_first_enabled})"
+        )
 
     def register_action_callback(
         self,
@@ -1207,9 +1230,21 @@ class ActiveInferenceController:
         # Check if query seems factual (contains question words or seeks information)
         if observation.text:
             factual_indicators = [
-                "what", "when", "where", "who", "how", "why",
-                "is it true", "tell me", "explain", "describe",
-                "latest", "news", "current", "today", "now"
+                "what",
+                "when",
+                "where",
+                "who",
+                "how",
+                "why",
+                "is it true",
+                "tell me",
+                "explain",
+                "describe",
+                "latest",
+                "news",
+                "current",
+                "today",
+                "now",
             ]
             text_lower = observation.text.lower()
             if any(ind in text_lower for ind in factual_indicators):
@@ -1253,61 +1288,144 @@ class ActiveInferenceController:
         text_lower = text.lower()
 
         # Skip greetings and small talk
-        greetings = ["hello", "hi ", "hey", "good morning", "good evening",
-                     "how are you", "what's up", "thanks", "thank you", "bye"]
+        greetings = [
+            "hello",
+            "hi ",
+            "hey",
+            "good morning",
+            "good evening",
+            "how are you",
+            "what's up",
+            "thanks",
+            "thank you",
+            "bye",
+        ]
         if any(text_lower.startswith(g) or text_lower == g.strip() for g in greetings):
             return False
 
         # Skip self-referential questions
-        self_refs = ["who are you", "what are you", "what can you", "your name",
-                     "about yourself", "introduce yourself"]
+        self_refs = [
+            "who are you",
+            "what are you",
+            "what can you",
+            "your name",
+            "about yourself",
+            "introduce yourself",
+        ]
         if any(ref in text_lower for ref in self_refs):
             return False
 
         # Skip pure commands
-        commands = ["set ", "turn ", "enable ", "disable ", "run ", "execute ",
-                    "open ", "close ", "start ", "stop ", "clear "]
+        commands = [
+            "set ",
+            "turn ",
+            "enable ",
+            "disable ",
+            "run ",
+            "execute ",
+            "open ",
+            "close ",
+            "start ",
+            "stop ",
+            "clear ",
+        ]
         if any(text_lower.startswith(cmd) for cmd in commands):
             return False
 
         # Skip pure math/calculation
-        if text.replace(" ", "").replace("+", "").replace("-", "").replace("*", "").replace("/", "").replace(".", "").isdigit():
+        if (
+            text.replace(" ", "")
+            .replace("+", "")
+            .replace("-", "")
+            .replace("*", "")
+            .replace("/", "")
+            .replace(".", "")
+            .isdigit()
+        ):
             return False
 
         # ===== TRIGGER CONDITIONS =====
 
         # Question words - STRONG indicator
-        question_words = ["what is", "what are", "what was", "what were",
-                         "who is", "who are", "who was",
-                         "when is", "when was", "when did", "when will",
-                         "where is", "where are", "where was",
-                         "why is", "why are", "why did", "why does",
-                         "how does", "how do", "how did", "how is", "how to",
-                         "which is", "which are"]
+        question_words = [
+            "what is",
+            "what are",
+            "what was",
+            "what were",
+            "who is",
+            "who are",
+            "who was",
+            "when is",
+            "when was",
+            "when did",
+            "when will",
+            "where is",
+            "where are",
+            "where was",
+            "why is",
+            "why are",
+            "why did",
+            "why does",
+            "how does",
+            "how do",
+            "how did",
+            "how is",
+            "how to",
+            "which is",
+            "which are",
+        ]
         if any(qw in text_lower for qw in question_words):
             logger.debug("Search gate: Question word detected")
             return True
 
         # Information-seeking phrases
-        info_phrases = ["tell me about", "explain", "describe", "define",
-                       "what does", "meaning of", "definition of",
-                       "information about", "details about", "facts about",
-                       "learn about", "teach me", "show me"]
+        info_phrases = [
+            "tell me about",
+            "explain",
+            "describe",
+            "define",
+            "what does",
+            "meaning of",
+            "definition of",
+            "information about",
+            "details about",
+            "facts about",
+            "learn about",
+            "teach me",
+            "show me",
+        ]
         if any(phrase in text_lower for phrase in info_phrases):
             logger.debug("Search gate: Info phrase detected")
             return True
 
         # Time-sensitive / current events
-        current_phrases = ["latest", "recent", "current", "today", "yesterday",
-                          "this week", "this month", "this year", "right now",
-                          "news about", "update on", "status of"]
+        current_phrases = [
+            "latest",
+            "recent",
+            "current",
+            "today",
+            "yesterday",
+            "this week",
+            "this month",
+            "this year",
+            "right now",
+            "news about",
+            "update on",
+            "status of",
+        ]
         if any(phrase in text_lower for phrase in current_phrases):
             logger.debug("Search gate: Time-sensitive query detected")
             return True
 
         # Explicit search request
-        search_phrases = ["search for", "look up", "find out", "google",
-                         "search the web", "find information"]
+        search_phrases = [
+            "search for",
+            "look up",
+            "find out",
+            "google",
+            "search the web",
+            "find information",
+        ]
         if any(phrase in text_lower for phrase in search_phrases):
             logger.debug("Search gate: Explicit search request")
             return True
@@ -1350,7 +1468,7 @@ class ActiveInferenceController:
             # Record action
             self.action_history.append((datetime.now(), PolicyType.PRIMARY_SEARCH, 0.0))
             if len(self.action_history) > self.max_history:
-                self.action_history = self.action_history[-self.max_history:]
+                self.action_history = self.action_history[-self.max_history :]
 
             # Execute callback if registered
             result = {"policy": PolicyType.PRIMARY_SEARCH.name, "G": 0.0, "gate_triggered": True}
@@ -1400,7 +1518,7 @@ class ActiveInferenceController:
         self.action_history.append((datetime.now(), selected_policy, G_value))
 
         if len(self.action_history) > self.max_history:
-            self.action_history = self.action_history[-self.max_history:]
+            self.action_history = self.action_history[-self.max_history :]
 
         # 7. Execute action callback if registered
         result = {"policy": selected_policy.name, "G": G_value}
@@ -1455,7 +1573,9 @@ class ActiveInferenceController:
             self._shift_belief(self.beliefs.knowledge_state, HiddenState.KNOWLEDGE_UNCERTAIN, lr)
         elif observation.surprise_signal > 0.5:
             # Moderate surprise = somewhat certain
-            self._shift_belief(self.beliefs.knowledge_state, HiddenState.KNOWLEDGE_CERTAIN, lr * 0.5)
+            self._shift_belief(
+                self.beliefs.knowledge_state, HiddenState.KNOWLEDGE_CERTAIN, lr * 0.5
+            )
 
         # Update interaction complexity
         if observation.query_complexity > 0.7:
@@ -1618,6 +1738,7 @@ class ActiveInferenceController:
         }
 
         import json
+
         with open(save_path, "w") as f:
             json.dump(state, f)
 
@@ -1632,6 +1753,7 @@ class ActiveInferenceController:
             return
 
         import json
+
         with open(load_path) as f:
             state = json.load(f)
 
@@ -1693,7 +1815,7 @@ class ActiveInferenceController:
             # Check response times from action history
             if len(self.action_history) >= 10:
                 recent_times = [
-                    (self.action_history[i][0] - self.action_history[i-1][0]).total_seconds()
+                    (self.action_history[i][0] - self.action_history[i - 1][0]).total_seconds()
                     for i in range(1, min(11, len(self.action_history)))
                 ]
                 avg_interval = np.mean(recent_times)
@@ -1741,9 +1863,18 @@ class ActiveInferenceController:
 
         # Check for shell patterns
         shell_patterns = [
-            "os.system", "subprocess", "exec(", "eval(",
-            "import os", "shell=", "cmd /c", "powershell",
-            "sudo", "chmod", "chown", "rm -rf"
+            "os.system",
+            "subprocess",
+            "exec(",
+            "eval(",
+            "import os",
+            "shell=",
+            "cmd /c",
+            "powershell",
+            "sudo",
+            "chmod",
+            "chown",
+            "rm -rf",
         ]
 
         return any(pattern in text_lower for pattern in shell_patterns)
@@ -1773,8 +1904,8 @@ class ActiveInferenceController:
         return {
             "requires_confirmation": True,
             "message": f"System command requested: {command}\nReason: {reason}\n\n"
-                      f"This command requires your explicit confirmation. "
-                      f"Reply 'yes' to proceed or 'no' to cancel.",
+            f"This command requires your explicit confirmation. "
+            f"Reply 'yes' to proceed or 'no' to cancel.",
             "command": command,
             "reason": reason,
         }
@@ -1894,7 +2025,7 @@ class ActiveInferenceController:
         claims = []
 
         # Split into sentences
-        sentences = re.split(r'[.!?]+', response)
+        sentences = re.split(r"[.!?]+", response)
 
         for sentence in sentences:
             sentence = sentence.strip()
@@ -1913,11 +2044,11 @@ class ActiveInferenceController:
 
             # Look for claim indicators
             claim_indicators = [
-                r'\d+',           # Contains numbers
-                r'[A-Z][a-z]+',   # Contains proper nouns
-                r'(is|are|was|were|has|have|had)\s+\w+',  # Assertions
-                r'(according to|based on|research shows)',  # References
-                r'(first|second|third|finally|originally)',  # Sequences
+                r"\d+",  # Contains numbers
+                r"[A-Z][a-z]+",  # Contains proper nouns
+                r"(is|are|was|were|has|have|had)\s+\w+",  # Assertions
+                r"(according to|based on|research shows)",  # References
+                r"(first|second|third|finally|originally)",  # Sequences
             ]
 
             if any(re.search(p, sentence) for p in claim_indicators):
@@ -1945,13 +2076,38 @@ class ActiveInferenceController:
         # Extract key terms (nouns, verbs, numbers, proper nouns)
         # Simple extraction: words longer than 3 chars, not common words
         common_words = {
-            "the", "and", "that", "this", "with", "from", "have", "been",
-            "were", "they", "what", "when", "which", "their", "about",
-            "into", "more", "other", "than", "then", "these", "some",
-            "very", "just", "also", "being", "over", "such", "through",
+            "the",
+            "and",
+            "that",
+            "this",
+            "with",
+            "from",
+            "have",
+            "been",
+            "were",
+            "they",
+            "what",
+            "when",
+            "which",
+            "their",
+            "about",
+            "into",
+            "more",
+            "other",
+            "than",
+            "then",
+            "these",
+            "some",
+            "very",
+            "just",
+            "also",
+            "being",
+            "over",
+            "such",
+            "through",
         }
 
-        words = re.findall(r'\b\w+\b', claim.lower())
+        words = re.findall(r"\b\w+\b", claim.lower())
         key_terms = [w for w in words if len(w) > 3 and w not in common_words]
 
         if not key_terms:
@@ -1992,6 +2148,7 @@ class ActiveInferenceController:
         )
 
         return warning + response
+
 
 # =============================================================================
 # ALIASES FOR BACKWARD COMPATIBILITY

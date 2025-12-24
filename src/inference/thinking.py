@@ -21,17 +21,19 @@ logger = logging.getLogger(__name__)
 
 class ThinkingStrategy(Enum):
     """Different strategies for extended thinking."""
-    DIRECT = "direct"              # Minimal thinking, direct response
-    CHAIN_OF_THOUGHT = "cot"       # Step-by-step reasoning
-    DECOMPOSITION = "decompose"    # Break into sub-problems
-    ANALOGY = "analogy"            # Reason by analogy
-    DELIBERATION = "deliberate"    # Consider multiple options
-    REFLECTION = "reflect"         # Think about thinking
+
+    DIRECT = "direct"  # Minimal thinking, direct response
+    CHAIN_OF_THOUGHT = "cot"  # Step-by-step reasoning
+    DECOMPOSITION = "decompose"  # Break into sub-problems
+    ANALOGY = "analogy"  # Reason by analogy
+    DELIBERATION = "deliberate"  # Consider multiple options
+    REFLECTION = "reflect"  # Think about thinking
 
 
 @dataclass
 class ThinkingResult:
     """Result of extended thinking process."""
+
     # The thinking process
     thinking_steps: list[str] = field(default_factory=list)
     strategy_used: ThinkingStrategy = ThinkingStrategy.DIRECT
@@ -232,6 +234,7 @@ class ThinkingEngine:
             ThinkingResult with reasoning and insights
         """
         import time
+
         start_time = time.time()
 
         result = ThinkingResult()
@@ -281,10 +284,7 @@ class ThinkingEngine:
         return result
 
     def _think_chain_of_thought(
-        self,
-        query: str,
-        context: str,
-        result: ThinkingResult
+        self, query: str, context: str, result: ThinkingResult
     ) -> ThinkingResult:
         """Step-by-step reasoning."""
         result.thinking_steps.append("Step 1: Understanding the question")
@@ -304,12 +304,7 @@ class ThinkingEngine:
 
         return result
 
-    def _think_decompose(
-        self,
-        query: str,
-        context: str,
-        result: ThinkingResult
-    ) -> ThinkingResult:
+    def _think_decompose(self, query: str, context: str, result: ThinkingResult) -> ThinkingResult:
         """Break complex query into sub-problems."""
         result.thinking_steps.append("Decomposing complex query into sub-problems")
 
@@ -325,12 +320,7 @@ class ThinkingEngine:
 
         return result
 
-    def _think_deliberate(
-        self,
-        query: str,
-        context: str,
-        result: ThinkingResult
-    ) -> ThinkingResult:
+    def _think_deliberate(self, query: str, context: str, result: ThinkingResult) -> ThinkingResult:
         """Consider multiple perspectives/options."""
         result.thinking_steps.append("Deliberating on multiple approaches")
 
@@ -343,12 +333,7 @@ class ThinkingEngine:
 
         return result
 
-    def _think_analogy(
-        self,
-        query: str,
-        context: str,
-        result: ThinkingResult
-    ) -> ThinkingResult:
+    def _think_analogy(self, query: str, context: str, result: ThinkingResult) -> ThinkingResult:
         """Reason by analogy."""
         result.thinking_steps.append("Seeking analogies and similar patterns")
 
@@ -361,12 +346,7 @@ class ThinkingEngine:
 
         return result
 
-    def _think_reflect(
-        self,
-        query: str,
-        context: str,
-        result: ThinkingResult
-    ) -> ThinkingResult:
+    def _think_reflect(self, query: str, context: str, result: ThinkingResult) -> ThinkingResult:
         """Meta-cognitive reflection."""
         result.thinking_steps.append("Reflecting on how to approach this")
         result.thinking_steps.append("Considering my knowledge and limitations")
@@ -384,10 +364,7 @@ class ThinkingEngine:
         return result
 
     def _consider_tools(
-        self,
-        query: str,
-        available_tools: list[str],
-        result: ThinkingResult
+        self, query: str, available_tools: list[str], result: ThinkingResult
     ) -> ThinkingResult:
         """Consider whether tools are needed."""
         query_lower = query.lower()
@@ -417,12 +394,7 @@ class ThinkingEngine:
 
         return result
 
-    def _detect_novelty(
-        self,
-        query: str,
-        context: str,
-        result: ThinkingResult
-    ) -> ThinkingResult:
+    def _detect_novelty(self, query: str, context: str, result: ThinkingResult) -> ThinkingResult:
         """Detect if query contains novel concepts."""
         # Simple heuristic: if many unique words not in context
         query_words = set(query.lower().split())
@@ -437,11 +409,7 @@ class ThinkingEngine:
 
         return result
 
-    def _calculate_confidence(
-        self,
-        result: ThinkingResult,
-        complexity: float
-    ) -> float:
+    def _calculate_confidence(self, result: ThinkingResult, complexity: float) -> float:
         """Calculate overall confidence in the thinking result."""
         confidence = 0.7  # Base confidence
 
@@ -486,7 +454,36 @@ class ThinkingEngine:
         # Simple extraction: nouns and significant words
         words = query.split()
         # Filter out common words
-        common = {"the", "a", "an", "is", "are", "was", "were", "be", "to", "of", "and", "or", "in", "on", "at", "for", "with", "it", "this", "that", "i", "you", "he", "she", "they", "we", "my", "your"}
+        common = {
+            "the",
+            "a",
+            "an",
+            "is",
+            "are",
+            "was",
+            "were",
+            "be",
+            "to",
+            "of",
+            "and",
+            "or",
+            "in",
+            "on",
+            "at",
+            "for",
+            "with",
+            "it",
+            "this",
+            "that",
+            "i",
+            "you",
+            "he",
+            "she",
+            "they",
+            "we",
+            "my",
+            "your",
+        }
         concepts = [w.strip(".,?!") for w in words if w.lower() not in common and len(w) > 2]
         return concepts[:5]
 
@@ -537,6 +534,7 @@ class ThinkingEngine:
 @dataclass
 class ToolCall:
     """A parsed tool call from model output."""
+
     tool_name: str
     arguments: str
     position: int  # Position in text where call was found
@@ -565,6 +563,7 @@ class ToolCall:
 @dataclass
 class ToolAugmentationResult:
     """Result of augmenting text with tool calls."""
+
     original_text: str
     augmented_text: str
     tool_calls: list[ToolCall] = field(default_factory=list)
@@ -595,16 +594,10 @@ class ToolCallParser:
     """
 
     # Pattern to match [ToolName: arguments] or [ToolName(arguments)]
-    TOOL_PATTERN = re.compile(
-        r'\[(\w+)(?::\s*|\()(.*?)(?:\)|\])',
-        re.DOTALL
-    )
+    TOOL_PATTERN = re.compile(r"\[(\w+)(?::\s*|\()(.*?)(?:\)|\])", re.DOTALL)
 
     # Alternative pattern: [ToolName] = result
-    RESULT_PATTERN = re.compile(
-        r'\[(\w+):\s*(.*?)\]\s*(?:=|→|->)\s*(.+?)(?=\[|\n|$)',
-        re.DOTALL
-    )
+    RESULT_PATTERN = re.compile(r"\[(\w+):\s*(.*?)\]\s*(?:=|→|->)\s*(.+?)(?=\[|\n|$)", re.DOTALL)
 
     def __init__(self, available_tools: list[str] | None = None):
         """
@@ -632,7 +625,9 @@ class ToolCallParser:
             arguments = match.group(2).strip()
 
             # Validate tool name if we have a list
-            if self.available_tools and tool_name.lower() not in {t.lower() for t in self.available_tools}:
+            if self.available_tools and tool_name.lower() not in {
+                t.lower() for t in self.available_tools
+            }:
                 continue
 
             call = ToolCall(
@@ -651,7 +646,7 @@ class ToolCallParser:
 
     def strip_tool_calls(self, text: str) -> str:
         """Remove all tool calls from text."""
-        return self.TOOL_PATTERN.sub('', text).strip()
+        return self.TOOL_PATTERN.sub("", text).strip()
 
     def inject_results(
         self,
@@ -678,9 +673,9 @@ class ToolCallParser:
             if call.executed and call.result is not None:
                 replacement = f"{call.raw_text} = {call.result}"
                 result_text = (
-                    result_text[:call.position] +
-                    replacement +
-                    result_text[call.position + len(call.raw_text):]
+                    result_text[: call.position]
+                    + replacement
+                    + result_text[call.position + len(call.raw_text) :]
                 )
 
         return result_text
@@ -698,34 +693,34 @@ class ToolCallDetector:
     # Patterns that suggest tool use
     TOOL_INDICATORS = {
         "calculator": [
-            r'\d+\s*[\+\-\*\/\%\^]\s*\d+',  # Math expressions
-            r'calculate|compute|sum|multiply|divide|subtract|add',
-            r'how much is|what is \d+',
-            r'equals|=',
+            r"\d+\s*[\+\-\*\/\%\^]\s*\d+",  # Math expressions
+            r"calculate|compute|sum|multiply|divide|subtract|add",
+            r"how much is|what is \d+",
+            r"equals|=",
         ],
         "search": [
-            r'who is|what is|where is|when was',
-            r'tell me about|information about|facts about',
-            r'define|meaning of|definition',
-            r'current|latest|today|recent',
+            r"who is|what is|where is|when was",
+            r"tell me about|information about|facts about",
+            r"define|meaning of|definition",
+            r"current|latest|today|recent",
         ],
         "qa": [
-            r'what does .+ mean',
-            r'explain .+ to me',
-            r'how does .+ work',
+            r"what does .+ mean",
+            r"explain .+ to me",
+            r"how does .+ work",
         ],
         "current_time": [
-            r'what time|current time|time is it',
-            r'what day|today|date',
+            r"what time|current time|time is it",
+            r"what day|today|date",
         ],
         "temperature_convert": [
-            r'celsius|fahrenheit|kelvin',
-            r'convert .+ degrees',
-            r'temperature',
+            r"celsius|fahrenheit|kelvin",
+            r"convert .+ degrees",
+            r"temperature",
         ],
         "word_count": [
-            r'how many words|word count|count words',
-            r'how many characters|character count',
+            r"how many words|word count|count words",
+            r"how many characters|character count",
         ],
     }
 
@@ -741,9 +736,7 @@ class ToolCallDetector:
         # Compile patterns
         self.compiled_patterns: dict[str, list[re.Pattern]] = {}
         for tool, patterns in self.TOOL_INDICATORS.items():
-            self.compiled_patterns[tool] = [
-                re.compile(p, re.IGNORECASE) for p in patterns
-            ]
+            self.compiled_patterns[tool] = [re.compile(p, re.IGNORECASE) for p in patterns]
 
     def detect_tool_opportunities(
         self,
@@ -818,7 +811,7 @@ class ToolCallDetector:
 
         if tool_name == "calculator":
             # Extract math expression
-            math_match = re.search(r'[\d\.\s\+\-\*\/\(\)\^]+', text)
+            math_match = re.search(r"[\d\.\s\+\-\*\/\(\)\^]+", text)
             if math_match:
                 return math_match.group(0).strip()
             return matched_text
@@ -836,7 +829,9 @@ class ToolCallDetector:
 
         elif tool_name == "temperature_convert":
             # Extract temperature and units
-            temp_match = re.search(r'(\d+(?:\.\d+)?)\s*(celsius|fahrenheit|kelvin|c|f|k)', text_lower)
+            temp_match = re.search(
+                r"(\d+(?:\.\d+)?)\s*(celsius|fahrenheit|kelvin|c|f|k)", text_lower
+            )
             if temp_match:
                 return f"{temp_match.group(1)} {temp_match.group(2)}"
             return matched_text
@@ -965,9 +960,9 @@ class ToolformerAugmenter:
         success_rate = sum(1 for tc in result.tool_calls if tc.success) / len(result.tool_calls)
 
         # Bonus for result length (longer = more informative)
-        avg_result_length = sum(
-            len(tc.result or "") for tc in result.tool_calls
-        ) / len(result.tool_calls)
+        avg_result_length = sum(len(tc.result or "") for tc in result.tool_calls) / len(
+            result.tool_calls
+        )
         length_bonus = min(avg_result_length / 100, 0.2)
 
         # Penalty for errors
@@ -1006,6 +1001,7 @@ class ToolformerAugmenter:
 @dataclass
 class DistillationSample:
     """A sample marked for self-distillation."""
+
     input_text: str
     original_output: str
     augmented_output: str
@@ -1088,7 +1084,7 @@ class SelfDistillationCollector:
         if len(self.samples) > self.max_samples:
             # Remove lowest quality samples
             self.samples.sort(key=lambda x: x.quality_score, reverse=True)
-            self.samples = self.samples[:self.max_samples]
+            self.samples = self.samples[: self.max_samples]
 
         return True
 
@@ -1134,7 +1130,8 @@ class SelfDistillationCollector:
             "max_samples": self.max_samples,
             "total_collected": self.total_collected,
             "total_rejected": self.total_rejected,
-            "acceptance_rate": self.total_collected / max(self.total_collected + self.total_rejected, 1),
+            "acceptance_rate": self.total_collected
+            / max(self.total_collected + self.total_rejected, 1),
             "avg_quality": sum(qualities) / len(qualities),
             "min_quality": min(qualities),
             "max_quality": max(qualities),

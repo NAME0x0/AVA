@@ -53,6 +53,7 @@ class Episode:
         tool_calls: Serialized tool call information
         metadata: Additional context
     """
+
     episode_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
 
@@ -152,10 +153,10 @@ class Episode:
 
         # Weighted combination
         priority = (
-            0.4 * surprise_factor +
-            0.3 * quality_factor +
-            0.2 * recency_factor +
-            0.1 * replay_factor
+            0.4 * surprise_factor
+            + 0.3 * quality_factor
+            + 0.2 * recency_factor
+            + 0.1 * replay_factor
         )
 
         return priority
@@ -173,6 +174,7 @@ class BufferConfig:
         cleanup_interval: How often to clean up old episodes
         priority_alpha: Alpha for priority sampling
     """
+
     db_path: str = "data/memory/episodic/replay_buffer.db"
     max_episodes: int = 10000
     surprise_threshold: float = 0.5
@@ -231,7 +233,8 @@ class EpisodicBuffer:
         conn = sqlite3.connect(self.config.db_path)
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS episodes (
                 episode_id TEXT PRIMARY KEY,
                 timestamp TEXT,
@@ -250,23 +253,30 @@ class EpisodicBuffer:
                 last_replayed TEXT,
                 priority_score REAL
             )
-        """)
+        """
+        )
 
         # Create indexes for efficient queries
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_surprise
             ON episodes(surprise DESC)
-        """)
+        """
+        )
 
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_priority
             ON episodes(priority_score DESC)
-        """)
+        """
+        )
 
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_timestamp
             ON episodes(timestamp DESC)
-        """)
+        """
+        )
 
         conn.commit()
         conn.close()
@@ -298,31 +308,34 @@ class EpisodicBuffer:
         cursor = conn.cursor()
 
         try:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT OR REPLACE INTO episodes (
                     episode_id, timestamp, prompt, response, embedding,
                     surprise, entropy, varentropy, cognitive_state,
                     quality_score, used_tools, tool_calls, metadata,
                     replay_count, last_replayed, priority_score
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                episode.episode_id,
-                episode.timestamp,
-                episode.prompt,
-                episode.response,
-                json.dumps(episode.embedding) if episode.embedding else None,
-                episode.surprise,
-                episode.entropy,
-                episode.varentropy,
-                episode.cognitive_state,
-                episode.quality_score,
-                1 if episode.used_tools else 0,
-                json.dumps(episode.tool_calls) if episode.tool_calls else None,
-                json.dumps(episode.metadata),
-                episode.replay_count,
-                episode.last_replayed,
-                priority,
-            ))
+            """,
+                (
+                    episode.episode_id,
+                    episode.timestamp,
+                    episode.prompt,
+                    episode.response,
+                    json.dumps(episode.embedding) if episode.embedding else None,
+                    episode.surprise,
+                    episode.entropy,
+                    episode.varentropy,
+                    episode.cognitive_state,
+                    episode.quality_score,
+                    1 if episode.used_tools else 0,
+                    json.dumps(episode.tool_calls) if episode.tool_calls else None,
+                    json.dumps(episode.metadata),
+                    episode.replay_count,
+                    episode.last_replayed,
+                    priority,
+                ),
+            )
 
             conn.commit()
 
@@ -349,13 +362,16 @@ class EpisodicBuffer:
         if count > self.config.max_episodes:
             # Delete oldest episodes (by timestamp)
             to_delete = count - self.config.max_episodes
-            cursor.execute("""
+            cursor.execute(
+                """
                 DELETE FROM episodes WHERE episode_id IN (
                     SELECT episode_id FROM episodes
                     ORDER BY timestamp ASC
                     LIMIT ?
                 )
-            """, (to_delete,))
+            """,
+                (to_delete,),
+            )
             logger.info(f"Cleaned up {to_delete} old episodes")
 
     def sample(
@@ -458,13 +474,16 @@ class EpisodicBuffer:
 
         for episode_id in episode_ids:
             # Update replay count and recalculate priority
-            cursor.execute("""
+            cursor.execute(
+                """
                 UPDATE episodes
                 SET replay_count = replay_count + 1,
                     last_replayed = ?,
                     priority_score = priority_score * 0.9
                 WHERE episode_id = ?
-            """, (now, episode_id))
+            """,
+                (now, episode_id),
+            )
 
         conn.commit()
         conn.close()
@@ -500,7 +519,9 @@ class EpisodicBuffer:
         cursor.execute("SELECT COUNT(*) FROM episodes")
         total = cursor.fetchone()[0]
 
-        cursor.execute("SELECT AVG(surprise), AVG(quality_score), AVG(priority_score) FROM episodes")
+        cursor.execute(
+            "SELECT AVG(surprise), AVG(quality_score), AVG(priority_score) FROM episodes"
+        )
         row = cursor.fetchone()
         avg_surprise = row[0] or 0.0
         avg_quality = row[1] or 0.0
@@ -554,11 +575,14 @@ class EpisodicBuffer:
         conn = sqlite3.connect(self.config.db_path)
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT * FROM episodes
             WHERE quality_score >= ?
             ORDER BY quality_score DESC
-        """, (min_quality,))
+        """,
+            (min_quality,),
+        )
 
         episodes = [self._row_to_episode(row) for row in cursor.fetchall()]
         conn.close()
@@ -579,11 +603,11 @@ class EpisodicBuffer:
         os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
 
         if format == "jsonl":
-            with open(output_path, 'w') as f:
+            with open(output_path, "w") as f:
                 for item in training_data:
-                    f.write(json.dumps(item) + '\n')
+                    f.write(json.dumps(item) + "\n")
         else:
-            with open(output_path, 'w') as f:
+            with open(output_path, "w") as f:
                 json.dump(training_data, f, indent=2)
 
         logger.info(f"Exported {len(training_data)} episodes to {output_path}")

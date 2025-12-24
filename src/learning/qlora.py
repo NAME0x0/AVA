@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 TRAINING_AVAILABLE = False
 try:
     import torch
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
@@ -55,6 +56,7 @@ try:
         Trainer,
         TrainingArguments,
     )
+
     TRAINING_AVAILABLE = True
 except ImportError:
     logger.warning(
@@ -80,10 +82,17 @@ class QLoRAConfig:
     lora_r: int = 8  # Rank (8 for fast, 64 for slow)
     lora_alpha: int = 16
     lora_dropout: float = 0.05
-    target_modules: list[str] = field(default_factory=lambda: [
-        "q_proj", "k_proj", "v_proj", "o_proj",
-        "gate_proj", "up_proj", "down_proj",
-    ])
+    target_modules: list[str] = field(
+        default_factory=lambda: [
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ]
+    )
 
     # Training settings
     learning_rate: float = 1e-4
@@ -278,9 +287,7 @@ class QLoRATrainer:
         self._model = get_peft_model(self._model, lora_config)
 
         # Log trainable parameters
-        trainable_params = sum(
-            p.numel() for p in self._model.parameters() if p.requires_grad
-        )
+        trainable_params = sum(p.numel() for p in self._model.parameters() if p.requires_grad)
         total_params = sum(p.numel() for p in self._model.parameters())
 
         logger.info(
@@ -363,16 +370,18 @@ class QLoRATrainer:
             self._tokenizer.save_pretrained(output_dir)
 
             # Record history
-            self.training_history.append({
-                "adapter_name": adapter_name,
-                "timestamp": datetime.now().isoformat(),
-                "samples": len(data),
-                "epochs": epochs,
-                "rank": rank,
-                "learning_rate": learning_rate,
-                "final_loss": train_result.training_loss,
-                "path": str(output_dir),
-            })
+            self.training_history.append(
+                {
+                    "adapter_name": adapter_name,
+                    "timestamp": datetime.now().isoformat(),
+                    "samples": len(data),
+                    "epochs": epochs,
+                    "rank": rank,
+                    "learning_rate": learning_rate,
+                    "final_loss": train_result.training_loss,
+                    "path": str(output_dir),
+                }
+            )
 
             logger.info(f"Adapter saved to: {output_dir}")
             return str(output_dir)
@@ -398,28 +407,34 @@ class QLoRATrainer:
         # Save training config
         config_path = output_dir / "adapter_config.json"
         with open(config_path, "w") as f:
-            json.dump({
-                "adapter_name": adapter_name,
-                "rank": rank,
-                "epochs": epochs,
-                "samples": len(data),
-                "mock": True,
-            }, f, indent=2)
+            json.dump(
+                {
+                    "adapter_name": adapter_name,
+                    "rank": rank,
+                    "epochs": epochs,
+                    "samples": len(data),
+                    "mock": True,
+                },
+                f,
+                indent=2,
+            )
 
         # Save sample of training data
         data_path = output_dir / "training_data_sample.json"
         with open(data_path, "w") as f:
             json.dump(data[:10], f, indent=2)  # Save first 10 samples
 
-        self.training_history.append({
-            "adapter_name": adapter_name,
-            "timestamp": datetime.now().isoformat(),
-            "samples": len(data),
-            "epochs": epochs,
-            "rank": rank,
-            "path": str(output_dir),
-            "mock": True,
-        })
+        self.training_history.append(
+            {
+                "adapter_name": adapter_name,
+                "timestamp": datetime.now().isoformat(),
+                "samples": len(data),
+                "epochs": epochs,
+                "rank": rank,
+                "path": str(output_dir),
+                "mock": True,
+            }
+        )
 
         return str(output_dir)
 

@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Message:
     """A single message in conversation."""
+
     role: str  # "user" or "assistant"
     content: str
     timestamp: datetime = field(default_factory=datetime.now)
@@ -30,7 +31,7 @@ class Message:
             "role": self.role,
             "content": self.content,
             "timestamp": self.timestamp.isoformat(),
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
     @classmethod
@@ -39,7 +40,7 @@ class Message:
             role=data["role"],
             content=data["content"],
             timestamp=datetime.fromisoformat(data.get("timestamp", datetime.now().isoformat())),
-            metadata=data.get("metadata", {})
+            metadata=data.get("metadata", {}),
         )
 
 
@@ -64,23 +65,14 @@ class ConversationMemory:
 
         logger.info(f"ConversationMemory initialized - Session: {self.session_id}")
 
-    def add_message(
-        self,
-        role: str,
-        content: str,
-        metadata: dict[str, Any] = None
-    ) -> Message:
+    def add_message(self, role: str, content: str, metadata: dict[str, Any] = None) -> Message:
         """Add a message to history."""
-        msg = Message(
-            role=role,
-            content=content,
-            metadata=metadata or {}
-        )
+        msg = Message(role=role, content=content, metadata=metadata or {})
         self.messages.append(msg)
 
         # Trim if needed
         if len(self.messages) > self.config.max_history:
-            self.messages = self.messages[-self.config.max_history:]
+            self.messages = self.messages[-self.config.max_history :]
 
         return msg
 
@@ -118,7 +110,7 @@ class ConversationMemory:
         data = {
             "session_id": self.session_id,
             "saved_at": datetime.now().isoformat(),
-            "messages": [m.to_dict() for m in self.messages]
+            "messages": [m.to_dict() for m in self.messages],
         }
 
         with open(path, "w") as f:

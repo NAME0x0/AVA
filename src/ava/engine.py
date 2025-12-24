@@ -32,23 +32,26 @@ logger = logging.getLogger(__name__)
 
 class CognitiveState(Enum):
     """Current cognitive processing state."""
-    FLOW = "FLOW"               # Confident, smooth processing
-    HESITATION = "HESITATION"   # Uncertain, needs more thought
-    CONFUSION = "CONFUSION"     # High uncertainty
-    CREATIVE = "CREATIVE"       # Exploring possibilities
-    VERIFYING = "VERIFYING"     # Double-checking response
+
+    FLOW = "FLOW"  # Confident, smooth processing
+    HESITATION = "HESITATION"  # Uncertain, needs more thought
+    CONFUSION = "CONFUSION"  # High uncertainty
+    CREATIVE = "CREATIVE"  # Exploring possibilities
+    VERIFYING = "VERIFYING"  # Double-checking response
 
 
 class ProcessingMode(Enum):
     """Which processing path to use."""
-    MEDULLA = auto()    # Fast, reflexive
-    CORTEX = auto()     # Deep, thoughtful
-    HYBRID = auto()     # Both (verify with Cortex)
+
+    MEDULLA = auto()  # Fast, reflexive
+    CORTEX = auto()  # Deep, thoughtful
+    HYBRID = auto()  # Both (verify with Cortex)
 
 
 @dataclass
 class _EngineResponse:
     """Internal response from the engine. Use Response from src.ava for public API."""
+
     text: str = ""
     used_cortex: bool = False
     cognitive_state: CognitiveState = CognitiveState.FLOW
@@ -109,8 +112,7 @@ class AVAEngine:
 
         # Create HTTP client
         self._client = httpx.AsyncClient(
-            base_url=self.config.ollama.host,
-            timeout=self.config.ollama.timeout
+            base_url=self.config.ollama.host, timeout=self.config.ollama.timeout
         )
 
         # Check Ollama health
@@ -169,8 +171,8 @@ class AVAEngine:
     async def process(
         self,
         user_input: str,
-        memory = None,
-        tools = None,
+        memory=None,
+        tools=None,
         force_cortex: bool = False,
         verify: bool = None,
     ) -> _EngineResponse:
@@ -209,39 +211,29 @@ class AVAEngine:
             result.surprise = surprise
 
             # 2. Decide processing mode
-            mode, reason = self._decide_mode(
-                user_input, complexity, surprise, force_cortex
-            )
+            mode, reason = self._decide_mode(user_input, complexity, surprise, force_cortex)
             logger.info(f"Processing mode: {mode.name} ({reason})")
 
             # 3. Check if tools are needed
             tools_used = []
             tool_context = ""
             if tools and self._needs_tools(user_input):
-                tools_used, tool_context = await self._execute_tools(
-                    user_input, tools
-                )
+                tools_used, tool_context = await self._execute_tools(user_input, tools)
                 result.tools_used = tools_used
 
             # 4. Generate response
             if mode == ProcessingMode.MEDULLA:
-                result.text = await self._generate_medulla(
-                    user_input, tool_context
-                )
+                result.text = await self._generate_medulla(user_input, tool_context)
                 result.used_cortex = False
             else:
-                result.text = await self._generate_cortex(
-                    user_input, tool_context
-                )
+                result.text = await self._generate_cortex(user_input, tool_context)
                 result.used_cortex = True
                 self.cortex_requests += 1
 
             # 5. Verify if needed
             should_verify = verify if verify is not None else self.config.verify_responses
             if should_verify and self._should_verify(user_input, result.text):
-                result.verified = await self._verify_response(
-                    user_input, result.text
-                )
+                result.verified = await self._verify_response(user_input, result.text)
                 self.verification_count += 1
                 result.cognitive_state = CognitiveState.VERIFYING
             else:
@@ -284,9 +276,19 @@ class AVAEngine:
 
         # Deep thinking indicators
         deep_keywords = [
-            "explain", "analyze", "compare", "contrast", "why",
-            "how does", "what if", "implications", "evaluate",
-            "step by step", "reasoning", "logic", "proof"
+            "explain",
+            "analyze",
+            "compare",
+            "contrast",
+            "why",
+            "how does",
+            "what if",
+            "implications",
+            "evaluate",
+            "step by step",
+            "reasoning",
+            "logic",
+            "proof",
         ]
         for kw in deep_keywords:
             if kw in text_lower:
@@ -301,8 +303,14 @@ class AVAEngine:
 
         # Technical terms
         technical = [
-            "algorithm", "function", "variable", "database",
-            "api", "server", "protocol", "architecture"
+            "algorithm",
+            "function",
+            "variable",
+            "database",
+            "api",
+            "server",
+            "protocol",
+            "architecture",
         ]
         for term in technical:
             if term in text_lower:
@@ -351,11 +359,7 @@ class AVAEngine:
         """Get embedding vector for text."""
         try:
             response = await self._client.post(
-                "/api/embeddings",
-                json={
-                    "model": self._active_fast_model,
-                    "prompt": text
-                }
+                "/api/embeddings", json={"model": self._active_fast_model, "prompt": text}
             )
             if response.status_code == 200:
                 data = response.json()
@@ -395,8 +399,16 @@ class AVAEngine:
         """Check if the query needs external tools."""
         text_lower = text.lower()
         tool_indicators = [
-            "calculate", "search", "find", "look up", "weather",
-            "what is", "who is", "when did", "how many", "convert"
+            "calculate",
+            "search",
+            "find",
+            "look up",
+            "weather",
+            "what is",
+            "who is",
+            "when did",
+            "how many",
+            "convert",
         ]
         return any(ind in text_lower for ind in tool_indicators)
 
@@ -419,9 +431,7 @@ Focus on being helpful and correct."""
         messages = self._build_messages(system_prompt, query, context)
 
         return await self._chat_completion(
-            self._active_fast_model,
-            messages,
-            temperature=self.config.temperature
+            self._active_fast_model, messages, temperature=self.config.temperature
         )
 
     async def _generate_cortex(self, query: str, context: str = "") -> str:
@@ -437,7 +447,7 @@ Prioritize accuracy over brevity."""
         return await self._chat_completion(
             self._active_deep_model,
             messages,
-            temperature=self.config.temperature * 0.8  # Slightly lower for reasoning
+            temperature=self.config.temperature * 0.8,  # Slightly lower for reasoning
         )
 
     def _build_messages(
@@ -451,10 +461,7 @@ Prioritize accuracy over brevity."""
 
         # Add context if available
         if context:
-            messages.append({
-                "role": "system",
-                "content": f"Additional context:\n{context}"
-            })
+            messages.append({"role": "system", "content": f"Additional context:\n{context}"})
 
         # Add recent conversation history
         history_window = self.conversation_history[-10:]  # Last 5 exchanges
@@ -482,8 +489,8 @@ Prioritize accuracy over brevity."""
                     "options": {
                         "temperature": temperature,
                         "num_predict": self.config.max_tokens,
-                    }
-                }
+                    },
+                },
             )
 
             if response.status_code == 200:
@@ -501,8 +508,14 @@ Prioritize accuracy over brevity."""
         """Decide if response needs verification."""
         # Verify factual claims, code, math
         verify_triggers = [
-            "calculate", "how many", "what is the", "when did",
-            "code", "function", "algorithm", "```"
+            "calculate",
+            "how many",
+            "what is the",
+            "when did",
+            "code",
+            "function",
+            "algorithm",
+            "```",
         ]
         query_lower = query.lower()
         return any(t in query_lower or t in response.lower() for t in verify_triggers)
@@ -519,13 +532,11 @@ Reply with only "VERIFIED" if correct, or "NEEDS_CORRECTION: [issue]" if there's
 
         messages = [
             {"role": "system", "content": "You are a fact-checker. Be strict about accuracy."},
-            {"role": "user", "content": verify_prompt}
+            {"role": "user", "content": verify_prompt},
         ]
 
         result = await self._chat_completion(
-            self._active_deep_model,
-            messages,
-            temperature=0.3  # Low temperature for verification
+            self._active_deep_model, messages, temperature=0.3  # Low temperature for verification
         )
 
         return "VERIFIED" in result.upper()
@@ -562,5 +573,5 @@ Reply with only "VERIFIED" if correct, or "NEEDS_CORRECTION: [issue]" if there's
             "models": {
                 "fast": self._active_fast_model,
                 "deep": self._active_deep_model,
-            }
+            },
         }

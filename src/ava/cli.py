@@ -42,10 +42,9 @@ def serve(
     simulation: bool = typer.Option(False, "--simulation", "-s", help="Enable simulation mode"),
 ):
     """Start the AVA HTTP API server."""
-    console.print(Panel.fit(
-        "[bold cyan]AVA[/bold cyan] API Server",
-        subtitle=f"http://{host}:{port}"
-    ))
+    console.print(
+        Panel.fit("[bold cyan]AVA[/bold cyan] API Server", subtitle=f"http://{host}:{port}")
+    )
 
     # Import and run server
     try:
@@ -73,10 +72,9 @@ def serve(
 @app.command()
 def tui():
     """Start the Terminal User Interface."""
-    console.print(Panel.fit(
-        "[bold cyan]AVA[/bold cyan] Terminal UI",
-        subtitle="Press Ctrl+Q to quit"
-    ))
+    console.print(
+        Panel.fit("[bold cyan]AVA[/bold cyan] Terminal UI", subtitle="Press Ctrl+Q to quit")
+    )
 
     try:
         # Import and run TUI
@@ -96,10 +94,13 @@ def tui():
 
 @app.command()
 def chat(
-    message: str | None = typer.Argument(None, help="Message to send (or omit for interactive mode)"),
+    message: str | None = typer.Argument(
+        None, help="Message to send (or omit for interactive mode)"
+    ),
     deep: bool = typer.Option(False, "--deep", "-d", help="Force deep thinking (Cortex)"),
 ):
     """Quick chat with AVA."""
+
     async def _chat():
         try:
             from ava import AVA
@@ -166,7 +167,9 @@ def status():
         if response.status_code == 200:
             table.add_row("API Server", "[green]Online[/green]", url)
         else:
-            table.add_row("API Server", "[yellow]Degraded[/yellow]", f"Status: {response.status_code}")
+            table.add_row(
+                "API Server", "[yellow]Degraded[/yellow]", f"Status: {response.status_code}"
+            )
     except httpx.ConnectError:
         table.add_row("API Server", "[red]Offline[/red]", f"Not running at {url}")
     except Exception as e:
@@ -179,7 +182,9 @@ def status():
         if response.status_code == 200:
             models = response.json().get("models", [])
             model_names = [m["name"] for m in models[:3]]
-            table.add_row("Ollama", "[green]Online[/green]", f"Models: {', '.join(model_names) or 'none'}")
+            table.add_row(
+                "Ollama", "[green]Online[/green]", f"Models: {', '.join(model_names) or 'none'}"
+            )
         else:
             table.add_row("Ollama", "[yellow]Degraded[/yellow]", f"Status: {response.status_code}")
     except httpx.ConnectError:
@@ -190,20 +195,23 @@ def status():
     # Check GPU
     try:
         import subprocess
+
         result = subprocess.run(
-            ["nvidia-smi", "--query-gpu=name,memory.used,memory.total,temperature.gpu", "--format=csv,noheader,nounits"],
+            [
+                "nvidia-smi",
+                "--query-gpu=name,memory.used,memory.total,temperature.gpu",
+                "--format=csv,noheader,nounits",
+            ],
             capture_output=True,
             text=True,
-            timeout=5
+            timeout=5,
         )
         if result.returncode == 0:
             parts = result.stdout.strip().split(", ")
             if len(parts) >= 4:
                 name, mem_used, mem_total, temp = parts[:4]
                 table.add_row(
-                    "GPU",
-                    "[green]Available[/green]",
-                    f"{name} ({mem_used}/{mem_total}MB, {temp}C)"
+                    "GPU", "[green]Available[/green]", f"{name} ({mem_used}/{mem_total}MB, {temp}C)"
                 )
             else:
                 table.add_row("GPU", "[green]Available[/green]", result.stdout.strip())
@@ -226,6 +234,7 @@ def doctor():
 
     # Check Python version
     import platform
+
     py_version = platform.python_version()
     if tuple(map(int, py_version.split(".")[:2])) >= (3, 10):
         checks.append(("Python Version", True, f"Python {py_version}"))
@@ -294,15 +303,18 @@ def version():
     """Show AVA version information."""
     try:
         from ava import __version__
+
         version_str = __version__
     except ImportError:
         version_str = "unknown"
 
-    console.print(Panel.fit(
-        f"[bold cyan]AVA[/bold cyan] v{version_str}\n"
-        "[dim]Adaptive Virtual Agent with dual-brain architecture[/dim]",
-        title="Version Info"
-    ))
+    console.print(
+        Panel.fit(
+            f"[bold cyan]AVA[/bold cyan] v{version_str}\n"
+            "[dim]Adaptive Virtual Agent with dual-brain architecture[/dim]",
+            title="Version Info",
+        )
+    )
 
 
 def main():

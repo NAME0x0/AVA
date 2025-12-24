@@ -44,11 +44,12 @@ logger = logging.getLogger(__name__)
 
 class DreamState(Enum):
     """Current state of the Dreamer."""
-    AWAKE = "awake"                # Not dreaming
-    LIGHT_SLEEP = "light_sleep"    # Processing replay buffer
-    REM = "rem"                    # Fast weight training
-    DEEP_SLEEP = "deep_sleep"      # Slow weight consolidation
-    LUCID = "lucid"                # Self-distillation
+
+    AWAKE = "awake"  # Not dreaming
+    LIGHT_SLEEP = "light_sleep"  # Processing replay buffer
+    REM = "rem"  # Fast weight training
+    DEEP_SLEEP = "deep_sleep"  # Slow weight consolidation
+    LUCID = "lucid"  # Self-distillation
 
 
 @dataclass
@@ -191,6 +192,7 @@ class Dreamer:
         """Initialize QLoRA trainer if available."""
         try:
             from ..learning.qlora import QLoRATrainer
+
             self.qlora_trainer = QLoRATrainer(
                 checkpoints_dir=str(self.checkpoints_dir),
                 adapters_dir=str(self.adapters_dir),
@@ -304,11 +306,13 @@ class Dreamer:
 
         except Exception as e:
             logger.error(f"Dream cycle failed: {e}")
-            results.append(DreamCycleResult(
-                cycle_type="error",
-                success=False,
-                error_message=str(e),
-            ))
+            results.append(
+                DreamCycleResult(
+                    cycle_type="error",
+                    success=False,
+                    error_message=str(e),
+                )
+            )
         finally:
             self.state = DreamState.AWAKE
 
@@ -319,7 +323,7 @@ class Dreamer:
         """Get replay buffer from conscious stream."""
         if self.conscious_stream:
             buffer = self.conscious_stream.get_replay_buffer()
-            return [r.to_dict() if hasattr(r, 'to_dict') else r for r in buffer]
+            return [r.to_dict() if hasattr(r, "to_dict") else r for r in buffer]
 
         # Fallback to weight manager
         if self.weight_manager:
@@ -352,13 +356,11 @@ class Dreamer:
 
         # Sort by quality (descending) and take top N
         filtered.sort(
-            key=lambda x: x.get("quality_score", 0) * (
-                1 + x.get("surprise_value", 0) * 0.5
-            ),
+            key=lambda x: x.get("quality_score", 0) * (1 + x.get("surprise_value", 0) * 0.5),
             reverse=True,
         )
 
-        return filtered[:self.config.max_samples_per_batch]
+        return filtered[: self.config.max_samples_per_batch]
 
     def _fast_weight_update(
         self,
@@ -494,7 +496,8 @@ class Dreamer:
         try:
             # Extract samples with reasoning steps
             cot_samples = [
-                s for s in samples
+                s
+                for s in samples
                 if s.get("reasoning_steps") and len(s.get("reasoning_steps", [])) > 0
             ]
 
@@ -513,11 +516,13 @@ class Dreamer:
 
                 enhanced_output = f"<think>\n{reasoning}\n</think>\n\n{output}"
 
-                enhanced_samples.append({
-                    "instruction": sample.get("input_text", ""),
-                    "output": enhanced_output,
-                    "quality_score": sample.get("quality_score", 0.5) * 1.2,  # Boost for CoT
-                })
+                enhanced_samples.append(
+                    {
+                        "instruction": sample.get("input_text", ""),
+                        "output": enhanced_output,
+                        "quality_score": sample.get("quality_score", 0.5) * 1.2,  # Boost for CoT
+                    }
+                )
 
             # Save enhanced samples for future training
             distill_path = self.checkpoints_dir / "distillation_samples.json"
@@ -607,10 +612,12 @@ class Dreamer:
                     tool_section += f"[{call.get('name', '')}:{call.get('args', '')}] → {result.get('output', '')}\n"
                 structured_output = tool_section + "\n" + structured_output
 
-            training_data.append({
-                "instruction": input_text,
-                "output": structured_output.strip(),
-            })
+            training_data.append(
+                {
+                    "instruction": input_text,
+                    "output": structured_output.strip(),
+                }
+            )
 
         return training_data
 
@@ -639,10 +646,14 @@ class Dreamer:
         self.state = DreamState.AWAKE
 
         # Return most recent result
-        return results[-1] if results else DreamCycleResult(
-            cycle_type=cycle_type,
-            success=False,
-            error_message="No operations performed",
+        return (
+            results[-1]
+            if results
+            else DreamCycleResult(
+                cycle_type=cycle_type,
+                success=False,
+                error_message="No operations performed",
+            )
         )
 
     def get_statistics(self) -> dict[str, Any]:
@@ -652,8 +663,12 @@ class Dreamer:
             "current_state": self.state.value,
             "is_running": self.is_running,
             "total_samples_processed": self.total_samples_processed,
-            "last_fast_update": self.last_fast_update.isoformat() if self.last_fast_update else None,
-            "last_slow_update": self.last_slow_update.isoformat() if self.last_slow_update else None,
+            "last_fast_update": (
+                self.last_fast_update.isoformat() if self.last_fast_update else None
+            ),
+            "last_slow_update": (
+                self.last_slow_update.isoformat() if self.last_slow_update else None
+            ),
             "dream_history_count": len(self.dream_history),
         }
 

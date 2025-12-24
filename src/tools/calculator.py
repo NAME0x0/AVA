@@ -16,7 +16,7 @@ from enum import Enum
 from typing import Any
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Set high precision for decimal calculations
@@ -25,6 +25,7 @@ getcontext().prec = 50
 
 class CalculationType(Enum):
     """Types of calculations supported."""
+
     BASIC_ARITHMETIC = "basic"
     ADVANCED_MATH = "advanced"
     SCIENTIFIC = "scientific"
@@ -34,6 +35,7 @@ class CalculationType(Enum):
 
 class NumberFormat(Enum):
     """Number format options."""
+
     DECIMAL = "decimal"
     SCIENTIFIC = "scientific"
     ENGINEERING = "engineering"
@@ -44,6 +46,7 @@ class NumberFormat(Enum):
 @dataclass
 class CalculationResult:
     """Represents the result of a calculation."""
+
     success: bool
     result: float | int | complex | str = None
     error: str | None = None
@@ -73,52 +76,49 @@ class SafeExpressionParser:
 
     SAFE_FUNCTIONS = {
         # Basic math functions
-        'abs': abs,
-        'round': round,
-        'min': min,
-        'max': max,
-        'sum': sum,
-
+        "abs": abs,
+        "round": round,
+        "min": min,
+        "max": max,
+        "sum": sum,
         # Math module functions
-        'sqrt': math.sqrt,
-        'pow': pow,
-        'exp': math.exp,
-        'log': math.log,
-        'log10': math.log10,
-        'log2': math.log2,
-
+        "sqrt": math.sqrt,
+        "pow": pow,
+        "exp": math.exp,
+        "log": math.log,
+        "log10": math.log10,
+        "log2": math.log2,
         # Trigonometric functions
-        'sin': math.sin,
-        'cos': math.cos,
-        'tan': math.tan,
-        'asin': math.asin,
-        'acos': math.acos,
-        'atan': math.atan,
-        'atan2': math.atan2,
-        'sinh': math.sinh,
-        'cosh': math.cosh,
-        'tanh': math.tanh,
-        'asinh': math.asinh,
-        'acosh': math.acosh,
-        'atanh': math.atanh,
-
+        "sin": math.sin,
+        "cos": math.cos,
+        "tan": math.tan,
+        "asin": math.asin,
+        "acos": math.acos,
+        "atan": math.atan,
+        "atan2": math.atan2,
+        "sinh": math.sinh,
+        "cosh": math.cosh,
+        "tanh": math.tanh,
+        "asinh": math.asinh,
+        "acosh": math.acosh,
+        "atanh": math.atanh,
         # Other math functions
-        'ceil': math.ceil,
-        'floor': math.floor,
-        'trunc': math.trunc,
-        'factorial': math.factorial,
-        'gcd': math.gcd,
-        'lcm': math.lcm if hasattr(math, 'lcm') else lambda a, b: abs(a * b) // math.gcd(a, b),
-        'degrees': math.degrees,
-        'radians': math.radians,
+        "ceil": math.ceil,
+        "floor": math.floor,
+        "trunc": math.trunc,
+        "factorial": math.factorial,
+        "gcd": math.gcd,
+        "lcm": math.lcm if hasattr(math, "lcm") else lambda a, b: abs(a * b) // math.gcd(a, b),
+        "degrees": math.degrees,
+        "radians": math.radians,
     }
 
     SAFE_CONSTANTS = {
-        'pi': math.pi,
-        'e': math.e,
-        'tau': math.tau,
-        'inf': math.inf,
-        'nan': math.nan,
+        "pi": math.pi,
+        "e": math.e,
+        "tau": math.tau,
+        "inf": math.inf,
+        "nan": math.nan,
     }
 
     def __init__(self):
@@ -144,7 +144,7 @@ class SafeExpressionParser:
             cleaned_expr = self._preprocess_expression(expression)
 
             # Parse expression to AST
-            tree = ast.parse(cleaned_expr, mode='eval')
+            tree = ast.parse(cleaned_expr, mode="eval")
 
             # Validate AST for safety
             self._validate_ast(tree)
@@ -155,30 +155,28 @@ class SafeExpressionParser:
             return result
 
         except Exception as e:
-            raise ValueError(
-                f"Error evaluating expression '{expression}': {str(e)}"
-            ) from e
+            raise ValueError(f"Error evaluating expression '{expression}': {str(e)}") from e
 
     def _preprocess_expression(self, expression: str) -> str:
         """Preprocess expression to handle common mathematical notation."""
         # Remove whitespace
-        cleaned = re.sub(r'\s+', '', expression)
+        cleaned = re.sub(r"\s+", "", expression)
 
         # Replace common mathematical notation
         replacements = {
-            '^': '**',  # Power operator
-            '÷': '/',   # Division symbol
-            '×': '*',   # Multiplication symbol
-            '√': 'sqrt', # Square root symbol
+            "^": "**",  # Power operator
+            "÷": "/",  # Division symbol
+            "×": "*",  # Multiplication symbol
+            "√": "sqrt",  # Square root symbol
         }
 
         for old, new in replacements.items():
             cleaned = cleaned.replace(old, new)
 
         # Handle implicit multiplication (e.g., 2(3+4) -> 2*(3+4))
-        cleaned = re.sub(r'(\d)(\()', r'\1*\2', cleaned)
-        cleaned = re.sub(r'(\))(\d)', r'\1*\2', cleaned)
-        cleaned = re.sub(r'(\))(\()', r'\1*\2', cleaned)
+        cleaned = re.sub(r"(\d)(\()", r"\1*\2", cleaned)
+        cleaned = re.sub(r"(\))(\d)", r"\1*\2", cleaned)
+        cleaned = re.sub(r"(\))(\()", r"\1*\2", cleaned)
 
         return cleaned
 
@@ -255,43 +253,52 @@ class EnhancedCalculator:
                 "name": "expression",
                 "type": "string",
                 "description": "Mathematical expression to evaluate. Supports basic arithmetic, advanced math functions, and constants.",
-                "required": True
+                "required": True,
             },
             {
                 "name": "format",
                 "type": "string",
                 "description": "Output format: 'decimal', 'scientific', 'engineering', 'percentage', 'fraction'",
-                "default": "decimal"
+                "default": "decimal",
             },
             {
                 "name": "precision",
                 "type": "integer",
                 "description": "Number of decimal places for result (1-50)",
-                "default": 15
-            }
+                "default": 15,
+            },
         ]
 
         # Unit conversion factors (to base units)
         self.unit_conversions = {
             # Length (to meters)
-            'mm': 0.001, 'cm': 0.01, 'm': 1.0, 'km': 1000.0,
-            'in': 0.0254, 'ft': 0.3048, 'yd': 0.9144, 'mi': 1609.344,
-
+            "mm": 0.001,
+            "cm": 0.01,
+            "m": 1.0,
+            "km": 1000.0,
+            "in": 0.0254,
+            "ft": 0.3048,
+            "yd": 0.9144,
+            "mi": 1609.344,
             # Weight (to grams)
-            'mg': 0.001, 'g': 1.0, 'kg': 1000.0, 'lb': 453.592, 'oz': 28.3495,
-
+            "mg": 0.001,
+            "g": 1.0,
+            "kg": 1000.0,
+            "lb": 453.592,
+            "oz": 28.3495,
             # Temperature conversions handled separately
             # Time (to seconds)
-            'ms': 0.001, 's': 1.0, 'min': 60.0, 'h': 3600.0, 'day': 86400.0,
+            "ms": 0.001,
+            "s": 1.0,
+            "min": 60.0,
+            "h": 3600.0,
+            "day": 86400.0,
         }
 
         logger.info(f"Enhanced Calculator initialized with {precision} decimal precision")
 
     def calculate(
-        self,
-        expression: str,
-        output_format: str = "decimal",
-        precision: int | None = None
+        self, expression: str, output_format: str = "decimal", precision: int | None = None
     ) -> CalculationResult:
         """
         Perform calculation with comprehensive error handling and formatting.
@@ -307,11 +314,7 @@ class EnhancedCalculator:
         start_time = time.time()
         precision = precision or self.precision
 
-        result = CalculationResult(
-            success=False,
-            expression=expression,
-            precision_used=precision
-        )
+        result = CalculationResult(success=False, expression=expression, precision_used=precision)
 
         try:
             # Validate input
@@ -336,9 +339,7 @@ class EnhancedCalculator:
 
             # Format result
             formatted_result = self._format_result(
-                raw_result,
-                NumberFormat(output_format),
-                precision
+                raw_result, NumberFormat(output_format), precision
             )
 
             # Success
@@ -347,8 +348,9 @@ class EnhancedCalculator:
             result.metadata = {
                 "raw_result": raw_result,
                 "result_type": type(raw_result).__name__,
-                "is_integer": isinstance(raw_result, int) or (isinstance(raw_result, float) and raw_result.is_integer()),
-                "absolute_value": abs(raw_result) if isinstance(raw_result, (int, float)) else None
+                "is_integer": isinstance(raw_result, int)
+                or (isinstance(raw_result, float) and raw_result.is_integer()),
+                "absolute_value": abs(raw_result) if isinstance(raw_result, (int, float)) else None,
             }
 
             logger.info(f"Calculation successful: {expression} = {formatted_result}")
@@ -366,22 +368,21 @@ class EnhancedCalculator:
         """Determine the type of calculation based on the expression."""
         expression_lower = expression.lower()
 
-        if any(func in expression_lower for func in ['sin', 'cos', 'tan', 'log', 'exp', 'sqrt']):
+        if any(func in expression_lower for func in ["sin", "cos", "tan", "log", "exp", "sqrt"]):
             return CalculationType.SCIENTIFIC
-        elif any(func in expression_lower for func in ['mean', 'median', 'std', 'var']):
+        elif any(func in expression_lower for func in ["mean", "median", "std", "var"]):
             return CalculationType.STATISTICAL
-        elif 'convert' in expression_lower or any(unit in expression_lower for unit in self.unit_conversions):
+        elif "convert" in expression_lower or any(
+            unit in expression_lower for unit in self.unit_conversions
+        ):
             return CalculationType.UNIT_CONVERSION
-        elif any(func in expression_lower for func in ['factorial', 'gcd', 'lcm']):
+        elif any(func in expression_lower for func in ["factorial", "gcd", "lcm"]):
             return CalculationType.ADVANCED_MATH
         else:
             return CalculationType.BASIC_ARITHMETIC
 
     def _format_result(
-        self,
-        value: float | int | complex,
-        format_type: NumberFormat,
-        precision: int
+        self, value: float | int | complex, format_type: NumberFormat, precision: int
     ) -> str:
         """Format the calculation result according to specified format."""
         try:
@@ -391,7 +392,7 @@ class EnhancedCalculator:
             if format_type == NumberFormat.DECIMAL:
                 if isinstance(value, int):
                     return str(value)
-                return f"{value:.{precision}f}".rstrip('0').rstrip('.')
+                return f"{value:.{precision}f}".rstrip("0").rstrip(".")
 
             elif format_type == NumberFormat.SCIENTIFIC:
                 return f"{value:.{precision}e}"
@@ -402,7 +403,7 @@ class EnhancedCalculator:
                     return "0"
                 exp = math.floor(math.log10(abs(value)))
                 eng_exp = exp - (exp % 3)
-                mantissa = value / (10 ** eng_exp)
+                mantissa = value / (10**eng_exp)
                 return f"{mantissa:.{precision}f}e{eng_exp:+d}"
 
             elif format_type == NumberFormat.PERCENTAGE:
@@ -421,6 +422,7 @@ class EnhancedCalculator:
         """Convert decimal to fraction representation."""
         try:
             from fractions import Fraction
+
             frac = Fraction(value).limit_denominator(max_denominator)
             return str(frac)
         except ImportError:
@@ -436,7 +438,7 @@ class EnhancedCalculator:
             to_unit = to_unit.lower()
 
             # Special case for temperature
-            if from_unit in ['c', 'f', 'k'] or to_unit in ['c', 'f', 'k']:
+            if from_unit in ["c", "f", "k"] or to_unit in ["c", "f", "k"]:
                 converted = self._convert_temperature(value, from_unit, to_unit)
             else:
                 # Regular unit conversion
@@ -460,17 +462,17 @@ class EnhancedCalculator:
     def _convert_temperature(self, value: float, from_unit: str, to_unit: str) -> float:
         """Convert temperature between Celsius, Fahrenheit, and Kelvin."""
         # Convert to Celsius first
-        if from_unit == 'f':
-            celsius = (value - 32) * 5/9
-        elif from_unit == 'k':
+        if from_unit == "f":
+            celsius = (value - 32) * 5 / 9
+        elif from_unit == "k":
             celsius = value - 273.15
         else:  # from_unit == 'c'
             celsius = value
 
         # Convert from Celsius to target
-        if to_unit == 'f':
-            return celsius * 9/5 + 32
-        elif to_unit == 'k':
+        if to_unit == "f":
+            return celsius * 9 / 5 + 32
+        elif to_unit == "k":
             return celsius + 273.15
         else:  # to_unit == 'c'
             return celsius
@@ -486,8 +488,8 @@ class EnhancedCalculator:
         Returns:
             Dictionary with result or error information
         """
-        output_format = kwargs.get('format', 'decimal')
-        precision = kwargs.get('precision', self.precision)
+        output_format = kwargs.get("format", "decimal")
+        precision = kwargs.get("precision", self.precision)
 
         result = self.calculate(expression, output_format, precision)
 
@@ -499,13 +501,13 @@ class EnhancedCalculator:
                 "execution_time_ms": result.execution_time_ms,
                 "precision": result.precision_used,
                 "warnings": result.warnings,
-                "metadata": result.metadata
+                "metadata": result.metadata,
             }
         else:
             return {
                 "error": result.error,
                 "expression": result.expression,
-                "execution_time_ms": result.execution_time_ms
+                "execution_time_ms": result.execution_time_ms,
             }
 
 
@@ -524,20 +526,17 @@ def test_calculator():
         "2**8",  # Power
         "17 % 5",  # Modulo
         "17 // 5",  # Floor division
-
         # Advanced math
         "sqrt(16)",
         "sin(pi/2)",
         "log(e)",
         "factorial(5)",
         "gcd(48, 18)",
-
         # Complex expressions
         "(2 + 3) * 4",
         "sqrt(sin(pi/4)**2 + cos(pi/4)**2)",
         "log10(1000)",
         "degrees(pi/2)",
-
         # Error cases
         "10 / 0",  # Division by zero
         "sqrt(-4)",  # Domain error

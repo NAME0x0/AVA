@@ -35,10 +35,11 @@ logger = logging.getLogger(__name__)
 
 class CortexState(Enum):
     """Operating states for the Cortex."""
-    DORMANT = "dormant"          # Weights in System RAM, VRAM free
+
+    DORMANT = "dormant"  # Weights in System RAM, VRAM free
     INITIALIZING = "initializing"  # Loading first layer
-    PROCESSING = "processing"    # Layer-wise inference active
-    GENERATING = "generating"    # Token generation in progress
+    PROCESSING = "processing"  # Layer-wise inference active
+    GENERATING = "generating"  # Token generation in progress
     COOLING_DOWN = "cooling_down"  # Releasing VRAM
 
 
@@ -59,12 +60,12 @@ class CortexConfig:
 
     # Model Configuration
     model_name: str = "meta-llama/Meta-Llama-3-70B-Instruct"
-    compression: str = "4bit"          # Block-wise quantization
+    compression: str = "4bit"  # Block-wise quantization
 
     # AirLLM Settings
-    prefetch_layers: int = 1           # Layers to prefetch (limited by VRAM)
-    use_safetensors: bool = True       # Use zero-copy memory mapping
-    use_flash_attention: bool = True   # Flash attention for efficiency
+    prefetch_layers: int = 1  # Layers to prefetch (limited by VRAM)
+    use_safetensors: bool = True  # Use zero-copy memory mapping
+    use_flash_attention: bool = True  # Flash attention for efficiency
 
     # Generation Parameters
     max_new_tokens: int = 512
@@ -74,16 +75,16 @@ class CortexConfig:
     repetition_penalty: float = 1.1
 
     # Context Configuration
-    max_context_length: int = 4096     # Limit to manage memory
-    max_input_tokens: int = 2048       # Max input before truncation
+    max_context_length: int = 4096  # Limit to manage memory
+    max_input_tokens: int = 2048  # Max input before truncation
 
     # System RAM Configuration
-    offload_to_disk: bool = False      # Use NVMe as overflow
+    offload_to_disk: bool = False  # Use NVMe as overflow
     disk_offload_path: str = "data/.cortex_cache"
 
     # Performance Tuning
-    batch_size: int = 1                # Always 1 for layer-wise
-    pin_memory: bool = True            # Pin System RAM for faster transfer
+    batch_size: int = 1  # Always 1 for layer-wise
+    pin_memory: bool = True  # Pin System RAM for faster transfer
 
     # State Persistence
     generation_log_path: str = "data/memory/cortex_generations.jsonl"
@@ -341,10 +342,16 @@ class Cortex:
 
             # THERMAL-AWARE TOKEN LIMITING
             # Reduce max tokens when GPU is throttled to minimize thermal load
-            if thermal_status and hasattr(thermal_status, 'is_throttled') and thermal_status.is_throttled:
+            if (
+                thermal_status
+                and hasattr(thermal_status, "is_throttled")
+                and thermal_status.is_throttled
+            ):
                 original_tokens = gen_max_tokens
                 gen_max_tokens = min(gen_max_tokens, 128)  # Cap at 128 when throttled
-                logger.info(f"Thermal throttle: Limited tokens from {original_tokens} to {gen_max_tokens}")
+                logger.info(
+                    f"Thermal throttle: Limited tokens from {original_tokens} to {gen_max_tokens}"
+                )
 
             if self._model is not None:
                 # Real AirLLM generation
@@ -435,7 +442,7 @@ class Cortex:
         )
 
         # Decode output
-        generated_ids = output[0][result.input_tokens:]
+        generated_ids = output[0][result.input_tokens :]
         result.tokens = generated_ids.tolist()
         result.text = self._tokenizer.decode(generated_ids, skip_special_tokens=True)
         result.output_tokens = len(result.tokens)
@@ -571,9 +578,7 @@ class Cortex:
             "avg_tokens_per_generation": (
                 self.total_tokens_generated / max(1, self.generation_count)
             ),
-            "avg_generation_time": (
-                self.total_generation_time / max(1, self.generation_count)
-            ),
+            "avg_generation_time": (self.total_generation_time / max(1, self.generation_count)),
             **transfer_stats,
         }
 
@@ -592,6 +597,7 @@ class Cortex:
 
         # Force garbage collection
         import gc
+
         gc.collect()
 
         self.state = CortexState.DORMANT

@@ -78,9 +78,7 @@ class ToolProgressionManager:
 
         # Sort by emotional preference if bias provided
         if emotional_bias:
-            accessible = self._sort_by_emotional_preference(
-                accessible, emotional_bias
-            )
+            accessible = self._sort_by_emotional_preference(accessible, emotional_bias)
 
         return accessible
 
@@ -129,9 +127,7 @@ class ToolProgressionManager:
 
         for tool_name, tool in self.registry.tools.items():
             # Skip already accessible tools
-            access = self.registry.check_access(
-                tool_name, current_stage, milestones, competencies
-            )
+            access = self.registry.check_access(tool_name, current_stage, milestones, competencies)
             if access.allowed:
                 continue
 
@@ -150,12 +146,14 @@ class ToolProgressionManager:
             # Stage requirement
             if current_stage < tool.safety_level:
                 stage_diff = tool.safety_level - current_stage
-                missing["requirements"].append({
-                    "type": "stage",
-                    "needed": tool.safety_level,
-                    "current": current_stage,
-                    "gap": stage_diff,
-                })
+                missing["requirements"].append(
+                    {
+                        "type": "stage",
+                        "needed": tool.safety_level,
+                        "current": current_stage,
+                        "gap": stage_diff,
+                    }
+                )
                 total_requirements += 1
             else:
                 requirements_met += 1
@@ -167,10 +165,12 @@ class ToolProgressionManager:
                 if milestone in milestones:
                     requirements_met += 1
                 else:
-                    missing["requirements"].append({
-                        "type": "milestone",
-                        "needed": milestone,
-                    })
+                    missing["requirements"].append(
+                        {
+                            "type": "milestone",
+                            "needed": milestone,
+                        }
+                    )
 
             # Competency requirements
             for comp, min_level in tool.minimum_competencies.items():
@@ -179,13 +179,15 @@ class ToolProgressionManager:
                 if current >= min_level:
                     requirements_met += 1
                 else:
-                    missing["requirements"].append({
-                        "type": "competency",
-                        "name": comp,
-                        "needed": min_level,
-                        "current": current,
-                        "gap": min_level - current,
-                    })
+                    missing["requirements"].append(
+                        {
+                            "type": "competency",
+                            "name": comp,
+                            "needed": min_level,
+                            "current": current,
+                            "gap": min_level - current,
+                        }
+                    )
 
             # Calculate progress
             if total_requirements > 0:
@@ -207,12 +209,14 @@ class ToolProgressionManager:
         trigger: str = "stage_transition",
     ):
         """Record a tool unlock event."""
-        self.unlock_history.append({
-            "tool_name": tool_name,
-            "stage": stage,
-            "trigger": trigger,
-            "timestamp": datetime.now().isoformat(),
-        })
+        self.unlock_history.append(
+            {
+                "tool_name": tool_name,
+                "stage": stage,
+                "trigger": trigger,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
         logger.info(f"Tool unlocked: {tool_name} at stage {stage}")
 
     def get_tool_mastery(
@@ -230,10 +234,7 @@ class ToolProgressionManager:
         Returns:
             Mastery status and statistics
         """
-        tools_at_level = [
-            t for t in self.registry.tools.values()
-            if t.safety_level == safety_level
-        ]
+        tools_at_level = [t for t in self.registry.tools.values() if t.safety_level == safety_level]
 
         if not tools_at_level:
             return {"mastered": True, "tools": [], "avg_success_rate": 1.0}
@@ -272,8 +273,7 @@ class ToolProgressionManager:
             mastery_info["avg_success_rate"] = total_success_rate / tools_with_usage
 
         mastery_info["mastered"] = (
-            mastery_info["mastered_count"] == len(tools_at_level) and
-            len(tools_at_level) > 0
+            mastery_info["mastered_count"] == len(tools_at_level) and len(tools_at_level) > 0
         )
 
         return mastery_info
@@ -357,7 +357,9 @@ class ToolProgressionManager:
             "total_tools": total_tools,
             "accessible_count": len(accessible),
             "accessible_tools": accessible,
-            "accessibility_percentage": len(accessible) / total_tools * 100 if total_tools > 0 else 0,
+            "accessibility_percentage": (
+                len(accessible) / total_tools * 100 if total_tools > 0 else 0
+            ),
             "mastery_by_level": mastery_by_level,
             "next_unlockable": self.get_next_unlockable_tools(
                 current_stage, milestones, competencies

@@ -15,16 +15,18 @@ logger = logging.getLogger(__name__)
 
 class ReflectionType(Enum):
     """Types of self-reflection."""
-    QUALITY_CHECK = "quality"        # Check response quality
-    COHERENCE_CHECK = "coherence"    # Check logical consistency
-    SAFETY_CHECK = "safety"          # Check for problematic content
+
+    QUALITY_CHECK = "quality"  # Check response quality
+    COHERENCE_CHECK = "coherence"  # Check logical consistency
+    SAFETY_CHECK = "safety"  # Check for problematic content
     COMPLETENESS_CHECK = "complete"  # Check if response is complete
-    TONE_CHECK = "tone"              # Check emotional appropriateness
+    TONE_CHECK = "tone"  # Check emotional appropriateness
 
 
 @dataclass
 class ReflectionResult:
     """Result of self-reflection process."""
+
     # Overall assessment
     passes_quality: bool = True
     overall_score: float = 0.8
@@ -110,9 +112,7 @@ class ReflectionEngine:
 
         # Run each check
         for check_type in check_types:
-            check_result = self._run_check(
-                check_type, response, original_query, emotional_state
-            )
+            check_result = self._run_check(check_type, response, original_query, emotional_state)
             result.checks_performed.append(check_type.value)
 
             if check_result["score"] is not None:
@@ -216,17 +216,19 @@ class ReflectionEngine:
 
             if has_positive and has_negative:
                 # Potential contradiction
-                issues.append({
-                    "type": "potential_contradiction",
-                    "severity": "medium",
-                    "location": f"sentences {i+1}-{i+2}"
-                })
+                issues.append(
+                    {
+                        "type": "potential_contradiction",
+                        "severity": "medium",
+                        "location": f"sentences {i+1}-{i+2}",
+                    }
+                )
                 score -= 0.15
 
         # Check for repetition
         if len(sentences) > 2:
             for i, sent in enumerate(sentences):
-                for j, other in enumerate(sentences[i+1:], i+1):
+                for j, other in enumerate(sentences[i + 1 :], i + 1):
                     # Simple similarity check
                     sent_words = set(sent.lower().split())
                     other_words = set(other.lower().split())
@@ -234,11 +236,13 @@ class ReflectionEngine:
                         overlap = len(sent_words & other_words)
                         similarity = overlap / max(len(sent_words), len(other_words))
                         if similarity > 0.8:
-                            issues.append({
-                                "type": "repetition",
-                                "severity": "low",
-                                "location": f"sentences {i+1} and {j+1}"
-                            })
+                            issues.append(
+                                {
+                                    "type": "repetition",
+                                    "severity": "low",
+                                    "location": f"sentences {i+1} and {j+1}",
+                                }
+                            )
                             suggestions.append("Avoid repeating similar content")
                             score -= 0.1
                             break
@@ -257,11 +261,7 @@ class ReflectionEngine:
         absolute_words = ["always", "never", "definitely", "certainly", "impossible"]
         for word in absolute_words:
             if word in response_lower:
-                issues.append({
-                    "type": "absolute_claim",
-                    "severity": "low",
-                    "word": word
-                })
+                issues.append({"type": "absolute_claim", "severity": "low", "word": word})
                 suggestions.append(f"Consider softening absolute claim '{word}'")
                 score -= 0.05
 
@@ -269,11 +269,9 @@ class ReflectionEngine:
         harmful_indicators = ["you should always", "never ever", "you must"]
         for indicator in harmful_indicators:
             if indicator in response_lower:
-                issues.append({
-                    "type": "prescriptive_language",
-                    "severity": "medium",
-                    "indicator": indicator
-                })
+                issues.append(
+                    {"type": "prescriptive_language", "severity": "medium", "indicator": indicator}
+                )
                 score -= 0.1
 
         return {"score": max(0, score), "issues": issues, "suggestions": suggestions}
@@ -305,27 +303,38 @@ class ReflectionEngine:
         # Check if key terms from query appear in response
         query_words = set(query_lower.split())
         response_words = set(response_lower.split())
-        common = {"the", "a", "an", "is", "are", "to", "of", "and", "or", "in", "on", "at", "for", "with"}
+        common = {
+            "the",
+            "a",
+            "an",
+            "is",
+            "are",
+            "to",
+            "of",
+            "and",
+            "or",
+            "in",
+            "on",
+            "at",
+            "for",
+            "with",
+        }
         key_terms = query_words - common
 
         if key_terms:
             addressed = key_terms & response_words
             coverage = len(addressed) / len(key_terms)
             if coverage < 0.3:
-                issues.append({
-                    "type": "low_topic_coverage",
-                    "severity": "medium",
-                    "coverage": coverage
-                })
+                issues.append(
+                    {"type": "low_topic_coverage", "severity": "medium", "coverage": coverage}
+                )
                 suggestions.append("Address more of the query's key terms")
                 score -= 0.2
 
         return {"score": max(0, score), "issues": issues, "suggestions": suggestions}
 
     def _check_tone(
-        self,
-        response: str,
-        emotional_state: dict[str, float] | None
+        self, response: str, emotional_state: dict[str, float] | None
     ) -> dict[str, Any]:
         """Check if tone matches emotional context."""
         issues = []
@@ -349,22 +358,26 @@ class ReflectionEngine:
         pos_count = sum(1 for w in positive_words if w in response_lower)
 
         if joy > 0.7 and neg_count > pos_count:
-            issues.append({
-                "type": "tone_mismatch",
-                "severity": "low",
-                "expected": "positive",
-                "actual": "negative"
-            })
+            issues.append(
+                {
+                    "type": "tone_mismatch",
+                    "severity": "low",
+                    "expected": "positive",
+                    "actual": "negative",
+                }
+            )
             suggestions.append("Consider more positive phrasing")
             score -= 0.1
 
         if fear > 0.6 and pos_count > neg_count + 2:
-            issues.append({
-                "type": "tone_mismatch",
-                "severity": "low",
-                "expected": "cautious",
-                "actual": "overly_positive"
-            })
+            issues.append(
+                {
+                    "type": "tone_mismatch",
+                    "severity": "low",
+                    "expected": "cautious",
+                    "actual": "overly_positive",
+                }
+            )
             suggestions.append("Consider more measured tone")
             score -= 0.1
 

@@ -30,21 +30,21 @@ except ImportError:
 
 try:
     from duckduckgo_search import DDGS
+
     HAS_DDG_SEARCH = True
 except ImportError:
     HAS_DDG_SEARCH = False
 
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
     HAS_DOTENV = True
 except ImportError:
     HAS_DOTENV = False
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Suppress warnings for cleaner output
@@ -53,6 +53,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 class SearchEngine(Enum):
     """Supported search engines."""
+
     DUCKDUCKGO = "duckduckgo"
     GOOGLE_CUSTOM = "google_custom"
     BING = "bing"
@@ -63,6 +64,7 @@ class SearchEngine(Enum):
 
 class SearchType(Enum):
     """Types of search queries."""
+
     WEB = "web"
     NEWS = "news"
     IMAGES = "images"
@@ -72,6 +74,7 @@ class SearchType(Enum):
 
 class SafetyLevel(Enum):
     """Content filtering safety levels."""
+
     OFF = "off"
     MODERATE = "moderate"
     STRICT = "strict"
@@ -80,6 +83,7 @@ class SafetyLevel(Enum):
 @dataclass
 class SearchResult:
     """Represents a single search result."""
+
     title: str
     url: str
     snippet: str = ""
@@ -94,6 +98,7 @@ class SearchResult:
 @dataclass
 class SearchResponse:
     """Represents the response from a search operation."""
+
     success: bool
     query: str
     engine: SearchEngine
@@ -125,8 +130,8 @@ class RateLimiter:
         now = time.time()
         # Remove old requests outside time window
         self.requests = [
-            req_time for req_time in self.requests if now -
-            req_time < self.time_window]
+            req_time for req_time in self.requests if now - req_time < self.time_window
+        ]
 
         return len(self.requests) < self.max_requests
 
@@ -153,7 +158,7 @@ class EnhancedWebSearch:
         primary_engine: SearchEngine = SearchEngine.DUCKDUCKGO,
         api_keys: dict[str, str] | None = None,
         rate_limit_requests: int = 100,
-        rate_limit_window: int = 3600
+        rate_limit_window: int = 3600,
     ):
         """
         Initialize the enhanced web search tool.
@@ -180,42 +185,54 @@ class EnhancedWebSearch:
         self._load_api_keys()
 
         # Tool parameters for function calling
-        self.parameters = [{"name": "query",
-                            "type": "string",
-                            "description": "Search query string",
-                            "required": True},
-                           {"name": "num_results",
-                            "type": "integer",
-                            "description": "Number of results to return (1-20)",
-                            "default": 5},
-                           {"name": "search_type",
-                            "type": "string",
-                            "description": "Type of search: 'web', 'news', 'images', 'academic', 'videos'",
-                            "default": "web"},
-                           {"name": "engine",
-                            "type": "string",
-                            "description": "Search engine: 'duckduckgo', 'google_custom', 'bing', 'serp_api', 'brave'",
-                            "default": self.primary_engine.value},
-                           {"name": "safety_level",
-                            "type": "string",
-                            "description": "Content filtering: 'off', 'moderate', 'strict'",
-                            "default": "moderate"}]
+        self.parameters = [
+            {
+                "name": "query",
+                "type": "string",
+                "description": "Search query string",
+                "required": True,
+            },
+            {
+                "name": "num_results",
+                "type": "integer",
+                "description": "Number of results to return (1-20)",
+                "default": 5,
+            },
+            {
+                "name": "search_type",
+                "type": "string",
+                "description": "Type of search: 'web', 'news', 'images', 'academic', 'videos'",
+                "default": "web",
+            },
+            {
+                "name": "engine",
+                "type": "string",
+                "description": "Search engine: 'duckduckgo', 'google_custom', 'bing', 'serp_api', 'brave'",
+                "default": self.primary_engine.value,
+            },
+            {
+                "name": "safety_level",
+                "type": "string",
+                "description": "Content filtering: 'off', 'moderate', 'strict'",
+                "default": "moderate",
+            },
+        ]
 
         # Request session for reuse
         self.session = None
 
         logger.info(
-            f"Enhanced Web Search initialized with {
-                primary_engine.value} as primary engine")
+            f"Enhanced Web Search initialized with {primary_engine.value} as primary engine"
+        )
 
     def _load_api_keys(self):
         """Load API keys from environment variables."""
         env_keys = {
-            'google_api_key': 'GOOGLE_API_KEY',
-            'google_cse_id': 'GOOGLE_CSE_ID',
-            'bing_api_key': 'BING_API_KEY',
-            'serp_api_key': 'SERPAPI_KEY',
-            'brave_api_key': 'BRAVE_API_KEY'
+            "google_api_key": "GOOGLE_API_KEY",
+            "google_cse_id": "GOOGLE_CSE_ID",
+            "bing_api_key": "BING_API_KEY",
+            "serp_api_key": "SERPAPI_KEY",
+            "brave_api_key": "BRAVE_API_KEY",
         }
 
         for key, env_var in env_keys.items():
@@ -228,7 +245,7 @@ class EnhancedWebSearch:
         num_results: int = 5,
         search_type: SearchType = SearchType.WEB,
         engine: SearchEngine | None = None,
-        safety_level: SafetyLevel = SafetyLevel.MODERATE
+        safety_level: SafetyLevel = SafetyLevel.MODERATE,
     ) -> SearchResponse:
         """
         Perform web search with specified parameters.
@@ -246,11 +263,7 @@ class EnhancedWebSearch:
         start_time = time.time()
         engine = engine or self.primary_engine
 
-        response = SearchResponse(
-            success=False,
-            query=query,
-            engine=engine
-        )
+        response = SearchResponse(success=False, query=query, engine=engine)
 
         try:
             # Validate input
@@ -268,7 +281,8 @@ class EnhancedWebSearch:
                 wait_time = self.rate_limiter.wait_time()
                 raise ValueError(
                     f"Rate limit exceeded. Wait {
-                        wait_time:.1f} seconds")
+                        wait_time:.1f} seconds"
+                )
 
             # Clean and preprocess query
             cleaned_query = self._preprocess_query(query)
@@ -287,14 +301,12 @@ class EnhancedWebSearch:
             elif engine == SearchEngine.BRAVE:
                 results = await self._search_brave(cleaned_query, num_results, search_type)
             elif engine == SearchEngine.MOCK:
-                results = self._search_mock(
-                    cleaned_query, num_results, search_type)
+                results = self._search_mock(cleaned_query, num_results, search_type)
             else:
                 raise ValueError(f"Unsupported search engine: {engine.value}")
 
             # Post-process results
-            processed_results = self._post_process_results(
-                results, safety_level)
+            processed_results = self._post_process_results(results, safety_level)
 
             # Record successful request
             self.rate_limiter.record_request()
@@ -306,11 +318,10 @@ class EnhancedWebSearch:
             response.metadata = {
                 "cleaned_query": cleaned_query,
                 "safety_level": safety_level.value,
-                "search_type": search_type.value
+                "search_type": search_type.value,
             }
 
-            logger.info(
-                f"Search successful: {len(response.results)} results for '{query}'")
+            logger.info(f"Search successful: {len(response.results)} results for '{query}'")
 
         except Exception as e:
             response.error = str(e)
@@ -324,10 +335,10 @@ class EnhancedWebSearch:
     def _preprocess_query(self, query: str) -> str:
         """Clean and preprocess search query."""
         # Remove excessive whitespace
-        cleaned = re.sub(r'\s+', ' ', query.strip())
+        cleaned = re.sub(r"\s+", " ", query.strip())
 
         # Remove special characters that might break search APIs
-        cleaned = re.sub(r'[<>"\{\}\\]', '', cleaned)
+        cleaned = re.sub(r'[<>"\{\}\\]', "", cleaned)
 
         # Limit length
         if len(cleaned) > 200:
@@ -336,10 +347,7 @@ class EnhancedWebSearch:
         return cleaned
 
     async def _search_duckduckgo(
-        self,
-        query: str,
-        num_results: int,
-        search_type: SearchType
+        self, query: str, num_results: int, search_type: SearchType
     ) -> list[SearchResult]:
         """Search using DuckDuckGo."""
         results = []
@@ -349,29 +357,25 @@ class EnhancedWebSearch:
                 # Use official duckduckgo-search library
                 with DDGS() as ddgs:
                     if search_type == SearchType.NEWS:
-                        search_results = ddgs.news(
-                            query, max_results=num_results)
+                        search_results = ddgs.news(query, max_results=num_results)
                     else:
-                        search_results = ddgs.text(
-                            query, max_results=num_results)
+                        search_results = ddgs.text(query, max_results=num_results)
 
                     for i, result in enumerate(search_results):
                         search_result = SearchResult(
-                            title=result.get('title', ''),
-                            url=result.get('href', ''),
-                            snippet=result.get('body', ''),
-                            domain=self._extract_domain(
-                                result.get('href', '')),
+                            title=result.get("title", ""),
+                            url=result.get("href", ""),
+                            snippet=result.get("body", ""),
+                            domain=self._extract_domain(result.get("href", "")),
                             rank=i + 1,
-                            published_date=result.get('date'),
+                            published_date=result.get("date"),
                             # Simple relevance scoring
-                            relevance_score=1.0 - (i * 0.1)
+                            relevance_score=1.0 - (i * 0.1),
                         )
                         results.append(search_result)
             else:
                 # Fallback to mock results
-                logger.warning(
-                    "duckduckgo-search library not available, using mock results")
+                logger.warning("duckduckgo-search library not available, using mock results")
                 results = self._search_mock(query, num_results, search_type)
 
         except Exception as e:
@@ -382,34 +386,30 @@ class EnhancedWebSearch:
         return results
 
     async def _search_google_custom(
-        self,
-        query: str,
-        num_results: int,
-        search_type: SearchType
+        self, query: str, num_results: int, search_type: SearchType
     ) -> list[SearchResult]:
         """Search using Google Custom Search API."""
         results = []
 
-        api_key = self.api_keys.get('google_api_key')
-        cse_id = self.api_keys.get('google_cse_id')
+        api_key = self.api_keys.get("google_api_key")
+        cse_id = self.api_keys.get("google_cse_id")
 
         if not api_key or not cse_id:
-            raise ValueError(
-                "Google API key and CSE ID required for Google Custom Search")
+            raise ValueError("Google API key and CSE ID required for Google Custom Search")
 
         try:
             url = "https://www.googleapis.com/customsearch/v1"
             params = {
-                'key': api_key,
-                'cx': cse_id,
-                'q': query,
-                'num': min(num_results, 10)  # Google allows max 10 per request
+                "key": api_key,
+                "cx": cse_id,
+                "q": query,
+                "num": min(num_results, 10),  # Google allows max 10 per request
             }
 
             if search_type == SearchType.NEWS:
-                params['tbm'] = 'nws'
+                params["tbm"] = "nws"
             elif search_type == SearchType.IMAGES:
-                params['searchType'] = 'image'
+                params["searchType"] = "image"
 
             if not self.session:
                 self.session = aiohttp.ClientSession()
@@ -418,21 +418,22 @@ class EnhancedWebSearch:
                 if response.status == 200:
                     data = await response.json()
 
-                    for i, item in enumerate(data.get('items', [])):
+                    for i, item in enumerate(data.get("items", [])):
                         search_result = SearchResult(
-                            title=item.get('title', ''),
-                            url=item.get('link', ''),
-                            snippet=item.get('snippet', ''),
-                            domain=self._extract_domain(item.get('link', '')),
+                            title=item.get("title", ""),
+                            url=item.get("link", ""),
+                            snippet=item.get("snippet", ""),
+                            domain=self._extract_domain(item.get("link", "")),
                             rank=i + 1,
                             relevance_score=1.0 - (i * 0.08),
-                            metadata={'page_map': item.get('pagemap', {})}
+                            metadata={"page_map": item.get("pagemap", {})},
                         )
                         results.append(search_result)
                 else:
                     raise ValueError(
                         f"Google API returned status {
-                            response.status}")
+                            response.status}"
+                    )
 
         except Exception as e:
             logger.error(f"Google Custom Search error: {str(e)}")
@@ -442,15 +443,12 @@ class EnhancedWebSearch:
         return results
 
     async def _search_bing(
-        self,
-        query: str,
-        num_results: int,
-        search_type: SearchType
+        self, query: str, num_results: int, search_type: SearchType
     ) -> list[SearchResult]:
         """Search using Bing Search API."""
         results = []
 
-        api_key = self.api_keys.get('bing_api_key')
+        api_key = self.api_keys.get("bing_api_key")
         if not api_key:
             raise ValueError("Bing API key required for Bing search")
 
@@ -459,12 +457,12 @@ class EnhancedWebSearch:
             if search_type == SearchType.NEWS:
                 base_url = "https://api.bing.microsoft.com/v7.0/news/search"
 
-            headers = {'Ocp-Apim-Subscription-Key': api_key}
+            headers = {"Ocp-Apim-Subscription-Key": api_key}
             params = {
-                'q': query,
-                'count': min(num_results, 20),
-                'textDecorations': False,
-                'textFormat': 'Raw'
+                "q": query,
+                "count": min(num_results, 20),
+                "textDecorations": False,
+                "textFormat": "Raw",
             }
 
             if not self.session:
@@ -474,26 +472,26 @@ class EnhancedWebSearch:
                 if response.status == 200:
                     data = await response.json()
 
-                    web_pages = data.get('webPages', {}).get('value', [])
-                    news_items = data.get(
-                        'value', []) if search_type == SearchType.NEWS else []
+                    web_pages = data.get("webPages", {}).get("value", [])
+                    news_items = data.get("value", []) if search_type == SearchType.NEWS else []
                     items = news_items if search_type == SearchType.NEWS else web_pages
 
                     for i, item in enumerate(items):
                         search_result = SearchResult(
-                            title=item.get('name', ''),
-                            url=item.get('url', ''),
-                            snippet=item.get('snippet', ''),
-                            domain=self._extract_domain(item.get('url', '')),
+                            title=item.get("name", ""),
+                            url=item.get("url", ""),
+                            snippet=item.get("snippet", ""),
+                            domain=self._extract_domain(item.get("url", "")),
                             rank=i + 1,
-                            published_date=item.get('datePublished'),
-                            relevance_score=1.0 - (i * 0.08)
+                            published_date=item.get("datePublished"),
+                            relevance_score=1.0 - (i * 0.08),
                         )
                         results.append(search_result)
                 else:
                     raise ValueError(
                         f"Bing API returned status {
-                            response.status}")
+                            response.status}"
+                    )
 
         except Exception as e:
             logger.error(f"Bing search error: {str(e)}")
@@ -502,29 +500,26 @@ class EnhancedWebSearch:
         return results
 
     async def _search_serp_api(
-        self,
-        query: str,
-        num_results: int,
-        search_type: SearchType
+        self, query: str, num_results: int, search_type: SearchType
     ) -> list[SearchResult]:
         """Search using SerpApi."""
         results = []
 
-        api_key = self.api_keys.get('serp_api_key')
+        api_key = self.api_keys.get("serp_api_key")
         if not api_key:
             raise ValueError("SerpApi key required for SerpApi search")
 
         try:
             url = "https://serpapi.com/search"
             params = {
-                'api_key': api_key,
-                'q': query,
-                'num': min(num_results, 20),
-                'engine': 'google'
+                "api_key": api_key,
+                "q": query,
+                "num": min(num_results, 20),
+                "engine": "google",
             }
 
             if search_type == SearchType.NEWS:
-                params['tbm'] = 'nws'
+                params["tbm"] = "nws"
 
             if not self.session:
                 self.session = aiohttp.ClientSession()
@@ -533,25 +528,26 @@ class EnhancedWebSearch:
                 if response.status == 200:
                     data = await response.json()
 
-                    organic_results = data.get('organic_results', [])
-                    news_results = data.get('news_results', [])
+                    organic_results = data.get("organic_results", [])
+                    news_results = data.get("news_results", [])
                     items = news_results if search_type == SearchType.NEWS else organic_results
 
                     for i, item in enumerate(items):
                         search_result = SearchResult(
-                            title=item.get('title', ''),
-                            url=item.get('link', ''),
-                            snippet=item.get('snippet', ''),
-                            domain=self._extract_domain(item.get('link', '')),
+                            title=item.get("title", ""),
+                            url=item.get("link", ""),
+                            snippet=item.get("snippet", ""),
+                            domain=self._extract_domain(item.get("link", "")),
                             rank=i + 1,
-                            published_date=item.get('date'),
-                            relevance_score=1.0 - (i * 0.08)
+                            published_date=item.get("date"),
+                            relevance_score=1.0 - (i * 0.08),
                         )
                         results.append(search_result)
                 else:
                     raise ValueError(
                         f"SerpApi returned status {
-                            response.status}")
+                            response.status}"
+                    )
 
         except Exception as e:
             logger.error(f"SerpApi search error: {str(e)}")
@@ -560,28 +556,19 @@ class EnhancedWebSearch:
         return results
 
     async def _search_brave(
-        self,
-        query: str,
-        num_results: int,
-        search_type: SearchType
+        self, query: str, num_results: int, search_type: SearchType
     ) -> list[SearchResult]:
         """Search using Brave Search API."""
         results = []
 
-        api_key = self.api_keys.get('brave_api_key')
+        api_key = self.api_keys.get("brave_api_key")
         if not api_key:
             raise ValueError("Brave API key required for Brave search")
 
         try:
             url = "https://api.search.brave.com/res/v1/web/search"
-            headers = {
-                'Accept': 'application/json',
-                'X-Subscription-Token': api_key
-            }
-            params = {
-                'q': query,
-                'count': min(num_results, 20)
-            }
+            headers = {"Accept": "application/json", "X-Subscription-Token": api_key}
+            params = {"q": query, "count": min(num_results, 20)}
 
             if not self.session:
                 self.session = aiohttp.ClientSession()
@@ -590,22 +577,23 @@ class EnhancedWebSearch:
                 if response.status == 200:
                     data = await response.json()
 
-                    web_results = data.get('web', {}).get('results', [])
+                    web_results = data.get("web", {}).get("results", [])
 
                     for i, item in enumerate(web_results):
                         search_result = SearchResult(
-                            title=item.get('title', ''),
-                            url=item.get('url', ''),
-                            snippet=item.get('description', ''),
-                            domain=self._extract_domain(item.get('url', '')),
+                            title=item.get("title", ""),
+                            url=item.get("url", ""),
+                            snippet=item.get("description", ""),
+                            domain=self._extract_domain(item.get("url", "")),
                             rank=i + 1,
-                            relevance_score=1.0 - (i * 0.08)
+                            relevance_score=1.0 - (i * 0.08),
                         )
                         results.append(search_result)
                 else:
                     raise ValueError(
                         f"Brave API returned status {
-                            response.status}")
+                            response.status}"
+                    )
 
         except Exception as e:
             logger.error(f"Brave search error: {str(e)}")
@@ -614,10 +602,7 @@ class EnhancedWebSearch:
         return results
 
     def _search_mock(
-        self,
-        query: str,
-        num_results: int,
-        search_type: SearchType
+        self, query: str, num_results: int, search_type: SearchType
     ) -> list[SearchResult]:
         """Generate mock search results for testing."""
         results = []
@@ -632,7 +617,7 @@ class EnhancedWebSearch:
                 rank=i,
                 relevance_score=1.0 - (i * 0.1),
                 content_type="mock_webpage",
-                metadata={"mock": True, "search_type": search_type.value}
+                metadata={"mock": True, "search_type": search_type.value},
             )
             results.append(result)
 
@@ -642,15 +627,14 @@ class EnhancedWebSearch:
         """Extract domain from URL."""
         try:
             from urllib.parse import urlparse
+
             parsed = urlparse(url)
             return parsed.netloc.lower()
         except Exception:
             return ""
 
     def _post_process_results(
-        self,
-        results: list[SearchResult],
-        safety_level: SafetyLevel
+        self, results: list[SearchResult], safety_level: SafetyLevel
     ) -> list[SearchResult]:
         """Post-process search results with filtering and scoring."""
         processed_results = []
@@ -668,16 +652,12 @@ class EnhancedWebSearch:
 
         return processed_results
 
-    def _is_safe_content(
-            self,
-            result: SearchResult,
-            safety_level: SafetyLevel) -> bool:
+    def _is_safe_content(self, result: SearchResult, safety_level: SafetyLevel) -> bool:
         """Check if content meets safety requirements."""
         # Basic content filtering - can be enhanced with ML models
-        unsafe_keywords = [
-            'adult',
-            'explicit',
-            'nsfw'] if safety_level == SafetyLevel.STRICT else []
+        unsafe_keywords = (
+            ["adult", "explicit", "nsfw"] if safety_level == SafetyLevel.STRICT else []
+        )
 
         text_to_check = f"{result.title} {result.snippet}".lower()
 
@@ -698,10 +678,10 @@ class EnhancedWebSearch:
         Returns:
             Dictionary with search results or error information
         """
-        num_results = kwargs.get('num_results', 5)
-        search_type = SearchType(kwargs.get('search_type', 'web'))
-        engine = SearchEngine(kwargs.get('engine', self.primary_engine.value))
-        safety_level = SafetyLevel(kwargs.get('safety_level', 'moderate'))
+        num_results = kwargs.get("num_results", 5)
+        search_type = SearchType(kwargs.get("search_type", "web"))
+        engine = SearchEngine(kwargs.get("engine", self.primary_engine.value))
+        safety_level = SafetyLevel(kwargs.get("safety_level", "moderate"))
 
         # Run async search in sync context
         loop = asyncio.new_event_loop()
@@ -709,12 +689,8 @@ class EnhancedWebSearch:
 
         try:
             response = loop.run_until_complete(
-                self.search(
-                    query,
-                    num_results,
-                    search_type,
-                    engine,
-                    safety_level))
+                self.search(query, num_results, search_type, engine, safety_level)
+            )
         finally:
             loop.close()
 
@@ -728,7 +704,7 @@ class EnhancedWebSearch:
                         "domain": result.domain,
                         "rank": result.rank,
                         "relevance_score": result.relevance_score,
-                        "published_date": result.published_date
+                        "published_date": result.published_date,
                     }
                     for result in response.results
                 ],
@@ -736,14 +712,14 @@ class EnhancedWebSearch:
                 "search_time_ms": response.search_time_ms,
                 "engine": response.engine.value,
                 "query": response.query,
-                "warnings": response.warnings
+                "warnings": response.warnings,
             }
         else:
             return {
                 "error": response.error,
                 "query": response.query,
                 "engine": response.engine.value,
-                "search_time_ms": response.search_time_ms
+                "search_time_ms": response.search_time_ms,
             }
 
     async def close(self):
@@ -764,7 +740,7 @@ def test_web_search():
         "latest advancements in 4-bit quantization for LLMs",
         "NVIDIA RTX A2000 4GB specifications",
         "local AI model deployment strategies",
-        "agentic AI frameworks 2024"
+        "agentic AI frameworks 2024",
     ]
 
     for query in test_queries:
@@ -777,7 +753,7 @@ def test_web_search():
             logger.info(f"Found {result['total_results']} results")
             logger.info(f"Search time: {result['search_time_ms']:.2f}ms")
 
-            for i, search_result in enumerate(result['results'][:2]):
+            for i, search_result in enumerate(result["results"][:2]):
                 logger.info(f"  {i + 1}. {search_result['title']}")
                 logger.info(f"     {search_result['url']}")
                 logger.info(f"     {search_result['snippet'][:100]}...")

@@ -32,10 +32,10 @@ logger = logging.getLogger(__name__)
 class AdapterType(Enum):
     """Available specialist adapter types."""
 
-    GENERAL = auto()    # Base model only, no adapter
-    CODING = auto()     # Software development specialist
-    LOGIC = auto()      # Logical reasoning specialist
-    BUTLER = auto()     # Conversational assistant
+    GENERAL = auto()  # Base model only, no adapter
+    CODING = auto()  # Software development specialist
+    LOGIC = auto()  # Logical reasoning specialist
+    BUTLER = auto()  # Conversational assistant
 
 
 @dataclass
@@ -77,9 +77,8 @@ class AdapterStats:
         self.load_count += 1
         # Running average
         self.average_load_time_ms = (
-            (self.average_load_time_ms * (self.load_count - 1) + load_time_ms)
-            / self.load_count
-        )
+            self.average_load_time_ms * (self.load_count - 1) + load_time_ms
+        ) / self.load_count
 
     def record_generation(self, tokens: int) -> None:
         """Record a generation using this adapter."""
@@ -150,8 +149,7 @@ class AdapterManager:
 
         # Statistics per adapter
         self.stats: dict[AdapterType, AdapterStats] = {
-            adapter_type: AdapterStats(name=adapter_type.name)
-            for adapter_type in AdapterType
+            adapter_type: AdapterStats(name=adapter_type.name) for adapter_type in AdapterType
         }
 
         # Lock for thread-safe swapping
@@ -200,21 +198,64 @@ class AdapterManager:
 
         # Strong indicators
         strong_keywords = [
-            "code", "function", "class", "method", "variable",
-            "debug", "error", "exception", "bug", "fix",
-            "python", "javascript", "java", "rust", "golang",
-            "api", "endpoint", "database", "sql", "query",
-            "git", "commit", "branch", "merge", "repository",
-            "import", "export", "module", "package", "library",
-            "compile", "build", "deploy", "test", "unittest",
+            "code",
+            "function",
+            "class",
+            "method",
+            "variable",
+            "debug",
+            "error",
+            "exception",
+            "bug",
+            "fix",
+            "python",
+            "javascript",
+            "java",
+            "rust",
+            "golang",
+            "api",
+            "endpoint",
+            "database",
+            "sql",
+            "query",
+            "git",
+            "commit",
+            "branch",
+            "merge",
+            "repository",
+            "import",
+            "export",
+            "module",
+            "package",
+            "library",
+            "compile",
+            "build",
+            "deploy",
+            "test",
+            "unittest",
         ]
 
         # Medium indicators
         medium_keywords = [
-            "program", "script", "algorithm", "data structure",
-            "loop", "array", "list", "dictionary", "object",
-            "string", "integer", "float", "boolean", "type",
-            "frontend", "backend", "server", "client", "http",
+            "program",
+            "script",
+            "algorithm",
+            "data structure",
+            "loop",
+            "array",
+            "list",
+            "dictionary",
+            "object",
+            "string",
+            "integer",
+            "float",
+            "boolean",
+            "type",
+            "frontend",
+            "backend",
+            "server",
+            "client",
+            "http",
         ]
 
         # Count matches
@@ -228,11 +269,12 @@ class AdapterManager:
 
         # Code patterns
         import re
-        if re.search(r'```[\w]*\n', text):  # Code blocks
+
+        if re.search(r"```[\w]*\n", text):  # Code blocks
             score += 0.3
-        if re.search(r'def\s+\w+|class\s+\w+|function\s+\w+', text):  # Definitions
+        if re.search(r"def\s+\w+|class\s+\w+|function\s+\w+", text):  # Definitions
             score += 0.25
-        if re.search(r'\w+\.\w+\(', text):  # Method calls
+        if re.search(r"\w+\.\w+\(", text):  # Method calls
             score += 0.15
 
         return min(score, 1.0)
@@ -243,22 +285,55 @@ class AdapterManager:
 
         # Strong indicators
         strong_keywords = [
-            "prove", "proof", "theorem", "lemma", "corollary",
-            "deduce", "deduction", "infer", "inference",
-            "therefore", "hence", "thus", "consequently",
-            "if and only if", "implies", "equivalent",
-            "valid", "invalid", "sound", "unsound",
-            "premise", "conclusion", "argument",
-            "logical", "fallacy", "contradiction",
+            "prove",
+            "proof",
+            "theorem",
+            "lemma",
+            "corollary",
+            "deduce",
+            "deduction",
+            "infer",
+            "inference",
+            "therefore",
+            "hence",
+            "thus",
+            "consequently",
+            "if and only if",
+            "implies",
+            "equivalent",
+            "valid",
+            "invalid",
+            "sound",
+            "unsound",
+            "premise",
+            "conclusion",
+            "argument",
+            "logical",
+            "fallacy",
+            "contradiction",
         ]
 
         # Medium indicators
         medium_keywords = [
-            "assume", "suppose", "given", "show that",
-            "follows", "derive", "reason", "reasoning",
-            "true", "false", "truth table",
-            "necessary", "sufficient", "condition",
-            "all", "some", "none", "every", "exists",
+            "assume",
+            "suppose",
+            "given",
+            "show that",
+            "follows",
+            "derive",
+            "reason",
+            "reasoning",
+            "true",
+            "false",
+            "truth table",
+            "necessary",
+            "sufficient",
+            "condition",
+            "all",
+            "some",
+            "none",
+            "every",
+            "exists",
         ]
 
         # Count matches
@@ -272,9 +347,10 @@ class AdapterManager:
 
         # Logic patterns
         import re
-        if re.search(r'if\s+.+\s+then\s+', text):  # If-then statements
+
+        if re.search(r"if\s+.+\s+then\s+", text):  # If-then statements
             score += 0.2
-        if re.search(r'∀|∃|¬|∧|∨|→|↔', text):  # Logic symbols
+        if re.search(r"∀|∃|¬|∧|∨|→|↔", text):  # Logic symbols
             score += 0.3
 
         return min(score, 1.0)
@@ -285,21 +361,49 @@ class AdapterManager:
 
         # Strong indicators
         strong_keywords = [
-            "schedule", "appointment", "meeting", "calendar",
-            "remind", "reminder", "notification", "alert",
-            "weather", "temperature", "forecast",
-            "news", "headlines", "update",
-            "recommend", "suggestion", "advice",
-            "help me", "assist", "please",
+            "schedule",
+            "appointment",
+            "meeting",
+            "calendar",
+            "remind",
+            "reminder",
+            "notification",
+            "alert",
+            "weather",
+            "temperature",
+            "forecast",
+            "news",
+            "headlines",
+            "update",
+            "recommend",
+            "suggestion",
+            "advice",
+            "help me",
+            "assist",
+            "please",
         ]
 
         # Medium indicators
         medium_keywords = [
-            "today", "tomorrow", "this week", "next",
-            "find", "search", "look up", "check",
-            "set", "turn on", "turn off", "enable", "disable",
-            "what time", "how long", "when is",
-            "thank", "thanks", "appreciate",
+            "today",
+            "tomorrow",
+            "this week",
+            "next",
+            "find",
+            "search",
+            "look up",
+            "check",
+            "set",
+            "turn on",
+            "turn off",
+            "enable",
+            "disable",
+            "what time",
+            "how long",
+            "when is",
+            "thank",
+            "thanks",
+            "appreciate",
         ]
 
         # Count matches
@@ -380,6 +484,7 @@ class AdapterManager:
             True on success
         """
         import time
+
         start_time = time.time()
 
         adapter_name = self.ADAPTER_PATHS.get(adapter_type)
@@ -469,8 +574,7 @@ class AdapterManager:
             "active_adapter": self.active_adapter.name,
             "adapter_loaded": self._adapter_loaded,
             "adapters": {
-                adapter_type.name: stats.to_dict()
-                for adapter_type, stats in self.stats.items()
+                adapter_type.name: stats.to_dict() for adapter_type, stats in self.stats.items()
             },
         }
 

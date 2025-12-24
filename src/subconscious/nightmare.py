@@ -40,12 +40,13 @@ logger = logging.getLogger(__name__)
 
 class SleepPhase(Enum):
     """Phases of the sleep/consolidation cycle."""
-    AWAKE = auto()           # Normal operation
-    DROWSY = auto()          # Preparing for sleep
-    LIGHT_SLEEP = auto()     # Fast weight updates
-    DEEP_SLEEP = auto()      # Slow weight consolidation
-    REM = auto()             # Intensive replay (QLoRA training)
-    WAKING = auto()          # Transitioning back to awake
+
+    AWAKE = auto()  # Normal operation
+    DROWSY = auto()  # Preparing for sleep
+    LIGHT_SLEEP = auto()  # Fast weight updates
+    DEEP_SLEEP = auto()  # Slow weight consolidation
+    REM = auto()  # Intensive replay (QLoRA training)
+    WAKING = auto()  # Transitioning back to awake
 
 
 @dataclass
@@ -67,6 +68,7 @@ class NightmareConfig:
         min_quality: Minimum quality for episode selection
         max_training_time_minutes: Maximum training time per cycle
     """
+
     idle_threshold_minutes: int = 30
     min_episodes_for_training: int = 10
     batch_size: int = 4
@@ -93,6 +95,7 @@ class NightmareConfig:
 @dataclass
 class SleepCycleStats:
     """Statistics from a sleep cycle."""
+
     cycle_id: str
     start_time: str
     end_time: str | None = None
@@ -337,10 +340,7 @@ class NightmareEngine:
         )
 
         # Filter by quality
-        episodes = [
-            ep for ep in episodes
-            if ep.quality_score >= self.config.min_quality
-        ]
+        episodes = [ep for ep in episodes if ep.quality_score >= self.config.min_quality]
 
         logger.info(f"Selected {len(episodes)} episodes for consolidation")
         self._current_stats.episodes_processed = len(episodes)
@@ -357,15 +357,17 @@ class NightmareEngine:
 
         # In a real implementation, this would update the Titans sidecar
         # with recent high-surprise events
-        for _ep in episodes[:self.config.batch_size]:
+        for _ep in episodes[: self.config.batch_size]:
             # Simulate fast weight update
             self._current_stats.fast_updates += 1
 
         # Brief pause to simulate processing
-        time.sleep(min(
-            self.config.light_sleep_duration_minutes * 60,
-            30  # Cap at 30 seconds for responsiveness
-        ))
+        time.sleep(
+            min(
+                self.config.light_sleep_duration_minutes * 60,
+                30,  # Cap at 30 seconds for responsiveness
+            )
+        )
 
     def _deep_sleep_phase(self, episodes: list[Any]):
         """
@@ -380,10 +382,7 @@ class NightmareEngine:
         self._current_stats.slow_updates = len(episodes)
 
         # Simulate processing time
-        time.sleep(min(
-            self.config.deep_sleep_duration_minutes * 60,
-            60  # Cap at 60 seconds
-        ))
+        time.sleep(min(self.config.deep_sleep_duration_minutes * 60, 60))  # Cap at 60 seconds
 
     def _rem_phase(self, episodes: list[Any]):
         """
@@ -406,8 +405,7 @@ class NightmareEngine:
 
         # Save training data
         training_path = os.path.join(
-            self.config.output_dir,
-            f"training_data_{self._current_stats.cycle_id}.jsonl"
+            self.config.output_dir, f"training_data_{self._current_stats.cycle_id}.jsonl"
         )
         self._save_training_data(training_data, training_path)
 
@@ -415,8 +413,7 @@ class NightmareEngine:
         if self.qlora_trainer:
             try:
                 adapter_path = os.path.join(
-                    self.config.output_dir,
-                    f"adapter_{self._current_stats.cycle_id}"
+                    self.config.output_dir, f"adapter_{self._current_stats.cycle_id}"
                 )
 
                 loss = self.qlora_trainer.train(
@@ -484,11 +481,11 @@ class NightmareEngine:
         """Save training data to JSONL file."""
         os.makedirs(os.path.dirname(path), exist_ok=True)
 
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             for item in data:
                 # Remove metadata for actual training
-                clean_item = {k: v for k, v in item.items() if not k.startswith('_')}
-                f.write(json.dumps(clean_item) + '\n')
+                clean_item = {k: v for k, v in item.items() if not k.startswith("_")}
+                f.write(json.dumps(clean_item) + "\n")
 
         logger.info(f"Training data saved to {path}")
 
