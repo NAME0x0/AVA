@@ -1,12 +1,18 @@
 """
-AVA CLI - Command Line Interface
+AVA CLI - Command Line Interface (v3)
+=====================================
 
-A rich terminal interface for interacting with AVA, the developmental AI.
+A rich terminal interface for interacting with AVA v3 (Cortex-Medulla Architecture).
+
 Features:
-- Interactive chat mode
-- Status display showing developmental stage and emotions
-- Feedback commands for training
-- Administrative commands (reset, status, etc.)
+- Interactive chat mode with the v3 engine
+- Status display showing cognitive state
+- System monitoring and tool access
+- Force modes: /think (Cortex), /search (Search-First)
+
+Note: This CLI uses the unified AVA class from src.ava which implements
+the Cortex-Medulla architecture. Legacy features like developmental stages
+and emotions have been removed in favor of cognitive states and VFE.
 """
 
 import asyncio
@@ -38,6 +44,23 @@ except ImportError:
 # Initialize console
 console = Console() if RICH_AVAILABLE else None
 
+# ASCII Art Banner
+BANNER = """
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║     █████╗ ██╗   ██╗ █████╗      ██████╗██╗     ██╗               ║
+║    ██╔══██╗██║   ██║██╔══██╗    ██╔════╝██║     ██║               ║
+║    ███████║██║   ██║███████║    ██║     ██║     ██║               ║
+║    ██╔══██║╚██╗ ██╔╝██╔══██║    ██║     ██║     ██║               ║
+║    ██║  ██║ ╚████╔╝ ██║  ██║    ╚██████╗███████╗██║               ║
+║    ╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝     ╚═════╝╚══════╝╚═╝               ║
+║                                                                   ║
+║              COMMAND LINE INTERFACE v3                            ║
+║         Cortex-Medulla • Search-First • Always-On                 ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+"""
+
 
 def print_output(text: str, style: str = ""):
     """Print output with or without rich formatting."""
@@ -67,10 +90,12 @@ def print_panel(content: str, title: str = "", style: str = "blue"):
 
 class AVACli:
     """
-    Command-line interface for AVA.
+    Command-line interface for AVA v3.
     
     Provides an interactive chat interface with commands for
-    status, feedback, and administration.
+    status, tools, and system monitoring.
+    
+    Note: Uses the v3 Cortex-Medulla architecture via src.ava.AVA
     """
     
     def __init__(self, data_dir: str = "data", model: str = "llama3.2"):
@@ -79,134 +104,91 @@ class AVACli:
         
         Args:
             data_dir: Data directory for AVA
-            model: Ollama model name
+            model: Ollama model name (for v3, this is configured in cortex_medulla.yaml)
         """
         self.data_dir = data_dir
         self.model = model
-        self.agent = None
-        self.last_sample_id: Optional[str] = None
+        self.ava = None  # v3 AVA instance
+        self.last_response = None  # Store last response for reference
         
         # Command handlers
         self.commands = {
             "/help": self.cmd_help,
             "/status": self.cmd_status,
-            "/emotions": self.cmd_emotions,
             "/memory": self.cmd_memory,
-            "/good": self.cmd_good_feedback,
-            "/bad": self.cmd_bad_feedback,
-            "/correct": self.cmd_correct,
-            "/reset": self.cmd_reset,
-            "/save": self.cmd_save,
             "/quit": self.cmd_quit,
             "/exit": self.cmd_quit,
-            "/stage": self.cmd_stage,
             "/tools": self.cmd_tools,
+            "/think": self.cmd_think,
+            "/search": self.cmd_search,
         }
     
-    def initialize_agent(self):
-        """Initialize the AVA agent."""
+    def initialize_ava(self) -> bool:
+        """Initialize the AVA v3 system."""
         try:
-            from .agent import DevelopmentalAgent
+            from .ava import AVA
             
-            self.agent = DevelopmentalAgent(
-                data_dir=self.data_dir,
-                model_name=self.model,
-            )
+            self.ava = AVA()
             return True
         except Exception as e:
-            print_error(f"Failed to initialize agent: {e}")
+            print_error(f"Failed to initialize AVA: {e}")
             return False
     
+    async def start_ava(self) -> bool:
+        """Start the AVA engine (async initialization)."""
+        if self.ava:
+            try:
+                success = await self.ava.start()
+                if success:
+                    return True
+                else:
+                    print_error("AVA engine failed to start")
+                    return False
+            except Exception as e:
+                print_error(f"Failed to start AVA engine: {e}")
+                return False
+        return False
+    
     def print_welcome(self):
-        """Print welcome message."""
-        stage = self.agent.development.current_stage.name if self.agent else "UNKNOWN"
-        age = self.agent.development.get_age_days() if self.agent else 0
+        """Print welcome message with ASCII banner."""
+        # Print the main banner
+        if console:
+            console.print(BANNER, style="cyan")
+        else:
+            print(BANNER)
         
-        welcome = f"""
-╔══════════════════════════════════════════════════════════════╗
-║                    Welcome to AVA                              ║
-║              Developmental AI Assistant                        ║
-╠══════════════════════════════════════════════════════════════╣
-║  Current Stage: {stage:<15}  Age: {age:.1f} days              ║
-║                                                                ║
-║  Commands:                                                     ║
-║    /help    - Show all commands                               ║
-║    /status  - Show AVA's status                               ║
-║    /good    - Positive feedback on last response              ║
-║    /bad     - Negative feedback on last response              ║
-║    /quit    - Exit                                            ║
-╚══════════════════════════════════════════════════════════════╝
+        # Print command help
+        help_text = """
+  Commands:
+    /help    - Show all commands
+    /status  - Show AVA's system status
+    /think   - Force deep thinking (Cortex)
+    /search  - Search-first mode
+    /quit    - Exit
 """
         if console:
-            console.print(Panel(welcome.strip(), title="AVA CLI", border_style="cyan"))
+            console.print(help_text, style="dim")
         else:
-            print(welcome)
+            print(help_text)
     
-    def print_prompt(self):
-        """Print the input prompt with stage indicator."""
-        if not self.agent:
-            return "You: "
-        
-        stage = self.agent.development.current_stage.name
-        stage_emoji = {
-            "INFANT": "👶",
-            "TODDLER": "🧒",
-            "CHILD": "👦",
-            "ADOLESCENT": "🧑",
-            "YOUNG_ADULT": "👨",
-            "MATURE": "🧓",
-        }
-        emoji = stage_emoji.get(stage, "🤖")
-        
-        return f"{emoji} You: "
+    def print_prompt(self) -> str:
+        """Print the input prompt."""
+        return "🤖 You: "
     
     def format_response(self, result) -> str:
         """Format AVA's response for display."""
         if not result:
             return ""
         
-        response = result.filtered_response
-        stage = result.developmental_stage
+        # Extract text from response object
+        text = getattr(result, 'text', str(result))
+        cognitive_state = getattr(result, 'cognitive_state', 'FLOW')
+        used_cortex = getattr(result, 'used_cortex', False)
         
-        # Add stage indicator
-        stage_emoji = {
-            "INFANT": "👶",
-            "TODDLER": "🧒",
-            "CHILD": "👦",
-            "ADOLESCENT": "🧑",
-            "YOUNG_ADULT": "👨",
-            "MATURE": "🧓",
-        }
-        emoji = stage_emoji.get(stage, "🤖")
+        # Add indicator if Cortex was used
+        indicator = "🧠" if used_cortex else "⚡"
         
-        return f"{emoji} AVA: {response}"
-    
-    def print_emotion_bar(self, emotions: dict):
-        """Print a visual representation of emotions."""
-        if not console:
-            return
-        
-        emotion_colors = {
-            "hope": "green",
-            "fear": "red",
-            "joy": "yellow",
-            "surprise": "magenta",
-            "ambition": "blue",
-        }
-        
-        table = Table(show_header=False, box=None, padding=(0, 1))
-        
-        for emotion, value in emotions.items():
-            bar_length = int(value * 20)
-            bar = "█" * bar_length + "░" * (20 - bar_length)
-            color = emotion_colors.get(emotion, "white")
-            table.add_row(
-                f"{emotion:10}",
-                f"[{color}]{bar}[/{color}]",
-                f"{value:.2f}"
-            )
-        
-        console.print(table)
+        return f"{indicator} AVA [{cognitive_state}]: {text}"
     
     async def process_input(self, user_input: str) -> bool:
         """
@@ -234,27 +216,27 @@ class AVACli:
                 print_error(f"Unknown command: {cmd}. Type /help for available commands.")
                 return True
         
-        # Regular interaction
-        if not self.agent:
-            print_error("Agent not initialized. Please restart.")
+        # Regular interaction with AVA v3
+        if not self.ava:
+            print_error("AVA not initialized. Please restart.")
             return True
         
         # Show thinking indicator
         if console:
             with Progress(
                 SpinnerColumn(),
-                TextColumn("[cyan]AVA is thinking...[/cyan]"),
+                TextColumn("[cyan]AVA is processing...[/cyan]"),
                 console=console,
                 transient=True,
             ) as progress:
                 progress.add_task("thinking", total=None)
-                result = await self.agent.interact(user_input)
+                result = await self.ava.chat(user_input)
         else:
-            print("AVA is thinking...")
-            result = await self.agent.interact(user_input)
+            print("AVA is processing...")
+            result = await self.ava.chat(user_input)
         
-        # Store sample ID for feedback
-        self.last_sample_id = result.sample_id
+        # Store response for reference
+        self.last_response = result
         
         # Print response
         formatted = self.format_response(result)
@@ -265,10 +247,10 @@ class AVACli:
             print(formatted)
         print_output("")
         
-        # Show emotions if significantly changed
-        dominant = max(result.emotional_state.items(), key=lambda x: x[1])
-        if dominant[1] > 0.6:
-            print_output(f"[{dominant[0]} feeling: {dominant[1]:.0%}]", style="dim")
+        # Show tools used if any
+        tools_used = getattr(result, 'tools_used', [])
+        if tools_used:
+            print_output(f"[Tools: {', '.join(tools_used)}]", style="dim")
         
         return True
     
@@ -281,240 +263,178 @@ Available Commands:
     /help           Show this help message
     /quit, /exit    Exit AVA
     
-  Feedback Commands:
-    /good           Give positive feedback on last response
-    /bad            Give negative feedback on last response
-    /correct <text> Provide a correction for last response
+  Processing Modes:
+    /think <query>  Force deep thinking (Cortex mode)
+    /search <query> Force search-first mode
     
   Status Commands:
-    /status         Show AVA's full status
-    /stage          Show developmental stage info
-    /emotions       Show current emotional state
+    /status         Show AVA's system status
     /memory         Show memory statistics
     /tools          Show available tools
-    
-  Admin Commands:
-    /save           Save current state
-    /reset          Reset AVA to infant stage (requires confirmation)
 """
         print_panel(help_text.strip(), "Help", "green")
         return True
     
     async def cmd_status(self, args: str) -> bool:
-        """Show AVA's status."""
-        if not self.agent:
-            print_error("Agent not initialized")
+        """Show AVA v3 system status."""
+        if not self.ava or not self.ava._started:
+            print_error("AVA not initialized")
             return True
         
-        status = self.agent.get_status()
-        
+        # Get status from engine if available
         if console:
-            table = Table(title="AVA Status", show_header=True)
-            table.add_column("Category", style="cyan")
-            table.add_column("Detail", style="white")
-            table.add_column("Value", style="green")
+            table = Table(title="AVA v3 Status", show_header=True)
+            table.add_column("Component", style="cyan")
+            table.add_column("Status", style="green")
             
-            # Developmental
-            table.add_row("Developmental", "Stage", status["developmental"]["stage"])
-            table.add_row("", "Age (days)", f"{status['developmental']['age_days']:.1f}")
-            table.add_row("", "Interactions", str(status["developmental"]["interaction_count"]))
-            table.add_row("", "Milestones", str(len(status["developmental"]["achieved_milestones"])))
+            table.add_row("Engine", "Running" if self.ava._started else "Stopped")
+            table.add_row("Architecture", "Cortex-Medulla v3")
+            table.add_row("Mode", "Search-First Enabled")
             
-            # Emotional
-            table.add_row("Emotional", "Dominant", status["emotional"]["dominant_emotion"] or "None")
-            for emotion, value in status["emotional"]["current_state"].items():
-                table.add_row("", emotion.capitalize(), f"{value:.2f}")
-            
-            # Learning
-            table.add_row("Learning", "Samples", str(status["learning"]["samples_collected"]))
-            table.add_row("", "Ready for training", str(status["learning"]["available_for_training"]))
-            table.add_row("", "Training runs", str(status["learning"]["training_runs"]))
-            
-            # Session
-            table.add_row("Session", "Started", status["session"]["started"][:19])
-            table.add_row("", "Interactions", str(status["session"]["interactions"]))
+            # Show last response info if available
+            if self.last_response:
+                table.add_row("Last Cognitive State", getattr(self.last_response, 'cognitive_state', 'N/A'))
+                table.add_row("Last Used Cortex", "Yes" if getattr(self.last_response, 'used_cortex', False) else "No")
             
             console.print(table)
         else:
-            print("\n=== AVA Status ===")
-            print(f"Stage: {status['developmental']['stage']}")
-            print(f"Age: {status['developmental']['age_days']:.1f} days")
-            print(f"Interactions: {status['developmental']['interaction_count']}")
-            print(f"Samples: {status['learning']['samples_collected']}")
-        
-        return True
-    
-    async def cmd_emotions(self, args: str) -> bool:
-        """Show emotional state."""
-        if not self.agent:
-            print_error("Agent not initialized")
-            return True
-        
-        emotions = self.agent.emotions.get_emotion_dict()
-        
-        print_output("\nCurrent Emotional State:", style="bold")
-        self.print_emotion_bar(emotions)
-        print_output("")
+            print("\n=== AVA v3 Status ===")
+            print(f"Engine: {'Running' if self.ava._started else 'Stopped'}")
+            print(f"Architecture: Cortex-Medulla v3")
         
         return True
     
     async def cmd_memory(self, args: str) -> bool:
         """Show memory statistics."""
-        if not self.agent:
-            print_error("Agent not initialized")
+        if not self.ava or not self.ava._memory:
+            print_error("AVA not initialized or memory not available")
             return True
         
-        stats = self.agent.memory.get_stats()
+        # Get memory stats from v3 memory system
+        memory = self.ava._memory
         
         print_panel(
-            f"Episodic memories: {stats.get('episodic_count', 0)}\n"
-            f"Semantic memories: {stats.get('semantic_count', 0)}\n"
-            f"Total memories: {stats.get('total', 0)}",
+            f"Conversation turns: {len(memory.messages) if hasattr(memory, 'messages') else 'N/A'}\n"
+            f"Architecture: Titans Neural Memory (when loaded)",
             "Memory Statistics",
             "yellow"
         )
         
         return True
     
-    async def cmd_stage(self, args: str) -> bool:
-        """Show developmental stage info."""
-        if not self.agent:
-            print_error("Agent not initialized")
-            return True
-        
-        from .developmental import STAGE_PROPERTIES
-        
-        stage = self.agent.development.current_stage
-        props = STAGE_PROPERTIES[stage]
-        
-        info = f"""
-Stage: {stage.name}
-Clarity: {props.clarity * 100:.0f}%
-Vocabulary Range: {props.vocabulary_range * 100:.0f}%
-Tool Level: {props.tool_level}
-Learning Rate Modifier: {props.learning_rate_modifier:.1f}x
-Max Response Tokens: {props.max_response_tokens}
-Thinking Budget: {props.thinking_budget}
-"""
-        print_panel(info.strip(), f"Developmental Stage: {stage.name}", "blue")
-        
-        return True
-    
     async def cmd_tools(self, args: str) -> bool:
         """Show available tools."""
-        if not self.agent:
-            print_error("Agent not initialized")
+        if not self.ava or not self.ava._tools:
+            print_error("AVA not initialized or tools not available")
             return True
         
-        available = self.agent.tool_progression.get_available_tools(
-            stage=self.agent.development.current_stage,
-            milestones=self.agent.development.get_achieved_milestones(),
-        )
-        
-        all_tools = list(self.agent.tools.tools.keys())
+        tools = self.ava._tools
+        available = list(tools.tools.keys()) if hasattr(tools, 'tools') else []
         
         if console:
-            table = Table(title="Tool Availability")
+            table = Table(title="Available Tools")
             table.add_column("Tool", style="cyan")
-            table.add_column("Status", style="white")
+            table.add_column("Status", style="green")
             
-            for tool in all_tools:
-                status = "[green]✓ Available[/green]" if tool in available else "[red]✗ Locked[/red]"
-                table.add_row(tool, status)
+            for tool in available:
+                table.add_row(tool, "[green]✓ Available[/green]")
+            
+            if not available:
+                table.add_row("(No tools loaded)", "[yellow]Configure tools in tools.yaml[/yellow]")
             
             console.print(table)
         else:
             print("\n=== Tools ===")
-            for tool in all_tools:
-                status = "Available" if tool in available else "Locked"
-                print(f"  {tool}: {status}")
+            for tool in available:
+                print(f"  {tool}: Available")
         
         return True
     
-    async def cmd_good_feedback(self, args: str) -> bool:
-        """Provide positive feedback."""
-        if not self.last_sample_id:
-            print_error("No previous response to rate")
-            return True
-        
-        self.agent.provide_feedback(
-            sample_id=self.last_sample_id,
-            positive=True,
-            feedback_text=args if args else None,
-        )
-        
-        print_output("✓ Positive feedback recorded. AVA is happy!", style="green")
-        return True
-    
-    async def cmd_bad_feedback(self, args: str) -> bool:
-        """Provide negative feedback."""
-        if not self.last_sample_id:
-            print_error("No previous response to rate")
-            return True
-        
-        self.agent.provide_feedback(
-            sample_id=self.last_sample_id,
-            positive=False,
-            feedback_text=args if args else None,
-        )
-        
-        print_output("✓ Negative feedback recorded. AVA will learn from this.", style="yellow")
-        return True
-    
-    async def cmd_correct(self, args: str) -> bool:
-        """Provide a correction."""
-        if not self.last_sample_id:
-            print_error("No previous response to correct")
-            return True
-        
+    async def cmd_think(self, args: str) -> bool:
+        """Force deep thinking (Cortex mode)."""
         if not args:
-            print_error("Please provide the correction text: /correct <your correction>")
+            print_error("Usage: /think <query>")
             return True
         
-        self.agent.provide_feedback(
-            sample_id=self.last_sample_id,
-            positive=False,
-            correction=args,
-        )
-        
-        print_output("✓ Correction recorded. AVA will learn the right response.", style="yellow")
-        return True
-    
-    async def cmd_save(self, args: str) -> bool:
-        """Save state."""
-        if self.agent:
-            self.agent.save_state()
-            print_output("✓ State saved", style="green")
-        return True
-    
-    async def cmd_reset(self, args: str) -> bool:
-        """Reset AVA to infant stage."""
-        if args.lower() != "confirm":
-            print_panel(
-                "This will reset AVA to infant stage, losing all progress and memories.\n"
-                "Type '/reset confirm' to proceed.",
-                "Warning",
-                "red"
-            )
+        if not self.ava:
+            print_error("AVA not initialized")
             return True
         
-        if self.agent:
-            self.agent.reset_to_infant(confirm=True)
-            print_output("AVA has been reset to infant stage.", style="yellow")
+        if console:
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[cyan]Cortex thinking deeply...[/cyan]"),
+                console=console,
+                transient=True,
+            ) as progress:
+                progress.add_task("thinking", total=None)
+                result = await self.ava.think(args)
+        else:
+            print("Cortex thinking...")
+            result = await self.ava.think(args)
+        
+        self.last_response = result
+        formatted = self.format_response(result)
+        print_output("")
+        if console:
+            console.print(formatted, style="cyan")
+        else:
+            print(formatted)
+        print_output("")
+        
+        return True
+    
+    async def cmd_search(self, args: str) -> bool:
+        """Force search-first mode."""
+        if not args:
+            print_error("Usage: /search <query>")
+            return True
+        
+        if not self.ava:
+            print_error("AVA not initialized")
+            return True
+        
+        # Search-first is the default in v3, but we make it explicit
+        if console:
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[cyan]Searching for information...[/cyan]"),
+                console=console,
+                transient=True,
+            ) as progress:
+                progress.add_task("searching", total=None)
+                result = await self.ava.chat(args, tools=["web_search"])
+        else:
+            print("Searching...")
+            result = await self.ava.chat(args, tools=["web_search"])
+        
+        self.last_response = result
+        formatted = self.format_response(result)
+        print_output("")
+        if console:
+            console.print(formatted, style="cyan")
+        else:
+            print(formatted)
+        print_output("")
         
         return True
     
     async def cmd_quit(self, args: str) -> bool:
         """Exit the CLI."""
-        if self.agent:
-            self.agent.save_state()
-            print_output("State saved. Goodbye!", style="green")
+        if self.ava:
+            await self.ava.stop()
+            print_output("AVA stopped. Goodbye!", style="green")
         return False
     
     async def run(self):
         """Run the interactive CLI loop."""
-        # Initialize agent
-        if not self.initialize_agent():
+        # Initialize AVA
+        if not self.initialize_ava():
+            return
+        
+        # Start AVA engine
+        print_output("Starting AVA v3 engine...", style="yellow")
+        if not await self.start_ava():
             return
         
         # Print welcome
@@ -534,9 +454,9 @@ Thinking Budget: {props.thinking_budget}
                 running = await self.process_input(user_input)
                 
             except KeyboardInterrupt:
-                print_output("\n\nInterrupted. Saving state...", style="yellow")
-                if self.agent:
-                    self.agent.save_state()
+                print_output("\n\nInterrupted. Shutting down...", style="yellow")
+                if self.ava:
+                    await self.ava.stop()
                 break
             except EOFError:
                 break
@@ -548,9 +468,9 @@ def main():
     """Main entry point."""
     import argparse
     
-    parser = argparse.ArgumentParser(description="AVA - Developmental AI Assistant")
+    parser = argparse.ArgumentParser(description="AVA v3 - Cortex-Medulla AI Assistant")
     parser.add_argument("--data-dir", default="data", help="Data directory")
-    parser.add_argument("--model", default="llama3.2", help="Ollama model name")
+    parser.add_argument("--model", default="llama3.2", help="Model name (configured in cortex_medulla.yaml)")
     
     args = parser.parse_args()
     

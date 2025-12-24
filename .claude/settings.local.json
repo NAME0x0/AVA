@@ -18,7 +18,8 @@
       "Bash(findstr:*)",
       "Bash(grep:*)",
       "Bash(dir:*)",
-      "Bash(dir /s \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\ui\\\\src\")"
+      "Bash(dir /s \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\ui\\\\src\")",
+      "Bash(mkdir:*)"
     ]
   }
 }

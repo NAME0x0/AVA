@@ -2,6 +2,41 @@
 
 This document outlines the concrete tasks for developing AVA as a high-capability, local agentic AI on an NVIDIA RTX A2000 (4GB VRAM). Refer to `ROADMAP.md` for phased timelines and `ARCHITECTURE.md` for detailed design.
 
+---
+
+## Current Architecture Status: v3 Cortex-Medulla ✅
+
+The repository has transitioned to the **Cortex-Medulla v3 Architecture**:
+
+### Core Entry Points (Consolidated)
+- **`run_core.py`** - v3 Always-On core loop (primary entry point)
+- **`server.py`** - HTTP/WebSocket API using `src.ava.AVA`
+- **`run_tui.py`** - Terminal UI connecting to server.py
+- **`src/cli.py`** - v3 CLI using `src.ava.AVA` (refactored)
+
+### v3 Core Components (`src/core/`)
+- [x] **Medulla** (`medulla.py`) - Reflexive O(1) state management
+- [x] **Cortex** (`cortex.py`) - Reflective reasoning engine
+- [x] **Bridge** (`bridge.py`) - State projection for handoffs
+- [x] **Agency** (`agency.py`) - Active Inference VFE minimization
+- [x] **System** (`system.py`) - Unified orchestration
+- [x] **Adapter Manager** (`adapter_manager.py`) - LoRA hot-swapping
+
+### Search-First Policy ✅
+- `web_search_effort_cost: 0.05` (lowest cost)
+- `search_first_enabled: True`
+- `search_gate_enabled: True`
+- Epistemic weight (0.6) > Pragmatic weight (0.4)
+
+### Legacy Code (Archived in `legacy/`)
+- Developmental stages system
+- Emotional engine
+- Old memory stores (replaced by Titans)
+- v2 core implementations
+- Old API servers
+
+---
+
 ## Phase 1: Foundation & Core Optimization
 
 ### Project Setup & Model Acquisition
@@ -56,10 +91,40 @@ This document outlines the concrete tasks for developing AVA as a high-capabilit
 *   [ ] **Test AVA with MCP Server:** Data retrieval and use.
 *   [ ] **Refine Agentic Workflows:** Combine reasoning, tools, and structured output.
 
+---
+
+## v3.4 Priority Tasks (Weights-In Phase)
+
+### Model Integration (Simulated → Real)
+*   [ ] **Integrate Mamba SSM weights** into Medulla for O(1) state management
+*   [ ] **Load BitNet weights** or alternative quantized model for Cortex
+*   [ ] **Test Bridge state projection** with actual model tensors
+*   [ ] **Validate VRAM budget** stays under 3,000 MB target
+
+### Adapter Library Setup
+*   [x] **Create adapter directory structure** (`models/adapters/`)
+*   [ ] **Train/Obtain Coding Expert LoRA** for software development tasks
+*   [ ] **Train/Obtain Logic Expert LoRA** for reasoning tasks
+*   [ ] **Train/Obtain Butler Expert LoRA** for conversational assistance
+*   [ ] **Implement hot-swap mechanism** in `adapter_manager.py`
+
+### Thermal Management
+*   [ ] **Implement Thermal Sentry** in Medulla for GPU monitoring
+*   [ ] **Add power throttling** when approaching 70W TDP
+*   [ ] **Test thermal behavior** under sustained load
+
+### Memory System
+*   [ ] **Integrate Titans Neural Memory** for infinite context
+*   [ ] **Remove legacy episodic/semantic buffers** from active path
+*   [ ] **Test memory fragmentation** under sustained operation
+
+---
+
 ## Phase 3: User Interface, Connectivity & Refinement
 
 ### CLI Development
 *   [x] **Develop Robust CLI:** Using `argparse`, `Typer`, or `Click`.
+*   [x] **Refactor CLI to v3 AVA class** - Uses `src.ava.AVA` now
 *   [ ] **Implement CLI Commands:** For prompts, function calls, settings.
 *   [ ] **Ensure CLI Handles Structured/Streamed Responses.**
 *   [x] **Document CLI Usage:** In `UI_CONNECTIVITY.md` and `USAGE.md`.
