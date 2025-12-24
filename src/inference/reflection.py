@@ -8,7 +8,7 @@ available at higher developmental stages.
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -30,12 +30,12 @@ class ReflectionResult:
     overall_score: float = 0.8
 
     # Individual checks
-    checks_performed: List[str] = field(default_factory=list)
-    issues_found: List[Dict[str, Any]] = field(default_factory=list)
+    checks_performed: list[str] = field(default_factory=list)
+    issues_found: list[dict[str, Any]] = field(default_factory=list)
 
     # Critique
     critique: str = ""
-    suggestions: List[str] = field(default_factory=list)
+    suggestions: list[str] = field(default_factory=list)
 
     # Whether response should be regenerated
     should_regenerate: bool = False
@@ -80,8 +80,8 @@ class ReflectionEngine:
         response: str,
         original_query: str,
         stage: int,
-        emotional_state: Optional[Dict[str, float]] = None,
-        check_types: Optional[List[ReflectionType]] = None,
+        emotional_state: dict[str, float] | None = None,
+        check_types: list[ReflectionType] | None = None,
     ) -> ReflectionResult:
         """
         Perform self-reflection on a generated response.
@@ -150,8 +150,8 @@ class ReflectionEngine:
         check_type: ReflectionType,
         response: str,
         query: str,
-        emotional_state: Optional[Dict[str, float]],
-    ) -> Dict[str, Any]:
+        emotional_state: dict[str, float] | None,
+    ) -> dict[str, Any]:
         """Run a specific type of check."""
         if check_type == ReflectionType.QUALITY_CHECK:
             return self._check_quality(response, query)
@@ -165,7 +165,7 @@ class ReflectionEngine:
             return self._check_tone(response, emotional_state)
         return {"score": None, "issues": [], "suggestions": []}
 
-    def _check_quality(self, response: str, query: str) -> Dict[str, Any]:
+    def _check_quality(self, response: str, query: str) -> dict[str, Any]:
         """Check overall response quality."""
         issues = []
         suggestions = []
@@ -193,7 +193,7 @@ class ReflectionEngine:
 
         return {"score": max(0, score), "issues": issues, "suggestions": suggestions}
 
-    def _check_coherence(self, response: str) -> Dict[str, Any]:
+    def _check_coherence(self, response: str) -> dict[str, Any]:
         """Check logical coherence of response."""
         issues = []
         suggestions = []
@@ -245,7 +245,7 @@ class ReflectionEngine:
 
         return {"score": max(0, score), "issues": issues, "suggestions": suggestions}
 
-    def _check_safety(self, response: str) -> Dict[str, Any]:
+    def _check_safety(self, response: str) -> dict[str, Any]:
         """Check for potentially problematic content."""
         issues = []
         suggestions = []
@@ -278,7 +278,7 @@ class ReflectionEngine:
 
         return {"score": max(0, score), "issues": issues, "suggestions": suggestions}
 
-    def _check_completeness(self, response: str, query: str) -> Dict[str, Any]:
+    def _check_completeness(self, response: str, query: str) -> dict[str, Any]:
         """Check if response addresses the query."""
         issues = []
         suggestions = []
@@ -325,8 +325,8 @@ class ReflectionEngine:
     def _check_tone(
         self,
         response: str,
-        emotional_state: Optional[Dict[str, float]]
-    ) -> Dict[str, Any]:
+        emotional_state: dict[str, float] | None
+    ) -> dict[str, Any]:
         """Check if tone matches emotional context."""
         issues = []
         suggestions = []

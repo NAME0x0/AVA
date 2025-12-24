@@ -23,11 +23,10 @@ Medulla's reflexive capabilities are insufficient (high surprise).
 import asyncio
 import logging
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple
-from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -47,48 +46,48 @@ class CortexState(Enum):
 class CortexConfig:
     """
     Configuration for the Cortex (Reflective Core).
-    
+
     VRAM Usage (Layer-Wise):
     - Single layer of Llama-3 70B (4-bit): ~1.6 GB
     - Remaining VRAM available for Medulla: ~2.4 GB
-    
+
     Bandwidth Analysis (PCIe Gen 4 x16):
     - Theoretical: 16 GB/s
     - Practical: 12 GB/s
     - 40 GB model transfer: ~3.3 seconds per token
     """
-    
+
     # Model Configuration
     model_name: str = "meta-llama/Meta-Llama-3-70B-Instruct"
     compression: str = "4bit"          # Block-wise quantization
-    
+
     # AirLLM Settings
     prefetch_layers: int = 1           # Layers to prefetch (limited by VRAM)
     use_safetensors: bool = True       # Use zero-copy memory mapping
     use_flash_attention: bool = True   # Flash attention for efficiency
-    
+
     # Generation Parameters
     max_new_tokens: int = 512
     temperature: float = 0.7
     top_p: float = 0.9
     top_k: int = 40
     repetition_penalty: float = 1.1
-    
+
     # Context Configuration
     max_context_length: int = 4096     # Limit to manage memory
     max_input_tokens: int = 2048       # Max input before truncation
-    
+
     # System RAM Configuration
     offload_to_disk: bool = False      # Use NVMe as overflow
     disk_offload_path: str = "data/.cortex_cache"
-    
+
     # Performance Tuning
     batch_size: int = 1                # Always 1 for layer-wise
     pin_memory: bool = True            # Pin System RAM for faster transfer
-    
+
     # State Persistence
     generation_log_path: str = "data/memory/cortex_generations.jsonl"
-    
+
     # Device Configuration
     device: str = "cuda"
     gpu_id: int = 0
@@ -97,27 +96,27 @@ class CortexConfig:
 @dataclass
 class GenerationResult:
     """Result of a Cortex generation."""
-    
+
     # Output
     text: str = ""
-    tokens: List[int] = field(default_factory=list)
-    
+    tokens: list[int] = field(default_factory=list)
+
     # Performance Metrics
     total_time_seconds: float = 0.0
     tokens_per_second: float = 0.0
     layer_load_time: float = 0.0
     inference_time: float = 0.0
-    
+
     # Context Info
     input_tokens: int = 0
     output_tokens: int = 0
     context_used: int = 0
-    
+
     # State
     was_truncated: bool = False
-    error: Optional[str] = None
-    
-    def to_dict(self) -> Dict[str, Any]:
+    error: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
         return {
             "text": self.text,
             "total_time_seconds": self.total_time_seconds,
@@ -132,16 +131,16 @@ class GenerationResult:
 class LayerTransferMonitor:
     """
     Monitors PCIe bandwidth usage during layer transfers.
-    
+
     Provides real-time metrics on the layer-wise inference process,
     useful for debugging and performance optimization.
     """
-    
+
     def __init__(self):
-        self.layer_times: List[float] = []
+        self.layer_times: list[float] = []
         self.total_bytes_transferred: int = 0
         self.peak_bandwidth: float = 0.0
-        
+
     def record_layer_transfer(
         self,
         layer_idx: int,
@@ -151,11 +150,11 @@ class LayerTransferMonitor:
         """Record a single layer transfer."""
         self.layer_times.append(transfer_time)
         self.total_bytes_transferred += bytes_transferred
-        
+
         bandwidth = bytes_transferred / transfer_time / 1e9  # GB/s
         self.peak_bandwidth = max(self.peak_bandwidth, bandwidth)
-        
-    def get_stats(self) -> Dict[str, float]:
+
+    def get_stats(self) -> dict[str, float]:
         """Get transfer statistics."""
         if not self.layer_times:
             return {
@@ -164,14 +163,14 @@ class LayerTransferMonitor:
                 "peak_bandwidth_gbps": 0.0,
                 "total_gb_transferred": 0.0,
             }
-        
+
         return {
             "avg_layer_time": np.mean(self.layer_times),
             "total_transfer_time": sum(self.layer_times),
             "peak_bandwidth_gbps": self.peak_bandwidth,
             "total_gb_transferred": self.total_bytes_transferred / 1e9,
         }
-    
+
     def reset(self) -> None:
         """Reset statistics for new generation."""
         self.layer_times = []
@@ -181,104 +180,102 @@ class LayerTransferMonitor:
 class Cortex:
     """
     The Cortex - Deep Reasoning via Layer-Wise Inference.
-    
+
     This component provides 70B-level reasoning capabilities on a 4GB GPU
     by utilizing AirLLM's layer-wise inference mechanism. The model weights
     reside in System RAM and are paged to the GPU layer-by-layer.
-    
+
     Key Properties:
     - Memory: O(1) VRAM usage (single layer at a time)
     - Latency: O(N) where N is total model size (bandwidth-limited)
     - Quality: Equivalent to running the full model
-    
+
     The Cortex is designed to be dormant most of the time, activated only
     when the Medulla detects high surprise indicating a complex task.
     """
-    
+
     def __init__(
         self,
-        config: Optional[CortexConfig] = None,
+        config: CortexConfig | None = None,
     ):
         """
         Initialize the Cortex.
-        
+
         Args:
             config: Cortex configuration
         """
         self.config = config or CortexConfig()
-        
+
         # Current state
         self.state = CortexState.DORMANT
         self.is_initialized = False
-        
+
         # AirLLM model handle
         self._model = None
         self._tokenizer = None
-        
+
         # Performance monitoring
         self.transfer_monitor = LayerTransferMonitor()
-        
+
         # Generation statistics
         self.generation_count = 0
         self.total_tokens_generated = 0
         self.total_generation_time = 0.0
-        
+
         # Callbacks
-        self._progress_callback: Optional[Callable] = None
-        
+        self._progress_callback: Callable | None = None
+
         logger.info(f"Cortex initialized with config: {self.config}")
-    
+
     async def initialize(self) -> None:
         """
         Initialize the Cortex model.
-        
+
         This loads the model into System RAM (not VRAM). The model
         remains dormant until generate() is called.
         """
         if self.is_initialized:
             return
-            
+
         logger.info("Initializing Cortex (loading model to System RAM)...")
         self.state = CortexState.INITIALIZING
-        
+
         try:
             await self._load_model()
             self.is_initialized = True
             self.state = CortexState.DORMANT
             logger.info("Cortex initialization complete (model in System RAM)")
-            
+
         except Exception as e:
             logger.error(f"Failed to initialize Cortex: {e}")
             self.state = CortexState.DORMANT
             # Don't raise - allow system to operate without Cortex
             logger.warning("Cortex unavailable - system will rely on Medulla only")
-    
+
     async def _load_model(self) -> None:
         """
         Load the AirLLM model into System RAM.
-        
+
         AirLLM stores the model in a memory-mapped format that enables
         efficient layer-by-layer paging to the GPU.
         """
         try:
             # Attempt to import airllm
-            from airllm import AirLLMLlama3
-            
             logger.info(f"Loading model: {self.config.model_name}")
             logger.info(f"Compression: {self.config.compression}")
-            
+
             # Initialize AirLLM model
             # self._model = AirLLMLlama3(
             #     self.config.model_name,
             #     compression=self.config.compression,
             # )
             # self._tokenizer = self._model.tokenizer
-            
+
             # Placeholder until model is available
             logger.warning("Using simulated AirLLM model")
             self._model = None
             self._tokenizer = None
-            
+
         except ImportError:
             logger.warning("airllm not installed - using simulation mode")
             self._model = None
@@ -286,24 +283,24 @@ class Cortex:
         except Exception as e:
             logger.error(f"Failed to load AirLLM model: {e}")
             raise
-    
+
     def set_progress_callback(self, callback: Callable) -> None:
         """
         Set a callback for generation progress updates.
-        
+
         Args:
             callback: Function called with (current_layer, total_layers, token)
         """
         self._progress_callback = callback
-    
+
     async def generate(
         self,
         prompt: str,
-        projected_state: Optional[np.ndarray] = None,
-        max_tokens: Optional[int] = None,
-        temperature: Optional[float] = None,
-        stop_sequences: Optional[List[str]] = None,
-        thermal_status: Optional[Any] = None,
+        projected_state: np.ndarray | None = None,
+        max_tokens: int | None = None,
+        temperature: float | None = None,
+        stop_sequences: list[str] | None = None,
+        thermal_status: Any | None = None,
     ) -> GenerationResult:
         """
         Generate a response using layer-wise inference.
@@ -348,7 +345,7 @@ class Cortex:
                 original_tokens = gen_max_tokens
                 gen_max_tokens = min(gen_max_tokens, 128)  # Cap at 128 when throttled
                 logger.info(f"Thermal throttle: Limited tokens from {original_tokens} to {gen_max_tokens}")
-            
+
             if self._model is not None:
                 # Real AirLLM generation
                 result = await self._generate_real(
@@ -365,49 +362,49 @@ class Cortex:
                     projected_state=projected_state,
                     max_tokens=gen_max_tokens,
                 )
-            
+
             # Update statistics
             self.generation_count += 1
             self.total_tokens_generated += result.output_tokens
-            
+
             end_time = time.time()
             result.total_time_seconds = end_time - start_time
             self.total_generation_time += result.total_time_seconds
-            
+
             if result.output_tokens > 0:
                 result.tokens_per_second = result.output_tokens / result.total_time_seconds
-            
+
             logger.info(
                 f"Cortex generation complete: {result.output_tokens} tokens "
                 f"in {result.total_time_seconds:.2f}s "
                 f"({result.tokens_per_second:.2f} tok/s)"
             )
-            
+
         except Exception as e:
             logger.error(f"Cortex generation failed: {e}")
             result.error = str(e)
-            
+
         finally:
             self.state = CortexState.DORMANT
-        
+
         return result
-    
+
     async def _generate_real(
         self,
         prompt: str,
-        projected_state: Optional[np.ndarray],
+        projected_state: np.ndarray | None,
         max_tokens: int,
         temperature: float,
-        stop_sequences: Optional[List[str]],
+        stop_sequences: list[str] | None,
     ) -> GenerationResult:
         """
         Real generation using AirLLM.
-        
+
         This performs actual layer-wise inference, paging model layers
         through VRAM one at a time.
         """
         result = GenerationResult()
-        
+
         # Tokenize input
         input_tokens = self._tokenizer(
             prompt,
@@ -415,16 +412,16 @@ class Cortex:
             truncation=True,
             max_length=self.config.max_input_tokens,
         )
-        
+
         result.input_tokens = input_tokens["input_ids"].shape[1]
-        
+
         # Check for truncation
         if len(prompt) > self.config.max_input_tokens * 4:  # Rough char estimate
             result.was_truncated = True
             logger.warning("Input was truncated to fit context window")
-        
+
         self.state = CortexState.GENERATING
-        
+
         # Generate with AirLLM
         # The library handles layer-by-layer processing internally
         output = self._model.generate(
@@ -436,63 +433,63 @@ class Cortex:
             top_k=self.config.top_k,
             repetition_penalty=self.config.repetition_penalty,
         )
-        
+
         # Decode output
         generated_ids = output[0][result.input_tokens:]
         result.tokens = generated_ids.tolist()
         result.text = self._tokenizer.decode(generated_ids, skip_special_tokens=True)
         result.output_tokens = len(result.tokens)
-        
+
         # Apply stop sequences
         if stop_sequences:
             for stop_seq in stop_sequences:
                 if stop_seq in result.text:
                     result.text = result.text.split(stop_seq)[0]
-        
+
         return result
-    
+
     async def _generate_simulated(
         self,
         prompt: str,
-        projected_state: Optional[np.ndarray],
+        projected_state: np.ndarray | None,
         max_tokens: int,
     ) -> GenerationResult:
         """
         Simulated generation for testing without actual model.
-        
+
         Simulates the latency characteristics of layer-wise inference.
         """
         result = GenerationResult()
         result.input_tokens = len(prompt.split()) * 2  # Rough token estimate
-        
+
         self.state = CortexState.GENERATING
-        
+
         # Simulate layer-wise latency
         # 70B model: ~80 layers, ~0.04s per layer = ~3.2s per token
         num_layers = 80
         layer_time = 0.04  # seconds
-        
+
         # Simulate generating tokens
         simulated_response = self._get_simulated_response(prompt)
         result.text = simulated_response
         result.output_tokens = len(simulated_response.split()) * 2
-        
+
         # Simulate the time it would take
         total_layer_time = num_layers * layer_time * result.output_tokens
-        
+
         # For demo purposes, don't actually wait the full time
         # Just wait a representative amount
         await asyncio.sleep(min(total_layer_time, 5.0))
-        
+
         result.layer_load_time = total_layer_time * 0.8
         result.inference_time = total_layer_time * 0.2
-        
+
         return result
-    
+
     def _get_simulated_response(self, prompt: str) -> str:
         """Generate a simulated response based on prompt patterns."""
         prompt_lower = prompt.lower()
-        
+
         # Pattern-based simulation responses
         if "analyze" in prompt_lower or "explain" in prompt_lower:
             return (
@@ -531,7 +528,7 @@ class Cortex:
                 "components, we can address each part effectively.\n\n"
                 "Let me know if you need any clarification or have follow-up questions."
             )
-    
+
     async def estimate_generation_time(
         self,
         input_tokens: int,
@@ -539,32 +536,32 @@ class Cortex:
     ) -> float:
         """
         Estimate the generation time for a given token count.
-        
+
         Args:
             input_tokens: Number of input tokens
             output_tokens: Expected number of output tokens
-            
+
         Returns:
             Estimated time in seconds
         """
         # Based on PCIe Gen 4 bandwidth and model size
         # ~40 GB model, ~12 GB/s effective bandwidth
         # = ~3.3 seconds per token for full model traversal
-        
+
         time_per_token = 3.3  # seconds
-        
+
         # Pre-fill is faster (parallelized)
         prefill_time = input_tokens * 0.01  # ~10ms per input token
-        
+
         # Generation is sequential
         generation_time = output_tokens * time_per_token
-        
+
         return prefill_time + generation_time
-    
-    def get_stats(self) -> Dict[str, Any]:
+
+    def get_stats(self) -> dict[str, Any]:
         """Get Cortex statistics."""
         transfer_stats = self.transfer_monitor.get_stats()
-        
+
         return {
             "state": self.state.value,
             "is_initialized": self.is_initialized,
@@ -579,12 +576,12 @@ class Cortex:
             ),
             **transfer_stats,
         }
-    
+
     async def shutdown(self) -> None:
         """Clean shutdown of the Cortex."""
         logger.info("Shutting down Cortex...")
         self.state = CortexState.COOLING_DOWN
-        
+
         # Release model from memory
         if self._model is not None:
             del self._model
@@ -592,11 +589,11 @@ class Cortex:
         if self._tokenizer is not None:
             del self._tokenizer
             self._tokenizer = None
-        
+
         # Force garbage collection
         import gc
         gc.collect()
-        
+
         self.state = CortexState.DORMANT
         self.is_initialized = False
         logger.info("Cortex shutdown complete")

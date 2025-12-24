@@ -19,12 +19,11 @@ This module acts as the "CEO" of AVA's cognitive architecture,
 making strategic decisions about how to process each request.
 """
 
-import asyncio
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -120,7 +119,7 @@ class Executive:
 
     def __init__(
         self,
-        config: Optional[ExecutiveConfig] = None,
+        config: ExecutiveConfig | None = None,
     ):
         """
         Initialize the Executive module.
@@ -145,7 +144,7 @@ class Executive:
     async def route_request(
         self,
         request: str,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> ExecutiveDecision:
         """
         Route a request to the appropriate cognitive component.

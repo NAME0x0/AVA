@@ -25,10 +25,10 @@ Reference Papers:
 - Toolformer: Language Models Teach Themselves (2023)
 """
 
-from .stream import ConsciousStream, StreamConfig
 from .dreaming import Dreamer, DreamerConfig
+from .entropix import CognitiveState, CognitiveStateLabel, Entropix, EntropixConfig
 from .executive import Executive, ExecutiveConfig
-from .entropix import Entropix, EntropixConfig, CognitiveState, CognitiveStateLabel
+from .stream import ConsciousStream, StreamConfig
 
 __all__ = [
     "ConsciousStream",

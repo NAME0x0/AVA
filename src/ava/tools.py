@@ -18,8 +18,8 @@ import subprocess
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Union
 from pathlib import Path
+from typing import Any
 
 import httpx
 
@@ -35,7 +35,7 @@ class ToolResult:
     """Result from tool execution."""
     success: bool
     output: Any
-    error: Optional[str] = None
+    error: str | None = None
     execution_time_ms: float = 0.0
 
 
@@ -44,9 +44,9 @@ class ToolDefinition:
     """Definition of a tool."""
     name: str
     description: str
-    parameters: Dict[str, Any] = field(default_factory=dict)
-    required_params: List[str] = field(default_factory=list)
-    
+    parameters: dict[str, Any] = field(default_factory=dict)
+    required_params: list[str] = field(default_factory=list)
+
     def to_prompt_format(self) -> str:
         """Format for including in prompts."""
         params = ", ".join(
@@ -58,17 +58,17 @@ class ToolDefinition:
 
 class Tool(ABC):
     """Base class for all tools."""
-    
+
     name: str = "base_tool"
     description: str = "A tool"
-    parameters: Dict[str, Any] = {}
-    required_params: List[str] = []
-    
+    parameters: dict[str, Any] = {}
+    required_params: list[str] = []
+
     @abstractmethod
     async def execute(self, **kwargs) -> ToolResult:
         """Execute the tool with given parameters."""
         pass
-    
+
     def get_definition(self) -> ToolDefinition:
         return ToolDefinition(
             name=self.name,
@@ -178,14 +178,14 @@ class CalculatorTool(Tool):
 
 class DateTimeTool(Tool):
     """Get current date and time."""
-    
+
     name = "datetime"
     description = "Get current date, time, or perform date calculations"
     parameters = {
         "format": {"type": "string", "description": "Output format (optional)"},
         "timezone": {"type": "string", "description": "Timezone (optional)"}
     }
-    
+
     async def execute(self, format: str = None, **kwargs) -> ToolResult:
         import time
         start = time.time()
@@ -204,7 +204,7 @@ class DateTimeTool(Tool):
                 "day": now.strftime("%A"),
                 "iso": now.isoformat()
             }
-        
+
         return ToolResult(
             success=True,
             output=output,
@@ -224,7 +224,7 @@ class FileReadTool(Tool):
     required_params = ["path"]
 
     # Allowed directories (security) - resolved to absolute paths
-    allowed_dirs: List[str] = ["data", "docs", "config"]
+    allowed_dirs: list[str] = ["data", "docs", "config"]
 
     def _is_path_allowed(self, file_path: Path) -> bool:
         """Check if path is within allowed directories (path traversal safe)."""
@@ -294,11 +294,11 @@ class FileReadTool(Tool):
 class WebSearchTool(Tool):
     """
     Search-First Web Search Tool.
-    
+
     Primary epistemic action for the Answer Machine paradigm.
     Uses multiple search providers for fact convergence.
     """
-    
+
     name = "web_search"
     description = "Search the web for factual information (PRIMARY action for queries)"
     parameters = {
@@ -307,13 +307,13 @@ class WebSearchTool(Tool):
         "provider": {"type": "string", "description": "Search provider: duckduckgo, brave (default duckduckgo)"}
     }
     required_params = ["query"]
-    
+
     # Search providers
     PROVIDERS = {
         "duckduckgo": "https://html.duckduckgo.com/html/",
         "brave": "https://search.brave.com/search",
     }
-    
+
     async def execute(
         self,
         query: str = "",
@@ -323,15 +323,15 @@ class WebSearchTool(Tool):
     ) -> ToolResult:
         import time
         start = time.time()
-        
+
         try:
             results = await self._search_provider(query, num_results, provider)
-            
+
             if not results:
                 # Fallback to alternative provider
                 alt_provider = "brave" if provider == "duckduckgo" else "duckduckgo"
                 results = await self._search_provider(query, num_results, alt_provider)
-            
+
             return ToolResult(
                 success=len(results) > 0,
                 output={
@@ -343,21 +343,21 @@ class WebSearchTool(Tool):
                 error=None if results else "No results found",
                 execution_time_ms=(time.time() - start) * 1000
             )
-            
+
         except Exception as e:
             return ToolResult(success=False, output=None, error=str(e))
-    
+
     async def _search_provider(
         self,
         query: str,
         num_results: int,
         provider: str,
-    ) -> List[Dict[str, str]]:
+    ) -> list[dict[str, str]]:
         """Execute search on a specific provider."""
         import re
-        
+
         results = []
-        
+
         try:
             async with httpx.AsyncClient() as client:
                 if provider == "duckduckgo":
@@ -367,22 +367,22 @@ class WebSearchTool(Tool):
                         headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
                         timeout=15.0
                     )
-                    
+
                     if response.status_code == 200:
                         text = response.text
-                        
+
                         # Extract results
                         snippets = re.findall(r'<a class="result__snippet"[^>]*>([^<]+)</a>', text)
                         titles = re.findall(r'<a class="result__a"[^>]*href="([^"]+)"[^>]*>([^<]+)</a>', text)
-                        
-                        for i, ((url, title), snippet) in enumerate(zip(titles[:num_results], snippets[:num_results])):
+
+                        for _i, ((url, title), snippet) in enumerate(zip(titles[:num_results], snippets[:num_results], strict=False)):
                             results.append({
                                 "title": title.strip(),
                                 "snippet": snippet.strip(),
                                 "url": url,
                                 "source": "duckduckgo",
                             })
-                
+
                 elif provider == "brave":
                     response = await client.get(
                         self.PROVIDERS["brave"],
@@ -390,37 +390,37 @@ class WebSearchTool(Tool):
                         headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
                         timeout=15.0
                     )
-                    
+
                     if response.status_code == 200:
                         text = response.text
-                        
+
                         # Extract from Brave's HTML
                         # Simplified extraction
                         desc_matches = re.findall(r'<p class="snippet-description"[^>]*>([^<]+)</p>', text)
                         title_matches = re.findall(r'<a class="result-header"[^>]*href="([^"]+)"[^>]*>([^<]+)</a>', text)
-                        
-                        for i, ((url, title), desc) in enumerate(zip(title_matches[:num_results], desc_matches[:num_results])):
+
+                        for _i, ((url, title), desc) in enumerate(zip(title_matches[:num_results], desc_matches[:num_results], strict=False)):
                             results.append({
                                 "title": title.strip(),
                                 "snippet": desc.strip(),
                                 "url": url,
                                 "source": "brave",
                             })
-        
+
         except Exception as e:
             logger.error(f"Search provider {provider} failed: {e}")
-        
+
         return results
 
 
 class WebBrowseTool(Tool):
     """
     Web browsing tool for detailed information retrieval.
-    
+
     Fetches and extracts content from web pages for deeper
     information gathering in the Answer Machine workflow.
     """
-    
+
     name = "web_browse"
     description = "Browse a web page and extract its content"
     parameters = {
@@ -429,7 +429,7 @@ class WebBrowseTool(Tool):
         "max_chars": {"type": "integer", "description": "Maximum characters to return (default 5000)"}
     }
     required_params = ["url"]
-    
+
     async def execute(
         self,
         url: str = "",
@@ -439,7 +439,7 @@ class WebBrowseTool(Tool):
     ) -> ToolResult:
         import time
         start = time.time()
-        
+
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
@@ -451,17 +451,17 @@ class WebBrowseTool(Tool):
                     timeout=20.0,
                     follow_redirects=True,
                 )
-                
+
                 if response.status_code != 200:
                     return ToolResult(
                         success=False,
                         output=None,
                         error=f"Failed to fetch URL: {response.status_code}"
                     )
-                
+
                 content = response.text
                 extracted = self._extract_content(content, extract_type, max_chars)
-                
+
                 return ToolResult(
                     success=True,
                     output={
@@ -472,10 +472,10 @@ class WebBrowseTool(Tool):
                     },
                     execution_time_ms=(time.time() - start) * 1000
                 )
-                
+
         except Exception as e:
             return ToolResult(success=False, output=None, error=str(e))
-    
+
     def _extract_content(
         self,
         html: str,
@@ -484,52 +484,52 @@ class WebBrowseTool(Tool):
     ) -> str:
         """Extract content from HTML."""
         import re
-        
+
         # Remove script and style tags
         html = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL | re.IGNORECASE)
         html = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.DOTALL | re.IGNORECASE)
-        
+
         if extract_type == "text":
             # Extract plain text
             text = re.sub(r'<[^>]+>', ' ', html)
             text = re.sub(r'\s+', ' ', text)
             text = text.strip()
             return text[:max_chars]
-        
+
         elif extract_type == "links":
             # Extract links
             links = re.findall(r'href="([^"]+)"', html)
             return "\n".join(links[:100])
-        
+
         elif extract_type == "structured":
             # Extract structured content (headings, paragraphs)
             result = []
-            
+
             # Headings
             for h_tag in ['h1', 'h2', 'h3']:
                 headings = re.findall(f'<{h_tag}[^>]*>([^<]+)</{h_tag}>', html, re.IGNORECASE)
                 for h in headings[:5]:
                     result.append(f"## {h.strip()}")
-            
+
             # Paragraphs
             paragraphs = re.findall(r'<p[^>]*>([^<]+)</p>', html, re.IGNORECASE)
             for p in paragraphs[:20]:
                 if len(p.strip()) > 50:
                     result.append(p.strip())
-            
+
             return "\n\n".join(result)[:max_chars]
-        
+
         return html[:max_chars]
 
 
 class FactVerificationTool(Tool):
     """
     Tool for verifying facts across multiple sources.
-    
+
     Implements the Audit-Verify-Research-Update workflow
     for the Answer Machine paradigm.
     """
-    
+
     name = "verify_fact"
     description = "Verify a fact by checking multiple sources"
     parameters = {
@@ -537,7 +537,7 @@ class FactVerificationTool(Tool):
         "num_sources": {"type": "integer", "description": "Number of sources to check (default 3)"}
     }
     required_params = ["claim"]
-    
+
     async def execute(
         self,
         claim: str = "",
@@ -546,7 +546,7 @@ class FactVerificationTool(Tool):
     ) -> ToolResult:
         import time
         start = time.time()
-        
+
         try:
             # Search for verification
             search_tool = WebSearchTool()
@@ -554,13 +554,13 @@ class FactVerificationTool(Tool):
                 query=f"fact check {claim}",
                 num_results=num_sources * 2,
             )
-            
+
             if not search_result.success:
                 return search_result
-            
+
             # Analyze results for convergence
             results = search_result.output.get("results", [])
-            
+
             verification = {
                 "claim": claim,
                 "sources_checked": len(results),
@@ -568,44 +568,44 @@ class FactVerificationTool(Tool):
                 "convergence": self._calculate_convergence(results, claim),
                 "confidence": 0.0,
             }
-            
+
             # Calculate confidence based on convergence
             verification["confidence"] = verification["convergence"]
-            
+
             return ToolResult(
                 success=True,
                 output=verification,
                 execution_time_ms=(time.time() - start) * 1000
             )
-            
+
         except Exception as e:
             return ToolResult(success=False, output=None, error=str(e))
-    
+
     def _calculate_convergence(
         self,
-        results: List[Dict],
+        results: list[dict],
         claim: str,
     ) -> float:
         """
         Calculate fact convergence across sources.
-        
+
         Higher convergence = more sources agree.
         """
         if not results:
             return 0.0
-        
+
         # Simple keyword matching for convergence
         claim_words = set(claim.lower().split())
-        
+
         matches = 0
         for result in results:
             snippet = result.get("snippet", "").lower()
             snippet_words = set(snippet.split())
-            
+
             overlap = len(claim_words & snippet_words) / len(claim_words) if claim_words else 0
             if overlap > 0.3:
                 matches += 1
-        
+
         return matches / len(results) if results else 0.0
 
 
@@ -618,25 +618,25 @@ class MCPServer:
     """Configuration for an MCP server."""
     name: str
     command: str  # Command to start the server
-    args: List[str] = field(default_factory=list)
-    env: Dict[str, str] = field(default_factory=dict)
+    args: list[str] = field(default_factory=list)
+    env: dict[str, str] = field(default_factory=dict)
     transport: str = "stdio"  # "stdio" or "http"
-    url: Optional[str] = None  # For HTTP transport
+    url: str | None = None  # For HTTP transport
 
 
 class MCPClient:
     """
     Model Context Protocol client.
-    
+
     Connects to MCP servers to access external tools and data sources.
     Follows the MCP specification: https://modelcontextprotocol.io/
     """
-    
+
     def __init__(self):
-        self.servers: Dict[str, MCPServer] = {}
-        self._processes: Dict[str, subprocess.Popen] = {}
-        self._tools: Dict[str, Dict[str, Any]] = {}  # server_name -> tools
-        
+        self.servers: dict[str, MCPServer] = {}
+        self._processes: dict[str, subprocess.Popen] = {}
+        self._tools: dict[str, dict[str, Any]] = {}  # server_name -> tools
+
     async def add_server(self, server: MCPServer) -> bool:
         """Add and connect to an MCP server."""
         try:
@@ -650,10 +650,10 @@ class MCPClient:
                     env={**dict(subprocess.os.environ), **server.env}
                 )
                 self._processes[server.name] = process
-                
+
                 # Initialize connection
                 await self._initialize_server(server.name)
-                
+
             elif server.transport == "http" and server.url:
                 # HTTP-based MCP server
                 async with httpx.AsyncClient() as client:
@@ -663,15 +663,15 @@ class MCPClient:
                     )
                     if response.status_code != 200:
                         return False
-            
+
             self.servers[server.name] = server
             logger.info(f"MCP server connected: {server.name}")
             return True
-            
+
         except Exception as e:
             logger.error(f"Failed to connect MCP server {server.name}: {e}")
             return False
-    
+
     async def _initialize_server(self, server_name: str):
         """Initialize an MCP server and get available tools."""
         # Send initialize request via JSON-RPC
@@ -684,7 +684,7 @@ class MCPClient:
                 "clientInfo": {"name": "AVA", "version": "3.1.0"}
             }
         }
-        
+
         response = await self._send_request(server_name, request)
         if response:
             # Get available tools
@@ -696,32 +696,32 @@ class MCPClient:
             tools_response = await self._send_request(server_name, tools_request)
             if tools_response and "result" in tools_response:
                 self._tools[server_name] = tools_response["result"].get("tools", [])
-    
-    async def _send_request(self, server_name: str, request: dict) -> Optional[dict]:
+
+    async def _send_request(self, server_name: str, request: dict) -> dict | None:
         """Send JSON-RPC request to server."""
         if server_name not in self._processes:
             return None
-        
+
         process = self._processes[server_name]
         try:
             # Write request
             request_str = json.dumps(request) + "\n"
             process.stdin.write(request_str.encode())
             process.stdin.flush()
-            
+
             # Read response
             response_str = process.stdout.readline().decode()
             return json.loads(response_str)
-            
+
         except Exception as e:
             logger.error(f"MCP request failed: {e}")
             return None
-    
+
     async def call_tool(
         self,
         server_name: str,
         tool_name: str,
-        arguments: Dict[str, Any]
+        arguments: dict[str, Any]
     ) -> ToolResult:
         """Call a tool on an MCP server."""
         request = {
@@ -733,9 +733,9 @@ class MCPClient:
                 "arguments": arguments
             }
         }
-        
+
         response = await self._send_request(server_name, request)
-        
+
         if response and "result" in response:
             return ToolResult(
                 success=True,
@@ -749,8 +749,8 @@ class MCPClient:
             )
         else:
             return ToolResult(success=False, output=None, error="No response from server")
-    
-    def get_all_tools(self) -> List[Dict[str, Any]]:
+
+    def get_all_tools(self) -> list[dict[str, Any]]:
         """Get all available tools from all servers."""
         all_tools = []
         for server_name, tools in self._tools.items():
@@ -758,14 +758,14 @@ class MCPClient:
                 tool["server"] = server_name
                 all_tools.append(tool)
         return all_tools
-    
+
     async def shutdown(self):
         """Shutdown all MCP servers."""
-        for name, process in self._processes.items():
+        for _name, process in self._processes.items():
             try:
                 process.terminate()
                 process.wait(timeout=5)
-            except:
+            except Exception:
                 process.kill()
         self._processes.clear()
 
@@ -777,26 +777,26 @@ class MCPClient:
 class ToolManager:
     """
     Manages all tools (built-in and MCP).
-    
+
     Responsibilities:
     - Register and discover tools
     - Select appropriate tools for queries
     - Execute tools safely
     - Aggregate results
     """
-    
+
     def __init__(self, config = None):
         self.config = config
-        
+
         # Built-in tools
-        self._tools: Dict[str, Tool] = {}
+        self._tools: dict[str, Tool] = {}
         self._register_builtin_tools()
-        
+
         # MCP client
         self.mcp = MCPClient()
-        
+
         logger.info(f"ToolManager initialized with {len(self._tools)} built-in tools")
-    
+
     def _register_builtin_tools(self):
         """Register built-in tools."""
         builtins = [
@@ -810,20 +810,20 @@ class ToolManager:
         ]
         for tool in builtins:
             self._tools[tool.name] = tool
-    
+
     def register(self, tool: Tool):
         """Register a custom tool."""
         self._tools[tool.name] = tool
         logger.info(f"Registered tool: {tool.name}")
-    
-    def get_tool(self, name: str) -> Optional[Tool]:
+
+    def get_tool(self, name: str) -> Tool | None:
         """Get a tool by name."""
         return self._tools.get(name)
-    
-    def list_tools(self) -> List[ToolDefinition]:
+
+    def list_tools(self) -> list[ToolDefinition]:
         """List all available tools."""
         definitions = [tool.get_definition() for tool in self._tools.values()]
-        
+
         # Add MCP tools
         for mcp_tool in self.mcp.get_all_tools():
             definitions.append(ToolDefinition(
@@ -831,16 +831,16 @@ class ToolManager:
                 description=mcp_tool.get("description", ""),
                 parameters=mcp_tool.get("inputSchema", {}).get("properties", {})
             ))
-        
+
         return definitions
-    
+
     def get_tools_prompt(self) -> str:
         """Get formatted tool list for prompts."""
         lines = ["Available tools:"]
         for defn in self.list_tools():
             lines.append(f"- {defn.to_prompt_format()}")
         return "\n".join(lines)
-    
+
     async def execute(
         self,
         tool_name: str,
@@ -853,7 +853,7 @@ class ToolManager:
             if len(parts) >= 3:
                 server, name = parts[1], parts[2]
                 return await self.mcp.call_tool(server, name, kwargs)
-        
+
         # Built-in tool
         tool = self._tools.get(tool_name)
         if not tool:
@@ -862,7 +862,7 @@ class ToolManager:
                 output=None,
                 error=f"Tool not found: {tool_name}"
             )
-        
+
         try:
             return await asyncio.wait_for(
                 tool.execute(**kwargs),
@@ -880,8 +880,8 @@ class ToolManager:
                 output=None,
                 error=str(e)
             )
-    
-    async def auto_execute(self, query: str) -> List[ToolResult]:
+
+    async def auto_execute(self, query: str) -> list[ToolResult]:
         """
         Automatically determine and execute relevant tools.
 
@@ -937,7 +937,7 @@ class ToolManager:
                 results.append(result)
 
         return results
-    
+
     async def shutdown(self):
         """Cleanup resources."""
         await self.mcp.shutdown()

@@ -14,7 +14,7 @@ The subconscious operates when AVA is "asleep":
 4. Update slow weights in the nested learning system
 """
 
-from .nightmare import NightmareEngine, NightmareConfig, SleepPhase
+from .nightmare import NightmareConfig, NightmareEngine, SleepPhase
 
 __all__ = [
     "NightmareEngine",

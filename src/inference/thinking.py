@@ -10,10 +10,11 @@ Reference: "Toolformer: Language Models Teach Themselves to Use Tools" (2023)
 
 import logging
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -32,22 +33,22 @@ class ThinkingStrategy(Enum):
 class ThinkingResult:
     """Result of extended thinking process."""
     # The thinking process
-    thinking_steps: List[str] = field(default_factory=list)
+    thinking_steps: list[str] = field(default_factory=list)
     strategy_used: ThinkingStrategy = ThinkingStrategy.DIRECT
 
     # Derived insights
     identified_intent: str = ""
-    key_concepts: List[str] = field(default_factory=list)
-    required_knowledge: List[str] = field(default_factory=list)
+    key_concepts: list[str] = field(default_factory=list)
+    required_knowledge: list[str] = field(default_factory=list)
 
     # Tool considerations
-    tools_considered: List[str] = field(default_factory=list)
-    selected_tool: Optional[str] = None
+    tools_considered: list[str] = field(default_factory=list)
+    selected_tool: str | None = None
     tool_reasoning: str = ""
 
     # Confidence and uncertainty
     confidence: float = 0.5
-    uncertainty_areas: List[str] = field(default_factory=list)
+    uncertainty_areas: list[str] = field(default_factory=list)
 
     # Novelty detection
     encountered_novelty: bool = False
@@ -215,7 +216,7 @@ class ThinkingEngine:
         context: str,
         stage: int,
         thinking_budget: int,
-        available_tools: Optional[List[str]] = None,
+        available_tools: list[str] | None = None,
     ) -> ThinkingResult:
         """
         Execute extended thinking on a query.
@@ -385,7 +386,7 @@ class ThinkingEngine:
     def _consider_tools(
         self,
         query: str,
-        available_tools: List[str],
+        available_tools: list[str],
         result: ThinkingResult
     ) -> ThinkingResult:
         """Consider whether tools are needed."""
@@ -480,7 +481,7 @@ class ThinkingEngine:
 
         return "statement"
 
-    def _extract_concepts(self, query: str) -> List[str]:
+    def _extract_concepts(self, query: str) -> list[str]:
         """Extract key concepts from a query."""
         # Simple extraction: nouns and significant words
         words = query.split()
@@ -489,7 +490,7 @@ class ThinkingEngine:
         concepts = [w.strip(".,?!") for w in words if w.lower() not in common and len(w) > 2]
         return concepts[:5]
 
-    def _identify_knowledge_needs(self, query: str, context: str) -> List[str]:
+    def _identify_knowledge_needs(self, query: str, context: str) -> list[str]:
         """Identify what knowledge is needed to answer."""
         needs = []
         query_lower = query.lower()
@@ -505,7 +506,7 @@ class ThinkingEngine:
 
         return needs
 
-    def _identify_uncertainties(self, query: str, context: str) -> List[str]:
+    def _identify_uncertainties(self, query: str, context: str) -> list[str]:
         """Identify areas of uncertainty."""
         uncertainties = []
         query_lower = query.lower()
@@ -540,13 +541,13 @@ class ToolCall:
     arguments: str
     position: int  # Position in text where call was found
     raw_text: str  # Original [Tool: args] text
-    result: Optional[str] = None
+    result: str | None = None
     executed: bool = False
     success: bool = False
     error_message: str = ""
     execution_time_ms: float = 0.0
-    
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "tool_name": self.tool_name,
@@ -566,12 +567,12 @@ class ToolAugmentationResult:
     """Result of augmenting text with tool calls."""
     original_text: str
     augmented_text: str
-    tool_calls: List[ToolCall] = field(default_factory=list)
+    tool_calls: list[ToolCall] = field(default_factory=list)
     augmentation_quality: float = 0.0
     perplexity_reduction: float = 0.0  # Estimated benefit
     should_distill: bool = False
-    
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "original_text": self.original_text,
@@ -586,54 +587,54 @@ class ToolAugmentationResult:
 class ToolCallParser:
     """
     Parses tool calls from model output.
-    
+
     Recognizes patterns like:
     - [Calculator: 2+2]
     - [Search: quantum computing]
     - [QA: What is the capital of France?]
     """
-    
+
     # Pattern to match [ToolName: arguments] or [ToolName(arguments)]
     TOOL_PATTERN = re.compile(
         r'\[(\w+)(?::\s*|\()(.*?)(?:\)|\])',
         re.DOTALL
     )
-    
+
     # Alternative pattern: [ToolName] = result
     RESULT_PATTERN = re.compile(
         r'\[(\w+):\s*(.*?)\]\s*(?:=|→|->)\s*(.+?)(?=\[|\n|$)',
         re.DOTALL
     )
-    
-    def __init__(self, available_tools: Optional[List[str]] = None):
+
+    def __init__(self, available_tools: list[str] | None = None):
         """
         Initialize parser.
-        
+
         Args:
             available_tools: List of valid tool names
         """
         self.available_tools = set(available_tools or [])
-    
-    def parse(self, text: str) -> List[ToolCall]:
+
+    def parse(self, text: str) -> list[ToolCall]:
         """
         Parse tool calls from text.
-        
+
         Args:
             text: Text potentially containing tool calls
-            
+
         Returns:
             List of parsed ToolCall objects
         """
         calls = []
-        
+
         for match in self.TOOL_PATTERN.finditer(text):
             tool_name = match.group(1)
             arguments = match.group(2).strip()
-            
+
             # Validate tool name if we have a list
             if self.available_tools and tool_name.lower() not in {t.lower() for t in self.available_tools}:
                 continue
-            
+
             call = ToolCall(
                 tool_name=tool_name,
                 arguments=arguments,
@@ -641,37 +642,37 @@ class ToolCallParser:
                 raw_text=match.group(0),
             )
             calls.append(call)
-        
+
         return calls
-    
+
     def has_tool_calls(self, text: str) -> bool:
         """Check if text contains any tool calls."""
         return bool(self.TOOL_PATTERN.search(text))
-    
+
     def strip_tool_calls(self, text: str) -> str:
         """Remove all tool calls from text."""
         return self.TOOL_PATTERN.sub('', text).strip()
-    
+
     def inject_results(
         self,
         text: str,
-        tool_calls: List[ToolCall],
+        tool_calls: list[ToolCall],
     ) -> str:
         """
         Inject tool results into text.
-        
+
         Replaces [Tool: args] with [Tool: args] = result
-        
+
         Args:
             text: Original text with tool calls
             tool_calls: Tool calls with results
-            
+
         Returns:
             Augmented text with results
         """
         # Sort by position descending to avoid offset issues
         sorted_calls = sorted(tool_calls, key=lambda x: x.position, reverse=True)
-        
+
         result_text = text
         for call in sorted_calls:
             if call.executed and call.result is not None:
@@ -681,19 +682,19 @@ class ToolCallParser:
                     replacement +
                     result_text[call.position + len(call.raw_text):]
                 )
-        
+
         return result_text
 
 
 class ToolCallDetector:
     """
     Detects when tool calls would be beneficial.
-    
+
     Uses heuristics to identify queries that would benefit
     from tool augmentation without requiring the model to
     explicitly request tools.
     """
-    
+
     # Patterns that suggest tool use
     TOOL_INDICATORS = {
         "calculator": [
@@ -727,43 +728,43 @@ class ToolCallDetector:
             r'how many characters|character count',
         ],
     }
-    
-    def __init__(self, available_tools: Optional[List[str]] = None):
+
+    def __init__(self, available_tools: list[str] | None = None):
         """
         Initialize detector.
-        
+
         Args:
             available_tools: List of available tool names
         """
         self.available_tools = set(available_tools or [])
-        
+
         # Compile patterns
-        self.compiled_patterns: Dict[str, List[re.Pattern]] = {}
+        self.compiled_patterns: dict[str, list[re.Pattern]] = {}
         for tool, patterns in self.TOOL_INDICATORS.items():
             self.compiled_patterns[tool] = [
                 re.compile(p, re.IGNORECASE) for p in patterns
             ]
-    
+
     def detect_tool_opportunities(
         self,
         text: str,
-    ) -> List[Tuple[str, str, float]]:
+    ) -> list[tuple[str, str, float]]:
         """
         Detect opportunities to use tools.
-        
+
         Args:
             text: Text to analyze
-            
+
         Returns:
             List of (tool_name, matched_text, confidence) tuples
         """
         opportunities = []
-        
+
         for tool, patterns in self.compiled_patterns.items():
             # Skip if tool not available
             if self.available_tools and tool not in self.available_tools:
                 continue
-            
+
             for pattern in patterns:
                 match = pattern.search(text)
                 if match:
@@ -771,41 +772,41 @@ class ToolCallDetector:
                     confidence = 0.7 + (len(match.group(0)) / len(text)) * 0.3
                     opportunities.append((tool, match.group(0), min(confidence, 1.0)))
                     break  # One match per tool is enough
-        
+
         return opportunities
-    
+
     def suggest_tool_call(
         self,
         text: str,
-    ) -> Optional[ToolCall]:
+    ) -> ToolCall | None:
         """
         Suggest a tool call for the given text.
-        
+
         Args:
             text: Text to analyze
-            
+
         Returns:
             Suggested ToolCall or None
         """
         opportunities = self.detect_tool_opportunities(text)
-        
+
         if not opportunities:
             return None
-        
+
         # Pick highest confidence
         best = max(opportunities, key=lambda x: x[2])
         tool_name, matched_text, confidence = best
-        
+
         # Extract arguments based on tool type
         args = self._extract_arguments(tool_name, text, matched_text)
-        
+
         return ToolCall(
             tool_name=tool_name,
             arguments=args,
             position=0,
             raw_text=f"[{tool_name}: {args}]",
         )
-    
+
     def _extract_arguments(
         self,
         tool_name: str,
@@ -814,14 +815,14 @@ class ToolCallDetector:
     ) -> str:
         """Extract appropriate arguments for a tool call."""
         text_lower = text.lower()
-        
+
         if tool_name == "calculator":
             # Extract math expression
             math_match = re.search(r'[\d\.\s\+\-\*\/\(\)\^]+', text)
             if math_match:
                 return math_match.group(0).strip()
             return matched_text
-        
+
         elif tool_name == "search":
             # Extract search query
             for prefix in ["what is", "who is", "tell me about", "define"]:
@@ -829,40 +830,40 @@ class ToolCallDetector:
                     idx = text_lower.find(prefix) + len(prefix)
                     return text[idx:].strip().rstrip("?.!")
             return matched_text
-        
+
         elif tool_name == "current_time":
             return ""  # No arguments needed
-        
+
         elif tool_name == "temperature_convert":
             # Extract temperature and units
             temp_match = re.search(r'(\d+(?:\.\d+)?)\s*(celsius|fahrenheit|kelvin|c|f|k)', text_lower)
             if temp_match:
                 return f"{temp_match.group(1)} {temp_match.group(2)}"
             return matched_text
-        
+
         return matched_text
 
 
 class ToolformerAugmenter:
     """
     Augments model output with tool call results.
-    
+
     Implements the Toolformer self-distillation pattern:
     1. Detect potential tool calls in output
     2. Execute tools and inject results
     3. Score augmentation quality
     4. Mark high-quality augmentations for distillation
     """
-    
+
     def __init__(
         self,
-        tool_executor: Optional[Callable[[str, str], Tuple[str, bool]]] = None,
+        tool_executor: Callable[[str, str], tuple[str, bool]] | None = None,
         quality_threshold: float = 0.6,
-        available_tools: Optional[List[str]] = None,
+        available_tools: list[str] | None = None,
     ):
         """
         Initialize augmenter.
-        
+
         Args:
             tool_executor: Function (tool_name, args) -> (result, success)
             quality_threshold: Minimum quality to mark for distillation
@@ -870,15 +871,15 @@ class ToolformerAugmenter:
         """
         self.tool_executor = tool_executor
         self.quality_threshold = quality_threshold
-        
+
         self.parser = ToolCallParser(available_tools)
         self.detector = ToolCallDetector(available_tools)
-        
+
         # Statistics
         self.total_augmentations = 0
         self.successful_augmentations = 0
         self.distillation_candidates = 0
-    
+
     def augment(
         self,
         text: str,
@@ -886,24 +887,24 @@ class ToolformerAugmenter:
     ) -> ToolAugmentationResult:
         """
         Augment text with tool call results.
-        
+
         Args:
             text: Text to augment (may contain explicit tool calls)
             auto_detect: Also detect implicit tool opportunities
-            
+
         Returns:
             ToolAugmentationResult with augmented text and metadata
         """
         import time
-        
+
         result = ToolAugmentationResult(
             original_text=text,
             augmented_text=text,
         )
-        
+
         # Parse explicit tool calls
         tool_calls = self.parser.parse(text)
-        
+
         # Auto-detect opportunities if enabled
         if auto_detect and not tool_calls:
             suggested = self.detector.suggest_tool_call(text)
@@ -912,12 +913,12 @@ class ToolformerAugmenter:
                 tool_calls = [suggested]
                 # Modify text to include the tool call marker
                 result.augmented_text = f"{text}\n{suggested.raw_text}"
-        
+
         # Execute tool calls
         if self.tool_executor:
             for call in tool_calls:
                 start_time = time.time()
-                
+
                 try:
                     call.result, call.success = self.tool_executor(
                         call.tool_name,
@@ -929,69 +930,69 @@ class ToolformerAugmenter:
                     call.success = False
                     call.error_message = str(e)
                     call.result = f"Error: {e}"
-                
+
                 call.execution_time_ms = (time.time() - start_time) * 1000
-        
+
         result.tool_calls = tool_calls
-        
+
         # Inject results into text
         if tool_calls:
             result.augmented_text = self.parser.inject_results(
                 result.augmented_text,
                 tool_calls,
             )
-        
+
         # Calculate augmentation quality
         result.augmentation_quality = self._calculate_quality(result)
         result.perplexity_reduction = self._estimate_perplexity_reduction(result)
         result.should_distill = result.augmentation_quality >= self.quality_threshold
-        
+
         # Update statistics
         self.total_augmentations += 1
         if any(tc.success for tc in tool_calls):
             self.successful_augmentations += 1
         if result.should_distill:
             self.distillation_candidates += 1
-        
+
         return result
-    
+
     def _calculate_quality(self, result: ToolAugmentationResult) -> float:
         """Calculate augmentation quality score."""
         if not result.tool_calls:
             return 0.0
-        
+
         # Base quality on execution success
         success_rate = sum(1 for tc in result.tool_calls if tc.success) / len(result.tool_calls)
-        
+
         # Bonus for result length (longer = more informative)
         avg_result_length = sum(
             len(tc.result or "") for tc in result.tool_calls
         ) / len(result.tool_calls)
         length_bonus = min(avg_result_length / 100, 0.2)
-        
+
         # Penalty for errors
         error_rate = sum(1 for tc in result.tool_calls if tc.error_message) / len(result.tool_calls)
         error_penalty = error_rate * 0.3
-        
+
         quality = success_rate + length_bonus - error_penalty
         return max(0.0, min(1.0, quality))
-    
+
     def _estimate_perplexity_reduction(self, result: ToolAugmentationResult) -> float:
         """
         Estimate perplexity reduction from augmentation.
-        
+
         In a full implementation, this would be measured by
         comparing model perplexity before/after augmentation.
         Here we use a heuristic based on quality.
         """
         if result.augmentation_quality < 0.3:
             return 0.0
-        
+
         # Estimate: good augmentations reduce perplexity by 5-15%
         reduction = result.augmentation_quality * 0.15
         return reduction
-    
-    def get_statistics(self) -> Dict[str, Any]:
+
+    def get_statistics(self) -> dict[str, Any]:
         """Get augmentation statistics."""
         return {
             "total_augmentations": self.total_augmentations,
@@ -1008,11 +1009,11 @@ class DistillationSample:
     input_text: str
     original_output: str
     augmented_output: str
-    tool_calls: List[Dict[str, Any]]
+    tool_calls: list[dict[str, Any]]
     quality_score: float
     created_at: datetime = field(default_factory=datetime.now)
-    
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "input_text": self.input_text,
@@ -1027,13 +1028,13 @@ class DistillationSample:
 class SelfDistillationCollector:
     """
     Collects high-quality tool-augmented samples for self-distillation.
-    
+
     These samples can be used to train the model to:
     1. Recognize when to use tools
     2. Generate proper tool call syntax
     3. Integrate tool results into responses
     """
-    
+
     def __init__(
         self,
         min_quality: float = 0.6,
@@ -1041,18 +1042,18 @@ class SelfDistillationCollector:
     ):
         """
         Initialize collector.
-        
+
         Args:
             min_quality: Minimum quality to collect
             max_samples: Maximum samples to store
         """
         self.min_quality = min_quality
         self.max_samples = max_samples
-        
-        self.samples: List[DistillationSample] = []
+
+        self.samples: list[DistillationSample] = []
         self.total_collected = 0
         self.total_rejected = 0
-    
+
     def collect(
         self,
         input_text: str,
@@ -1060,18 +1061,18 @@ class SelfDistillationCollector:
     ) -> bool:
         """
         Collect a sample if it meets quality threshold.
-        
+
         Args:
             input_text: Original input/query
             augmentation_result: Result from ToolformerAugmenter
-            
+
         Returns:
             True if sample was collected
         """
         if augmentation_result.augmentation_quality < self.min_quality:
             self.total_rejected += 1
             return False
-        
+
         sample = DistillationSample(
             input_text=input_text,
             original_output=augmentation_result.original_text,
@@ -1079,35 +1080,35 @@ class SelfDistillationCollector:
             tool_calls=[tc.to_dict() for tc in augmentation_result.tool_calls],
             quality_score=augmentation_result.augmentation_quality,
         )
-        
+
         self.samples.append(sample)
         self.total_collected += 1
-        
+
         # Trim if over capacity
         if len(self.samples) > self.max_samples:
             # Remove lowest quality samples
             self.samples.sort(key=lambda x: x.quality_score, reverse=True)
             self.samples = self.samples[:self.max_samples]
-        
+
         return True
-    
+
     def get_training_batch(
         self,
         batch_size: int = 32,
-    ) -> List[Dict[str, str]]:
+    ) -> list[dict[str, str]]:
         """
         Get a batch of samples for training.
-        
+
         Returns samples formatted as input/output pairs.
         """
         import random
-        
+
         if not self.samples:
             return []
-        
+
         batch_size = min(batch_size, len(self.samples))
         batch = random.sample(self.samples, batch_size)
-        
+
         return [
             {
                 "input": s.input_text,
@@ -1116,8 +1117,8 @@ class SelfDistillationCollector:
             }
             for s in batch
         ]
-    
-    def get_statistics(self) -> Dict[str, Any]:
+
+    def get_statistics(self) -> dict[str, Any]:
         """Get collector statistics."""
         if not self.samples:
             return {
@@ -1125,9 +1126,9 @@ class SelfDistillationCollector:
                 "total_collected": self.total_collected,
                 "total_rejected": self.total_rejected,
             }
-        
+
         qualities = [s.quality_score for s in self.samples]
-        
+
         return {
             "current_samples": len(self.samples),
             "max_samples": self.max_samples,
@@ -1138,27 +1139,27 @@ class SelfDistillationCollector:
             "min_quality": min(qualities),
             "max_quality": max(qualities),
         }
-    
-    def export_samples(self) -> List[Dict[str, Any]]:
+
+    def export_samples(self) -> list[dict[str, Any]]:
         """Export all samples as dictionaries."""
         return [s.to_dict() for s in self.samples]
 
 
 def create_toolformer_system(
-    tool_executor: Optional[Callable[[str, str], Tuple[str, bool]]] = None,
-    available_tools: Optional[List[str]] = None,
+    tool_executor: Callable[[str, str], tuple[str, bool]] | None = None,
+    available_tools: list[str] | None = None,
     quality_threshold: float = 0.6,
     max_distillation_samples: int = 1000,
-) -> Tuple[ToolformerAugmenter, SelfDistillationCollector]:
+) -> tuple[ToolformerAugmenter, SelfDistillationCollector]:
     """
     Factory function to create Toolformer components.
-    
+
     Args:
         tool_executor: Function to execute tools
         available_tools: List of available tool names
         quality_threshold: Quality threshold for distillation
         max_distillation_samples: Max samples to store
-        
+
     Returns:
         Tuple of (ToolformerAugmenter, SelfDistillationCollector)
     """
@@ -1167,10 +1168,10 @@ def create_toolformer_system(
         quality_threshold=quality_threshold,
         available_tools=available_tools,
     )
-    
+
     collector = SelfDistillationCollector(
         min_quality=quality_threshold,
         max_samples=max_distillation_samples,
     )
-    
+
     return augmenter, collector

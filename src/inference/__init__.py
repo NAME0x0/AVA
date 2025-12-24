@@ -5,8 +5,8 @@ Implements test-time compute including extended reasoning (thinking)
 and self-reflection capabilities.
 """
 
-from .thinking import ThinkingEngine, ThinkingResult
 from .reflection import ReflectionEngine, ReflectionResult
+from .thinking import ThinkingEngine, ThinkingResult
 
 __all__ = [
     "ThinkingEngine",

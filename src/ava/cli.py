@@ -16,13 +16,11 @@ Usage:
 import asyncio
 import sys
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from rich import print as rprint
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -51,10 +49,9 @@ def serve(
 
     # Import and run server
     try:
-        from aiohttp import web
-
         # Set environment variables
         import os
+
         if simulation:
             os.environ["AVA_SIMULATION_MODE"] = "true"
 
@@ -68,7 +65,7 @@ def serve(
     except ImportError as e:
         console.print(f"[red]Error:[/red] Missing dependency: {e}")
         console.print("Run: [cyan]pip install aiohttp[/cyan]")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
     except KeyboardInterrupt:
         console.print("\n[yellow]Server stopped.[/yellow]")
 
@@ -92,14 +89,14 @@ def tui():
     except ImportError as e:
         console.print(f"[red]Error:[/red] TUI not available: {e}")
         console.print("Run: [cyan]pip install textual[/cyan]")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
     except KeyboardInterrupt:
         console.print("\n[yellow]TUI closed.[/yellow]")
 
 
 @app.command()
 def chat(
-    message: Optional[str] = typer.Argument(None, help="Message to send (or omit for interactive mode)"),
+    message: str | None = typer.Argument(None, help="Message to send (or omit for interactive mode)"),
     deep: bool = typer.Option(False, "--deep", "-d", help="Force deep thinking (Cortex)"),
 ):
     """Quick chat with AVA."""
@@ -142,7 +139,7 @@ def chat(
 
         except Exception as e:
             console.print(f"[red]Error:[/red] {e}")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from None
 
     asyncio.run(_chat())
 
@@ -150,8 +147,9 @@ def chat(
 @app.command()
 def status():
     """Check AVA system status."""
-    import httpx
     import os
+
+    import httpx
 
     host = os.getenv("AVA_HOST", "127.0.0.1")
     port = os.getenv("AVA_PORT", "8085")
@@ -185,7 +183,7 @@ def status():
         else:
             table.add_row("Ollama", "[yellow]Degraded[/yellow]", f"Status: {response.status_code}")
     except httpx.ConnectError:
-        table.add_row("Ollama", "[red]Offline[/red]", f"Start with: ollama serve")
+        table.add_row("Ollama", "[red]Offline[/red]", "Start with: ollama serve")
     except Exception as e:
         table.add_row("Ollama", "[red]Error[/red]", str(e))
 

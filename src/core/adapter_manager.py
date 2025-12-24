@@ -20,11 +20,11 @@ Architecture:
 
 import asyncio
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ class AdapterStats:
     total_generations: int = 0
     total_tokens_generated: int = 0
     average_load_time_ms: float = 0.0
-    last_used: Optional[datetime] = None
+    last_used: datetime | None = None
 
     def record_load(self, load_time_ms: float) -> None:
         """Record an adapter load event."""
@@ -87,7 +87,7 @@ class AdapterStats:
         self.total_tokens_generated += tokens
         self.last_used = datetime.now()
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
             "name": self.name,
@@ -132,7 +132,7 @@ class AdapterManager:
         AdapterType.GENERAL: None,  # No adapter
     }
 
-    def __init__(self, config: Optional[AdapterConfig] = None):
+    def __init__(self, config: AdapterConfig | None = None):
         """
         Initialize the Adapter Manager.
 
@@ -146,10 +146,10 @@ class AdapterManager:
         self._adapter_loaded: bool = False
 
         # Loaded adapter reference (for unloading)
-        self._current_adapter_weights: Optional[Any] = None
+        self._current_adapter_weights: Any | None = None
 
         # Statistics per adapter
-        self.stats: Dict[AdapterType, AdapterStats] = {
+        self.stats: dict[AdapterType, AdapterStats] = {
             adapter_type: AdapterStats(name=adapter_type.name)
             for adapter_type in AdapterType
         }
@@ -159,7 +159,7 @@ class AdapterManager:
 
         logger.info("AdapterManager initialized")
 
-    def classify_query(self, prompt: str) -> Tuple[AdapterType, float]:
+    def classify_query(self, prompt: str) -> tuple[AdapterType, float]:
         """
         Classify a query to determine the best specialist adapter.
 
@@ -353,7 +353,7 @@ class AdapterManager:
                 if adapter_type != AdapterType.GENERAL:
                     success = await self._load_adapter(model, adapter_type)
                     if not success and self.config.fallback_to_general:
-                        logger.warning(f"Falling back to GENERAL adapter")
+                        logger.warning("Falling back to GENERAL adapter")
                         self.active_adapter = AdapterType.GENERAL
                         self._adapter_loaded = False
                         return True
@@ -396,8 +396,6 @@ class AdapterManager:
 
             # Load using PEFT if available
             try:
-                from peft import PeftModel
-
                 # Apply adapter to model
                 # Note: In real implementation, this integrates with AirLLM
                 logger.info(f"Loading adapter: {adapter_name}")
@@ -465,7 +463,7 @@ class AdapterManager:
         """
         self.stats[adapter_type].record_generation(tokens_generated)
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get all adapter statistics."""
         return {
             "active_adapter": self.active_adapter.name,

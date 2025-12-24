@@ -4,7 +4,7 @@ AVA Source Package
 
 Core modules:
 - ava: Main AVA interface (new, clean API)
-- core: Cortex-Medulla architecture  
+- core: Cortex-Medulla architecture
 - tools: Tool system
 - memory: Memory management
 - cortex: Cognitive processing

@@ -16,18 +16,16 @@ Design Philosophy:
 - Learn from interactions
 """
 
-import asyncio
 import logging
 import time
 from dataclasses import dataclass, field
-from datetime import datetime
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
-import numpy as np
 import httpx
+import numpy as np
 
-from .config import EngineConfig, OllamaConfig
+from .config import EngineConfig
 
 logger = logging.getLogger(__name__)
 
@@ -58,89 +56,89 @@ class _EngineResponse:
     complexity: float = 0.0
     confidence: float = 0.8
     response_time_ms: float = 0.0
-    tools_used: List[str] = field(default_factory=list)
+    tools_used: list[str] = field(default_factory=list)
     verified: bool = False
-    error: Optional[str] = None
+    error: str | None = None
 
 
 class AVAEngine:
     """
     The brain of AVA - handles all thinking and reasoning.
-    
+
     Architecture:
     - Medulla: Quick responses using small model
     - Cortex: Deep reasoning using full model capacity
     - Router: Decides which to use based on query analysis
     - Verifier: Optional double-check for accuracy
     """
-    
+
     def __init__(self, config: EngineConfig = None):
         self.config = config or EngineConfig()
-        self._client: Optional[httpx.AsyncClient] = None
-        
+        self._client: httpx.AsyncClient | None = None
+
         # State
         self.is_initialized = False
-        self._available_models: List[str] = []
+        self._available_models: list[str] = []
         self._active_fast_model: str = ""
         self._active_deep_model: str = ""
-        
+
         # Conversation context
-        self.conversation_history: List[Dict[str, str]] = []
-        
+        self.conversation_history: list[dict[str, str]] = []
+
         # Embedding cache for surprise calculation
-        self._embedding_centroid: Optional[np.ndarray] = None
-        self._embedding_history: List[np.ndarray] = []
-        
+        self._embedding_centroid: np.ndarray | None = None
+        self._embedding_history: list[np.ndarray] = []
+
         # Statistics
         self.total_requests = 0
         self.cortex_requests = 0
         self.verification_count = 0
-        
+
         logger.info("AVA Engine created")
-    
+
     async def initialize(self) -> bool:
         """
         Initialize the engine.
-        
+
         Returns:
             True if successful
         """
         logger.info("=" * 60)
         logger.info("INITIALIZING AVA ENGINE")
         logger.info("=" * 60)
-        
+
         # Create HTTP client
         self._client = httpx.AsyncClient(
             base_url=self.config.ollama.host,
             timeout=self.config.ollama.timeout
         )
-        
+
         # Check Ollama health
         if not await self._check_ollama():
             logger.error("Ollama is not running. Please start it with: ollama serve")
             return False
-        
+
         # Get available models
         self._available_models = await self._get_models()
         logger.info(f"Available models: {self._available_models}")
-        
+
         if not self._available_models:
             logger.error("No models available. Pull a model with: ollama pull gemma3:4b")
             return False
-        
+
         # Select models
         self._active_fast_model = self._select_model(self.config.ollama.fast_model)
         self._active_deep_model = self._select_model(self.config.ollama.deep_model)
-        
+
         logger.info(f"Fast model (Medulla): {self._active_fast_model}")
         logger.info(f"Deep model (Cortex): {self._active_deep_model}")
         logger.info("=" * 60)
         logger.info("AVA ENGINE READY")
         logger.info("=" * 60)
-        
+
         self.is_initialized = True
         return True
-    
+
     async def _check_ollama(self) -> bool:
         """Check if Ollama is running."""
         try:
@@ -149,8 +147,8 @@ class AVAEngine:
         except Exception as e:
             logger.error(f"Ollama connection failed: {e}")
             return False
-    
-    async def _get_models(self) -> List[str]:
+
+    async def _get_models(self) -> list[str]:
         """Get list of available models."""
         try:
             response = await self._client.get("/api/tags")
@@ -160,14 +158,14 @@ class AVAEngine:
         except Exception as e:
             logger.warning(f"Failed to get models: {e}")
         return []
-    
+
     def _select_model(self, preferred: str) -> str:
         """Select the best available model."""
         if preferred in self._available_models:
             return preferred
         # Use first available
         return self._available_models[0] if self._available_models else ""
-    
+
     async def process(
         self,
         user_input: str,
@@ -178,7 +176,7 @@ class AVAEngine:
     ) -> _EngineResponse:
         """
         Process user input and generate response.
-        
+
         This is the main entry point. It:
         1. Analyzes the query complexity
         2. Calculates surprise (how novel is this?)
@@ -186,36 +184,36 @@ class AVAEngine:
         4. Executes any needed tools
         5. Generates response
         6. Optionally verifies for accuracy
-        
+
         Args:
             user_input: The user's message
             memory: Optional conversation memory
             tools: Optional tool manager
             force_cortex: Force deep thinking mode
             verify: Override verification setting
-            
+
         Returns:
             _EngineResponse with text and metadata
         """
         if not self.is_initialized:
             await self.initialize()
-        
+
         start_time = time.time()
         result = _EngineResponse()
-        
+
         try:
             # 1. Analyze the query
             complexity = self._estimate_complexity(user_input)
             surprise = await self._calculate_surprise(user_input)
             result.complexity = complexity
             result.surprise = surprise
-            
+
             # 2. Decide processing mode
             mode, reason = self._decide_mode(
                 user_input, complexity, surprise, force_cortex
             )
             logger.info(f"Processing mode: {mode.name} ({reason})")
-            
+
             # 3. Check if tools are needed
             tools_used = []
             tool_context = ""
@@ -224,7 +222,7 @@ class AVAEngine:
                     user_input, tools
                 )
                 result.tools_used = tools_used
-            
+
             # 4. Generate response
             if mode == ProcessingMode.MEDULLA:
                 result.text = await self._generate_medulla(
@@ -237,7 +235,7 @@ class AVAEngine:
                 )
                 result.used_cortex = True
                 self.cortex_requests += 1
-            
+
             # 5. Verify if needed
             should_verify = verify if verify is not None else self.config.verify_responses
             if should_verify and self._should_verify(user_input, result.text):
@@ -250,40 +248,40 @@ class AVAEngine:
                 result.cognitive_state = self._assess_cognitive_state(
                     surprise, complexity, result.used_cortex
                 )
-            
+
             # 6. Update history
             self.conversation_history.append({"role": "user", "content": user_input})
             self.conversation_history.append({"role": "assistant", "content": result.text})
-            
+
             # Keep history bounded
             if len(self.conversation_history) > 100:
                 self.conversation_history = self.conversation_history[-100:]
-            
+
             self.total_requests += 1
-            
+
         except Exception as e:
             logger.error(f"Error processing input: {e}")
             result.error = str(e)
             result.text = f"I encountered an error: {str(e)}"
-        
+
         result.response_time_ms = (time.time() - start_time) * 1000
         return result
-    
+
     def _estimate_complexity(self, text: str) -> float:
         """
         Estimate query complexity (0-1).
-        
+
         Higher complexity = more likely to need Cortex.
         """
         score = 0.0
         text_lower = text.lower()
-        
+
         # Question complexity
         if "?" in text:
             score += 0.1
         if text.count("?") > 1:
             score += 0.1  # Multiple questions
-        
+
         # Deep thinking indicators
         deep_keywords = [
             "explain", "analyze", "compare", "contrast", "why",
@@ -293,14 +291,14 @@ class AVAEngine:
         for kw in deep_keywords:
             if kw in text_lower:
                 score += 0.15
-        
+
         # Length (longer = potentially more complex)
         words = len(text.split())
         if words > 50:
             score += 0.1
         if words > 100:
             score += 0.1
-        
+
         # Technical terms
         technical = [
             "algorithm", "function", "variable", "database",
@@ -309,13 +307,13 @@ class AVAEngine:
         for term in technical:
             if term in text_lower:
                 score += 0.05
-        
+
         return min(1.0, score)
-    
+
     async def _calculate_surprise(self, text: str) -> float:
         """
         Calculate how surprising/novel this input is.
-        
+
         Uses embedding distance from conversation centroid.
         Higher surprise = more novel = might need Cortex.
         """
@@ -324,32 +322,32 @@ class AVAEngine:
             embedding = await self._get_embedding(text)
             if embedding is None:
                 return 0.3  # Default moderate surprise
-            
+
             # First message
             if self._embedding_centroid is None:
                 self._embedding_centroid = embedding
                 self._embedding_history = [embedding]
                 return 0.5  # Neutral for first message
-            
+
             # Calculate distance from centroid
             distance = np.linalg.norm(embedding - self._embedding_centroid)
-            
+
             # Normalize to 0-1 range (typical distances are 0.1-2.0)
             surprise = min(1.0, distance / 1.5)
-            
+
             # Update centroid (moving average)
             self._embedding_history.append(embedding)
             if len(self._embedding_history) > 20:
                 self._embedding_history = self._embedding_history[-20:]
             self._embedding_centroid = np.mean(self._embedding_history, axis=0)
-            
+
             return surprise
-            
+
         except Exception as e:
             logger.warning(f"Surprise calculation failed: {e}")
             return 0.3
-    
-    async def _get_embedding(self, text: str) -> Optional[np.ndarray]:
+
+    async def _get_embedding(self, text: str) -> np.ndarray | None:
         """Get embedding vector for text."""
         try:
             response = await self._client.post(
@@ -365,34 +363,34 @@ class AVAEngine:
         except Exception as e:
             logger.warning(f"Embedding failed: {e}")
         return None
-    
+
     def _decide_mode(
         self,
         text: str,
         complexity: float,
         surprise: float,
         force_cortex: bool,
-    ) -> Tuple[ProcessingMode, str]:
+    ) -> tuple[ProcessingMode, str]:
         """Decide whether to use Medulla or Cortex."""
-        
+
         if force_cortex:
             return ProcessingMode.CORTEX, "forced"
-        
+
         # Check keywords
         text_lower = text.lower()
         for keyword in self.config.cortex_keywords:
             if keyword in text_lower:
                 return ProcessingMode.CORTEX, f"keyword: {keyword}"
-        
+
         # Thresholds
         if surprise >= self.config.cortex_surprise_threshold:
             return ProcessingMode.CORTEX, f"high surprise: {surprise:.2f}"
-        
+
         if complexity >= self.config.cortex_complexity_threshold:
             return ProcessingMode.CORTEX, f"high complexity: {complexity:.2f}"
-        
+
         return ProcessingMode.MEDULLA, "routine query"
-    
+
     def _needs_tools(self, text: str) -> bool:
         """Check if the query needs external tools."""
         text_lower = text.lower()
@@ -401,31 +399,31 @@ class AVAEngine:
             "what is", "who is", "when did", "how many", "convert"
         ]
         return any(ind in text_lower for ind in tool_indicators)
-    
+
     async def _execute_tools(
         self,
         query: str,
         tools,
-    ) -> Tuple[List[str], str]:
+    ) -> tuple[list[str], str]:
         """Execute relevant tools and return results."""
         # Tool execution will be handled by ToolManager
         # For now, return empty
         return [], ""
-    
+
     async def _generate_medulla(self, query: str, context: str = "") -> str:
         """Generate quick response via Medulla (fast model)."""
-        system_prompt = """You are AVA, a helpful AI assistant. 
+        system_prompt = """You are AVA, a helpful AI assistant.
 Be concise but accurate. If you're unsure, say so.
 Focus on being helpful and correct."""
-        
+
         messages = self._build_messages(system_prompt, query, context)
-        
+
         return await self._chat_completion(
             self._active_fast_model,
             messages,
             temperature=self.config.temperature
         )
-    
+
     async def _generate_cortex(self, query: str, context: str = "") -> str:
         """Generate thoughtful response via Cortex (deep model)."""
         system_prompt = """You are AVA, a research-grade AI assistant.
@@ -433,44 +431,44 @@ Think carefully and provide accurate, well-reasoned responses.
 Break down complex problems step by step.
 If you're uncertain about something, explain your uncertainty.
 Prioritize accuracy over brevity."""
-        
+
         messages = self._build_messages(system_prompt, query, context)
-        
+
         return await self._chat_completion(
             self._active_deep_model,
             messages,
             temperature=self.config.temperature * 0.8  # Slightly lower for reasoning
         )
-    
+
     def _build_messages(
         self,
         system_prompt: str,
         query: str,
         context: str = "",
-    ) -> List[Dict[str, str]]:
+    ) -> list[dict[str, str]]:
         """Build message list for chat completion."""
         messages = [{"role": "system", "content": system_prompt}]
-        
+
         # Add context if available
         if context:
             messages.append({
                 "role": "system",
                 "content": f"Additional context:\n{context}"
             })
-        
+
         # Add recent conversation history
         history_window = self.conversation_history[-10:]  # Last 5 exchanges
         messages.extend(history_window)
-        
+
         # Add current query
         messages.append({"role": "user", "content": query})
-        
+
         return messages
-    
+
     async def _chat_completion(
         self,
         model: str,
-        messages: List[Dict[str, str]],
+        messages: list[dict[str, str]],
         temperature: float = 0.7,
     ) -> str:
         """Call Ollama chat completion."""
@@ -487,18 +485,18 @@ Prioritize accuracy over brevity."""
                     }
                 }
             )
-            
+
             if response.status_code == 200:
                 data = response.json()
                 return data.get("message", {}).get("content", "")
             else:
                 logger.error(f"Chat completion failed: {response.text}")
                 return f"Error: API returned {response.status_code}"
-                
+
         except Exception as e:
             logger.error(f"Chat completion error: {e}")
             return f"Error: {str(e)}"
-    
+
     def _should_verify(self, query: str, response: str) -> bool:
         """Decide if response needs verification."""
         # Verify factual claims, code, math
@@ -508,7 +506,7 @@ Prioritize accuracy over brevity."""
         ]
         query_lower = query.lower()
         return any(t in query_lower or t in response.lower() for t in verify_triggers)
-    
+
     async def _verify_response(self, query: str, response: str) -> bool:
         """Verify response accuracy using a second pass."""
         verify_prompt = f"""Review this response for accuracy:
@@ -516,22 +514,22 @@ Prioritize accuracy over brevity."""
 Question: {query}
 Response: {response}
 
-Is this response accurate and complete? 
+Is this response accurate and complete?
 Reply with only "VERIFIED" if correct, or "NEEDS_CORRECTION: [issue]" if there's a problem."""
-        
+
         messages = [
             {"role": "system", "content": "You are a fact-checker. Be strict about accuracy."},
             {"role": "user", "content": verify_prompt}
         ]
-        
+
         result = await self._chat_completion(
             self._active_deep_model,
             messages,
             temperature=0.3  # Low temperature for verification
         )
-        
+
         return "VERIFIED" in result.upper()
-    
+
     def _assess_cognitive_state(
         self,
         surprise: float,
@@ -546,14 +544,14 @@ Reply with only "VERIFIED" if correct, or "NEEDS_CORRECTION: [issue]" if there's
         if complexity > 0.5:
             return CognitiveState.HESITATION
         return CognitiveState.FLOW
-    
+
     async def shutdown(self):
         """Cleanup resources."""
         if self._client:
             await self._client.aclose()
         logger.info("AVA Engine shutdown complete")
-    
-    def get_stats(self) -> Dict[str, Any]:
+
+    def get_stats(self) -> dict[str, Any]:
         """Get engine statistics."""
         return {
             "total_requests": self.total_requests,

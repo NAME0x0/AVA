@@ -43,14 +43,19 @@ Reference Papers:
 - Active Inference: "Active Inference: The Free Energy Principle in Mind, Brain, and Behavior" (2022)
 """
 
-from .medulla import Medulla, MedullaConfig
-from .cortex import Cortex, CortexConfig
-from .bridge import Bridge, BridgeConfig
+from .adapter_manager import AdapterConfig, AdapterManager, AdapterType
 from .agency import (
-    ActiveInferenceController, AgencyConfig, PolicyType, VerificationResult,
-    ASEAController, ASEAConfig, ASEAState,  # ASEA Algorithm
+    ActiveInferenceController,
+    AgencyConfig,
+    ASEAConfig,
+    ASEAController,  # ASEA Algorithm
+    ASEAState,
+    PolicyType,
+    VerificationResult,
 )
-from .adapter_manager import AdapterManager, AdapterConfig, AdapterType
+from .bridge import Bridge, BridgeConfig
+from .cortex import Cortex, CortexConfig
+from .medulla import Medulla, MedullaConfig
 from .system import AVACoreSystem, CoreConfig
 
 # Note: V2 implementations have been archived to legacy/v2_core/
@@ -73,7 +78,7 @@ __all__ = [
     "AgencyConfig",
     "PolicyType",
     "VerificationResult",
-    
+
     # ASEA (AVA Sentience & Efficiency Algorithm)
     "ASEAController",
     "ASEAConfig",

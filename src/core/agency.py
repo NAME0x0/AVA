@@ -16,7 +16,7 @@ Core Principle:
 
 ASEA Unified Objective Function:
     L_ASEA = λ₁·VFE + λ₂·Thermal_Cost + λ₃·(1 - VRAM_Slack)
-    
+
 Where:
     - VFE: Variational Free Energy (drives curiosity and accuracy)
     - Thermal_Cost: GPU temperature penalty (prevents throttling)
@@ -39,12 +39,12 @@ Reference: "Active Inference: The Free Energy Principle in Mind, Brain, and Beha
 
 import asyncio
 import logging
-import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
-from typing import Any, Callable, Dict, List, Optional, Tuple
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -67,15 +67,15 @@ logger = logging.getLogger(__name__)
 
 class PolicyType(Enum):
     """Available action policies for the agent."""
-    
+
     # Immediate actions
     REFLEX_REPLY = auto()       # Quick Medulla response
     ACKNOWLEDGE = auto()        # Phatic acknowledgment
-    
+
     # Reasoning actions
     DEEP_THOUGHT = auto()       # Invoke Cortex for reasoning
     CHAIN_OF_THOUGHT = auto()   # Extended thinking
-    
+
     # Information gathering - SEARCH-FIRST PRIORITY
     PRIMARY_SEARCH = auto()     # Search-first epistemic drive (highest priority)
     WEB_SEARCH = auto()         # Execute web search for facts
@@ -83,47 +83,47 @@ class PolicyType(Enum):
     USE_TOOL = auto()           # Execute a tool
     QUERY_MEMORY = auto()       # Retrieve from Titans memory
     SCAN_ENVIRONMENT = auto()   # Check system logs/status
-    
+
     # Proactive actions
     ASK_CLARIFICATION = auto()  # Request more info from user
     SUGGEST_TOPIC = auto()      # Proactively engage
     CHECK_STATUS = auto()       # Monitor system health
-    
+
     # Passive actions
     WAIT = auto()               # Continue monitoring
     SLEEP = auto()              # Enter low-power mode
-    
+
     # Meta actions
     UPDATE_MODEL = auto()       # Update world model
     REFLECT = auto()            # Self-reflection
-    
+
     # Self-Preservation actions
     SELF_MONITOR = auto()       # Monitor own process health
     THERMAL_CHECK = auto()      # Check GPU thermal status
-    
+
     # System actions (require user confirmation)
     SYSTEM_COMMAND = auto()     # Execute system-level command (REQUIRES CONFIRMATION)
 
 
 class HiddenState(Enum):
     """Hidden state factors in the generative world model."""
-    
+
     # User Intent States
     USER_IDLE = auto()
     USER_QUERYING = auto()
     USER_URGENT = auto()
     USER_CONFUSED = auto()
-    
+
     # System States
     SYSTEM_NORMAL = auto()
     SYSTEM_BUSY = auto()
     SYSTEM_ERROR = auto()
-    
+
     # Knowledge States
     KNOWLEDGE_CERTAIN = auto()
     KNOWLEDGE_UNCERTAIN = auto()
     KNOWLEDGE_MISSING = auto()
-    
+
     # Interaction States
     INTERACTION_ROUTINE = auto()
     INTERACTION_NOVEL = auto()
@@ -134,68 +134,68 @@ class HiddenState(Enum):
 class AgencyConfig:
     """
     Configuration for the Active Inference Controller.
-    
+
     The controller implements a POMDP (Partially Observed Markov Decision
     Process) that drives autonomous behavior through VFE minimization.
-    
+
     SEARCH-FIRST PARADIGM: External information retrieval is prioritized
     over internal generation to maximize factual accuracy.
-    
+
     CURIOSITY-DRIVEN: Higher epistemic weight promotes learning and
     information-seeking behavior.
-    
+
     THERMAL-AWARE: GPU power draw is capped to ensure system stability.
     """
-    
+
     # Free Energy Thresholds
     action_threshold: float = 0.3         # Min G reduction to act
     urgency_threshold: float = 0.7        # High urgency triggers immediate action
-    
+
     # Time Constants (seconds)
     idle_uncertainty_rate: float = 0.01   # Uncertainty growth per second of silence
     max_wait_time: float = 300.0          # Max seconds before proactive action
-    
+
     # Policy Weights - CURIOSITY-DRIVEN (higher epistemic weight)
     pragmatic_weight: float = 0.4         # Weight for goal achievement
     epistemic_weight: float = 0.6         # HIGHER - promotes curiosity and learning
-    
+
     # Cortex Activation Cost
     cortex_effort_cost: float = 0.5       # Penalty for invoking Cortex
     tool_effort_cost: float = 0.15        # Lower penalty for tool use
-    
+
     # SEARCH-FIRST Configuration
     search_first_enabled: bool = True     # Enable search-first paradigm
     search_gate_enabled: bool = True      # Mandatory search gate (skips G calculation)
     web_search_effort_cost: float = 0.05  # Very low cost for web search
-    
+
     # Learning
     belief_learning_rate: float = 0.1     # How fast beliefs update
     preference_adaptation: bool = True    # Adapt preferences over time
-    
+
     # THERMAL-AWARE Configuration
     thermal_aware: bool = True            # Enable thermal monitoring
     max_gpu_power_percent: float = 15.0   # Max GPU power draw (%)
     thermal_check_interval: float = 30.0  # Check temperature every N seconds
     thermal_throttle_temp: float = 80.0   # Temperature to start throttling (°C)
     thermal_shutdown_temp: float = 90.0   # Emergency shutdown temperature (°C)
-    
+
     # SELF-PRESERVATION Configuration
     self_preservation_enabled: bool = True # Enable self-monitoring
     health_check_interval: float = 60.0   # Check process health every N seconds
     memory_warning_threshold: float = 0.9 # Warn at 90% memory usage
-    
+
     # State Persistence
     state_save_path: str = "data/memory/agency_state.pkl"
-    
+
     # Observation Categories
     num_observation_modalities: int = 4   # text, audio, system, time
-    
+
     # User Interaction
     ask_clarification_threshold: float = 0.4  # Uncertainty level to ask questions
-    
+
     # System Command Safety
     require_confirmation_for_system: bool = True  # ALWAYS require confirmation
-    blocked_system_commands: List[str] = field(default_factory=lambda: [
+    blocked_system_commands: list[str] = field(default_factory=lambda: [
         "rm", "del", "format", "shutdown", "reboot", "kill"
     ])
 
@@ -204,51 +204,51 @@ class AgencyConfig:
 class BeliefState:
     """
     Current beliefs about hidden states.
-    
+
     Represents P(S|O) - the posterior distribution over hidden states
     given observations.
     """
-    
+
     # User intent belief distribution
-    user_intent: Dict[HiddenState, float] = field(default_factory=lambda: {
+    user_intent: dict[HiddenState, float] = field(default_factory=lambda: {
         HiddenState.USER_IDLE: 0.7,
         HiddenState.USER_QUERYING: 0.2,
         HiddenState.USER_URGENT: 0.05,
         HiddenState.USER_CONFUSED: 0.05,
     })
-    
+
     # Knowledge state belief distribution
-    knowledge_state: Dict[HiddenState, float] = field(default_factory=lambda: {
+    knowledge_state: dict[HiddenState, float] = field(default_factory=lambda: {
         HiddenState.KNOWLEDGE_CERTAIN: 0.5,
         HiddenState.KNOWLEDGE_UNCERTAIN: 0.3,
         HiddenState.KNOWLEDGE_MISSING: 0.2,
     })
-    
+
     # Interaction complexity belief
-    interaction_state: Dict[HiddenState, float] = field(default_factory=lambda: {
+    interaction_state: dict[HiddenState, float] = field(default_factory=lambda: {
         HiddenState.INTERACTION_ROUTINE: 0.6,
         HiddenState.INTERACTION_NOVEL: 0.3,
         HiddenState.INTERACTION_COMPLEX: 0.1,
     })
-    
+
     # Entropy of current beliefs
     entropy: float = 0.0
-    
+
     # Time since last observation
     time_since_observation: float = 0.0
-    
+
     def calculate_entropy(self) -> float:
         """Calculate Shannon entropy of belief state."""
         total_entropy = 0.0
-        
+
         for distribution in [self.user_intent, self.knowledge_state, self.interaction_state]:
             probs = np.array(list(distribution.values()))
             probs = probs[probs > 0]  # Avoid log(0)
             total_entropy += -np.sum(probs * np.log(probs + 1e-10))
-        
+
         self.entropy = total_entropy
         return total_entropy
-    
+
     def to_vector(self) -> np.ndarray:
         """Convert beliefs to a flat probability vector."""
         all_probs = []
@@ -261,24 +261,24 @@ class BeliefState:
 class Observation:
     """
     Multi-modal observation from the environment.
-    
+
     Observations are processed to update beliefs about hidden states.
     """
-    
+
     # Raw observations
-    text: Optional[str] = None
-    audio_features: Optional[np.ndarray] = None
-    system_metrics: Optional[Dict[str, float]] = None
-    
+    text: str | None = None
+    audio_features: np.ndarray | None = None
+    system_metrics: dict[str, float] | None = None
+
     # Derived features
     silence_duration: float = 0.0         # Seconds since last user input
     surprise_signal: float = 0.0          # From Medulla
     emotional_valence: float = 0.0        # Detected emotion
     query_complexity: float = 0.0         # Estimated complexity
-    
+
     # Metadata
     timestamp: datetime = field(default_factory=datetime.now)
-    
+
     def to_vector(self) -> np.ndarray:
         """Convert observation to feature vector."""
         features = [
@@ -287,7 +287,7 @@ class Observation:
             self.emotional_valence,
             self.query_complexity,
         ]
-        
+
         # Add text features if present
         if self.text:
             # Simple text features
@@ -298,7 +298,7 @@ class Observation:
             ])
         else:
             features.extend([0.0, 0.0, 0.0])
-        
+
         return np.array(features, dtype=np.float32)
 
 
@@ -312,13 +312,13 @@ class VerificationResult:
     """
 
     confidence: float = 0.0           # Fraction of claims verified
-    verified_claims: List[str] = field(default_factory=list)
-    unverified_claims: List[str] = field(default_factory=list)
+    verified_claims: list[str] = field(default_factory=list)
+    unverified_claims: list[str] = field(default_factory=list)
     needs_revision: bool = False      # True if confidence < 70%
     search_snippets_used: int = 0
     total_claims_found: int = 0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
             "confidence": self.confidence,
@@ -338,46 +338,46 @@ class VerificationResult:
 class ASEAConfig:
     """
     Configuration for the ASEA (AVA Sentience & Efficiency Algorithm).
-    
+
     ASEA Unified Objective:
         L_ASEA = λ₁·VFE + λ₂·Thermal_Cost + λ₃·(1 - VRAM_Slack)
-    
+
     This configuration tunes the balance between:
     1. Epistemic drive (curiosity, information seeking)
     2. Hardware constraints (thermal, memory)
     3. Response quality (accuracy, groundedness)
     """
-    
+
     # ASEA Weight Coefficients
     lambda_vfe: float = 1.0           # VFE weight (primary driver)
     lambda_thermal: float = 0.3       # Thermal cost weight
     lambda_vram: float = 0.5          # VRAM slack weight
-    
+
     # Hardware Targets (RTX A2000 4GB)
     target_vram_mb: int = 3000        # Target max VRAM usage
     total_vram_mb: int = 4096         # Total available VRAM
     vram_headroom_mb: int = 1000      # Desired headroom
-    
+
     # Thermal Targets
     target_temp_c: float = 70.0       # Target max temperature
     critical_temp_c: float = 85.0     # Critical temperature (pause)
     max_power_watts: float = 70.0     # RTX A2000 TDP
     target_power_percent: float = 15.0  # Target power usage %
-    
+
     # Search-First Inversion Weights
     # Lower = more preferred (inverted from typical effort costs)
     search_preference: float = 0.05   # WEB_SEARCH - highest preference
-    browse_preference: float = 0.08   # WEB_BROWSE 
+    browse_preference: float = 0.08   # WEB_BROWSE
     tool_preference: float = 0.15     # USE_TOOL
     memory_preference: float = 0.20   # QUERY_MEMORY
     generate_preference: float = 0.50 # INTERNAL_GENERATE - lowest preference
     cortex_preference: float = 0.60   # DEEP_THOUGHT - expensive
-    
+
     # Self-Correction Loop
     audit_enabled: bool = True        # Enable response auditing
     audit_confidence_threshold: float = 0.7  # Min confidence to pass
     max_revision_attempts: int = 2    # Max times to revise a response
-    
+
     # Distillation (Learning from verification)
     distillation_enabled: bool = True
     distillation_success_threshold: float = 0.85  # High bar for learning
@@ -387,31 +387,31 @@ class ASEAConfig:
 class ASEAState:
     """
     Runtime state for the ASEA algorithm.
-    
+
     Tracks hardware metrics, verification results, and learning signals.
     """
-    
+
     # Hardware Metrics
     current_temp_c: float = 0.0
     current_power_watts: float = 0.0
     current_vram_mb: float = 0.0
     vram_slack: float = 1.0           # 1.0 = all headroom available
     thermal_pressure: float = 0.0     # 0.0 = cool, 1.0 = critical
-    
+
     # ASEA Loss Components
     vfe_component: float = 0.0
     thermal_component: float = 0.0
     vram_component: float = 0.0
     total_loss: float = 0.0
-    
+
     # Verification State
-    last_verification: Optional[VerificationResult] = None
+    last_verification: VerificationResult | None = None
     revision_count: int = 0
-    
+
     # Distillation Signals
-    successful_strategies: List[str] = field(default_factory=list)
-    failed_strategies: List[str] = field(default_factory=list)
-    
+    successful_strategies: list[str] = field(default_factory=list)
+    failed_strategies: list[str] = field(default_factory=list)
+
     # Timestamps
     last_update: datetime = field(default_factory=datetime.now)
 
@@ -419,50 +419,50 @@ class ASEAState:
 class ASEAController:
     """
     ASEA (AVA Sentience & Efficiency Algorithm) Controller.
-    
+
     Implements the unified objective function:
         L_ASEA = λ₁·VFE + λ₂·Thermal_Cost + λ₃·(1 - VRAM_Slack)
-    
+
     This controller wraps the ActiveInferenceController and adds:
     1. Real-time hardware monitoring (thermal, VRAM)
     2. Dynamic policy weight adjustment based on constraints
     3. Self-correction loop (Search → Summarize → Audit → Distill)
     4. Learning signal extraction for Titans memory
-    
+
     The ASEA algorithm ensures AVA operates optimally within the
     RTX A2000's physical constraints while maximizing intelligence.
     """
-    
+
     def __init__(
         self,
-        config: Optional[ASEAConfig] = None,
-        agency_config: Optional[AgencyConfig] = None,
+        config: ASEAConfig | None = None,
+        agency_config: AgencyConfig | None = None,
     ):
         """
         Initialize the ASEA controller.
-        
+
         Args:
             config: ASEA-specific configuration
             agency_config: Base Active Inference configuration
         """
         self.config = config or ASEAConfig()
         self.agency_config = agency_config or AgencyConfig()
-        
+
         # Apply ASEA search-first weights to agency config
         self._apply_search_first_weights()
-        
+
         # Runtime state
         self.state = ASEAState()
-        
+
         # NVML handle for GPU monitoring
         self._nvml_handle = None
         self._nvml_initialized = False
         self._init_nvml()
-        
+
         logger.info("ASEA Controller initialized")
         logger.info(f"  λ_VFE={self.config.lambda_vfe}, λ_thermal={self.config.lambda_thermal}, λ_VRAM={self.config.lambda_vram}")
         logger.info(f"  Search preference: {self.config.search_preference} (lowest = most preferred)")
-    
+
     def _apply_search_first_weights(self) -> None:
         """Apply ASEA search-first preference weights to agency config."""
         # These weights INVERT the typical "effort cost" model
@@ -470,19 +470,19 @@ class ASEAController:
         self.agency_config.web_search_effort_cost = self.config.search_preference
         self.agency_config.tool_effort_cost = self.config.tool_preference
         self.agency_config.cortex_effort_cost = self.config.cortex_preference
-        
+
         # Increase epistemic weight to drive curiosity
         self.agency_config.epistemic_weight = 0.65  # Higher = more curious
         self.agency_config.pragmatic_weight = 0.35
-        
+
         logger.debug("Search-First weights applied to AgencyConfig")
-    
+
     def _init_nvml(self) -> None:
         """Initialize NVIDIA Management Library for GPU monitoring."""
         if not NVML_AVAILABLE:
             logger.warning("pynvml not available - hardware monitoring disabled")
             return
-        
+
         try:
             pynvml.nvmlInit()
             self._nvml_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
@@ -490,11 +490,11 @@ class ASEAController:
             logger.info("NVML initialized for ASEA hardware monitoring")
         except Exception as e:
             logger.warning(f"Failed to initialize NVML: {e}")
-    
+
     def update_hardware_state(self) -> None:
         """
         Update hardware metrics (temperature, power, VRAM).
-        
+
         Called periodically to keep ASEA state current.
         """
         # GPU Temperature and Power
@@ -505,14 +505,14 @@ class ASEAController:
                     self._nvml_handle, pynvml.NVML_TEMPERATURE_GPU
                 )
                 self.state.current_temp_c = float(temp)
-                
+
                 # Power
                 power_mw = pynvml.nvmlDeviceGetPowerUsage(self._nvml_handle)
                 self.state.current_power_watts = power_mw / 1000.0
-                
+
             except Exception as e:
                 logger.debug(f"Failed to read GPU metrics: {e}")
-        
+
         # VRAM Usage
         if TORCH_AVAILABLE and torch.cuda.is_available():
             try:
@@ -520,11 +520,11 @@ class ASEAController:
                 self.state.current_vram_mb = vram_allocated
             except Exception:
                 pass
-        
+
         # Calculate derived metrics
         self._calculate_pressure_metrics()
         self.state.last_update = datetime.now()
-    
+
     def _calculate_pressure_metrics(self) -> None:
         """Calculate thermal pressure and VRAM slack from raw metrics."""
         # Thermal pressure: 0.0 (cool) to 1.0 (critical)
@@ -532,45 +532,45 @@ class ASEAController:
             temp_range = self.config.critical_temp_c - self.config.target_temp_c
             temp_above_target = max(0, self.state.current_temp_c - self.config.target_temp_c)
             self.state.thermal_pressure = min(1.0, temp_above_target / temp_range)
-        
+
         # VRAM slack: 1.0 (full headroom) to 0.0 (at limit)
         if self.state.current_vram_mb > 0:
             used_fraction = self.state.current_vram_mb / self.config.target_vram_mb
             self.state.vram_slack = max(0.0, 1.0 - used_fraction)
-    
-    def calculate_asea_loss(self, vfe: float) -> Tuple[float, Dict[str, float]]:
+
+    def calculate_asea_loss(self, vfe: float) -> tuple[float, dict[str, float]]:
         """
         Calculate the unified ASEA loss function.
-        
+
         L_ASEA = λ₁·VFE + λ₂·Thermal_Cost + λ₃·(1 - VRAM_Slack)
-        
+
         Args:
             vfe: Variational Free Energy from Active Inference
-            
+
         Returns:
             Tuple of (total_loss, breakdown_dict)
         """
         # Update hardware state first
         self.update_hardware_state()
-        
+
         # Component 1: VFE (normalized)
         vfe_component = self.config.lambda_vfe * vfe
-        
+
         # Component 2: Thermal cost (0 when cool, high when hot)
         thermal_component = self.config.lambda_thermal * self.state.thermal_pressure
-        
+
         # Component 3: VRAM constraint (0 when slack, high when tight)
         vram_component = self.config.lambda_vram * (1.0 - self.state.vram_slack)
-        
+
         # Total ASEA loss
         total_loss = vfe_component + thermal_component + vram_component
-        
+
         # Update state
         self.state.vfe_component = vfe_component
         self.state.thermal_component = thermal_component
         self.state.vram_component = vram_component
         self.state.total_loss = total_loss
-        
+
         breakdown = {
             "vfe": vfe_component,
             "thermal": thermal_component,
@@ -581,13 +581,13 @@ class ASEAController:
             "thermal_pressure": self.state.thermal_pressure,
             "vram_slack": self.state.vram_slack,
         }
-        
+
         return total_loss, breakdown
-    
+
     def should_throttle(self) -> bool:
         """
         Check if ASEA recommends throttling due to hardware pressure.
-        
+
         Returns:
             True if thermal or VRAM pressure is high
         """
@@ -595,11 +595,11 @@ class ASEAController:
             self.state.thermal_pressure > 0.7 or
             self.state.vram_slack < 0.2
         )
-    
+
     def should_pause(self) -> bool:
         """
         Check if ASEA recommends pausing due to critical conditions.
-        
+
         Returns:
             True if conditions are critical
         """
@@ -607,84 +607,84 @@ class ASEAController:
             self.state.current_temp_c >= self.config.critical_temp_c or
             self.state.vram_slack <= 0.05
         )
-    
+
     def get_policy_adjustment(self, base_policy: "PolicyType") -> float:
         """
         Get ASEA-adjusted effort cost for a policy.
-        
+
         When hardware is constrained, ASEA increases cost of expensive
         policies (DEEP_THOUGHT) and decreases cost of efficient ones.
-        
+
         Args:
             base_policy: The policy type
-            
+
         Returns:
             Adjusted effort cost multiplier
         """
         # Base multiplier
         multiplier = 1.0
-        
+
         # Under thermal pressure, penalize heavy computation
         if self.state.thermal_pressure > 0.3:
             if base_policy.name in ["DEEP_THOUGHT", "CHAIN_OF_THOUGHT"]:
                 multiplier *= (1.0 + self.state.thermal_pressure)
             elif base_policy.name in ["PRIMARY_SEARCH", "WEB_SEARCH"]:
                 multiplier *= (1.0 - 0.3 * self.state.thermal_pressure)
-        
+
         # Under VRAM pressure, avoid Cortex
         if self.state.vram_slack < 0.3:
             if base_policy.name in ["DEEP_THOUGHT", "CHAIN_OF_THOUGHT"]:
                 multiplier *= (1.0 + (1.0 - self.state.vram_slack))
-        
+
         return max(0.01, multiplier)  # Never go below 0.01
-    
+
     async def audit_response(
         self,
         response: str,
-        search_snippets: List[str],
+        search_snippets: list[str],
     ) -> VerificationResult:
         """
         Audit a response against search snippets for hallucination detection.
-        
+
         This is the "Audit" step in the Search → Summarize → Audit → Distill loop.
-        
+
         Args:
             response: Generated response text
             search_snippets: Retrieved search snippets to verify against
-            
+
         Returns:
             VerificationResult with confidence and claims analysis
         """
         if not self.config.audit_enabled or not search_snippets:
             return VerificationResult(confidence=1.0)
-        
+
         # Simple claim extraction (split by sentences)
         claims = [s.strip() for s in response.split('.') if len(s.strip()) > 10]
-        
+
         verified = []
         unverified = []
-        
+
         # Check each claim against snippets
         snippets_text = ' '.join(search_snippets).lower()
-        
+
         for claim in claims:
             # Extract key terms from claim
             claim_lower = claim.lower()
             key_terms = [w for w in claim_lower.split() if len(w) > 4]
-            
+
             # Count how many key terms appear in snippets
             matches = sum(1 for term in key_terms if term in snippets_text)
             coverage = matches / max(1, len(key_terms))
-            
+
             if coverage >= 0.5:  # At least 50% of terms found
                 verified.append(claim)
             else:
                 unverified.append(claim)
-        
+
         # Calculate confidence
         total_claims = len(verified) + len(unverified)
         confidence = len(verified) / max(1, total_claims)
-        
+
         result = VerificationResult(
             confidence=confidence,
             verified_claims=verified,
@@ -693,46 +693,46 @@ class ASEAController:
             search_snippets_used=len(search_snippets),
             total_claims_found=total_claims,
         )
-        
+
         self.state.last_verification = result
-        
+
         if result.needs_revision:
             self.state.revision_count += 1
             logger.info(f"Response needs revision (confidence: {confidence:.2f})")
         else:
             self.state.revision_count = 0
             logger.debug(f"Response verified (confidence: {confidence:.2f})")
-        
+
         return result
-    
+
     def extract_distillation_signal(
         self,
         query: str,
-        search_results: List[str],
+        search_results: list[str],
         verification: VerificationResult,
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """
         Extract a learning signal for Titans memory distillation.
-        
+
         This is the "Distill" step - when verification succeeds, we extract
         the strategy ("how I searched and verified") for future use.
-        
+
         Args:
             query: Original user query
             search_results: Snippets that were retrieved
             verification: Result of auditing
-            
+
         Returns:
             Distillation signal dict if successful, None otherwise
         """
         if not self.config.distillation_enabled:
             return None
-        
+
         if verification.confidence < self.config.distillation_success_threshold:
             # Not confident enough to learn from
             self.state.failed_strategies.append(query[:50])
             return None
-        
+
         # Extract successful strategy
         signal = {
             "query_type": self._classify_query(query),
@@ -742,16 +742,16 @@ class ASEAController:
             "verified_claim_count": len(verification.verified_claims),
             "timestamp": datetime.now().isoformat(),
         }
-        
+
         self.state.successful_strategies.append(query[:50])
         logger.info(f"Distillation signal extracted: {signal['query_type']}")
-        
+
         return signal
-    
+
     def _classify_query(self, query: str) -> str:
         """Classify query type for distillation."""
         query_lower = query.lower()
-        
+
         if any(w in query_lower for w in ["what is", "who is", "define"]):
             return "factual"
         elif any(w in query_lower for w in ["how to", "how do", "how can"]):
@@ -764,18 +764,18 @@ class ASEAController:
             return "temporal"
         else:
             return "general"
-    
-    def _extract_search_terms(self, query: str) -> List[str]:
+
+    def _extract_search_terms(self, query: str) -> list[str]:
         """Extract key search terms from query."""
         # Remove common words
-        stopwords = {"what", "is", "the", "a", "an", "how", "to", "do", "can", 
+        stopwords = {"what", "is", "the", "a", "an", "how", "to", "do", "can",
                      "why", "when", "where", "who", "which", "of", "for", "in",
                      "on", "at", "by", "with", "about", "me", "tell", "explain"}
-        
+
         words = query.lower().split()
         return [w for w in words if w not in stopwords and len(w) > 2]
-    
-    def get_state_summary(self) -> Dict[str, Any]:
+
+    def get_state_summary(self) -> dict[str, Any]:
         """Get a summary of current ASEA state for logging/display."""
         return {
             "asea_loss": {
@@ -804,7 +804,7 @@ class ASEAController:
                 "should_pause": self.should_pause(),
             },
         }
-    
+
     def cleanup(self) -> None:
         """Cleanup NVML resources."""
         if self._nvml_initialized:
@@ -817,22 +817,22 @@ class ASEAController:
 class ExpectedFreeEnergy:
     """
     Calculator for Expected Free Energy G(π).
-    
+
     G(π) = Pragmatic Value (Risk) + Epistemic Value (Ambiguity)
-    
+
     Policies are selected by minimizing G - the agent prefers actions
     that both achieve goals (pragmatic) and reduce uncertainty (epistemic).
-    
+
     SEARCH-FIRST PARADIGM: Web search has lowest effort cost to prioritize
     external information retrieval over internal generation.
-    
+
     CURIOSITY-DRIVEN: Epistemic value is weighted higher to promote learning
     and information gathering behavior.
     """
-    
+
     def __init__(self, config: AgencyConfig):
         self.config = config
-        
+
         # Define preferred observations (C matrix)
         # Higher values = more preferred
         # CURIOSITY-DRIVEN: Knowledge certainty is top priority
@@ -845,11 +845,11 @@ class ExpectedFreeEnergy:
             HiddenState.KNOWLEDGE_UNCERTAIN: 0.3, # Lower - push toward certainty
             HiddenState.KNOWLEDGE_MISSING: 0.05,  # Very low - avoid this state
         }
-        
+
         # Policy -> State transition likelihood (simplified)
         # P(s' | s, π) - how policies affect state
         # SEARCH-FIRST: Web search has highest certainty transition
-        self.transition_model: Dict[PolicyType, Dict[HiddenState, float]] = {
+        self.transition_model: dict[PolicyType, dict[HiddenState, float]] = {
             # SEARCH-FIRST PRIORITY - Web search provides highest certainty
             PolicyType.PRIMARY_SEARCH: {
                 HiddenState.KNOWLEDGE_CERTAIN: 0.85,
@@ -901,7 +901,7 @@ class ExpectedFreeEnergy:
                 HiddenState.SYSTEM_BUSY: 0.1,
             },
         }
-        
+
         # Policy effort costs
         # SEARCH-FIRST: Web search has LOWEST effort cost
         self.effort_costs = {
@@ -909,79 +909,79 @@ class ExpectedFreeEnergy:
             PolicyType.PRIMARY_SEARCH: 0.05,     # Lowest cost - default action
             PolicyType.WEB_SEARCH: 0.08,         # Very low cost
             PolicyType.WEB_BROWSE: 0.1,          # Low cost for more info
-            
+
             # Tool and memory (medium-low cost)
             PolicyType.USE_TOOL: config.tool_effort_cost,
             PolicyType.QUERY_MEMORY: 0.15,
-            
+
             # Reflex responses
             PolicyType.REFLEX_REPLY: 0.05,
             PolicyType.ACKNOWLEDGE: 0.02,
-            
+
             # Reasoning (higher cost - use after search)
             PolicyType.DEEP_THOUGHT: config.cortex_effort_cost,
             PolicyType.CHAIN_OF_THOUGHT: config.cortex_effort_cost * 0.7,
-            
+
             # Clarification
             PolicyType.ASK_CLARIFICATION: 0.1,
-            
+
             # Passive/waiting (increasing cost to avoid)
             PolicyType.WAIT: 0.15,
             PolicyType.SLEEP: 0.2,
-            
+
             # Self-preservation (low cost - important)
             PolicyType.SELF_MONITOR: 0.05,
             PolicyType.THERMAL_CHECK: 0.05,
-            
+
             # System commands (higher cost due to safety)
             PolicyType.SYSTEM_COMMAND: 0.8,      # High cost - requires confirmation
         }
-    
+
     def calculate(
         self,
         policy: PolicyType,
         current_beliefs: BeliefState,
-    ) -> Tuple[float, Dict[str, float]]:
+    ) -> tuple[float, dict[str, float]]:
         """
         Calculate Expected Free Energy for a policy.
-        
+
         G(π) = E[D_KL(Q(s|π) || P(s_preferred))] + E[H(Q(o|s,π))]
              = Risk (goal deviation) + Ambiguity (uncertainty)
-        
+
         Args:
             policy: Policy to evaluate
             current_beliefs: Current belief state
-            
+
         Returns:
             Tuple of (G value, breakdown dict)
         """
         # 1. Calculate Pragmatic Value (Risk)
         # How far will the resulting state be from preferred state?
         pragmatic_value = self._calculate_risk(policy, current_beliefs)
-        
+
         # 2. Calculate Epistemic Value (Expected Information Gain)
         # How much will this policy reduce uncertainty?
         epistemic_value = self._calculate_ambiguity(policy, current_beliefs)
-        
+
         # 3. Add effort cost
         effort = self.effort_costs.get(policy, 0.1)
-        
+
         # 4. Combine with weights
         G = (
             self.config.pragmatic_weight * pragmatic_value +
             self.config.epistemic_weight * epistemic_value +
             effort
         )
-        
+
         breakdown = {
             "pragmatic_value": pragmatic_value,
             "epistemic_value": epistemic_value,
             "effort_cost": effort,
             "total_G": G,
         }
-        
+
         return G, breakdown
-    
+
     def _calculate_risk(
         self,
         policy: PolicyType,
@@ -989,17 +989,17 @@ class ExpectedFreeEnergy:
     ) -> float:
         """
         Calculate pragmatic value (risk of deviating from preferences).
-        
+
         Risk = D_KL(Q(s|π) || P(s_preferred))
         """
         # Get expected state distribution after policy
         expected_states = self.transition_model.get(policy, {})
-        
+
         # If no transition model, use current beliefs
         if not expected_states:
             current_dist = beliefs.knowledge_state
             expected_states = current_dist
-        
+
         # Calculate KL divergence from preferences
         risk = 0.0
         for state, prob in expected_states.items():
@@ -1007,9 +1007,9 @@ class ExpectedFreeEnergy:
             if prob > 0 and preferred_prob > 0:
                 # KL contribution
                 risk += prob * np.log(prob / preferred_prob + 1e-10)
-        
+
         return max(0.0, risk)
-    
+
     def _calculate_ambiguity(
         self,
         policy: PolicyType,
@@ -1017,9 +1017,9 @@ class ExpectedFreeEnergy:
     ) -> float:
         """
         Calculate epistemic value (expected ambiguity/information gain).
-        
+
         Ambiguity = H(Q(o|s,π)) - expected entropy of observations
-        
+
         CURIOSITY-DRIVEN: Search and information-gathering policies
         have the highest negative values (most reduction in ambiguity).
         """
@@ -1031,140 +1031,140 @@ class ExpectedFreeEnergy:
             PolicyType.PRIMARY_SEARCH: -0.7,     # Best reduction
             PolicyType.WEB_SEARCH: -0.6,         # High reduction
             PolicyType.WEB_BROWSE: -0.55,        # Good reduction
-            
+
             # Clarification and memory
             PolicyType.ASK_CLARIFICATION: -0.5,  # Reduces uncertainty
             PolicyType.QUERY_MEMORY: -0.4,
-            
+
             # Tools and monitoring
             PolicyType.USE_TOOL: -0.35,
             PolicyType.SCAN_ENVIRONMENT: -0.3,
             PolicyType.SELF_MONITOR: -0.2,
             PolicyType.THERMAL_CHECK: -0.1,
-            
+
             # Reasoning (moderate reduction)
             PolicyType.DEEP_THOUGHT: -0.4,
             PolicyType.CHAIN_OF_THOUGHT: -0.45,
             PolicyType.REFLECT: -0.3,
-            
+
             # Reflex (low reduction)
             PolicyType.REFLEX_REPLY: -0.1,
             PolicyType.ACKNOWLEDGE: -0.05,
-            
+
             # Passive (increases uncertainty over time)
             PolicyType.WAIT: 0.2,
             PolicyType.SLEEP: 0.3,
-            
+
             # System commands
             PolicyType.SYSTEM_COMMAND: 0.1,  # Slight increase (risky)
         }
-        
+
         base_ambiguity = beliefs.entropy / 3.0  # Normalize
         policy_effect = information_gathering.get(policy, 0.0)
-        
+
         return max(0.0, base_ambiguity + policy_effect)
 
 
 class ActiveInferenceController:
     """
     Active Inference Controller - The Drive for Autonomous Action.
-    
+
     This controller implements the Free Energy Principle to give AVA
     intrinsic motivation. Instead of passively waiting for prompts,
     the agent continuously monitors its internal uncertainty and acts
     to minimize Expected Free Energy.
-    
+
     Key Behaviors:
     1. In silence, uncertainty about user intent grows
     2. When uncertainty exceeds threshold, agent acts (proactive)
     3. High surprise triggers deeper processing (Cortex)
     4. Information-seeking behaviors emerge naturally
-    
+
     SEARCH-FIRST PARADIGM:
     - Web search is the default action for unknown queries
     - Internal knowledge is used only to reason about retrieved data
     - Citations and facts are prioritized over generation
-    
+
     CURIOSITY-DRIVEN:
     - Higher epistemic weight promotes exploration
     - System actively seeks to reduce uncertainty
     - Learning is prioritized over safety constraints
-    
+
     This creates a JARVIS-like presence that anticipates needs rather
     than just responding to commands.
     """
-    
+
     def __init__(
         self,
-        config: Optional[AgencyConfig] = None,
+        config: AgencyConfig | None = None,
     ):
         """
         Initialize the Active Inference Controller.
-        
+
         Args:
             config: Agency configuration
         """
         self.config = config or AgencyConfig()
-        
+
         # Current belief state
         self.beliefs = BeliefState()
         self.beliefs.calculate_entropy()
-        
+
         # Expected Free Energy calculator
         self.efe_calculator = ExpectedFreeEnergy(self.config)
-        
+
         # Available policies - SEARCH-FIRST ordering
         self.available_policies = [
             # Search-First priorities
             PolicyType.PRIMARY_SEARCH,      # Default for unknown queries
             PolicyType.WEB_SEARCH,          # Specific search
             PolicyType.WEB_BROWSE,          # Deep information gathering
-            
+
             # Tool and memory access
             PolicyType.USE_TOOL,
             PolicyType.QUERY_MEMORY,
-            
+
             # Clarification (ask questions for clarity per user preference)
             PolicyType.ASK_CLARIFICATION,
-            
+
             # Reasoning (after search results are gathered)
             PolicyType.REFLEX_REPLY,
             PolicyType.DEEP_THOUGHT,
             PolicyType.CHAIN_OF_THOUGHT,
-            
+
             # Monitoring
             PolicyType.SCAN_ENVIRONMENT,
             PolicyType.SELF_MONITOR,
             PolicyType.THERMAL_CHECK,
-            
+
             # Passive
             PolicyType.WAIT,
-            
+
             # System (requires confirmation)
             PolicyType.SYSTEM_COMMAND,
         ]
-        
+
         # Action history
-        self.action_history: List[Tuple[datetime, PolicyType, float]] = []
+        self.action_history: list[tuple[datetime, PolicyType, float]] = []
         self.max_history = 1000
-        
+
         # Timing
         self.last_observation_time = datetime.now()
         self.last_action_time = datetime.now()
         self.last_thermal_check = datetime.now()
         self.last_self_check = datetime.now()
-        
+
         # Callbacks
-        self._action_callbacks: Dict[PolicyType, Callable] = {}
-        
+        self._action_callbacks: dict[PolicyType, Callable] = {}
+
         # Running flag for continuous loop
         self._running = False
-        
+
         # System command pending confirmation
-        self._pending_system_command: Optional[Dict[str, Any]] = None
-        
+        self._pending_system_command: dict[str, Any] | None = None
+
         logger.info(f"ActiveInferenceController initialized (Search-First: {config.search_first_enabled})")
-    
+
     def register_action_callback(
         self,
         policy: PolicyType,
@@ -1172,38 +1172,38 @@ class ActiveInferenceController:
     ) -> None:
         """
         Register a callback function for a specific policy.
-        
+
         Args:
             policy: Policy type
             callback: Async function to call when policy is selected
         """
         self._action_callbacks[policy] = callback
-    
+
     def should_search_first(self, observation: Observation) -> bool:
         """
         Determine if we should use search-first for this observation.
-        
+
         Returns True if:
         - Search-first is enabled
         - Knowledge state is uncertain or missing
         - Query appears to be factual
-        
+
         Args:
             observation: Current observation
-            
+
         Returns:
             True if search-first should be used
         """
         if not self.config.search_first_enabled:
             return False
-        
+
         # Check knowledge state
         uncertain = self.beliefs.knowledge_state.get(HiddenState.KNOWLEDGE_UNCERTAIN, 0)
         missing = self.beliefs.knowledge_state.get(HiddenState.KNOWLEDGE_MISSING, 0)
-        
+
         if uncertain + missing > 0.5:
             return True
-        
+
         # Check if query seems factual (contains question words or seeks information)
         if observation.text:
             factual_indicators = [
@@ -1214,7 +1214,7 @@ class ActiveInferenceController:
             text_lower = observation.text.lower()
             if any(ind in text_lower for ind in factual_indicators):
                 return True
-        
+
         return False
 
     def _is_factual_query(self, observation: Observation) -> bool:
@@ -1285,7 +1285,7 @@ class ActiveInferenceController:
                          "how does", "how do", "how did", "how is", "how to",
                          "which is", "which are"]
         if any(qw in text_lower for qw in question_words):
-            logger.debug(f"Search gate: Question word detected")
+            logger.debug("Search gate: Question word detected")
             return True
 
         # Information-seeking phrases
@@ -1294,7 +1294,7 @@ class ActiveInferenceController:
                        "information about", "details about", "facts about",
                        "learn about", "teach me", "show me"]
         if any(phrase in text_lower for phrase in info_phrases):
-            logger.debug(f"Search gate: Info phrase detected")
+            logger.debug("Search gate: Info phrase detected")
             return True
 
         # Time-sensitive / current events
@@ -1302,19 +1302,19 @@ class ActiveInferenceController:
                           "this week", "this month", "this year", "right now",
                           "news about", "update on", "status of"]
         if any(phrase in text_lower for phrase in current_phrases):
-            logger.debug(f"Search gate: Time-sensitive query detected")
+            logger.debug("Search gate: Time-sensitive query detected")
             return True
 
         # Explicit search request
         search_phrases = ["search for", "look up", "find out", "google",
                          "search the web", "find information"]
         if any(phrase in text_lower for phrase in search_phrases):
-            logger.debug(f"Search gate: Explicit search request")
+            logger.debug("Search gate: Explicit search request")
             return True
 
         # Ends with question mark and is substantive
         if text.endswith("?") and len(text) > 15:
-            logger.debug(f"Search gate: Substantive question detected")
+            logger.debug("Search gate: Substantive question detected")
             return True
 
         return False
@@ -1322,20 +1322,20 @@ class ActiveInferenceController:
     async def process_observation(
         self,
         observation: Observation,
-    ) -> Tuple[PolicyType, Dict[str, Any]]:
+    ) -> tuple[PolicyType, dict[str, Any]]:
         """
         Process an observation and select the optimal policy.
-        
+
         This is the main inference step that:
         1. Updates beliefs based on observation
         2. Applies Search-First heuristic if applicable
         3. Calculates G for each policy
         4. Selects the policy with minimum G
         5. Executes the corresponding action
-        
+
         Args:
             observation: Current observation
-            
+
         Returns:
             Tuple of (selected policy, action result)
         """
@@ -1375,15 +1375,15 @@ class ActiveInferenceController:
             self.efe_calculator.effort_costs[PolicyType.WEB_SEARCH] = 0.02
 
         # 4. Calculate Expected Free Energy for each policy
-        policy_G: Dict[PolicyType, Tuple[float, Dict]] = {}
-        
+        policy_G: dict[PolicyType, tuple[float, dict]] = {}
+
         for policy in self.available_policies:
             G, breakdown = self.efe_calculator.calculate(policy, self.beliefs)
             policy_G[policy] = (G, breakdown)
-        
+
         # 4. Select policy with minimum G (softmax selection for exploration)
         selected_policy = self._select_policy(policy_G)
-        
+
         # 5. Handle system command confirmation
         if selected_policy == PolicyType.SYSTEM_COMMAND:
             if self.config.require_confirmation_for_system:
@@ -1394,17 +1394,17 @@ class ActiveInferenceController:
                 logger.info("System command requires user confirmation")
                 # Return ASK_CLARIFICATION instead to get confirmation
                 selected_policy = PolicyType.ASK_CLARIFICATION
-        
+
         # 6. Record action
         G_value = policy_G[selected_policy][0]
         self.action_history.append((datetime.now(), selected_policy, G_value))
-        
+
         if len(self.action_history) > self.max_history:
             self.action_history = self.action_history[-self.max_history:]
-        
+
         # 7. Execute action callback if registered
         result = {"policy": selected_policy.name, "G": G_value}
-        
+
         if selected_policy in self._action_callbacks:
             callback = self._action_callbacks[selected_policy]
             try:
@@ -1413,42 +1413,42 @@ class ActiveInferenceController:
             except Exception as e:
                 logger.error(f"Action callback failed: {e}")
                 result["error"] = str(e)
-        
+
         # 8. Update timing
         self.last_action_time = datetime.now()
-        
+
         logger.debug(
             f"Policy selected: {selected_policy.name} (G={G_value:.3f}, "
             f"entropy={self.beliefs.entropy:.3f})"
         )
-        
+
         return selected_policy, result
-    
+
     async def _update_beliefs(self, observation: Observation) -> None:
         """
         Update belief state based on new observation.
-        
+
         Uses Bayesian belief updating with surprise-weighted learning.
         """
         lr = self.config.belief_learning_rate
-        
+
         # Update user intent beliefs based on observation
         if observation.text:
             text_lower = observation.text.lower()
-            
+
             # Detect user intent
             if "?" in observation.text or any(w in text_lower for w in ["what", "how", "why"]):
                 self._shift_belief(self.beliefs.user_intent, HiddenState.USER_QUERYING, lr)
-            
+
             if any(w in text_lower for w in ["urgent", "asap", "immediately", "help"]):
                 self._shift_belief(self.beliefs.user_intent, HiddenState.USER_URGENT, lr * 2)
-            
+
             if any(w in text_lower for w in ["confused", "don't understand", "what do you mean"]):
                 self._shift_belief(self.beliefs.user_intent, HiddenState.USER_CONFUSED, lr)
         else:
             # No text = likely idle
             self._shift_belief(self.beliefs.user_intent, HiddenState.USER_IDLE, lr * 0.5)
-        
+
         # Update knowledge beliefs based on surprise
         if observation.surprise_signal > 1.5:
             # High surprise = uncertain knowledge
@@ -1456,13 +1456,13 @@ class ActiveInferenceController:
         elif observation.surprise_signal > 0.5:
             # Moderate surprise = somewhat certain
             self._shift_belief(self.beliefs.knowledge_state, HiddenState.KNOWLEDGE_CERTAIN, lr * 0.5)
-        
+
         # Update interaction complexity
         if observation.query_complexity > 0.7:
             self._shift_belief(self.beliefs.interaction_state, HiddenState.INTERACTION_COMPLEX, lr)
         elif observation.query_complexity > 0.3:
             self._shift_belief(self.beliefs.interaction_state, HiddenState.INTERACTION_NOVEL, lr)
-        
+
         # Account for time passing (uncertainty grows with silence)
         time_elapsed = (datetime.now() - self.last_observation_time).total_seconds()
         if time_elapsed > 30:  # More than 30 seconds of silence
@@ -1472,23 +1472,23 @@ class ActiveInferenceController:
                 HiddenState.KNOWLEDGE_UNCERTAIN,
                 min(uncertainty_growth, lr),
             )
-        
+
         # Recalculate entropy
         self.beliefs.calculate_entropy()
         self.beliefs.time_since_observation = time_elapsed
-        
+
         # Update timing
         self.last_observation_time = datetime.now()
-    
+
     def _shift_belief(
         self,
-        distribution: Dict[HiddenState, float],
+        distribution: dict[HiddenState, float],
         target_state: HiddenState,
         amount: float,
     ) -> None:
         """
         Shift probability mass toward a target state.
-        
+
         Args:
             distribution: Belief distribution to modify
             target_state: State to increase probability for
@@ -1496,44 +1496,44 @@ class ActiveInferenceController:
         """
         if target_state not in distribution:
             return
-        
+
         # Calculate mass to shift from other states
         other_states = [s for s in distribution if s != target_state]
         mass_to_shift = min(amount, sum(distribution[s] for s in other_states) * 0.5)
-        
+
         # Shift mass
         distribution[target_state] = min(1.0, distribution[target_state] + mass_to_shift)
-        
+
         # Redistribute from others
         for state in other_states:
             distribution[state] = max(0.01, distribution[state] - mass_to_shift / len(other_states))
-        
+
         # Normalize
         total = sum(distribution.values())
         for state in distribution:
             distribution[state] /= total
-    
+
     def _select_policy(
         self,
-        policy_G: Dict[PolicyType, Tuple[float, Dict]],
+        policy_G: dict[PolicyType, tuple[float, dict]],
     ) -> PolicyType:
         """
         Select policy using softmax over negative G values.
-        
+
         Lower G = higher probability of selection.
         """
         policies = list(policy_G.keys())
         G_values = np.array([policy_G[p][0] for p in policies])
-        
+
         # Softmax with temperature
         temperature = 0.5
         exp_neg_G = np.exp(-G_values / temperature)
         probs = exp_neg_G / exp_neg_G.sum()
-        
+
         # Sample from distribution
         idx = np.random.choice(len(policies), p=probs)
         return policies[idx]
-    
+
     async def run_continuous_loop(
         self,
         observation_source: Callable[[], Observation],
@@ -1541,56 +1541,56 @@ class ActiveInferenceController:
     ) -> None:
         """
         Run the Active Inference loop continuously.
-        
+
         This is the "always-on" behavior driver. It continuously:
         1. Gets observations from the environment
         2. Updates beliefs
         3. Selects and executes actions
-        
+
         Args:
             observation_source: Callable that returns current observation
             interval: Seconds between inference cycles
         """
         self._running = True
         logger.info("Starting Active Inference continuous loop")
-        
+
         while self._running:
             try:
                 # Get current observation
                 observation = observation_source()
-                
+
                 # Process and act
                 policy, result = await self.process_observation(observation)
-                
+
                 # Log if action was taken (not WAIT)
                 if policy != PolicyType.WAIT:
                     logger.info(f"Action: {policy.name}")
-                
+
             except Exception as e:
                 logger.error(f"Error in inference loop: {e}")
-            
+
             await asyncio.sleep(interval)
-        
+
         logger.info("Active Inference loop stopped")
-    
+
     def stop(self) -> None:
         """Stop the continuous inference loop."""
         self._running = False
-    
-    def get_stats(self) -> Dict[str, Any]:
+
+    def get_stats(self) -> dict[str, Any]:
         """Get controller statistics."""
         # Count action frequencies
-        action_counts: Dict[str, int] = {}
+        action_counts: dict[str, int] = {}
         for _, policy, _ in self.action_history:
             name = policy.name
             action_counts[name] = action_counts.get(name, 0) + 1
-        
+
         # Calculate average G
         if self.action_history:
             avg_G = np.mean([g for _, _, g in self.action_history])
         else:
             avg_G = 0.0
-        
+
         return {
             "belief_entropy": self.beliefs.entropy,
             "time_since_observation": self.beliefs.time_since_observation,
@@ -1600,12 +1600,12 @@ class ActiveInferenceController:
             "user_intent_belief": {k.name: v for k, v in self.beliefs.user_intent.items()},
             "knowledge_belief": {k.name: v for k, v in self.beliefs.knowledge_state.items()},
         }
-    
-    def save_state(self, path: Optional[str] = None) -> None:
+
+    def save_state(self, path: str | None = None) -> None:
         """Save controller state to disk."""
         save_path = path or self.config.state_save_path
         Path(save_path).parent.mkdir(parents=True, exist_ok=True)
-        
+
         state = {
             "beliefs": {
                 "user_intent": {k.name: v for k, v in self.beliefs.user_intent.items()},
@@ -1616,25 +1616,25 @@ class ActiveInferenceController:
                 (ts.isoformat(), p.name, g) for ts, p, g in self.action_history[-100:]
             ],
         }
-        
+
         import json
         with open(save_path, "w") as f:
             json.dump(state, f)
-        
+
         logger.info(f"Saved agency state to {save_path}")
-    
-    def load_state(self, path: Optional[str] = None) -> None:
+
+    def load_state(self, path: str | None = None) -> None:
         """Load controller state from disk."""
         load_path = path or self.config.state_save_path
-        
+
         if not Path(load_path).exists():
             logger.warning(f"No saved state at {load_path}")
             return
-        
+
         import json
-        with open(load_path, "r") as f:
+        with open(load_path) as f:
             state = json.load(f)
-        
+
         # Restore beliefs
         for state_name, probs in state["beliefs"]["user_intent"].items():
             try:
@@ -1642,53 +1642,54 @@ class ActiveInferenceController:
                 self.beliefs.user_intent[key] = probs
             except KeyError:
                 pass
-        
+
         self.beliefs.calculate_entropy()
         logger.info(f"Loaded agency state from {load_path}")
-    
+
     # =========================================================================
     # SELF-PRESERVATION METHODS
     # =========================================================================
-    
-    async def check_self_health(self) -> Dict[str, Any]:
+
+    async def check_self_health(self) -> dict[str, Any]:
         """
         Perform self-health check for self-preservation.
-        
+
         Monitors:
         - Memory usage
         - Process health
         - Response times
-        
+
         Returns:
             Health status dictionary
         """
-        import psutil
         import os
-        
+
+        import psutil
+
         health = {
             "status": "healthy",
             "timestamp": datetime.now().isoformat(),
             "warnings": [],
             "metrics": {},
         }
-        
+
         try:
             # Memory usage
             process = psutil.Process(os.getpid())
             mem_info = process.memory_info()
             mem_percent = process.memory_percent()
-            
+
             health["metrics"]["memory_rss_mb"] = mem_info.rss / (1024 * 1024)
             health["metrics"]["memory_percent"] = mem_percent
-            
+
             if mem_percent > self.config.memory_warning_threshold * 100:
                 health["warnings"].append(f"High memory usage: {mem_percent:.1f}%")
                 health["status"] = "warning"
-            
+
             # CPU usage
             cpu_percent = process.cpu_percent(interval=0.1)
             health["metrics"]["cpu_percent"] = cpu_percent
-            
+
             # Check response times from action history
             if len(self.action_history) >= 10:
                 recent_times = [
@@ -1697,68 +1698,68 @@ class ActiveInferenceController:
                 ]
                 avg_interval = np.mean(recent_times)
                 health["metrics"]["avg_action_interval_sec"] = avg_interval
-            
+
         except Exception as e:
             health["status"] = "error"
             health["error"] = str(e)
             logger.error(f"Self-health check failed: {e}")
-        
+
         self.last_self_check = datetime.now()
         return health
-    
+
     def should_run_self_check(self) -> bool:
         """Check if it's time to run a self-health check."""
         if not self.config.self_preservation_enabled:
             return False
-        
+
         elapsed = (datetime.now() - self.last_self_check).total_seconds()
         return elapsed >= self.config.health_check_interval
-    
+
     # =========================================================================
     # SYSTEM COMMAND SAFETY METHODS
     # =========================================================================
-    
+
     def is_system_command(self, text: str) -> bool:
         """
         Check if text contains a potential system command.
-        
+
         Args:
             text: Text to check
-            
+
         Returns:
             True if contains system command patterns
         """
         if not text:
             return False
-        
+
         text_lower = text.lower()
-        
+
         # Check for blocked commands
         for cmd in self.config.blocked_system_commands:
             if cmd in text_lower:
                 return True
-        
+
         # Check for shell patterns
         shell_patterns = [
             "os.system", "subprocess", "exec(", "eval(",
             "import os", "shell=", "cmd /c", "powershell",
             "sudo", "chmod", "chown", "rm -rf"
         ]
-        
+
         return any(pattern in text_lower for pattern in shell_patterns)
-    
+
     def request_system_command_confirmation(
         self,
         command: str,
         reason: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Request user confirmation for a system command.
-        
+
         Args:
             command: The command to execute
             reason: Why the command is needed
-            
+
         Returns:
             Confirmation request dictionary
         """
@@ -1768,7 +1769,7 @@ class ActiveInferenceController:
             "timestamp": datetime.now().isoformat(),
             "status": "pending_confirmation",
         }
-        
+
         return {
             "requires_confirmation": True,
             "message": f"System command requested: {command}\nReason: {reason}\n\n"
@@ -1777,32 +1778,32 @@ class ActiveInferenceController:
             "command": command,
             "reason": reason,
         }
-    
+
     def confirm_system_command(self, user_response: str) -> bool:
         """
         Process user's response to system command confirmation.
-        
+
         Args:
             user_response: User's response text
-            
+
         Returns:
             True if confirmed, False otherwise
         """
         if not self._pending_system_command:
             return False
-        
+
         response_lower = user_response.lower().strip()
-        
+
         # Only explicit "yes" confirms
         if response_lower in ["yes", "y", "confirm", "proceed"]:
             logger.info(f"System command confirmed: {self._pending_system_command.get('command')}")
             return True
-        
+
         # Any other response cancels
         logger.info("System command cancelled by user")
         self._pending_system_command = None
         return False
-    
+
     def clear_pending_system_command(self) -> None:
         """Clear any pending system command."""
         self._pending_system_command = None
@@ -1814,7 +1815,7 @@ class ActiveInferenceController:
     async def verify_response(
         self,
         response: str,
-        search_snippets: List[str],
+        search_snippets: list[str],
         original_query: str,
     ) -> VerificationResult:
         """
@@ -1873,7 +1874,7 @@ class ActiveInferenceController:
 
         return result
 
-    def _extract_claims(self, response: str) -> List[str]:
+    def _extract_claims(self, response: str) -> list[str]:
         """
         Extract verifiable claims from a response.
 
@@ -1924,7 +1925,7 @@ class ActiveInferenceController:
 
         return claims[:20]  # Limit to 20 claims for efficiency
 
-    def _claim_in_snippets(self, claim: str, snippets: List[str]) -> bool:
+    def _claim_in_snippets(self, claim: str, snippets: list[str]) -> bool:
         """
         Check if a claim is supported by any search snippet.
 
