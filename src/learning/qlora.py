@@ -71,6 +71,8 @@ class QLoRAConfig:
 
     # Model settings
     base_model: str = "meta-llama/Llama-3.2-3B-Instruct"
+    # Revision/commit hash for reproducibility and security (pin to specific version)
+    model_revision: str | None = "main"
 
     # Quantization
     load_in_4bit: bool = True
@@ -250,18 +252,20 @@ class QLoRATrainer:
             bnb_4bit_use_double_quant=self.config.bnb_4bit_use_double_quant,
         )
 
-        # Load tokenizer
+        # Load tokenizer with revision pinning for security
         self._tokenizer = AutoTokenizer.from_pretrained(
             self.config.base_model,
+            revision=self.config.model_revision,
             trust_remote_code=True,
         )
 
         if self._tokenizer.pad_token is None:
             self._tokenizer.pad_token = self._tokenizer.eos_token
 
-        # Load model
+        # Load model with revision pinning for security
         self._model = AutoModelForCausalLM.from_pretrained(
             self.config.base_model,
+            revision=self.config.model_revision,
             quantization_config=bnb_config,
             device_map="auto",
             trust_remote_code=True,

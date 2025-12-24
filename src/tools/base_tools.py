@@ -4,11 +4,102 @@ Base Tools for AVA
 Implements tools at each safety level, from baby-safe to mature.
 """
 
+import ast
 import math
+import operator
 import random
 from datetime import datetime
 
 from .registry import ToolRegistry, ToolSafetyLevel
+
+
+class SafeMathEvaluator(ast.NodeVisitor):
+    """
+    Safe AST-based mathematical expression evaluator.
+
+    Only allows basic arithmetic operations and whitelisted math functions.
+    Prevents arbitrary code execution that eval() would allow.
+    """
+
+    # Allowed binary operators
+    OPERATORS = {
+        ast.Add: operator.add,
+        ast.Sub: operator.sub,
+        ast.Mult: operator.mul,
+        ast.Div: operator.truediv,
+        ast.Pow: operator.pow,
+        ast.USub: operator.neg,
+        ast.UAdd: operator.pos,
+    }
+
+    # Allowed functions
+    FUNCTIONS = {
+        "sqrt": math.sqrt,
+        "abs": abs,
+        "sin": math.sin,
+        "cos": math.cos,
+        "tan": math.tan,
+        "log": math.log,
+        "log10": math.log10,
+        "exp": math.exp,
+    }
+
+    # Allowed constants
+    CONSTANTS = {
+        "pi": math.pi,
+        "e": math.e,
+    }
+
+    def visit_BinOp(self, node: ast.BinOp) -> float:
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        op_type = type(node.op)
+        if op_type not in self.OPERATORS:
+            raise ValueError(f"Unsupported operator: {op_type.__name__}")
+        return self.OPERATORS[op_type](left, right)
+
+    def visit_UnaryOp(self, node: ast.UnaryOp) -> float:
+        operand = self.visit(node.operand)
+        op_type = type(node.op)
+        if op_type not in self.OPERATORS:
+            raise ValueError(f"Unsupported unary operator: {op_type.__name__}")
+        return self.OPERATORS[op_type](operand)
+
+    def visit_Constant(self, node: ast.Constant) -> float:
+        if isinstance(node.value, (int, float)):
+            return node.value
+        raise ValueError(f"Unsupported constant type: {type(node.value)}")
+
+    def visit_Num(self, node: ast.Num) -> float:
+        # For Python < 3.8 compatibility
+        return node.n
+
+    def visit_Name(self, node: ast.Name) -> float:
+        if node.id in self.CONSTANTS:
+            return self.CONSTANTS[node.id]
+        raise ValueError(f"Unknown variable: {node.id}")
+
+    def visit_Call(self, node: ast.Call) -> float:
+        if not isinstance(node.func, ast.Name):
+            raise ValueError("Only simple function calls allowed")
+        func_name = node.func.id
+        if func_name not in self.FUNCTIONS:
+            raise ValueError(f"Unknown function: {func_name}")
+        args = [self.visit(arg) for arg in node.args]
+        return self.FUNCTIONS[func_name](*args)
+
+    def visit_Expr(self, node: ast.Expr) -> float:
+        return self.visit(node.value)
+
+    def generic_visit(self, node: ast.AST) -> float:
+        raise ValueError(f"Unsupported syntax: {type(node).__name__}")
+
+    @classmethod
+    def evaluate(cls, expression: str) -> float:
+        """Safely evaluate a mathematical expression."""
+        tree = ast.parse(expression, mode="eval")
+        evaluator = cls()
+        return evaluator.visit(tree.body)
 
 # =============================================================================
 # LEVEL 0 - Baby Safe Tools
@@ -90,27 +181,9 @@ def calculator(expression: str) -> str:
     Args:
         expression: Mathematical expression to evaluate
     """
-    # Safe math functions
-    safe_dict = {
-        "sqrt": math.sqrt,
-        "abs": abs,
-        "sin": math.sin,
-        "cos": math.cos,
-        "tan": math.tan,
-        "log": math.log,
-        "log10": math.log10,
-        "exp": math.exp,
-        "pi": math.pi,
-        "e": math.e,
-    }
-
     try:
-        # Remove any dangerous characters
-        allowed_chars = set("0123456789+-*/().sqrtabsincotagloexpe ")
-        expression_clean = "".join(c for c in expression if c in allowed_chars or c.isalpha())
-
-        # Evaluate with restricted globals
-        result = eval(expression_clean, {"__builtins__": {}}, safe_dict)
+        # Use safe AST-based evaluator instead of eval()
+        result = SafeMathEvaluator.evaluate(expression)
         return str(result)
     except Exception as e:
         return f"Error: {str(e)}"
@@ -241,18 +314,21 @@ def code_evaluate(code: str, language: str = "python") -> str:
     Evaluate simple code (very restricted).
 
     This is intentionally limited for safety.
+    Only allows basic arithmetic: digits, +, -, *, /, parentheses, spaces.
     """
     if language != "python":
         return f"Only Python is supported (got: {language})"
 
-    # Very restricted - only allow simple expressions
+    # Very restricted - only allow simple arithmetic expressions
     try:
         # Only allow basic operations
-        allowed = set("0123456789+-*/() ")
-        if all(c in allowed for c in code):
-            result = eval(code, {"__builtins__": {}}, {})
-            return f"Result: {result}"
-        return "Code contains disallowed characters"
+        allowed = set("0123456789+-*/() .")
+        if not all(c in allowed for c in code):
+            return "Code contains disallowed characters"
+
+        # Use safe AST-based evaluator instead of eval()
+        result = SafeMathEvaluator.evaluate(code)
+        return f"Result: {result}"
     except Exception as e:
         return f"Error: {e}"
 

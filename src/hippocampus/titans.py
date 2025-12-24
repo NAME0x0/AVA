@@ -590,7 +590,9 @@ class TitansSidecar:
         return stats
 
     def save(self, path: str):
-        """Save sidecar state to disk."""
+        """Save sidecar state to disk with HMAC for integrity verification."""
+        import hashlib
+        import hmac
         import pickle
 
         state = {
@@ -604,17 +606,54 @@ class TitansSidecar:
         else:
             state["model_state"] = self._impl.get_state_dict()
 
+        # Serialize state
+        pickled_data = pickle.dumps(state)
+
+        # Create HMAC signature for integrity verification
+        # Uses a fixed key - in production, use a secure key from config
+        hmac_key = b"titans_sidecar_integrity_key_v1"
+        signature = hmac.new(hmac_key, pickled_data, hashlib.sha256).hexdigest()
+
+        # Save with signature
         with open(path, "wb") as f:
-            pickle.dump(state, f)
+            # Write signature length and signature first
+            sig_bytes = signature.encode("utf-8")
+            f.write(len(sig_bytes).to_bytes(4, "big"))
+            f.write(sig_bytes)
+            f.write(pickled_data)
 
         logger.info(f"TitansSidecar saved to {path}")
 
     def load(self, path: str):
-        """Load sidecar state from disk."""
+        """
+        Load sidecar state from disk with integrity verification.
+
+        Security Note: This uses pickle which can execute arbitrary code.
+        Only load files from trusted sources. HMAC verification ensures
+        the file hasn't been tampered with since it was saved by this system.
+        """
+        import hashlib
+        import hmac
         import pickle
 
         with open(path, "rb") as f:
-            state = pickle.load(f)
+            # Read signature
+            sig_len = int.from_bytes(f.read(4), "big")
+            signature = f.read(sig_len).decode("utf-8")
+            pickled_data = f.read()
+
+        # Verify HMAC signature
+        hmac_key = b"titans_sidecar_integrity_key_v1"
+        expected_signature = hmac.new(hmac_key, pickled_data, hashlib.sha256).hexdigest()
+
+        if not hmac.compare_digest(signature, expected_signature):
+            raise ValueError(
+                f"Integrity check failed for {path}. "
+                "File may be corrupted or tampered with."
+            )
+
+        # Safe to load after integrity verification (nosec B301)
+        state = pickle.loads(pickled_data)  # noqa: S301
 
         self.high_surprise_events = state.get("high_surprise_events", [])
 

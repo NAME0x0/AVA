@@ -19,11 +19,15 @@ import aiohttp
 
 # Optional imports with fallbacks
 try:
+    import requests
+
     HAS_REQUESTS = True
 except ImportError:
     HAS_REQUESTS = False
 
 try:
+    from bs4 import BeautifulSoup
+
     HAS_BS4 = True
 except ImportError:
     HAS_BS4 = False
