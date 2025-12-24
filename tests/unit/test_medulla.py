@@ -5,23 +5,20 @@ Unit Tests for Medulla Component
 Tests for the reflexive core of AVA's dual-brain architecture.
 """
 
-import pytest
-import asyncio
-from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime
-
 import sys
 from pathlib import Path
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from src.core.medulla import (
-    MedullaState,
-    ThermalStatus,
-    ThermalMonitor,
-    MedullaConfig,
     CognitiveState,
+    MedullaConfig,
+    MedullaState,
+    ThermalMonitor,
+    ThermalStatus,
 )
 
 
@@ -31,9 +28,13 @@ class TestMedullaState:
     def test_all_states_exist(self):
         """Verify all expected states are defined."""
         expected = [
-            "IDLE", "LISTENING", "PERCEIVING",
-            "RESPONDING", "ROUTING",
-            "THERMAL_THROTTLED", "THERMAL_PAUSED"
+            "IDLE",
+            "LISTENING",
+            "PERCEIVING",
+            "RESPONDING",
+            "ROUTING",
+            "THERMAL_THROTTLED",
+            "THERMAL_PAUSED",
         ]
         for state in expected:
             assert hasattr(MedullaState, state)
@@ -194,6 +195,7 @@ class TestSurpriseCalculation:
         # Cosine similarity of identical vectors = 1.0
         # Surprise = 1 - similarity = 0.0
         import numpy as np
+
         similarity = np.dot(embedding1, embedding2) / (
             np.linalg.norm(embedding1) * np.linalg.norm(embedding2)
         )
@@ -273,6 +275,7 @@ class TestMedullaAsync:
 
     async def test_process_handles_empty_input(self):
         """Test handling of empty input."""
+
         class MockMedulla:
             async def process(self, text: str) -> dict:
                 if not text.strip():

@@ -8,8 +8,8 @@ Shared pytest fixtures and configuration for all tests.
 import asyncio
 import os
 import sys
+from collections.abc import Generator
 from pathlib import Path
-from typing import AsyncGenerator, Generator
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 # Pytest Configuration
 # ============================================================================
 
+
 def pytest_configure(config):
     """Configure pytest with custom markers."""
     config.addinivalue_line("markers", "slow: marks tests as slow")
@@ -32,6 +33,7 @@ def pytest_configure(config):
 # ============================================================================
 # Event Loop Fixture
 # ============================================================================
+
 
 @pytest.fixture(scope="session")
 def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
@@ -44,6 +46,7 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
 # ============================================================================
 # Environment Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def simulation_mode():
@@ -89,6 +92,7 @@ search_first:
 # Mock Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 def mock_ollama():
     """Mock Ollama client for testing without actual LLM."""
@@ -131,6 +135,7 @@ def mock_thermal_monitor():
 # AVA Instance Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 async def ava_instance(simulation_mode, mock_ollama):
     """Create an AVA instance in simulation mode for testing."""
@@ -158,6 +163,7 @@ async def ava_engine(simulation_mode, mock_ollama):
 # Test Data Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 def sample_messages() -> list[dict]:
     """Sample messages for testing chat functionality."""
@@ -182,6 +188,7 @@ def sample_queries() -> list[str]:
 # ============================================================================
 # Server Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 async def test_server(simulation_mode, mock_ollama, tmp_path):
@@ -223,6 +230,7 @@ async def test_client(test_server):
 # ============================================================================
 # Utility Functions
 # ============================================================================
+
 
 def assert_response_valid(response: dict):
     """Assert that a chat response has required fields."""

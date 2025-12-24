@@ -20,7 +20,8 @@
       "Bash(dir:*)",
       "Bash(dir /s \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\ui\\\\src\")",
       "Bash(mkdir:*)",
-      "Bash(bandit:*)"
+      "Bash(bandit:*)",
+      "Bash(python -m ruff check:*)"
     ]
   }
 }

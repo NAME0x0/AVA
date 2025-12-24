@@ -5,13 +5,10 @@ Unit Tests for Agency Module
 Tests for the Active Inference-based autonomous behavior system.
 """
 
-import pytest
-import asyncio
-from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime
-
 import sys
 from pathlib import Path
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -19,8 +16,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from src.core.agency import (
     AgencyConfig,
     AgencyModule,
-    Policy,
     BeliefState,
+    Policy,
 )
 
 
@@ -217,9 +214,7 @@ class TestSearchFirstParadigm:
 
         for word in question_words:
             query = f"{word.capitalize()} is the meaning of life?"
-            has_question_word = any(
-                query.lower().startswith(w) for w in question_words
-            )
+            has_question_word = any(query.lower().startswith(w) for w in question_words)
             assert has_question_word is True
 
     def test_non_question_no_trigger(self):
@@ -233,14 +228,11 @@ class TestSearchFirstParadigm:
         question_words = ["what", "when", "where", "who", "how", "why"]
 
         for query in queries:
-            has_question_word = any(
-                query.lower().startswith(w) for w in question_words
-            )
+            has_question_word = any(query.lower().startswith(w) for w in question_words)
             assert has_question_word is False
 
     def test_search_verification_threshold(self):
         """Test source agreement threshold."""
-        min_sources = 3
         agreement_threshold = 0.7
 
         # Scenario: 3 sources, 2 agree
@@ -292,7 +284,6 @@ class TestSystemCommandSafety:
     def test_command_requires_confirmation(self):
         """Test that system commands require confirmation."""
         # All SYSTEM_COMMAND policy executions should require confirmation
-        policy = Policy.SYSTEM_COMMAND
 
         # Simulated confirmation flow
         confirmation_required = True
@@ -315,10 +306,7 @@ class TestAgencyAsync:
         config = AgencyConfig()
         agency = AgencyModule(config)
 
-        result = await agency.execute_policy(
-            Policy.REFLEX_REPLY,
-            context={"query": "Hello!"}
-        )
+        result = await agency.execute_policy(Policy.REFLEX_REPLY, context={"query": "Hello!"})
 
         assert isinstance(result, dict)
         assert "success" in result or "response" in result
@@ -329,8 +317,7 @@ class TestAgencyAsync:
         agency = AgencyModule(config)
 
         result = await agency.execute_policy(
-            Policy.PRIMARY_SEARCH,
-            context={"query": "What is Python?"}
+            Policy.PRIMARY_SEARCH, context={"query": "What is Python?"}
         )
 
         assert isinstance(result, dict)
@@ -344,8 +331,8 @@ class TestFreeEnergyPrinciple:
         # G(π) = pragmatic_value + epistemic_value - effort_cost
 
         pragmatic = 0.5  # Task completion value
-        epistemic = 0.3   # Information gain value
-        effort = 0.2      # Resource cost
+        epistemic = 0.3  # Information gain value
+        effort = 0.2  # Resource cost
 
         g = pragmatic + epistemic - effort
 
@@ -354,9 +341,9 @@ class TestFreeEnergyPrinciple:
     def test_policy_ranking(self):
         """Test policies are ranked by expected free energy."""
         policies_g = {
-            Policy.REFLEX_REPLY: 0.8,    # High: low effort, good for simple
+            Policy.REFLEX_REPLY: 0.8,  # High: low effort, good for simple
             Policy.PRIMARY_SEARCH: 0.7,  # Good: moderate effort, info gain
-            Policy.DEEP_THOUGHT: 0.4,    # Lower: high effort, but thorough
+            Policy.DEEP_THOUGHT: 0.4,  # Lower: high effort, but thorough
             Policy.SYSTEM_COMMAND: 0.1,  # Lowest: high risk, limited use
         }
 

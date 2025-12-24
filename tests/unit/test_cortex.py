@@ -5,13 +5,10 @@ Unit Tests for Cortex Component
 Tests for the deep reasoning core of AVA's dual-brain architecture.
 """
 
-import pytest
-import asyncio
-from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime
-
 import sys
 from pathlib import Path
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -125,10 +122,7 @@ class TestCortexAsync:
             "Discussion about machine learning",
         ]
 
-        result = await engine.think(
-            "How does this relate?",
-            context=context
-        )
+        result = await engine.think("How does this relate?", context=context)
 
         assert "response" in result
 
@@ -141,7 +135,6 @@ class TestCortexMemoryManagement:
         # Cortex uses layer-wise paging to fit 70B models in 4GB
         # Each layer loaded one at a time
 
-        total_layers = 80  # Typical for 70B model
         layer_size_mb = 100  # ~100MB per layer
         vram_limit_mb = 4096  # 4GB
 

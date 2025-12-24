@@ -10,13 +10,10 @@ Tests for the v3 dual-brain architecture workflow:
 5. Memory integration
 """
 
-import pytest
-import asyncio
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
-from datetime import datetime
-
 import sys
 from pathlib import Path
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -33,9 +30,9 @@ class TestMedullaCortexRouting:
         }
 
         test_cases = [
-            ("Hello", 0.1),           # Greeting - very low surprise
-            ("What time is it?", 0.2), # Common question
-            ("Thanks!", 0.15),         # Acknowledgment
+            ("Hello", 0.1),  # Greeting - very low surprise
+            ("What time is it?", 0.2),  # Common question
+            ("Thanks!", 0.15),  # Acknowledgment
         ]
 
         for query, surprise in test_cases:
@@ -94,9 +91,7 @@ class TestSearchFirstParadigm:
         ]
 
         for query in question_queries:
-            has_question = any(
-                query.lower().startswith(w) for w in question_words
-            )
+            has_question = any(query.lower().startswith(w) for w in question_words)
             assert has_question is True, f"'{query}' should be detected as question"
 
     def test_non_question_detection(self):
@@ -111,14 +106,11 @@ class TestSearchFirstParadigm:
         question_words = ["what", "when", "where", "who", "how", "why"]
 
         for query in non_questions:
-            has_question = any(
-                query.lower().startswith(w) for w in question_words
-            )
+            has_question = any(query.lower().startswith(w) for w in question_words)
             assert has_question is False, f"'{query}' should NOT be detected as question"
 
     def test_source_verification(self):
         """Test source agreement verification."""
-        min_sources = 3
         agreement_threshold = 0.7
 
         # Scenario 1: Good agreement
@@ -154,11 +146,10 @@ class TestAgencyIntegration:
                 "QUESTION": 0.8,
                 "COMMAND": 0.1,
                 "CHAT": 0.1,
-            }
+            },
         }
 
         # Expected policy for question state
-        expected_policies = ["PRIMARY_SEARCH", "REFLEX_REPLY"]
 
         # Verify question state leads to search/reply policies
         assert belief_state["distribution"]["QUESTION"] > 0.5
@@ -206,11 +197,13 @@ class TestMemoryIntegration:
         ]
 
         for content, surprise in inputs:
-            memories.append({
-                "content": content,
-                "surprise": surprise,
-                "weight": surprise,  # Higher surprise = higher weight
-            })
+            memories.append(
+                {
+                    "content": content,
+                    "surprise": surprise,
+                    "weight": surprise,  # Higher surprise = higher weight
+                }
+            )
 
         # Sort by importance
         sorted_memories = sorted(memories, key=lambda m: m["weight"], reverse=True)
@@ -228,13 +221,9 @@ class TestMemoryIntegration:
         ]
 
         # Query for related context
-        query = "deep learning frameworks"
 
         # Simulate retrieval (would use embeddings in real system)
-        related = [
-            msg for msg in conversation_history
-            if "learning" in msg["content"].lower()
-        ]
+        related = [msg for msg in conversation_history if "learning" in msg["content"].lower()]
 
         assert len(related) > 0
 
@@ -246,7 +235,6 @@ class TestSystemWorkflow:
     async def test_simple_query_workflow(self):
         """Test workflow for simple query."""
         # Simulate simple query
-        query = "Hello, how are you?"
 
         # Step 1: Medulla processes
         medulla_output = {
@@ -267,7 +255,6 @@ class TestSystemWorkflow:
     async def test_complex_query_workflow(self):
         """Test workflow for complex query."""
         # Simulate complex query
-        query = "Explain the relationship between entropy and information theory"
 
         # Step 1: Medulla processes
         medulla_output = {
@@ -305,7 +292,6 @@ class TestSystemWorkflow:
         assert is_question is True
 
         # Step 2: Agency selects search policy
-        policy = "PRIMARY_SEARCH"
 
         # Step 3: Execute search
         search_results = [
@@ -315,7 +301,7 @@ class TestSystemWorkflow:
         ]
 
         # Step 4: Verify agreement
-        answers = [r["answer"] for r in search_results]
+        [r["answer"] for r in search_results]
         # Approximate agreement (would use fuzzy matching)
         agreement = 0.9  # High agreement
 
@@ -327,6 +313,7 @@ class TestErrorHandling:
 
     def test_ollama_unavailable(self):
         """Test graceful handling when Ollama is unavailable."""
+
         # Simulate connection error
         class MockError(Exception):
             pass

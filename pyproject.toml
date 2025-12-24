@@ -145,6 +145,15 @@ exclude = [
 [tool.ruff]
 target-version = "py310"
 line-length = 100
+exclude = [
+    "legacy/",
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
 select = [
     "E",      # pycodestyle errors
     "W",      # pycodestyle warnings
@@ -158,15 +167,8 @@ ignore = [
     "E501",   # line too long (handled by formatter)
     "B008",   # do not perform function calls in argument defaults
 ]
-exclude = [
-    "legacy/",
-    ".git",
-    "__pycache__",
-    "build",
-    "dist",
-]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["ava", "src"]
 
 [tool.black]

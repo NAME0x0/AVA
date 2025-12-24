@@ -5,23 +5,21 @@ Unit Tests for Titans Memory Module
 Tests for the test-time learning memory system.
 """
 
-import pytest
-import asyncio
-from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime
-import numpy as np
-
 import sys
+from datetime import datetime
 from pathlib import Path
+
+import numpy as np
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from src.hippocampus.titans import (
-    TitansConfig,
-    TitansMemory,
     Memory,
     MemoryStats,
+    TitansConfig,
+    TitansMemory,
     create_titans_memory,
 )
 
@@ -156,7 +154,7 @@ class TestMemorization:
         titans = TitansMemory(config)
 
         # High surprise should cause larger updates
-        initial_state = titans.get_state_snapshot()
+        titans.get_state_snapshot()
 
         titans.memorize("Novel concept", surprise=0.9)
 
@@ -229,7 +227,7 @@ class TestTestTimeLearning:
     def test_mlp_structure(self):
         """Test 3-layer MLP structure."""
         config = TitansConfig(num_layers=3, hidden_dim=256)
-        titans = TitansMemory(config)
+        TitansMemory(config)
 
         # MLP should have input, hidden, output layers
         assert config.num_layers == 3

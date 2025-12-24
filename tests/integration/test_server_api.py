@@ -5,10 +5,10 @@ AVA Server API Integration Tests
 Tests for the HTTP API endpoints.
 """
 
-import pytest
-import json
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import pytest
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
@@ -63,9 +63,7 @@ class TestChatEndpoint:
     async def test_chat_requires_message(self, test_client):
         """Chat should fail without a message."""
         response = await test_client.post(
-            "/chat",
-            json={},
-            headers={"Content-Type": "application/json"}
+            "/chat", json={}, headers={"Content-Type": "application/json"}
         )
 
         # Should return 400 or error response
@@ -77,9 +75,7 @@ class TestChatEndpoint:
     async def test_chat_with_valid_message(self, test_client, simulation_mode):
         """Chat with valid message should return response."""
         response = await test_client.post(
-            "/chat",
-            json={"message": "Hello!"},
-            headers={"Content-Type": "application/json"}
+            "/chat", json={"message": "Hello!"}, headers={"Content-Type": "application/json"}
         )
 
         assert response.status == 200
@@ -92,7 +88,7 @@ class TestChatEndpoint:
         response = await test_client.post(
             "/chat",
             json={"message": "What is Python?"},
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"},
         )
 
         data = await response.json()
@@ -106,13 +102,11 @@ class TestChatEndpoint:
     async def test_chat_handles_empty_message(self, test_client):
         """Chat should handle empty message gracefully."""
         response = await test_client.post(
-            "/chat",
-            json={"message": ""},
-            headers={"Content-Type": "application/json"}
+            "/chat", json={"message": ""}, headers={"Content-Type": "application/json"}
         )
 
         # Should either error or provide a response
-        data = await response.json()
+        await response.json()
         assert response.status in [200, 400]
 
 
@@ -125,7 +119,7 @@ class TestThinkEndpoint:
         response = await test_client.post(
             "/think",
             json={"message": "Explain quantum computing"},
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"},
         )
 
         data = await response.json()
@@ -169,7 +163,6 @@ class TestCORSMiddleware:
         response = await test_client.get("/health")
 
         # Check for CORS headers (may vary based on implementation)
-        headers = response.headers
         # At minimum, should handle cross-origin requests
         assert response.status == 200
 
@@ -181,9 +174,7 @@ class TestErrorHandling:
     async def test_invalid_json(self, test_client):
         """Invalid JSON should return error."""
         response = await test_client.post(
-            "/chat",
-            data="not valid json",
-            headers={"Content-Type": "application/json"}
+            "/chat", data="not valid json", headers={"Content-Type": "application/json"}
         )
 
         # Should return 400 or 500
@@ -204,11 +195,8 @@ class TestRequestValidation:
         """Chat should accept optional conversation_id."""
         response = await test_client.post(
             "/chat",
-            json={
-                "message": "Hello!",
-                "conversation_id": "test-session-123"
-            },
-            headers={"Content-Type": "application/json"}
+            json={"message": "Hello!", "conversation_id": "test-session-123"},
+            headers={"Content-Type": "application/json"},
         )
 
         # Should succeed
@@ -220,9 +208,7 @@ class TestRequestValidation:
         huge_message = "x" * 1000000  # 1MB message
 
         response = await test_client.post(
-            "/chat",
-            json={"message": huge_message},
-            headers={"Content-Type": "application/json"}
+            "/chat", json={"message": huge_message}, headers={"Content-Type": "application/json"}
         )
 
         # Should either handle gracefully or reject
