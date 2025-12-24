@@ -7,10 +7,8 @@ Implements tools at each safety level, from baby-safe to mature.
 import math
 import random
 from datetime import datetime
-from typing import Any, Dict, Optional
 
 from .registry import ToolRegistry, ToolSafetyLevel
-
 
 # =============================================================================
 # LEVEL 0 - Baby Safe Tools
@@ -193,7 +191,7 @@ def dictionary_lookup(word: str) -> str:
     return f"Definition not found for: {word}"
 
 
-def day_of_week(date_str: Optional[str] = None) -> str:
+def day_of_week(date_str: str | None = None) -> str:
     """
     Get the day of the week for a date.
 
