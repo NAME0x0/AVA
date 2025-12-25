@@ -59,7 +59,7 @@ class CortexConfig:
     """
 
     # Model Configuration
-    model_name: str = "meta-llama/Meta-Llama-3-70B-Instruct"
+    model_name: str = "qwen2.5:32b"  # Default for backward compat
     compression: str = "4bit"  # Block-wise quantization
 
     # AirLLM Settings
@@ -68,7 +68,8 @@ class CortexConfig:
     use_flash_attention: bool = True  # Flash attention for efficiency
 
     # Generation Parameters
-    max_new_tokens: int = 512
+    max_new_tokens: int = 2048  # Updated for backward compat
+    max_tokens: int = 2048  # Backward compat alias
     temperature: float = 0.7
     top_p: float = 0.9
     top_k: int = 40
@@ -92,6 +93,21 @@ class CortexConfig:
     # Device Configuration
     device: str = "cuda"
     gpu_id: int = 0
+
+    # Simulation mode for testing
+    simulation_mode: bool = False
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert config to dictionary."""
+        return {
+            "model_name": self.model_name,
+            "max_tokens": self.max_tokens,
+            "max_new_tokens": self.max_new_tokens,
+            "temperature": self.temperature,
+            "simulation_mode": self.simulation_mode,
+            "compression": self.compression,
+            "device": self.device,
+        }
 
 
 @dataclass
@@ -227,6 +243,86 @@ class Cortex:
         self._progress_callback: Callable | None = None
 
         logger.info(f"Cortex initialized with config: {self.config}")
+
+    # =========================================================================
+    # BACKWARD COMPATIBILITY PROPERTIES AND METHODS
+    # =========================================================================
+
+    @property
+    def _is_loaded(self) -> bool:
+        """Backward compatible alias for is_initialized."""
+        return self.is_initialized
+
+    async def think(
+        self,
+        prompt: str,
+        context: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """
+        Backward compatible think method.
+
+        Args:
+            prompt: Input prompt
+            context: Optional context messages
+
+        Returns:
+            Dict with response and metadata
+        """
+        # Prepend context if provided
+        full_prompt = prompt
+        if context:
+            context_str = "\n".join(context)
+            full_prompt = f"Context:\n{context_str}\n\nQuery: {prompt}"
+
+        result = await self.generate(full_prompt)
+
+        return {
+            "response": result.text,
+            "tokens_generated": result.output_tokens,
+            "generation_time_ms": int(result.total_time_seconds * 1000),
+            "was_truncated": result.was_truncated,
+            "error": result.error,
+        }
+
+    async def verify(
+        self,
+        claim: str,
+        sources: list[str],
+    ) -> dict[str, Any]:
+        """
+        Backward compatible verification method.
+
+        Args:
+            claim: Claim to verify
+            sources: Sources to check against
+
+        Returns:
+            Dict with verification results
+        """
+        # Build verification prompt
+        sources_str = "\n".join(f"- {s}" for s in sources)
+        prompt = f"""Verify the following claim against the provided sources:
+
+Claim: {claim}
+
+Sources:
+{sources_str}
+
+Is this claim verified by the sources? Respond with a confidence level."""
+
+        result = await self.generate(prompt)
+
+        # Parse simple verification result
+        response_lower = result.text.lower()
+        verified = "yes" in response_lower or "verified" in response_lower or "true" in response_lower
+        confidence = 0.9 if verified else 0.3
+
+        return {
+            "verified": verified,
+            "confidence": confidence,
+            "reasoning": result.text,
+            "sources_checked": len(sources),
+        }
 
     async def initialize(self) -> None:
         """

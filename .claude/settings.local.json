@@ -21,7 +21,14 @@
       "Bash(dir /s \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\ui\\\\src\")",
       "Bash(mkdir:*)",
       "Bash(bandit:*)",
-      "Bash(python -m ruff check:*)"
+      "Bash(python -m ruff check:*)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\pip.exe\" install pyyaml httpx aiohttp --quiet)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m pytest \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\tests\\\\unit\\\\test_titans.py\" -v --tb=short)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m pytest \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\tests\\\\unit\" -v --tb=short)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m pytest \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\tests\\\\unit\\\\test_agency.py\" -v --tb=short)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m pytest \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\tests\\\\unit\\\\test_cortex.py\" -v --tb=short)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m pytest \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\tests\\\\unit\\\\test_medulla.py\" -v --tb=short)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m pytest:*)"
     ]
   }
 }

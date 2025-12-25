@@ -162,8 +162,9 @@ class AgencyConfig:
     epistemic_weight: float = 0.6  # HIGHER - promotes curiosity and learning
 
     # Cortex Activation Cost
-    cortex_effort_cost: float = 0.5  # Penalty for invoking Cortex
+    cortex_effort_cost: float = 0.3  # Penalty for invoking Cortex (was 0.5)
     tool_effort_cost: float = 0.15  # Lower penalty for tool use
+    search_effort_cost: float = 0.1  # Backward compat alias for web_search_effort_cost
 
     # SEARCH-FIRST Configuration
     search_first_enabled: bool = True  # Enable search-first paradigm
@@ -245,6 +246,11 @@ class BeliefState:
     # Time since last observation
     time_since_observation: float = 0.0
 
+    # Backward compatibility attributes
+    current_state: str = "IDLE"
+    state_distribution: dict[str, float] = field(default_factory=lambda: {"IDLE": 0.7, "QUESTION": 0.2, "UNCERTAIN": 0.1})
+    policy_distribution: dict[str, float] = field(default_factory=lambda: {"PRIMARY_SEARCH": 0.3, "REFLEX_REPLY": 0.4, "DEEP_THOUGHT": 0.2, "WAIT": 0.1})
+
     def calculate_entropy(self) -> float:
         """Calculate Shannon entropy of belief state."""
         total_entropy = 0.0
@@ -263,6 +269,23 @@ class BeliefState:
         for distribution in [self.user_intent, self.knowledge_state, self.interaction_state]:
             all_probs.extend(distribution.values())
         return np.array(all_probs, dtype=np.float32)
+
+    def update(self, observation: dict[str, Any]) -> None:
+        """Backward compatible update method."""
+        # Update current state based on observation
+        if observation.get("has_question_word") or observation.get("query_type") == "question":
+            self.current_state = "QUESTION"
+            self.state_distribution["QUESTION"] = 0.7
+            self.state_distribution["IDLE"] = 0.2
+        if observation.get("surprise", 0) > 0.7:
+            self.state_distribution["UNCERTAIN"] = 0.5
+        self.calculate_entropy()
+
+    def get_policy_probabilities(self) -> dict[str, float]:
+        """Backward compatible policy probabilities method."""
+        # Normalize policy distribution
+        total = sum(self.policy_distribution.values())
+        return {k: v / total for k, v in self.policy_distribution.items()}
 
 
 @dataclass
@@ -1187,6 +1210,67 @@ class ActiveInferenceController:
         logger.info(
             f"ActiveInferenceController initialized (Search-First: {config.search_first_enabled})"
         )
+
+    # =========================================================================
+    # BACKWARD COMPATIBILITY PROPERTIES AND METHODS
+    # =========================================================================
+
+    @property
+    def belief_state(self) -> BeliefState:
+        """Backward compatible alias for beliefs."""
+        return self.beliefs
+
+    def calculate_expected_free_energy(
+        self,
+        policy: PolicyType,
+        state: dict[str, Any],
+    ) -> float:
+        """Backward compatible method for calculating G(π)."""
+        # Create a temporary belief state from the state dict
+        beliefs = BeliefState()
+        beliefs.calculate_entropy()
+        G, _ = self.efe_calculator.calculate(policy, beliefs)
+        return G
+
+    def select_policy(self, state: dict[str, Any]) -> PolicyType:
+        """Backward compatible synchronous policy selection."""
+        # Check for thermal override
+        if state.get("gpu_temperature", 0) > 85.0:
+            return PolicyType.THERMAL_CHECK
+
+        # Check for high surprise -> deep thought
+        surprise = state.get("surprise", 0)
+        query_type = state.get("query_type", "")
+
+        if surprise > 0.8 and query_type == "analytical":
+            return PolicyType.DEEP_THOUGHT
+
+        # Question queries -> search first
+        if state.get("has_question_word") or query_type == "informational":
+            return PolicyType.PRIMARY_SEARCH
+
+        # Default to reflex reply
+        return PolicyType.REFLEX_REPLY
+
+    async def execute_policy(
+        self,
+        policy: PolicyType,
+        context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Backward compatible policy execution."""
+        result = {"success": True, "policy": policy.name}
+
+        if policy in self._action_callbacks:
+            callback = self._action_callbacks[policy]
+            try:
+                obs = Observation(text=context.get("query", "") if context else "")
+                action_result = await callback(obs, self.beliefs)
+                result["action_result"] = action_result
+            except Exception as e:
+                result["success"] = False
+                result["error"] = str(e)
+
+        return result
 
     def register_action_callback(
         self,

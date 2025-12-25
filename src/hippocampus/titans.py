@@ -696,27 +696,34 @@ def create_titans_sidecar(
 # Backward compatibility alias
 def create_titans_memory(
     input_dim: int = 768,
-    memory_dim: int = 2048,
+    hidden_dim: int = 256,
+    memory_dim: int = None,  # Deprecated, use hidden_dim
     learning_rate: float = 0.01,
+    num_layers: int = 3,
+    max_memory_mb: int = 200,
     momentum_decay: float = 0.99,
     surprise_threshold: float = 0.5,
     use_torch: bool = None,
     device: str = "cpu",
-) -> TitansSidecar:
+) -> "TitansMemory":
     """
     Legacy factory function for backward compatibility.
 
-    Use create_titans_sidecar() for new code.
+    Returns a TitansMemory instance with the specified configuration.
+    Use create_titans_sidecar() for the low-level sidecar API.
     """
-    config = TitansSidecarConfig(
+    # Support legacy memory_dim parameter
+    if memory_dim is not None:
+        hidden_dim = memory_dim
+
+    config = TitansConfig(
         input_dim=input_dim,
-        hidden_dim=memory_dim,
-        output_dim=input_dim,
+        hidden_dim=hidden_dim,
+        num_layers=num_layers,
         learning_rate=learning_rate,
-        momentum=momentum_decay,
-        surprise_threshold=surprise_threshold,
+        max_memory_mb=max_memory_mb,
     )
-    return TitansSidecar(config, device=device)
+    return TitansMemory(config)
 
 
 # =============================================================================
@@ -1161,8 +1168,8 @@ class TitansMemory:
         self._update_count += 1
         self._total_surprise += surprise
 
-        # Update sidecar
-        self._sidecar.update(np.array(embedding), surprise)
+        # Update sidecar using memorize method
+        self._sidecar.memorize(np.array(embedding), surprise=surprise)
 
     async def async_memorize(self, content: str, surprise: float = 0.5) -> None:
         """Async version of memorize."""
@@ -1198,7 +1205,7 @@ class TitansMemory:
         return {
             "memory_count": self._memory_count,
             "update_count": self._update_count,
-            "sidecar_stats": self._sidecar.get_stats(),
+            "sidecar_stats": self._sidecar.get_statistics(),
         }
 
     def get_parameter_count(self) -> int:

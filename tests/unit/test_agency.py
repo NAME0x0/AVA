@@ -336,7 +336,7 @@ class TestFreeEnergyPrinciple:
 
         g = pragmatic + epistemic - effort
 
-        assert g == 0.6  # Net expected free energy
+        assert abs(g - 0.6) < 0.01  # Net expected free energy (with float tolerance)
 
     def test_policy_ranking(self):
         """Test policies are ranked by expected free energy."""
