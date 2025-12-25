@@ -14,8 +14,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-# Add src to path for imports
+# Add src and legacy to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "legacy"))
 
 
 # ============================================================================

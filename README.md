@@ -133,6 +133,38 @@ User Input
 
 ---
 
+## Implementation Status
+
+> **Note**: This section clarifies what is currently implemented vs. planned for future development.
+
+### ✅ Fully Implemented
+
+| Feature | Description |
+|---------|-------------|
+| **Ollama Integration** | Full LLM inference via Ollama (gemma3:4b default) |
+| **HTTP API Server** | REST + WebSocket endpoints for chat, tools, status |
+| **Search-First Workflow** | Web search as default for informational queries |
+| **Active Inference** | Autonomous policy selection using Free Energy Principle |
+| **Entropy-Based Routing** | Query complexity analysis via Entropix |
+| **Command Safety** | Blocking dangerous system commands |
+| **Thermal Monitoring** | GPU temperature tracking and throttling |
+| **Terminal UI** | Full-featured TUI with Textual |
+| **Desktop GUI** | Tauri + Next.js with neural visualization |
+| **Memory System** | Episodic memory with conversation storage |
+
+### 🚧 Designed but Not Yet Implemented
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| **AirLLM (70B)** | Layer-wise paging for large models | Architecture ready |
+| **BitNet 3B** | 1.58-bit quantized Medulla talker | Not integrated |
+| **Slender-Mamba** | 1-bit SSM for Medulla monitor | Not integrated |
+| **Titans Test-Time Learning** | Online memory weight updates | Architecture ready |
+| **Bridge Adapter Training** | MLP projection training pipeline | Not implemented |
+| **Expert Adapters** | DeepSeek-Coder, Butler adapters | Not created |
+
+---
+
 ## API Reference
 
 | Endpoint | Method | Description |
