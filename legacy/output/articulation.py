@@ -429,7 +429,7 @@ COT_TEMPLATES = {
         CoTPromptTemplate(
             name="numbered_steps",
             prefix="I'll work through this carefully.",
-            suffix="Step 1:",
+            suffix="Let's reason through this step by step:\nStep 1:",
             reasoning_style=ReasoningStyle.STEP_BY_STEP,
             min_stage=2,  # CHILD
         ),
@@ -810,6 +810,63 @@ class ChainOfThoughtEnforcer:
             enhanced_parts.append(sentences[-1] + ".")
         
         return "\n".join(enhanced_parts)
+    
+    def extract_reasoning_steps(self, response: str) -> List[str]:
+        """
+        Extract intermediate reasoning steps from a response.
+        
+        Looks for <think>...</think> sections first, then falls back
+        to extracting step-like sentences.
+        
+        Args:
+            response: Model's response with potential reasoning
+            
+        Returns:
+            List of extracted reasoning steps
+        """
+        # First try to extract <think>...</think> blocks
+        think_matches = re.findall(r'<think>(.*?)</think>', response, re.DOTALL)
+        if think_matches:
+            steps = []
+            for match in think_matches:
+                # Split the think block into individual steps
+                lines = [line.strip() for line in match.strip().split('\n') if line.strip()]
+                steps.extend(lines)
+            return steps
+        
+        # Fall back to using extract_rationale
+        extraction = self.extract_rationale(response)
+        return extraction.steps
+    
+    def format_structured_reasoning(
+        self,
+        question: str,
+        reasoning: str,
+        answer: str,
+    ) -> str:
+        """
+        Format question, reasoning, and answer into a structured output.
+        
+        Args:
+            question: The original question
+            reasoning: The reasoning/rationale
+            answer: The final answer
+            
+        Returns:
+            Structured string with question, reasoning, and answer
+        """
+        parts = []
+        
+        if question:
+            parts.append(f"<question>{question}</question>")
+        
+        if reasoning:
+            parts.append(f"<reasoning>{reasoning}</reasoning>")
+        
+        if answer:
+            parts.append(f"<answer>{answer}</answer>")
+        
+        return "\n".join(parts)
 
 
 @dataclass
