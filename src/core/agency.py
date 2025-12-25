@@ -248,8 +248,17 @@ class BeliefState:
 
     # Backward compatibility attributes
     current_state: str = "IDLE"
-    state_distribution: dict[str, float] = field(default_factory=lambda: {"IDLE": 0.7, "QUESTION": 0.2, "UNCERTAIN": 0.1})
-    policy_distribution: dict[str, float] = field(default_factory=lambda: {"PRIMARY_SEARCH": 0.3, "REFLEX_REPLY": 0.4, "DEEP_THOUGHT": 0.2, "WAIT": 0.1})
+    state_distribution: dict[str, float] = field(
+        default_factory=lambda: {"IDLE": 0.7, "QUESTION": 0.2, "UNCERTAIN": 0.1}
+    )
+    policy_distribution: dict[str, float] = field(
+        default_factory=lambda: {
+            "PRIMARY_SEARCH": 0.3,
+            "REFLEX_REPLY": 0.4,
+            "DEEP_THOUGHT": 0.2,
+            "WAIT": 0.1,
+        }
+    )
 
     def calculate_entropy(self) -> float:
         """Calculate Shannon entropy of belief state."""

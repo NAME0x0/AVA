@@ -25,7 +25,15 @@ import sys
 from pathlib import Path
 
 import pytest
-import torch
+
+# Torch is optional - skip tests if not available
+try:
+    import torch
+
+    TORCH_AVAILABLE = True
+except ImportError:
+    torch = None  # type: ignore
+    TORCH_AVAILABLE = False
 
 # Add src to path for imports
 src_path = Path(__file__).parent.parent.parent / "src"
@@ -49,6 +57,7 @@ except ImportError:
     LEGACY_OUTPUT_AVAILABLE = False
 
 
+@pytest.mark.skipif(not TORCH_AVAILABLE, reason="torch not installed")
 @pytest.mark.skipif(not LEGACY_MEMORY_AVAILABLE, reason="Legacy memory module archived")
 class TestTitansMemorySurprise:
     """
@@ -186,6 +195,7 @@ class TestTitansMemorySurprise:
         assert True
 
 
+@pytest.mark.skipif(not TORCH_AVAILABLE, reason="torch not installed")
 class TestFastSlowWeightManager:
     """
     Test FastSlowWeightManager for nested learning dynamics.
@@ -451,6 +461,7 @@ class TestDistillationPipeline:
         assert all(s.quality_score >= 0.7 for s in filtered)
 
 
+@pytest.mark.skipif(not TORCH_AVAILABLE, reason="torch not installed")
 class TestIntegratedWorkflow:
     """
     End-to-end integration tests simulating the full blueprint workflow.

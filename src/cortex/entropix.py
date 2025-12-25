@@ -68,7 +68,9 @@ class CognitiveState:
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for logging/serialization."""
         # Handle both string and enum labels
-        label_value = self.label.value if isinstance(self.label, CognitiveStateLabel) else self.label
+        label_value = (
+            self.label.value if isinstance(self.label, CognitiveStateLabel) else self.label
+        )
         return {
             "label": label_value,
             "entropy": self.entropy,
@@ -82,7 +84,9 @@ class CognitiveState:
         }
 
     def __repr__(self) -> str:
-        label_value = self.label.value if isinstance(self.label, CognitiveStateLabel) else self.label
+        label_value = (
+            self.label.value if isinstance(self.label, CognitiveStateLabel) else self.label
+        )
         return (
             f"CognitiveState({label_value}, "
             f"H={self.entropy:.3f}, V={self.varentropy:.3f}, "

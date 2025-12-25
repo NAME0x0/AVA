@@ -58,7 +58,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
   return (
     <AnimatePresence mode="wait">
       {isOpen && (
-        <>
+        <motion.div key="sidebar-container" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           {/* Mobile backdrop */}
           {isMobile && (
             <motion.div
@@ -242,6 +242,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
             </section>
           </div>
         </motion.aside>
+        </motion.div>
       )}
     </AnimatePresence>
   );

@@ -963,6 +963,7 @@ except ImportError:
     @dataclass
     class CognitiveState:
         """Backward compatible CognitiveState."""
+
         label: str = "FLOW"
         entropy: float = 0.0
         varentropy: float = 0.0

@@ -314,7 +314,11 @@ Is this claim verified by the sources? Respond with a confidence level."""
 
         # Parse simple verification result
         response_lower = result.text.lower()
-        verified = "yes" in response_lower or "verified" in response_lower or "true" in response_lower
+        verified = (
+            "yes" in response_lower
+            or "verified" in response_lower
+            or "true" in response_lower
+        )
         confidence = 0.9 if verified else 0.3
 
         return {
