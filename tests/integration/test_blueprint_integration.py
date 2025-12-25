@@ -473,7 +473,7 @@ class TestIntegratedWorkflow:
         from learning.fine_tuning import DistillationSample
 
         # Initialize components
-        memory = TitansMemoryTorch(input_dim=64, hidden_dim=128, output_dim=64)
+        memory = TitansMemoryTorch(input_dim=64, memory_dim=128)
 
         # Simulate conversation
         input_embedding = torch.randn(1, 64)
