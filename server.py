@@ -153,10 +153,20 @@ async def chat_handler(request: web.Request) -> web.Response:
         start = time.time()
         result = await ava.chat(message)
         
+        # Convert cognitive_state to string if it's an object
+        cog_state = result.cognitive_state
+        if hasattr(cog_state, 'label'):
+            # CognitiveState object - extract label
+            cog_state = cog_state.label if isinstance(cog_state.label, str) else cog_state.label.value
+        elif hasattr(cog_state, 'to_dict'):
+            cog_state = cog_state.to_dict().get('label', 'FLOW')
+        elif not isinstance(cog_state, str):
+            cog_state = str(cog_state)
+
         response = ChatResponse(
             text=result.text,
             used_cortex=result.used_cortex,
-            cognitive_state=result.cognitive_state,
+            cognitive_state=cog_state,
             confidence=result.confidence,
             tools_used=result.tools_used,
             response_time_ms=(time.time() - start) * 1000

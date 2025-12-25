@@ -56,6 +56,13 @@ try:
 except ImportError:
     LEGACY_OUTPUT_AVAILABLE = False
 
+try:
+    from inference.thinking import ToolformerParser  # noqa: F401
+
+    TOOLFORMER_AVAILABLE = True
+except ImportError:
+    TOOLFORMER_AVAILABLE = False
+
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="torch not installed")
 @pytest.mark.skipif(not LEGACY_MEMORY_AVAILABLE, reason="Legacy memory module archived")
@@ -284,6 +291,7 @@ class TestFastSlowWeightManager:
         # (Exact behavior depends on implementation)
 
 
+@pytest.mark.skipif(not TOOLFORMER_AVAILABLE, reason="ToolformerParser not available")
 class TestToolformerParser:
     """
     Test ToolformerParser for autonomous tool-call detection.
