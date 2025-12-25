@@ -13,7 +13,7 @@ description = "Research-grade AI assistant with biomimetic dual-brain architectu
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
-    {name = "Muhammad Afsah Mumtaz", email = ""}
+    {name = "Muhammad Afsah Mumtaz", email = "lancearmour24200@gmail.com"}
 ]
 maintainers = [
     {name = "Muhammad Afsah Mumtaz"}
