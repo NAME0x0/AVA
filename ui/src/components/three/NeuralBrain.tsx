@@ -91,23 +91,20 @@ interface SynapseProps {
 }
 
 function Synapse({ start, end, color, activity = 0 }: SynapseProps) {
-  const lineRef = useRef<THREE.Line>(null);
+  const [opacity, setOpacity] = useState(0.3);
 
   useFrame((state) => {
-    if (lineRef.current && lineRef.current.material) {
-      const mat = lineRef.current.material as THREE.LineBasicMaterial;
-      mat.opacity = 0.2 + activity * 0.6 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
-    }
+    const newOpacity = 0.2 + activity * 0.6 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
+    setOpacity(newOpacity);
   });
 
   return (
     <Line
-      ref={lineRef}
       points={[start, end]}
       color={color}
       lineWidth={1 + activity * 2}
       transparent
-      opacity={0.3}
+      opacity={opacity}
     />
   );
 }
@@ -229,8 +226,8 @@ function NeuralNetwork({ activeComponent, cognitiveState, entropy, activity }: N
           neuron.region === "medulla"
             ? colors.primary
             : neuron.region === "cortex"
-            ? colors.secondary
-            : colors.accent;
+              ? colors.secondary
+              : colors.accent;
 
         return (
           <Neuron
@@ -259,8 +256,8 @@ function NeuralNetwork({ activeComponent, cognitiveState, entropy, activity }: N
               synapse.region === "medulla"
                 ? colors.primary
                 : synapse.region === "cortex"
-                ? colors.secondary
-                : colors.accent
+                  ? colors.secondary
+                  : colors.accent
             }
             activity={isActive ? activity : 0.1}
           />
