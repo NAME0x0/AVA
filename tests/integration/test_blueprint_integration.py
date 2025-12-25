@@ -478,8 +478,8 @@ class TestIntegratedWorkflow:
         # Simulate conversation
         input_embedding = torch.randn(1, 64)
 
-        # Process through memory
-        memory_output = memory.forward(input_embedding)
+        # Process through memory (returns tuple: output, hidden_state)
+        memory_output, _ = memory.forward(input_embedding)
 
         # Simulate model response and actual result
         actual_result = torch.randn(1, 64)
