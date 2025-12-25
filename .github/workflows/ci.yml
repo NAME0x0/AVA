@@ -153,7 +153,8 @@ jobs:
       - name: Run pip-audit (dependency vulnerabilities)
         run: |
           pip install -r requirements.txt
-          pip-audit --strict --desc
+          # Ignore CVE-2024-23342 (ecdsa timing attack) - no fix available from maintainers
+          pip-audit --strict --desc --ignore-vuln GHSA-wj6h-64fc-37mp
 
   # ============================================================================
   # Build Check
@@ -207,11 +208,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          cache: "npm"
-          cache-dependency-path: ui/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Type check
         run: npm run type-check || true
