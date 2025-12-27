@@ -20,7 +20,7 @@ from textual.widgets import Static
 
 
 class MetricsPanel(Static):
-    """Real-time system metrics display."""
+    """Real-time system metrics display with sparkline history."""
 
     # Enable focus for keyboard navigation
     can_focus = True
@@ -50,9 +50,50 @@ class MetricsPanel(Static):
     interaction_count = reactive(0)
     cortex_invocations = reactive(0)
 
+    # Sparkline characters (Unicode block elements)
+    SPARKLINE_CHARS = "▁▂▃▄▅▆▇█"
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.border_title = "System Metrics"
+
+        # History tracking for sparklines
+        self._entropy_history: list[float] = []
+        self._surprise_history: list[float] = []
+        self._confidence_history: list[float] = []
+        self._max_history = 12  # Width of sparkline
+
+    def _render_sparkline(self, values: list[float], width: int = 12) -> str:
+        """
+        Render a mini sparkline chart using Unicode block elements.
+
+        Args:
+            values: List of values to plot
+            width: Max number of characters
+
+        Returns:
+            String of block characters representing the data
+        """
+        if not values:
+            return "─" * width
+
+        # Get last N values
+        recent = values[-width:]
+
+        min_val = min(recent)
+        max_val = max(recent)
+
+        # Handle flat line
+        if max_val == min_val:
+            return self.SPARKLINE_CHARS[3] * len(recent)
+
+        result = ""
+        for v in recent:
+            normalized = (v - min_val) / (max_val - min_val)
+            idx = int(normalized * (len(self.SPARKLINE_CHARS) - 1))
+            result += self.SPARKLINE_CHARS[idx]
+
+        return result.ljust(width, "─")
 
     def update_state(self, data: Dict[str, Any]) -> None:
         """Update metrics from backend data."""
@@ -82,6 +123,19 @@ class MetricsPanel(Static):
         if "cortex_invocations" in data:
             self.cortex_invocations = data["cortex_invocations"]
 
+        # Update history for sparklines
+        self._entropy_history.append(self.entropy)
+        self._surprise_history.append(self.surprise)
+        self._confidence_history.append(self.confidence)
+
+        # Trim history to max length
+        if len(self._entropy_history) > self._max_history:
+            self._entropy_history.pop(0)
+        if len(self._surprise_history) > self._max_history:
+            self._surprise_history.pop(0)
+        if len(self._confidence_history) > self._max_history:
+            self._confidence_history.pop(0)
+
     def render(self) -> str:
         """Render the metrics display."""
         # Active component indicator
@@ -98,6 +152,11 @@ class MetricsPanel(Static):
         }
         state_color = state_colors.get(self.cognitive_state, "white")
 
+        # Generate sparklines
+        entropy_spark = self._render_sparkline(self._entropy_history)
+        surprise_spark = self._render_sparkline(self._surprise_history)
+        confidence_spark = self._render_sparkline(self._confidence_history)
+
         lines = [
             f"╭─ Active Component ─────────╮",
             f"│ {comp_icon} [{comp_color}]{self.active_component.upper():^22}[/] │",
@@ -106,9 +165,12 @@ class MetricsPanel(Static):
             f"╭─ Cognitive State ──────────╮",
             f"│ State:    [{state_color}]{self.cognitive_state:>14}[/] │",
             f"│ Entropy:        {self.entropy:>10.4f} │",
+            f"│   [dim]{entropy_spark}[/]           │",
             f"│ Varentropy:     {self.varentropy:>10.4f} │",
             f"│ Confidence:     {self.confidence:>10.2%} │",
+            f"│   [dim]{confidence_spark}[/]           │",
             f"│ Surprise:       {self.surprise:>10.4f} │",
+            f"│   [dim]{surprise_spark}[/]           │",
             f"╰────────────────────────────╯",
             f"",
             f"╭─ Statistics ───────────────╮",

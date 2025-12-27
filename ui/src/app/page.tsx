@@ -6,6 +6,8 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { ChatArea } from "@/components/chat/ChatArea";
 import { SystemStatus } from "@/components/system/SystemStatus";
 import { CommandPalette } from "@/components/CommandPalette";
+import { SettingsPanel } from "@/components/settings/SettingsPanel";
+import { ToolsPanel } from "@/components/tools/ToolsPanel";
 import { useCoreStore } from "@/stores/core";
 import { useSystemPolling } from "@/hooks/useSystemPolling";
 
@@ -17,10 +19,17 @@ export default function Home() {
     toggleSidebar,
     clearMessages,
     forceCortex,
+    toggleSettingsPanel,
+    connectWebSocket,
   } = useCoreStore();
 
   // Start polling for system state
   useSystemPolling();
+
+  // Connect WebSocket on mount
+  useEffect(() => {
+    connectWebSocket();
+  }, [connectWebSocket]);
 
   // Global keyboard shortcuts
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -45,9 +54,13 @@ export default function Home() {
           e.preventDefault();
           forceCortex();
           break;
+        case ',':
+          e.preventDefault();
+          toggleSettingsPanel();
+          break;
       }
     }
-  }, [setCommandPaletteOpen, toggleSidebar, clearMessages, forceCortex]);
+  }, [setCommandPaletteOpen, toggleSidebar, clearMessages, forceCortex, toggleSettingsPanel]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -78,6 +91,12 @@ export default function Home() {
         isOpen={commandPaletteOpen}
         onClose={() => setCommandPaletteOpen(false)}
       />
+
+      {/* Settings Panel */}
+      <SettingsPanel />
+
+      {/* Tools Panel */}
+      <ToolsPanel />
     </main>
   );
 }

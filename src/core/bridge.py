@@ -198,24 +198,29 @@ class ProjectionAdapter:
         """Save adapter weights to disk."""
         Path(path).parent.mkdir(parents=True, exist_ok=True)
 
-        np.savez(
-            path,
-            weights=list(self.weights),
-            biases=list(self.biases),
-            layer_norm_gamma=self.layer_norm_gamma if self.config.use_layer_norm else None,
-            layer_norm_beta=self.layer_norm_beta if self.config.use_layer_norm else None,
-            running_mean=self.running_mean,
-            running_var=self.running_var,
-            num_updates=self.num_updates,
-        )
+        # Save weights and biases individually to avoid inhomogeneous array issues
+        save_dict = {f"weight_{i}": w for i, w in enumerate(self.weights)}
+        save_dict.update({f"bias_{i}": b for i, b in enumerate(self.biases)})
+        save_dict["num_layers"] = np.array(len(self.weights))
+
+        if self.config.use_layer_norm:
+            save_dict["layer_norm_gamma"] = self.layer_norm_gamma
+            save_dict["layer_norm_beta"] = self.layer_norm_beta
+
+        save_dict["running_mean"] = self.running_mean
+        save_dict["running_var"] = self.running_var
+        save_dict["num_updates"] = np.array(self.num_updates)
+
+        np.savez(path, **save_dict)
         logger.info(f"Saved projection adapter to {path}")
 
     def load(self, path: str) -> None:
         """Load adapter weights from disk."""
         data = np.load(path, allow_pickle=True)
 
-        self.weights = list(data["weights"])
-        self.biases = list(data["biases"])
+        num_layers = int(data["num_layers"])
+        self.weights = [data[f"weight_{i}"] for i in range(num_layers)]
+        self.biases = [data[f"bias_{i}"] for i in range(num_layers)]
 
         if self.config.use_layer_norm:
             self.layer_norm_gamma = data["layer_norm_gamma"]

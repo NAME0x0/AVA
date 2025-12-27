@@ -40,7 +40,18 @@ export function CommandPalette({
   const [showHelp, setShowHelp] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  const { forceCortex, forceSleep, clearMessages, toggleSidebar, setInputValue } = useCoreStore();
+  const {
+    forceCortex,
+    forceSleep,
+    clearMessages,
+    toggleSidebar,
+    setInputValue,
+    toggleSettingsPanel,
+    toggleToolsPanel,
+    preferences,
+    updatePreference,
+    messages,
+  } = useCoreStore();
 
   // Default commands
   const defaultCommands: Command[] = useMemo(
@@ -106,6 +117,72 @@ export function CommandPalette({
         category: "System",
       },
       {
+        id: "settings",
+        label: "Settings",
+        description: "Open settings panel",
+        shortcut: "Ctrl+,",
+        icon: "⚙️",
+        action: () => {
+          toggleSettingsPanel();
+          onClose();
+        },
+        category: "View",
+      },
+      {
+        id: "view-tools",
+        label: "View Tools",
+        description: "Show available tools",
+        icon: "🔧",
+        action: () => {
+          toggleToolsPanel();
+          onClose();
+        },
+        category: "View",
+      },
+      {
+        id: "export-chat",
+        label: "Export Chat",
+        description: "Download chat history as JSON",
+        icon: "📥",
+        action: () => {
+          const data = {
+            exported: new Date().toISOString(),
+            messages: messages.map((m) => ({
+              role: m.role,
+              content: m.content,
+              timestamp: m.timestamp,
+              cognitiveState: m.cognitiveState?.label,
+              usedCortex: m.usedCortex,
+            })),
+          };
+          const blob = new Blob([JSON.stringify(data, null, 2)], {
+            type: "application/json",
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `ava-chat-${new Date().toISOString().slice(0, 10)}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+          onClose();
+        },
+        category: "Chat",
+      },
+      {
+        id: "toggle-streaming",
+        label: "Toggle Streaming Mode",
+        description: `Currently: ${preferences.streamingMode === 'websocket' ? 'WebSocket' : 'HTTP'}`,
+        icon: "📡",
+        action: () => {
+          updatePreference(
+            "streamingMode",
+            preferences.streamingMode === "websocket" ? "http" : "websocket"
+          );
+          onClose();
+        },
+        category: "System",
+      },
+      {
         id: "help",
         label: "Help",
         description: "Show keyboard shortcuts",
@@ -117,7 +194,7 @@ export function CommandPalette({
         category: "Help",
       },
     ],
-    [forceCortex, forceSleep, clearMessages, toggleSidebar, onClose]
+    [forceCortex, forceSleep, clearMessages, toggleSidebar, toggleSettingsPanel, toggleToolsPanel, preferences, updatePreference, messages, onClose]
   );
 
   const allCommands = useMemo(
@@ -274,31 +351,59 @@ export function CommandPalette({
               aria-label="Available commands"
               className="max-h-80 overflow-y-auto py-2"
             >
-              {Object.entries(groupedCommands).map(([category, commands]) => (
-                <div key={category} role="group" aria-label={category}>
+              {Object.entries(groupedCommands).map(([category, commands], categoryIndex) => (
+                <motion.div
+                  key={category}
+                  role="group"
+                  aria-label={category}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: categoryIndex * 0.05 }}
+                >
                   <div className="px-4 py-1 text-xs font-semibold text-text-muted uppercase tracking-wide">
                     {category}
                   </div>
-                  {commands.map((cmd) => {
+                  {commands.map((cmd, cmdIndex) => {
                     const globalIndex = filteredCommands.indexOf(cmd);
                     const isSelected = globalIndex === selectedIndex;
 
                     return (
-                      <button
+                      <motion.button
                         key={cmd.id}
                         id={cmd.id}
                         role="option"
                         aria-selected={isSelected}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{
+                          opacity: 1,
+                          x: 0,
+                          boxShadow: isSelected
+                            ? "0 0 20px rgba(0, 212, 200, 0.3)"
+                            : "none",
+                        }}
+                        transition={{
+                          delay: (categoryIndex * commands.length + cmdIndex) * 0.02,
+                          duration: 0.15,
+                        }}
+                        whileHover={{ scale: 1.01, x: 4 }}
+                        whileTap={{ scale: 0.99 }}
                         className={`
                           w-full flex items-center gap-3 px-4 py-2 text-left
                           transition-colors duration-75
-                          ${isSelected ? "bg-accent-primary/20 text-accent-primary" : "hover:bg-neural-elevated text-text-primary"}
+                          ${isSelected ? "bg-accent-primary/20 text-accent-primary border-l-2 border-accent-primary" : "hover:bg-neural-elevated text-text-primary border-l-2 border-transparent"}
                           focus:outline-none focus:bg-accent-primary/20
                         `}
                         onClick={cmd.action}
                         onMouseEnter={() => setSelectedIndex(globalIndex)}
                       >
-                        <span className="text-lg" aria-hidden="true">{cmd.icon}</span>
+                        <motion.span
+                          className="text-lg"
+                          aria-hidden="true"
+                          animate={{ scale: isSelected ? 1.1 : 1 }}
+                          transition={{ type: "spring", stiffness: 400 }}
+                        >
+                          {cmd.icon}
+                        </motion.span>
                         <div className="flex-1 min-w-0">
                           <div className="font-medium truncate">{cmd.label}</div>
                           {cmd.description && (
@@ -312,10 +417,10 @@ export function CommandPalette({
                             {cmd.shortcut}
                           </kbd>
                         )}
-                      </button>
+                      </motion.button>
                     );
                   })}
-                </div>
+                </motion.div>
               ))}
 
               {filteredCommands.length === 0 && (

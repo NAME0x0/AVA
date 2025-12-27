@@ -1,10 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Brain, Zap, Clock, User, Bot } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Brain, Zap, Clock, User, Bot, Copy, Check, Wrench } from "lucide-react";
 import { Message } from "@/stores/core";
 import { cn, getCognitiveStateColor, getCognitiveStateBgColor } from "@/lib/utils";
+
+// Tool icon mapping
+const TOOL_ICONS: Record<string, string> = {
+  calculator: "🧮",
+  web_search: "🔍",
+  datetime: "📅",
+  read_file: "📄",
+  web_browse: "🌐",
+  verify_fact: "✓",
+};
 
 interface MessageBubbleProps {
   message: Message;
@@ -20,15 +30,56 @@ function formatTime(date: Date): string {
   return `${hour12}:${minuteStr} ${ampm}`;
 }
 
+// Tool Badge Component
+function ToolBadge({ name }: { name: string }) {
+  const icon = TOOL_ICONS[name] || "🔧";
+  return (
+    <motion.span
+      className="px-1.5 py-0.5 text-[10px] rounded bg-accent-dim/20 text-accent-primary inline-flex items-center gap-1"
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 500, damping: 15 }}
+    >
+      <span>{icon}</span>
+      <span>{name.replace(/_/g, " ")}</span>
+    </motion.span>
+  );
+}
+
+// Streaming Cursor Component
+function StreamingCursor() {
+  return (
+    <motion.span
+      className="inline-block w-2 h-4 bg-accent-primary ml-0.5 align-middle"
+      animate={{ opacity: [1, 0] }}
+      transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+    />
+  );
+}
+
 export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const isStreaming = message.isStreaming;
-  
+
   // Use client-side only rendering for timestamp to avoid hydration mismatch
   const [mounted, setMounted] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [copied, setCopied] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const copyToClipboard = useCallback(async () => {
+    if (!message.content) return;
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  }, [message.content]);
 
   // Determine message style based on whether Cortex was used
   const messageStyle = isUser
@@ -38,11 +89,15 @@ export function MessageBubble({ message }: MessageBubbleProps) {
     : "message-medulla";
 
   return (
-    <div
+    <motion.div
       className={cn(
-        "flex gap-3",
+        "flex gap-3 relative group",
         isUser ? "flex-row-reverse" : "flex-row"
       )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      whileHover={{ scale: 1.005 }}
+      transition={{ duration: 0.2 }}
     >
       {/* Avatar */}
       <div
@@ -99,13 +154,39 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         {/* Bubble */}
         <motion.div
           className={cn(
-            "px-4 py-3 rounded-2xl border",
+            "px-4 py-3 rounded-2xl border relative",
             messageStyle,
-            isUser ? "rounded-tr-md" : "rounded-tl-md",
-            isStreaming && "animate-pulse"
+            isUser ? "rounded-tr-md" : "rounded-tl-md"
           )}
           layout
         >
+          {/* Copy Button */}
+          <AnimatePresence>
+            {isHovered && message.content && !isStreaming && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                onClick={copyToClipboard}
+                className={cn(
+                  "absolute top-2 right-2 p-1.5 rounded-lg",
+                  "bg-neural-elevated/80 backdrop-blur-sm",
+                  "hover:bg-neural-hover transition-colors",
+                  "border border-neural-hover/50"
+                )}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                title={copied ? "Copied!" : "Copy message"}
+              >
+                {copied ? (
+                  <Check className="w-3.5 h-3.5 text-state-flow" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5 text-text-muted" />
+                )}
+              </motion.button>
+            )}
+          </AnimatePresence>
+
           {isStreaming && !message.content ? (
             <div className="waveform">
               <div className="waveform-bar" />
@@ -115,6 +196,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           ) : (
             <p className="text-sm whitespace-pre-wrap leading-relaxed">
               {message.content}
+              {isStreaming && <StreamingCursor />}
             </p>
           )}
         </motion.div>
@@ -159,7 +241,16 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             </span>
           )}
         </div>
+
+        {/* Tool badges */}
+        {!isUser && message.toolsUsed && message.toolsUsed.length > 0 && (
+          <div className="flex gap-1 mt-1.5 flex-wrap">
+            {message.toolsUsed.map((tool) => (
+              <ToolBadge key={tool} name={tool} />
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </motion.div>
   );
 }

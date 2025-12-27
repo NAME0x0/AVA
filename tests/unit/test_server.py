@@ -22,6 +22,7 @@ class TestHealthEndpointUnit:
     async def test_health_returns_json_response(self):
         """Health endpoint should return JSON with status ok."""
         from aiohttp import web
+
         from server import health_handler
 
         # Create mock request
@@ -38,6 +39,7 @@ class TestHealthEndpointUnit:
         import json
 
         from aiohttp import web
+
         from server import health_handler
 
         request = MagicMock(spec=web.Request)
@@ -55,6 +57,7 @@ class TestStatusEndpointUnit:
     async def test_status_returns_json(self):
         """Status endpoint should return JSON."""
         from aiohttp import web
+
         from server import status_handler
 
         request = MagicMock(spec=web.Request)
@@ -84,9 +87,8 @@ class TestChatEndpointUnit:
     @pytest.mark.asyncio
     async def test_chat_requires_message(self):
         """Chat endpoint should require message field."""
-        import json
-
         from aiohttp import web
+
         from server import chat_handler
 
         request = MagicMock(spec=web.Request)
@@ -94,7 +96,6 @@ class TestChatEndpointUnit:
 
         response = await chat_handler(request)
 
-        body = json.loads(response.body)
         # Should return error or handle gracefully
         assert response.status in [200, 400]
 
@@ -104,6 +105,7 @@ class TestChatEndpointUnit:
         import json
 
         from aiohttp import web
+
         from server import chat_handler
 
         request = MagicMock(spec=web.Request)
@@ -129,9 +131,9 @@ class TestChatEndpointUnit:
     @pytest.mark.asyncio
     async def test_chat_handles_empty_message(self):
         """Chat should handle empty message strings."""
-        import json
 
         from aiohttp import web
+
         from server import chat_handler
 
         request = MagicMock(spec=web.Request)
@@ -152,6 +154,7 @@ class TestToolsEndpointUnit:
         import json
 
         from aiohttp import web
+
         from server import tools_handler
 
         request = MagicMock(spec=web.Request)
@@ -183,6 +186,7 @@ class TestThinkEndpointUnit:
     async def test_think_requires_message(self):
         """Think endpoint should require message field."""
         from aiohttp import web
+
         from server import think_handler
 
         request = MagicMock(spec=web.Request)
@@ -198,6 +202,7 @@ class TestThinkEndpointUnit:
         import json
 
         from aiohttp import web
+
         from server import think_handler
 
         request = MagicMock(spec=web.Request)
@@ -227,6 +232,7 @@ class TestCORSMiddlewareUnit:
     async def test_cors_adds_headers(self):
         """CORS middleware should add access control headers."""
         from aiohttp import web
+
         from server import cors_middleware
 
         # Create mock request and handler
@@ -245,6 +251,7 @@ class TestCORSMiddlewareUnit:
     async def test_cors_handles_options(self):
         """CORS should handle OPTIONS preflight requests."""
         from aiohttp import web
+
         from server import cors_middleware
 
         request = MagicMock(spec=web.Request)
@@ -288,6 +295,7 @@ class TestCreateApp:
     def test_create_app_returns_application(self):
         """create_app should return an aiohttp Application."""
         from aiohttp.web import Application
+
         from server import create_app
 
         app = create_app()

@@ -409,7 +409,7 @@ class AVACoreSystem:
             storage_path.mkdir(parents=True, exist_ok=True)
 
             self._episodic_store = EpisodicMemoryStore(
-                storage_path=storage_path, max_entries=self.config.episodic_max_entries
+                storage_path=storage_path, max_memories=self.config.episodic_max_entries
             )
 
             count = len(self._episodic_store.memories)

@@ -31,9 +31,7 @@ class TestBridgeConfig:
 
     def test_custom_dimensions(self):
         """Test custom dimension configuration."""
-        config = BridgeConfig(
-            medulla_state_dim=512, cortex_embedding_dim=1024, num_soft_tokens=16
-        )
+        config = BridgeConfig(medulla_state_dim=512, cortex_embedding_dim=1024, num_soft_tokens=16)
 
         assert config.medulla_state_dim == 512
         assert config.cortex_embedding_dim == 1024
@@ -56,9 +54,7 @@ class TestProjectionAdapter:
 
     def test_initialization(self):
         """Test adapter initializes correctly."""
-        config = BridgeConfig(
-            medulla_state_dim=256, cortex_embedding_dim=512, num_soft_tokens=8
-        )
+        config = BridgeConfig(medulla_state_dim=256, cortex_embedding_dim=512, num_soft_tokens=8)
         adapter = ProjectionAdapter(config)
 
         assert adapter is not None
@@ -66,9 +62,7 @@ class TestProjectionAdapter:
 
     def test_forward_output_shape(self):
         """Test forward pass produces correct output shape."""
-        config = BridgeConfig(
-            medulla_state_dim=256, cortex_embedding_dim=512, num_soft_tokens=8
-        )
+        config = BridgeConfig(medulla_state_dim=256, cortex_embedding_dim=512, num_soft_tokens=8)
         adapter = ProjectionAdapter(config)
 
         # Create input
@@ -164,10 +158,7 @@ class TestContextCompressor:
         compressor = ContextCompressor(max_tokens=100)
 
         # Create long history
-        history = [
-            {"role": "user", "content": f"Question {i} " * 20}
-            for i in range(20)
-        ]
+        history = [{"role": "user", "content": f"Question {i} " * 20} for i in range(20)]
 
         result = compressor.compress(history, "Final question?")
 
@@ -216,9 +207,7 @@ class TestBridge:
     async def test_prepare_cortex_input_with_system_prompt(self):
         """Test with system prompt."""
         bridge = Bridge()
-        medulla_state = np.random.randn(bridge.config.medulla_state_dim).astype(
-            np.float32
-        )
+        medulla_state = np.random.randn(bridge.config.medulla_state_dim).astype(np.float32)
 
         result = await bridge.prepare_cortex_input(
             medulla_state=medulla_state,
@@ -249,7 +238,7 @@ class TestBridge:
             bridge.save_state()
         except Exception:
             pass  # May not be fully implemented
-        
+
         assert True  # Test passes if no crash
 
 
@@ -270,9 +259,7 @@ class TestDimensionValidation:
 
     def test_correct_embedding_normalization(self):
         """Test that embeddings are properly normalized if enabled."""
-        config = BridgeConfig(
-            medulla_state_dim=64, cortex_embedding_dim=128, use_layer_norm=True
-        )
+        config = BridgeConfig(medulla_state_dim=64, cortex_embedding_dim=128, use_layer_norm=True)
         adapter = ProjectionAdapter(config)
 
         state = np.random.randn(config.medulla_state_dim).astype(np.float32) * 100

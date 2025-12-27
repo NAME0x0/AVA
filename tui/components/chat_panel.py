@@ -9,17 +9,23 @@ Accessibility Features:
 - Arrow keys for message navigation
 - Page Up/Down for scrolling
 - Home/End to jump to top/bottom
+
+Streaming Features:
+- StreamingMessageWidget for real-time token display
+- Blinking cursor animation during streaming
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any
 
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.text import Text
 from textual.binding import Binding
 from textual.containers import ScrollableContainer
+from textual.reactive import reactive
 from textual.widgets import Static
+from textual.timer import Timer
 
 
 class MessageWidget(Static):
@@ -70,6 +76,112 @@ class MessageWidget(Static):
             yield Static(md, classes="message-content")
         except Exception:
             yield Static(self.content, classes="message-content")
+
+
+class StreamingMessageWidget(Static):
+    """
+    Message widget that updates as tokens arrive.
+
+    Features:
+    - Blinking cursor during streaming
+    - Incremental content updates
+    - Metadata display on completion
+    """
+
+    content = reactive("")
+    is_complete = reactive(False)
+
+    DEFAULT_CSS = """
+    StreamingMessageWidget {
+        padding: 1;
+        margin-bottom: 1;
+        background: $surface;
+    }
+
+    StreamingMessageWidget .streaming-cursor {
+        background: $accent;
+    }
+    """
+
+    def __init__(
+        self,
+        role: str = "assistant",
+        used_cortex: bool = False,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.role = role
+        self.used_cortex = used_cortex
+        self.cognitive_state = "FLOW"
+        self.timestamp = datetime.now()
+        self._cursor_timer: Optional[Timer] = None
+        self._cursor_visible = True
+        self._metadata: Dict[str, Any] = {}
+
+    def on_mount(self) -> None:
+        """Start cursor blink timer."""
+        self._cursor_timer = self.set_interval(0.5, self._toggle_cursor)
+
+    def _toggle_cursor(self) -> None:
+        """Toggle cursor visibility for blink effect."""
+        if not self.is_complete:
+            self._cursor_visible = not self._cursor_visible
+            self.refresh()
+
+    def append_token(self, token: str) -> None:
+        """Append a streaming token to the content."""
+        self.content += token
+        self.refresh()
+
+    def complete(self, metadata: Optional[Dict[str, Any]] = None) -> None:
+        """Mark streaming as complete with optional metadata."""
+        self.is_complete = True
+        if metadata:
+            self._metadata = metadata
+            self.used_cortex = metadata.get("used_cortex", self.used_cortex)
+            self.cognitive_state = metadata.get("cognitive_state", self.cognitive_state)
+        if self._cursor_timer:
+            self._cursor_timer.stop()
+        self.refresh()
+
+    def render(self) -> Text:
+        """Render the streaming message with cursor."""
+        result = Text()
+
+        # Header
+        style = "bold green" if not self.used_cortex else "bold magenta"
+        prefix = "AVA" if not self.used_cortex else "AVA [Cortex]"
+        time_str = self.timestamp.strftime("%H:%M")
+
+        result.append(f"{prefix}", style=style)
+        result.append(f" • {time_str}", style="dim")
+
+        if not self.is_complete:
+            result.append(" • streaming...", style="italic cyan")
+        elif self.cognitive_state != "FLOW":
+            result.append(f" • {self.cognitive_state}", style="italic yellow")
+
+        result.append("\n\n")
+
+        # Content
+        result.append(self.content)
+
+        # Cursor (blink effect)
+        if not self.is_complete and self._cursor_visible:
+            result.append("█", style="cyan")
+
+        return result
+
+    def to_message_widget(self) -> MessageWidget:
+        """Convert to a static MessageWidget after streaming completes."""
+        return MessageWidget(
+            content=self.content,
+            role=self.role,
+            used_cortex=self.used_cortex,
+            cognitive_state=self.cognitive_state,
+            timestamp=self.timestamp,
+            classes="assistant-message",
+        )
 
 
 class ChatPanel(ScrollableContainer):
@@ -176,3 +288,40 @@ class ChatPanel(ScrollableContainer):
     def clear(self) -> None:
         """Clear all messages."""
         self.remove_children()
+
+    def start_streaming_message(self) -> StreamingMessageWidget:
+        """
+        Start a new streaming message.
+
+        Returns:
+            StreamingMessageWidget that can be updated with append_token()
+        """
+        widget = StreamingMessageWidget(
+            role="assistant",
+            classes="assistant-message streaming",
+        )
+        self.mount(widget)
+        self.scroll_end(animate=False)
+        return widget
+
+    def finalize_streaming_message(
+        self,
+        streaming_widget: StreamingMessageWidget,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """
+        Finalize a streaming message, optionally replacing with static widget.
+
+        Args:
+            streaming_widget: The streaming widget to finalize
+            metadata: Optional metadata (used_cortex, cognitive_state, etc.)
+        """
+        streaming_widget.complete(metadata)
+
+        # Optionally replace with static MessageWidget for markdown rendering
+        # Uncomment below if you want full markdown support after streaming
+        # static_widget = streaming_widget.to_message_widget()
+        # streaming_widget.remove()
+        # self.mount(static_widget)
+
+        self.scroll_end(animate=False)

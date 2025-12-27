@@ -177,11 +177,22 @@ class AVATUI(App):
             import httpx
 
             async with httpx.AsyncClient() as client:
+                # Build request with force flags
+                request_data = {
+                    "message": message,
+                    "force_search": self._force_search,
+                    "force_cortex": self._force_cortex,
+                }
+
                 response = await client.post(
                     f"{self.backend_url}/chat",
-                    json={"message": message},
+                    json=request_data,
                     timeout=300.0,  # 5 minute timeout for deep thinking
                 )
+
+                # Reset flags after sending
+                self._force_search = False
+                self._force_cortex = False
 
                 if response.status_code == 200:
                     data = response.json()
@@ -202,7 +213,59 @@ class AVATUI(App):
 
     def action_command_palette(self) -> None:
         """Show command palette."""
-        self.notify("Command palette coming soon!", severity="information")
+        from .components.command_palette import CommandPalette
+
+        def handle_result(action_name: str | None) -> None:
+            """Handle the command palette result."""
+            if action_name:
+                # Map action names to methods
+                action_map = {
+                    "clear_chat": self.action_clear_chat,
+                    "force_search": self.action_force_search,
+                    "deep_think": self.action_deep_think,
+                    "toggle_metrics": self.action_toggle_metrics,
+                    "export_chat": self._export_chat,
+                    "help": self.action_help,
+                    "quit": self.action_quit,
+                }
+                if action_name in action_map:
+                    action_map[action_name]()
+
+        self.push_screen(CommandPalette(), handle_result)
+
+    def _export_chat(self) -> None:
+        """Export chat history to a file."""
+        import json
+        from datetime import datetime
+        from pathlib import Path
+
+        chat = self.query_one("#chat", ChatPanel)
+        messages = []
+
+        # Collect messages from chat panel
+        for child in chat.children:
+            if hasattr(child, "content") and hasattr(child, "role"):
+                messages.append({
+                    "role": child.role,
+                    "content": child.content,
+                    "timestamp": datetime.now().isoformat(),
+                })
+
+        if not messages:
+            self.notify("No messages to export", severity="warning")
+            return
+
+        # Save to file
+        export_dir = Path("data/exports")
+        export_dir.mkdir(parents=True, exist_ok=True)
+
+        filename = f"chat_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        filepath = export_dir / filename
+
+        with open(filepath, "w") as f:
+            json.dump({"messages": messages}, f, indent=2)
+
+        self.notify(f"Chat exported to {filepath}", severity="information")
 
     def action_toggle_metrics(self) -> None:
         """Toggle metrics panel visibility."""

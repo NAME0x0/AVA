@@ -7,9 +7,7 @@
  * Features:
  * - State persistence for UI preferences (sidebar, split pane)
  * - Environment variable support for backend URL
- *
- * TODO: WebSocket streaming will be integrated when real-time streaming
- * is implemented in the backend (currently uses polling + chunked response).
+ * - WebSocket streaming with HTTP fallback
  */
 
 import { create } from "zustand";
@@ -60,6 +58,7 @@ export interface Message {
   policySelected?: string;
   responseTimeMs?: number;
   isStreaming?: boolean;
+  toolsUsed?: string[];
 }
 
 export interface BeliefState {
@@ -114,6 +113,34 @@ interface CoreStore {
   setSplitPaneMode: (mode: "chat-only" | "chat-metrics" | "chat-code") => void;
   setSplitPaneRatio: (ratio: number) => void;
 
+  // Settings Panel
+  settingsPanelOpen: boolean;
+  setSettingsPanelOpen: (open: boolean) => void;
+  toggleSettingsPanel: () => void;
+
+  // Tools Panel
+  toolsPanelOpen: boolean;
+  setToolsPanelOpen: (open: boolean) => void;
+  toggleToolsPanel: () => void;
+
+  // Preferences
+  preferences: {
+    streamingMode: 'http' | 'websocket';
+    animations: 'full' | 'reduced' | 'none';
+    showToolsUsed: boolean;
+  };
+  updatePreference: <K extends keyof CoreStore['preferences']>(
+    key: K,
+    value: CoreStore['preferences'][K]
+  ) => void;
+
+  // WebSocket State
+  wsConnected: boolean;
+  wsRef: WebSocket | null;
+  setWsConnected: (connected: boolean) => void;
+  connectWebSocket: () => void;
+  disconnectWebSocket: () => void;
+
   // Thinking State
   thinkingStage: "idle" | "perceiving" | "routing" | "searching" | "generating" | "verifying";
   setThinkingStage: (stage: "idle" | "perceiving" | "routing" | "searching" | "generating" | "verifying") => void;
@@ -125,7 +152,7 @@ interface CoreStore {
   setIsGenerating: (generating: boolean) => void;
 
   // Actions
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (content: string, forceSearch?: boolean, forceCortex?: boolean) => Promise<void>;
   forceCortex: () => Promise<void>;
   forceSleep: () => Promise<void>;
 }
@@ -240,6 +267,157 @@ export const useCoreStore = create<CoreStore>()(
     setSplitPaneMode: (splitPaneMode) => set({ splitPaneMode }),
     setSplitPaneRatio: (splitPaneRatio) => set({ splitPaneRatio }),
 
+    // Settings Panel
+    settingsPanelOpen: false,
+    setSettingsPanelOpen: (settingsPanelOpen) => set({ settingsPanelOpen }),
+    toggleSettingsPanel: () => set((s) => ({ settingsPanelOpen: !s.settingsPanelOpen })),
+
+    // Tools Panel
+    toolsPanelOpen: false,
+    setToolsPanelOpen: (toolsPanelOpen) => set({ toolsPanelOpen }),
+    toggleToolsPanel: () => set((s) => ({ toolsPanelOpen: !s.toolsPanelOpen })),
+
+    // Preferences
+    preferences: {
+      streamingMode: 'websocket',
+      animations: 'full',
+      showToolsUsed: true,
+    },
+    updatePreference: (key, value) =>
+      set((s) => ({
+        preferences: { ...s.preferences, [key]: value },
+      })),
+
+    // WebSocket State
+    wsConnected: false,
+    wsRef: null,
+    setWsConnected: (wsConnected) => set({ wsConnected }),
+    connectWebSocket: () => {
+      const state = get();
+      if (state.wsRef?.readyState === WebSocket.OPEN) return;
+
+      if (typeof window === "undefined") return;
+
+      try {
+        const url = new URL(state.backendUrl);
+        const protocol = url.protocol === "https:" ? "wss:" : "ws:";
+        const wsUrl = `${protocol}//${url.host}/ws`;
+
+        const ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+          set({ wsConnected: true, wsRef: ws });
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            const state = get();
+
+            if (data.type === "status") {
+              // Update thinking stage
+              state.setThinkingStage(data.stage || "generating");
+            } else if (data.type === "chunk" || data.type === "token") {
+              // Append streaming content
+              const messages = state.messages;
+              const lastMessage = messages[messages.length - 1];
+              if (lastMessage?.isStreaming && lastMessage.role === "assistant") {
+                set({
+                  messages: [
+                    ...messages.slice(0, -1),
+                    {
+                      ...lastMessage,
+                      content: lastMessage.content + (data.text || data.token || data.content || ""),
+                    },
+                  ],
+                });
+              }
+            } else if (data.type === "response" || data.type === "complete" || data.type === "end") {
+              // Finalize message with metadata
+              const messages = state.messages;
+              const lastMessage = messages[messages.length - 1];
+              if (lastMessage?.isStreaming) {
+                set({
+                  messages: [
+                    ...messages.slice(0, -1),
+                    {
+                      ...lastMessage,
+                      content: data.response || lastMessage.content,
+                      isStreaming: false,
+                      cognitiveState: data.cognitive_state ? {
+                        label: data.cognitive_state.label || data.cognitive_state,
+                        entropy: data.cognitive_state.entropy || 0,
+                        varentropy: data.cognitive_state.varentropy || 0,
+                        confidence: data.cognitive_state.confidence || 0,
+                        surprise: data.cognitive_state.surprise || 0,
+                        shouldUseTools: data.cognitive_state.should_use_tools || false,
+                        shouldThink: data.cognitive_state.should_think || false,
+                      } : undefined,
+                      usedCortex: data.used_cortex,
+                      policySelected: data.policy_selected,
+                      responseTimeMs: data.response_time_ms,
+                      toolsUsed: data.tools_used,
+                    },
+                  ],
+                  isGenerating: false,
+                  thinkingStage: "idle",
+                });
+
+                // Update cognitive state
+                if (data.cognitive_state) {
+                  state.setCognitiveState({
+                    label: data.cognitive_state.label || data.cognitive_state,
+                    entropy: data.cognitive_state.entropy || 0,
+                    varentropy: data.cognitive_state.varentropy || 0,
+                    confidence: data.cognitive_state.confidence || 0,
+                    surprise: data.cognitive_state.surprise || 0,
+                  });
+                }
+              }
+            } else if (data.type === "error") {
+              const messages = state.messages;
+              const lastMessage = messages[messages.length - 1];
+              if (lastMessage?.isStreaming) {
+                set({
+                  messages: [
+                    ...messages.slice(0, -1),
+                    {
+                      ...lastMessage,
+                      content: `Error: ${data.message || "Unknown error"}`,
+                      isStreaming: false,
+                    },
+                  ],
+                  isGenerating: false,
+                  thinkingStage: "idle",
+                });
+              }
+            }
+          } catch (e) {
+            console.error("Failed to parse WebSocket message:", e);
+          }
+        };
+
+        ws.onclose = () => {
+          set({ wsConnected: false, wsRef: null });
+        };
+
+        ws.onerror = () => {
+          set({ wsConnected: false });
+        };
+
+        set({ wsRef: ws });
+      } catch (e) {
+        console.error("Failed to connect WebSocket:", e);
+      }
+    },
+    disconnectWebSocket: () => {
+      const { wsRef } = get();
+      if (wsRef) {
+        wsRef.close(1000, "User disconnected");
+        set({ wsConnected: false, wsRef: null });
+      }
+    },
+
     // Thinking State
     thinkingStage: "idle",
     setThinkingStage: (thinkingStage) => set({ thinkingStage }),
@@ -251,8 +429,19 @@ export const useCoreStore = create<CoreStore>()(
     setIsGenerating: (isGenerating) => set({ isGenerating }),
 
     // Actions
-    sendMessage: async (content: string) => {
-      const { backendUrl, addMessage, updateMessage, setIsGenerating, setCognitiveState, setSystemState } = get();
+    sendMessage: async (content: string, forceSearch: boolean = false, forceCortex: boolean = false) => {
+      const {
+        backendUrl,
+        addMessage,
+        updateMessage,
+        setIsGenerating,
+        setCognitiveState,
+        setSystemState,
+        setThinkingStage,
+        wsRef,
+        wsConnected,
+        preferences,
+      } = get();
 
       // Add user message
       addMessage({ role: "user", content });
@@ -272,14 +461,27 @@ export const useCoreStore = create<CoreStore>()(
         ],
         inputValue: "",
         isGenerating: true,
+        thinkingStage: "perceiving",
       }));
 
       try {
-        // Check if we're in Tauri
+        // Try WebSocket first if connected and preferred
+        if (preferences.streamingMode === 'websocket' && wsConnected && wsRef?.readyState === WebSocket.OPEN) {
+          // Send via WebSocket - response handled by onmessage handler
+          wsRef.send(JSON.stringify({
+            message: content,
+            force_search: forceSearch,
+            force_cortex: forceCortex,
+          }));
+          // Don't set isGenerating to false here - WebSocket handler will do it
+          return;
+        }
+
+        // HTTP fallback
         const isTauri = typeof window !== "undefined" && "__TAURI__" in window;
-        
+
         let response;
-        
+
         if (isTauri) {
           // Use Tauri command
           const { invoke } = await import("@tauri-apps/api/tauri");
@@ -289,7 +491,11 @@ export const useCoreStore = create<CoreStore>()(
           const res = await fetch(`${backendUrl}/chat`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: content }),
+            body: JSON.stringify({
+              message: content,
+              force_search: forceSearch,
+              force_cortex: forceCortex,
+            }),
           });
           response = await res.json();
         }
@@ -313,6 +519,7 @@ export const useCoreStore = create<CoreStore>()(
           usedCortex: response.used_cortex,
           policySelected: response.policy_selected,
           responseTimeMs: response.response_time_ms,
+          toolsUsed: response.tools_used,
         });
 
         // Update cognitive state if available
@@ -335,13 +542,16 @@ export const useCoreStore = create<CoreStore>()(
             ? get().systemState.cortexInvocations + 1
             : get().systemState.cortexInvocations,
         });
+
+        setIsGenerating(false);
+        setThinkingStage("idle");
       } catch (error) {
         updateMessage(assistantId, {
           content: `Error: ${error instanceof Error ? error.message : "Connection failed"}`,
           isStreaming: false,
         });
-      } finally {
         setIsGenerating(false);
+        setThinkingStage("idle");
       }
     },
 
@@ -383,6 +593,7 @@ export const useCoreStore = create<CoreStore>()(
         splitPaneMode: state.splitPaneMode,
         splitPaneRatio: state.splitPaneRatio,
         backendUrl: state.backendUrl,
+        preferences: state.preferences,
       }),
     }
   )
