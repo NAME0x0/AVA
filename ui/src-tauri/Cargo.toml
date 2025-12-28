@@ -19,7 +19,9 @@ tauri = { version = "1.6", features = [
     "process-exit",
     "process-relaunch",
     "global-shortcut-all",
-    "os-all"
+    "os-all",
+    "http-all",
+    "updater"
 ] }
 
 # Plugins for installer features
