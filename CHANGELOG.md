@@ -8,17 +8,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Installer Infrastructure**: Foundation for Windows installer distribution
+  - Installer build scripts (`installer/scripts/build_installer.py`)
+  - NSIS configuration for Windows installer
+  - Installer configuration (`installer/config/installer.yaml`)
+- **System Tray Support**: Tauri configuration for running in background
+  - System tray module (`ui/src-tauri/src/tray.rs`)
+  - Hide to tray on close
+  - Status menu with backend/memory info
+- **Bug Reporting System**: Automated bug reports via GitHub Issues
+  - Bug report module (`ui/src-tauri/src/bug_report.rs`)
+  - Smart error categorization (filters user-side issues)
+  - Pre-filled GitHub issue templates
+- **Single Instance**: Prevent multiple app instances
+- **Autostart Support**: Optional start on boot
+- **GitHub Issue Templates**: Bug report and feature request templates
 - Pre-commit configuration for code quality
 - CHANGELOG.md for version history tracking
+- VERSION file as single source of truth
 
 ### Changed
+- Updated Tauri to include system-tray, process, and global-shortcut features
+- Added tauri-plugin-single-instance and tauri-plugin-autostart
 - Replaced alert() with inline help modal in CommandPalette
 - Added WebGL fallback for 3D visualizations
 - Improved canvas null safety checks
+- Removed deprecated setup.py (using pyproject.toml only)
+- CI/CD now builds Tauri app for Windows
 
 ### Fixed
 - Fixed broken Tailwind class in SplitPane component
 - Fixed potential canvas context null errors
+- Fixed version inconsistency (setup.py vs pyproject.toml)
 
 ---
 

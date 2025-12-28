@@ -1,0 +1,94 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the information below.
+
+        **Before reporting**, please check:
+        - [ ] Ollama is installed and running (`ollama --version`)
+        - [ ] Python 3.10+ is installed (`python --version`)
+        - [ ] You've tried restarting AVA
+
+  - type: input
+    id: version
+    attributes:
+      label: AVA Version
+      description: Run `ava --version` or check Settings
+      placeholder: "3.2.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS 14 (Sonoma)
+        - macOS 13 (Ventura)
+        - Ubuntu 22.04
+        - Ubuntu 20.04
+        - Other Linux
+    validations:
+      required: true
+
+  - type: dropdown
+    id: interface
+    attributes:
+      label: Interface Used
+      options:
+        - Desktop GUI (Tauri)
+        - Terminal UI (TUI)
+        - CLI
+        - HTTP API
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear description of what happened
+      placeholder: "When I try to... the application..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: "I expected..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Open AVA
+        2. Navigate to...
+        3. Click on...
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Error Messages
+      description: Any relevant logs or error messages
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Screenshots, config files, or any other context

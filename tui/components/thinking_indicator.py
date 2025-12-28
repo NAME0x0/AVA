@@ -9,7 +9,6 @@ Features a neural network visualization with synaptic activity.
 from textual.reactive import reactive
 from textual.widgets import Static
 
-
 # Detailed neural brain animation frames with synaptic activity
 BRAIN_FRAMES = [
     """

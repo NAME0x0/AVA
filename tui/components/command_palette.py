@@ -9,7 +9,6 @@ Triggered by Ctrl+K.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable
 
 from rich.text import Text
 from textual import on
@@ -35,9 +34,13 @@ class Command:
 # Available commands
 COMMANDS = [
     Command("clear", "Clear Chat", "Clear all messages from chat", "Ctrl+L", "Chat", "clear_chat"),
-    Command("search", "Force Search", "Use web search for next query", "Ctrl+S", "Mode", "force_search"),
+    Command(
+        "search", "Force Search", "Use web search for next query", "Ctrl+S", "Mode", "force_search"
+    ),
     Command("think", "Deep Think", "Force Cortex deep thinking", "Ctrl+D", "Mode", "deep_think"),
-    Command("metrics", "Toggle Metrics", "Show/hide metrics panel", "Ctrl+T", "View", "toggle_metrics"),
+    Command(
+        "metrics", "Toggle Metrics", "Show/hide metrics panel", "Ctrl+T", "View", "toggle_metrics"
+    ),
     Command("export", "Export Chat", "Save chat history to file", "", "Chat", "export_chat"),
     Command("help", "Help", "Show keyboard shortcuts", "F1", "Help", "help"),
     Command("quit", "Quit", "Exit application", "Ctrl+Q", "System", "quit"),
@@ -204,10 +207,7 @@ class CommandPalette(ModalScreen[str | None]):
     def _update_selection(self) -> None:
         """Update the visual selection state."""
         results = self.query_one("#palette-results", Vertical)
-        visible_items = [
-            c for c in results.children
-            if isinstance(c, CommandItem) and c.display
-        ]
+        visible_items = [c for c in results.children if isinstance(c, CommandItem) and c.display]
 
         for i, item in enumerate(visible_items):
             if i == self._selected_index:

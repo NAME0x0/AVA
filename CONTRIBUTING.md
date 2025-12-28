@@ -123,6 +123,32 @@ textual console  # In one terminal
 textual run --dev tui.app:AVATUI  # In another
 ```
 
+### Building the Installer
+
+Prerequisites:
+- **NSIS** - [Download](https://nsis.sourceforge.io/) (for Windows installer)
+- **Rust & Cargo** - [Download](https://rustup.rs/)
+
+```bash
+# 1. Build the Tauri app first
+cd ui
+npm run tauri build
+
+# 2. Build the installer
+cd ../installer/scripts
+python build_installer.py
+
+# Or build portable version
+python build_installer.py --portable
+
+# Or build all variants
+python build_installer.py --all
+```
+
+Output will be in `installer/dist/`:
+- `AVA-{version}-Setup.exe` - Windows installer
+- `AVA-{version}-portable.zip` - Portable version
+
 ---
 
 ## Project Structure
@@ -155,7 +181,16 @@ AVA/
 │   │   ├── app/
 │   │   ├── components/
 │   │   └── stores/
-│   └── src-tauri/
+│   └── src-tauri/         # Rust backend
+│       ├── src/
+│       │   ├── main.rs
+│       │   ├── tray.rs    # System tray
+│       │   └── bug_report.rs  # Bug reporting
+│       └── Cargo.toml
+├── installer/             # Installer build system
+│   ├── config/            # Installer configuration
+│   ├── nsis/              # NSIS scripts
+│   └── scripts/           # Build automation
 ├── tests/                 # Test suite
 │   ├── unit/
 │   └── integration/

@@ -1,0 +1,66 @@
+# AVA Installer Configuration
+# ============================
+# Configuration for building Windows installer
+
+app:
+  name: "AVA"
+  display_name: "AVA - Cortex-Medulla AI Assistant"
+  publisher: "Muhammad Afsah Mumtaz"
+  url: "https://github.com/NAME0x0/AVA"
+  version_file: "../../VERSION"  # Single source of truth
+
+install:
+  default_dir: "$LOCALAPPDATA\\AVA"
+  require_admin: false
+  single_instance: true
+
+components:
+  gui:
+    name: "Desktop Application"
+    description: "Native desktop GUI with neural visualization"
+    required: true
+    size_mb: 150
+
+  tui:
+    name: "Terminal Interface"
+    description: "Power-user terminal UI with keyboard navigation"
+    required: false
+    size_mb: 5
+
+  cli:
+    name: "Command Line Tools"
+    description: "CLI commands for automation and scripting"
+    required: false
+    size_mb: 2
+
+shortcuts:
+  desktop: true
+  start_menu: true
+  start_menu_folder: "AVA"
+
+startup:
+  auto_start: false  # User chooses during install
+  minimize_to_tray: true
+  start_hidden: false
+
+python:
+  version: "3.11"
+  embedded: false  # Download during install if missing
+  download_url: "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
+
+dependencies:
+  ollama:
+    required: true
+    bundled: false  # Prompt user to install
+    download_url: "https://ollama.ai/download"
+    check_command: "ollama --version"
+
+registry:
+  add_to_path: true
+  file_associations: []
+  uninstall_key: "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\AVA"
+
+files:
+  license: "../nsis/license.txt"
+  readme: "../../README.md"
+  changelog: "../../CHANGELOG.md"

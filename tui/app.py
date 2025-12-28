@@ -13,19 +13,20 @@ Accessibility Features:
 
 import asyncio
 import logging
-from typing import Optional
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical
-from textual.widgets import Header, Footer, Static, Input, RichLog
 from textual.reactive import reactive
+from textual.widgets import Footer, Header
 
 from .components.chat_panel import ChatPanel
 from .components.input_box import ChatInput
 from .components.metrics_panel import MetricsPanel
+from .components.settings_panel import SettingsPanel
 from .components.status_bar import StatusBar
 from .components.thinking_indicator import ThinkingIndicator
+from .components.tools_panel import ToolsPanel
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +50,8 @@ class AVATUI(App):
         Binding("ctrl+1", "focus_input", "Input", show=False),
         Binding("ctrl+2", "focus_chat", "Chat", show=False),
         Binding("ctrl+3", "focus_metrics", "Metrics", show=False),
+        Binding("ctrl+4", "toggle_settings", "Settings", show=False),
+        Binding("ctrl+5", "toggle_tools", "Tools", show=False),
         # Chat navigation
         Binding("page_up", "scroll_chat_up", "Scroll Up", show=False),
         Binding("page_down", "scroll_chat_down", "Scroll Down", show=False),
@@ -85,11 +88,13 @@ class AVATUI(App):
         yield Header()
         with Container(id="main"):
             with Horizontal(id="split-view"):
+                yield SettingsPanel(id="settings")
                 with Vertical(id="chat-container"):
                     yield ChatPanel(id="chat")
                     yield ThinkingIndicator(id="thinking")
                     yield ChatInput(id="input")
                 yield MetricsPanel(id="metrics")
+                yield ToolsPanel(id="tools")
         yield StatusBar(id="status")
         yield Footer()
 
@@ -245,11 +250,13 @@ class AVATUI(App):
         # Collect messages from chat panel
         for child in chat.children:
             if hasattr(child, "content") and hasattr(child, "role"):
-                messages.append({
-                    "role": child.role,
-                    "content": child.content,
-                    "timestamp": datetime.now().isoformat(),
-                })
+                messages.append(
+                    {
+                        "role": child.role,
+                        "content": child.content,
+                        "timestamp": datetime.now().isoformat(),
+                    }
+                )
 
         if not messages:
             self.notify("No messages to export", severity="warning")
@@ -271,6 +278,32 @@ class AVATUI(App):
         """Toggle metrics panel visibility."""
         metrics = self.query_one("#metrics", MetricsPanel)
         metrics.display = not metrics.display
+
+    def action_toggle_settings(self) -> None:
+        """Toggle settings panel visibility (Ctrl+4)."""
+        try:
+            settings = self.query_one("#settings", SettingsPanel)
+            settings.toggle_class("visible")
+            if settings.has_class("visible"):
+                settings.focus()
+                self._announce("Settings panel opened")
+            else:
+                self._announce("Settings panel closed")
+        except Exception:
+            pass
+
+    def action_toggle_tools(self) -> None:
+        """Toggle tools panel visibility (Ctrl+5)."""
+        try:
+            tools = self.query_one("#tools", ToolsPanel)
+            tools.toggle_class("visible")
+            if tools.has_class("visible"):
+                tools.focus()
+                self._announce("Tools panel opened")
+            else:
+                self._announce("Tools panel closed")
+        except Exception:
+            pass
 
     def action_clear_chat(self) -> None:
         """Clear chat history."""
@@ -303,6 +336,8 @@ class AVATUI(App):
 | Ctrl+1 | Focus input |
 | Ctrl+2 | Focus chat |
 | Ctrl+3 | Focus metrics |
+| Ctrl+4 | Toggle settings |
+| Ctrl+5 | Toggle tools |
 
 ## Chat Scrolling
 | Key | Action |

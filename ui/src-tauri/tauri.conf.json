@@ -8,16 +8,21 @@
   },
   "package": {
     "productName": "AVA",
-    "version": "3.0.0"
+    "version": "3.2.0"
   },
   "tauri": {
     "allowlist": {
       "all": false,
       "shell": {
-        "open": true
+        "open": true,
+        "execute": false,
+        "sidecar": false
       },
       "window": {
+        "all": true,
         "close": true,
+        "hide": true,
+        "show": true,
         "minimize": true,
         "maximize": true,
         "unmaximize": true,
@@ -31,7 +36,22 @@
       },
       "notification": {
         "all": true
+      },
+      "process": {
+        "exit": true,
+        "relaunch": true
+      },
+      "globalShortcut": {
+        "all": true
+      },
+      "os": {
+        "all": true
       }
+    },
+    "systemTray": {
+      "iconPath": "icons/icon.ico",
+      "iconAsTemplate": false,
+      "menuOnLeftClick": false
     },
     "bundle": {
       "active": true,
@@ -83,7 +103,10 @@
         "fullscreen": false,
         "decorations": false,
         "transparent": true,
-        "center": true
+        "center": true,
+        "visible": true,
+        "focus": true,
+        "skipTaskbar": false
       }
     ]
   }

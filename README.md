@@ -17,52 +17,51 @@
 
 - **Cortex-Medulla Architecture**: Fast reflexive responses for simple queries, deep reasoning for complex ones
 - **Desktop App**: Native Tauri + Next.js GUI with real-time neural activity visualization
+- **System Tray**: Run in background with minimal resource usage
 - **Terminal UI**: Phenomenal TUI for power users built with Textual
 - **Search-First Paradigm**: Web search as default for informational queries
 - **Titans Neural Memory**: Infinite context through test-time learning
 - **Active Inference**: Autonomous behavior using Free Energy Principle
+- **Automated Bug Reporting**: One-click bug reports with system info (coming soon)
 
 ---
 
 ## Quick Start
 
+> **New to open source or AI projects?** See our [Beginner's Guide](docs/BEGINNER_GUIDE.md) for step-by-step instructions.
+
 ### Prerequisites
 
-1. **Python 3.10+** - [Download Python](https://www.python.org/downloads/)
+1. **Python 3.9+** - [Download Python](https://www.python.org/downloads/)
 2. **Ollama** - [Download Ollama](https://ollama.ai/)
-3. **Node.js 18+** (for GUI) - [Download Node.js](https://nodejs.org/)
+3. **Node.js 18+** (for GUI, optional) - [Download Node.js](https://nodejs.org/)
 
-### One-Click Setup
-
-**Windows:**
-```powershell
-.\setup_ava.ps1
-```
-
-**macOS/Linux:**
-```bash
-chmod +x start.sh && ./start.sh
-```
-
-### Manual Setup
+### One-Command Setup (Recommended)
 
 ```bash
-# Clone repository
 git clone https://github.com/NAME0x0/AVA.git
 cd AVA
+python setup_ava.py
+```
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+The setup script shows live progress and handles everything:
+```
+[Step 3/7] Installing Dependencies
+  [████████████░░░░░░░░] 60%  Installing httpx
+  Done: 15 OK
+```
 
-# Install dependencies
-pip install -r requirements.txt
+**Setup options:**
+- `python setup_ava.py --minimal` - Faster setup with small models
+- `python setup_ava.py --full` - Complete setup with all models
+- `python setup_ava.py --verbose` - Show detailed output
+- `python setup_ava.py --check` - Verify existing installation
 
-# Download model
-ollama pull gemma3:4b
+### Start AVA
 
-# Start server
-python server.py
+```bash
+python server.py        # Start the API server
+# Then open http://localhost:8085
 ```
 
 ---
@@ -246,6 +245,10 @@ AVA/
 ├── config/              # Configuration files
 ├── data/                # Runtime data
 ├── docs/                # Documentation
+├── installer/           # Installer build system
+│   ├── config/          # Installer configuration
+│   ├── nsis/            # NSIS scripts (Windows)
+│   └── scripts/         # Build automation
 ├── legacy/              # Archived v2 code
 ├── models/              # Model adapters
 ├── src/
@@ -260,6 +263,7 @@ AVA/
 ├── tests/               # Test suite
 ├── tui/                 # Terminal UI (Textual)
 ├── ui/                  # Desktop GUI (Next.js + Tauri)
+│   └── src-tauri/       # Rust backend (system tray, bug reports)
 ├── server.py            # HTTP API server
 ├── run_core.py          # Direct core CLI
 └── run_tui.py           # TUI entry point

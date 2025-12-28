@@ -16,16 +16,15 @@ Streaming Features:
 """
 
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Any
 
 from rich.markdown import Markdown
-from rich.panel import Panel
 from rich.text import Text
 from textual.binding import Binding
 from textual.containers import ScrollableContainer
 from textual.reactive import reactive
-from textual.widgets import Static
 from textual.timer import Timer
+from textual.widgets import Static
 
 
 class MessageWidget(Static):
@@ -37,7 +36,7 @@ class MessageWidget(Static):
         role: str = "assistant",
         used_cortex: bool = False,
         cognitive_state: str = "FLOW",
-        timestamp: Optional[datetime] = None,
+        timestamp: datetime | None = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -114,9 +113,9 @@ class StreamingMessageWidget(Static):
         self.used_cortex = used_cortex
         self.cognitive_state = "FLOW"
         self.timestamp = datetime.now()
-        self._cursor_timer: Optional[Timer] = None
+        self._cursor_timer: Timer | None = None
         self._cursor_visible = True
-        self._metadata: Dict[str, Any] = {}
+        self._metadata: dict[str, Any] = {}
 
     def on_mount(self) -> None:
         """Start cursor blink timer."""
@@ -133,7 +132,7 @@ class StreamingMessageWidget(Static):
         self.content += token
         self.refresh()
 
-    def complete(self, metadata: Optional[Dict[str, Any]] = None) -> None:
+    def complete(self, metadata: dict[str, Any] | None = None) -> None:
         """Mark streaming as complete with optional metadata."""
         self.is_complete = True
         if metadata:
@@ -307,7 +306,7 @@ class ChatPanel(ScrollableContainer):
     def finalize_streaming_message(
         self,
         streaming_widget: StreamingMessageWidget,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """
         Finalize a streaming message, optionally replacing with static widget.

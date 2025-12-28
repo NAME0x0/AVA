@@ -12,8 +12,8 @@ Accessibility Features:
 """
 
 from textual.binding import Binding
-from textual.widgets import Input
 from textual.message import Message
+from textual.widgets import Input
 
 
 class ChatInput(Input):

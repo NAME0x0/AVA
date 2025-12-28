@@ -2,33 +2,48 @@
 
 Get AVA running in under 5 minutes.
 
+> **New to programming?** Check out the [Beginner's Guide](BEGINNER_GUIDE.md) for a gentler introduction.
+
 ## Prerequisites
 
-- **Python 3.10+** ([Download](https://python.org))
+- **Python 3.9+** ([Download](https://python.org))
 - **Ollama** ([Download](https://ollama.ai))
-- **Git** ([Download](https://git-scm.com))
+- **Git** (optional, [Download](https://git-scm.com))
 
-## Step 1: Clone and Install (2 minutes)
+## Step 1: One-Command Setup (Recommended)
 
 ```bash
 # Clone the repository
 git clone https://github.com/NAME0x0/AVA.git
 cd AVA
 
-# Create virtual environment
-python -m venv venv
-
-# Activate it
-# Windows:
-venv\Scripts\activate
-# macOS/Linux:
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
+# Run automated setup
+python setup_ava.py
 ```
 
-## Step 2: Start Ollama (1 minute)
+The setup script automatically:
+- Creates a virtual environment
+- Installs all dependencies
+- Downloads required AI models
+- Verifies the installation
+
+You'll see a live progress bar:
+```
+[Step 3/7] Installing Dependencies
+  [████████████░░░░░░░░] 60%  Installing httpx
+```
+
+### Setup Options
+
+```bash
+python setup_ava.py              # Standard setup
+python setup_ava.py --minimal    # Minimal models (faster)
+python setup_ava.py --full       # All models (best quality)
+python setup_ava.py --verbose    # Show all details
+python setup_ava.py --check      # Verify existing install
+```
+
+## Step 2: Start Ollama
 
 ```bash
 # In a new terminal, start Ollama
@@ -101,13 +116,17 @@ Try these prompts to explore AVA's capabilities:
 | `Ctrl+K` | Open command palette |
 | `Ctrl+D` | Force deep thinking |
 | `Ctrl+L` | Clear chat |
-| `Ctrl+B` | Toggle sidebar |
+| `Ctrl+T` | Toggle metrics panel |
+| `Ctrl+4` | Toggle settings panel |
+| `Ctrl+5` | Toggle tools panel |
+| `F1` | Show help |
+| `Ctrl+Q` | Quit |
 
 ## Next Steps
 
-- Read the [User Guide](USER_GUIDE.md) for detailed usage
-- Check [Troubleshooting](TROUBLESHOOTING.md) if you hit issues
-- Explore [API Examples](API_EXAMPLES.md) for programmatic use
+- Read the [Beginner's Guide](BEGINNER_GUIDE.md) for detailed explanations
+- Check [Troubleshooting](#common-issues) below if you hit issues
+- Explore the [Architecture docs](CORTEX_MEDULLA.md) for technical details
 
 ## Common Issues
 

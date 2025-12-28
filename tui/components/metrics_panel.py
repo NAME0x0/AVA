@@ -10,11 +10,8 @@ Accessibility Features:
 - Screen reader friendly labels
 """
 
-from typing import Any, Dict
+from typing import Any
 
-from rich.panel import Panel
-from rich.table import Table
-from rich.text import Text
 from textual.reactive import reactive
 from textual.widgets import Static
 
@@ -95,7 +92,7 @@ class MetricsPanel(Static):
 
         return result.ljust(width, "─")
 
-    def update_state(self, data: Dict[str, Any]) -> None:
+    def update_state(self, data: dict[str, Any]) -> None:
         """Update metrics from backend data."""
         if "cognitive_state" in data:
             cog = data["cognitive_state"]
@@ -158,11 +155,11 @@ class MetricsPanel(Static):
         confidence_spark = self._render_sparkline(self._confidence_history)
 
         lines = [
-            f"╭─ Active Component ─────────╮",
+            "╭─ Active Component ─────────╮",
             f"│ {comp_icon} [{comp_color}]{self.active_component.upper():^22}[/] │",
-            f"╰────────────────────────────╯",
-            f"",
-            f"╭─ Cognitive State ──────────╮",
+            "╰────────────────────────────╯",
+            "",
+            "╭─ Cognitive State ──────────╮",
             f"│ State:    [{state_color}]{self.cognitive_state:>14}[/] │",
             f"│ Entropy:        {self.entropy:>10.4f} │",
             f"│   [dim]{entropy_spark}[/]           │",
@@ -171,13 +168,13 @@ class MetricsPanel(Static):
             f"│   [dim]{confidence_spark}[/]           │",
             f"│ Surprise:       {self.surprise:>10.4f} │",
             f"│   [dim]{surprise_spark}[/]           │",
-            f"╰────────────────────────────╯",
-            f"",
-            f"╭─ Statistics ───────────────╮",
+            "╰────────────────────────────╯",
+            "",
+            "╭─ Statistics ───────────────╮",
             f"│ Interactions:   {self.interaction_count:>10} │",
             f"│ Cortex Calls:   {self.cortex_invocations:>10} │",
             f"│ Memories:       {self.memory_count:>10} │",
-            f"╰────────────────────────────╯",
+            "╰────────────────────────────╯",
         ]
 
         return "\n".join(lines)

@@ -151,3 +151,17 @@ ui/build/
 **/*.ilk
 **/*.exp
 ./ui/target/debug/*
+
+# Installer artifacts
+installer/build/
+installer/dist/
+*.nsi.log
+*.msi
+
+# Tauri bundle outputs (keep in target/)
+ui/src-tauri/target/release/bundle/
+
+# Windows installer specific
+*.iss.log
+*.wixobj
+*.wixpdb

@@ -6,7 +6,7 @@ Bottom status bar showing system state and quick stats.
 """
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from textual.reactive import reactive
 from textual.widgets import Static
@@ -36,7 +36,7 @@ class StatusBar(Static):
         super().__init__(**kwargs)
         self._start_time = datetime.now()
 
-    def update_state(self, data: Dict[str, Any]) -> None:
+    def update_state(self, data: dict[str, Any]) -> None:
         """Update status from backend data."""
         if "system_state" in data:
             self.system_state = data["system_state"]

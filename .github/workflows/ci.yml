@@ -223,3 +223,44 @@ jobs:
         run: npm run build
         env:
           SKIP_ENV_VALIDATION: true
+
+  # ============================================================================
+  # Tauri Build Check (Rust)
+  # ============================================================================
+  tauri:
+    name: Tauri Build Check
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Set up Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ui/src-tauri
+
+      - name: Install frontend dependencies
+        working-directory: ui
+        run: npm install
+
+      - name: Check Rust code
+        working-directory: ui/src-tauri
+        run: cargo check
+
+      - name: Run Clippy
+        working-directory: ui/src-tauri
+        run: cargo clippy -- -D warnings || true
+
+      - name: Check formatting
+        working-directory: ui/src-tauri
+        run: cargo fmt --check || true

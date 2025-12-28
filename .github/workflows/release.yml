@@ -1,6 +1,7 @@
 # AVA Release Workflow
 # =====================
 # Creates GitHub releases when version tags are pushed
+# Builds Windows installer with Tauri
 
 name: Release
 
@@ -47,7 +48,54 @@ jobs:
           path: dist/
 
   # ============================================================================
-  # Build Frontend
+  # Build Tauri Desktop App (Windows)
+  # ============================================================================
+  build-tauri:
+    name: Build Tauri App (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Set up Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          toolchain: stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ui/src-tauri
+
+      - name: Install frontend dependencies
+        working-directory: ui
+        run: npm ci || npm install
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SKIP_ENV_VALIDATION: true
+        with:
+          projectPath: ui
+
+      - name: Upload Tauri artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-windows
+          path: |
+            ui/src-tauri/target/release/bundle/msi/*.msi
+            ui/src-tauri/target/release/bundle/nsis/*.exe
+
+  # ============================================================================
+  # Build Frontend (for non-Tauri users)
   # ============================================================================
   build-frontend:
     name: Build Frontend
@@ -92,7 +140,7 @@ jobs:
   release:
     name: Create Release
     runs-on: ubuntu-latest
-    needs: [build-python, build-frontend]
+    needs: [build-python, build-frontend, build-tauri]
 
     steps:
       - uses: actions/checkout@v4
@@ -108,6 +156,12 @@ jobs:
         with:
           name: frontend-build
           path: ./
+
+      - name: Download Tauri artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: tauri-windows
+          path: tauri-build/
 
       - name: Extract version from tag
         id: version
@@ -132,29 +186,36 @@ jobs:
           name: AVA v${{ steps.version.outputs.VERSION }}
           body: |
             # AVA v${{ steps.version.outputs.VERSION }}
-            
+
             ${{ steps.changelog.outputs.CHANGELOG }}
-            
+
             ## Installation
-            
+
+            ### Windows Installer (Recommended)
+            Download `AVA_${{ steps.version.outputs.VERSION }}_x64-setup.exe` and run the installer.
+
+            Features:
+            - System tray integration
+            - Auto-start on boot (optional)
+            - Component selection (GUI/TUI/CLI)
+
             ### Python Package
             ```bash
             pip install ava-agent
             ```
-            
+
             ### From Source
             ```bash
             git clone https://github.com/NAME0x0/AVA.git
             cd AVA
             pip install -r requirements.txt
             ```
-            
-            ### Desktop App
-            Download the frontend build and run with Node.js.
           files: |
             dist/*.whl
             dist/*.tar.gz
             frontend-build.tar.gz
+            tauri-build/**/*.exe
+            tauri-build/**/*.msi
           draft: false
           prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
         env:

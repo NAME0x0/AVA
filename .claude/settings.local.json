@@ -32,7 +32,10 @@
       "Bash(git check-ignore:*)",
       "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -c \"from PIL import Image; print\\(''PIL available''\\)\")",
       "Bash(python -m black:*)",
-      "Bash(python -m bandit:*)"
+      "Bash(python -m bandit:*)",
+      "Bash(cat:*)",
+      "Bash(del \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\setup.py\")",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m pytest tests/unit -v --tb=short)"
     ]
   }
 }
