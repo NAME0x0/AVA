@@ -257,6 +257,12 @@ jobs:
         working-directory: ui
         run: npm install
 
+      - name: Build frontend
+        working-directory: ui
+        run: npm run build
+        env:
+          SKIP_ENV_VALIDATION: true
+
       - name: Check Rust code
         working-directory: ui/src-tauri
         run: cargo check
