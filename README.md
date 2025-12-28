@@ -30,7 +30,6 @@
 - **Titans Neural Memory**: Infinite context through test-time learning
 - **Active Inference**: Autonomous behavior using Free Energy Principle
 - **Automated Bug Reporting**: One-click bug reports with system info
-- **Auto-Updates**: Automatic updates when new versions are released
 
 ---
 
@@ -52,7 +51,6 @@
 **Features included:**
 - Desktop application with system tray
 - Auto-start on Windows boot (optional)
-- Automatic updates
 - One-click bug reporting
 
 ### Prerequisites (for all installation methods)
