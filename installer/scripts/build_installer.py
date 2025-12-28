@@ -145,6 +145,7 @@ def build_portable() -> bool:
 
     version = get_version()
     DIST_DIR.mkdir(parents=True, exist_ok=True)
+    BUILD_DIR.mkdir(parents=True, exist_ok=True)
 
     # Create portable directory
     portable_dir = BUILD_DIR / f"AVA-{version}-portable"
@@ -152,13 +153,85 @@ def build_portable() -> bool:
         shutil.rmtree(portable_dir)
     portable_dir.mkdir(parents=True)
 
-    # Copy Tauri app bundle
-    tauri_bundle = PROJECT_ROOT / "ui" / "src-tauri" / "target" / "release" / "bundle"
-    if tauri_bundle.exists():
-        # Copy the exe or appropriate bundle
-        pass
+    # Copy Tauri executable
+    tauri_exe = PROJECT_ROOT / "ui" / "src-tauri" / "target" / "release" / "ava-ui.exe"
+    if tauri_exe.exists():
+        print("  Copying Tauri executable...")
+        shutil.copy2(tauri_exe, portable_dir / "AVA.exe")
+    else:
+        print("  [WARN] Tauri executable not found, skipping")
+
+    # Copy Python backend
+    print("  Copying Python backend...")
+    src_dir = PROJECT_ROOT / "src"
+    if src_dir.exists():
+        shutil.copytree(src_dir, portable_dir / "src", dirs_exist_ok=True)
+
+    # Copy essential files
+    essential_files = [
+        "server.py",
+        "run_tui.py",
+        "run_core.py",
+        "requirements.txt",
+        "VERSION",
+        "README.md",
+        "LICENSE",
+    ]
+    for filename in essential_files:
+        src_file = PROJECT_ROOT / filename
+        if src_file.exists():
+            shutil.copy2(src_file, portable_dir / filename)
+
+    # Copy config directory
+    config_dir = PROJECT_ROOT / "config"
+    if config_dir.exists():
+        shutil.copytree(config_dir, portable_dir / "config", dirs_exist_ok=True)
+
+    # Copy TUI directory
+    tui_dir = PROJECT_ROOT / "tui"
+    if tui_dir.exists():
+        shutil.copytree(tui_dir, portable_dir / "tui", dirs_exist_ok=True)
+
+    # Create launcher batch file
+    launcher_content = """@echo off
+echo Starting AVA...
+echo.
+
+REM Check for Python
+python --version >nul 2>&1
+if errorlevel 1 (
+    echo Python not found! Please install Python 3.10 or later.
+    echo Download from: https://python.org/downloads/
+    pause
+    exit /b 1
+)
+
+REM Check for dependencies
+if not exist "%~dp0\\venv" (
+    echo Creating virtual environment...
+    python -m venv "%~dp0\\venv"
+    call "%~dp0\\venv\\Scripts\\activate.bat"
+    pip install -r "%~dp0\\requirements.txt" --quiet
+) else (
+    call "%~dp0\\venv\\Scripts\\activate.bat"
+)
+
+REM Start the backend server in background
+start /b python "%~dp0\\server.py"
+
+REM Start the GUI
+if exist "%~dp0\\AVA.exe" (
+    start "" "%~dp0\\AVA.exe"
+) else (
+    echo GUI executable not found. Starting in TUI mode...
+    python "%~dp0\\run_tui.py"
+)
+"""
+    launcher_path = portable_dir / "Start AVA.bat"
+    launcher_path.write_text(launcher_content)
 
     # Create ZIP
+    print("  Creating ZIP archive...")
     zip_path = DIST_DIR / f"AVA-{version}-portable.zip"
     shutil.make_archive(
         str(zip_path).replace(".zip", ""),

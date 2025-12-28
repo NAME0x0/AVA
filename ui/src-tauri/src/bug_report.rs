@@ -7,7 +7,7 @@
 //! - Smart filtering (don't report user-side issues)
 
 use serde::{Deserialize, Serialize};
-use sysinfo::{System, SystemExt, CpuExt};
+use sysinfo::System;
 
 /// Categories of errors for filtering
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]

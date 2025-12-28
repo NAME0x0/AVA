@@ -35,7 +35,13 @@
       "Bash(python -m bandit:*)",
       "Bash(cat:*)",
       "Bash(del \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\setup.py\")",
-      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m pytest tests/unit -v --tb=short)"
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m pytest tests/unit -v --tb=short)",
+      "WebFetch(domain:docs.rs)",
+      "WebSearch",
+      "Bash(cargo check:*)",
+      "Bash(npm run lint)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

@@ -129,6 +129,7 @@ yarn.lock
 
 # UI build outputs
 ui/out/
+!ui/out/.gitkeep
 ui/dist/
 ui/.next/
 ui/build/

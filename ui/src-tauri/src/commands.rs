@@ -5,7 +5,6 @@
 use serde::{Deserialize, Serialize};
 use tauri::State;
 use crate::state::AppState;
-use crate::backend;
 
 /// Response from the chat endpoint
 #[derive(Debug, Clone, Serialize, Deserialize)]

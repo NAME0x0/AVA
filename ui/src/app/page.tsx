@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { TitleBar } from "@/components/layout/TitleBar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ChatArea } from "@/components/chat/ChatArea";
@@ -8,8 +8,12 @@ import { SystemStatus } from "@/components/system/SystemStatus";
 import { CommandPalette } from "@/components/CommandPalette";
 import { SettingsPanel } from "@/components/settings/SettingsPanel";
 import { ToolsPanel } from "@/components/tools/ToolsPanel";
+import { BugReportDialog } from "@/components/feedback/BugReportDialog";
 import { useCoreStore } from "@/stores/core";
 import { useSystemPolling } from "@/hooks/useSystemPolling";
+
+// Check if we're in Tauri environment
+const isTauri = typeof window !== "undefined" && "__TAURI__" in window;
 
 export default function Home() {
   const {
@@ -20,8 +24,13 @@ export default function Home() {
     clearMessages,
     forceCortex,
     toggleSettingsPanel,
+    setSettingsPanelOpen,
     connectWebSocket,
   } = useCoreStore();
+
+  // Bug report dialog state
+  const [bugReportOpen, setBugReportOpen] = useState(false);
+  const [bugReportError, setBugReportError] = useState("");
 
   // Start polling for system state
   useSystemPolling();
@@ -30,6 +39,64 @@ export default function Home() {
   useEffect(() => {
     connectWebSocket();
   }, [connectWebSocket]);
+
+  // Listen for Tauri tray menu events
+  useEffect(() => {
+    if (!isTauri) return;
+
+    let unlisten: (() => void) | undefined;
+
+    const setupTauriListeners = async () => {
+      try {
+        const { listen } = await import("@tauri-apps/api/event");
+
+        // Listen for settings event from tray
+        const unlistenSettings = await listen("open-settings", () => {
+          setSettingsPanelOpen(true);
+        });
+
+        // Listen for bug report event from tray
+        const unlistenBugReport = await listen("open-bug-report", () => {
+          setBugReportOpen(true);
+        });
+
+        unlisten = () => {
+          unlistenSettings();
+          unlistenBugReport();
+        };
+      } catch (err) {
+        console.error("Failed to setup Tauri listeners:", err);
+      }
+    };
+
+    setupTauriListeners();
+
+    return () => {
+      if (unlisten) unlisten();
+    };
+  }, [setSettingsPanelOpen]);
+
+  // Global error handler for bug reporting
+  useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      setBugReportError(event.message);
+      setBugReportOpen(true);
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      const message = event.reason?.message || String(event.reason);
+      setBugReportError(message);
+      setBugReportOpen(true);
+    };
+
+    window.addEventListener("error", handleError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener("error", handleError);
+      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
+    };
+  }, []);
 
   // Global keyboard shortcuts
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -97,6 +164,16 @@ export default function Home() {
 
       {/* Tools Panel */}
       <ToolsPanel />
+
+      {/* Bug Report Dialog */}
+      <BugReportDialog
+        isOpen={bugReportOpen}
+        onClose={() => {
+          setBugReportOpen(false);
+          setBugReportError("");
+        }}
+        errorMessage={bugReportError}
+      />
     </main>
   );
 }
