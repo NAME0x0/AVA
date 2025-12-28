@@ -9,6 +9,13 @@
   <a href="https://github.com/NAME0x0/AVA"><img src="https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+"></a>
   <a href="https://github.com/NAME0x0/AVA/blob/main/LICENSE"><img src="https://img.shields.io/github/license/NAME0x0/AVA?style=flat-square" alt="License"></a>
   <a href="https://github.com/NAME0x0/AVA/releases"><img src="https://img.shields.io/github/v/release/NAME0x0/AVA?style=flat-square&include_prereleases" alt="Release"></a>
+  <a href="https://github.com/NAME0x0/AVA/releases/latest"><img src="https://img.shields.io/github/downloads/NAME0x0/AVA/total?style=flat-square&logo=windows&label=Downloads" alt="Downloads"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/NAME0x0/AVA/releases/latest/download/AVA_3.2.0_x64-setup.exe">
+    <img src="https://img.shields.io/badge/Download-Windows%20Installer-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download Windows Installer">
+  </a>
 </p>
 
 **AVA v3** is a research-grade AI assistant with a **biomimetic dual-brain architecture** inspired by the human nervous system. It runs locally on constrained hardware (4GB VRAM) and prioritizes accuracy over speed.
@@ -22,7 +29,37 @@
 - **Search-First Paradigm**: Web search as default for informational queries
 - **Titans Neural Memory**: Infinite context through test-time learning
 - **Active Inference**: Autonomous behavior using Free Energy Principle
-- **Automated Bug Reporting**: One-click bug reports with system info (coming soon)
+- **Automated Bug Reporting**: One-click bug reports with system info
+- **Auto-Updates**: Automatic updates when new versions are released
+
+---
+
+## Installation
+
+### Windows Installer (Recommended)
+
+<p align="center">
+  <a href="https://github.com/NAME0x0/AVA/releases/latest">
+    <img src="https://img.shields.io/badge/Download-Latest%20Release-28a745?style=for-the-badge&logo=github&logoColor=white" alt="Latest Release">
+  </a>
+</p>
+
+1. Download the installer from [Releases](https://github.com/NAME0x0/AVA/releases/latest)
+2. Run `AVA_x.x.x_x64-setup.exe`
+3. Follow the installation wizard
+4. Launch AVA from the Start Menu or Desktop shortcut
+
+**Features included:**
+- Desktop application with system tray
+- Auto-start on Windows boot (optional)
+- Automatic updates
+- One-click bug reporting
+
+### Prerequisites (for all installation methods)
+
+1. **Python 3.10+** - [Download Python](https://www.python.org/downloads/)
+2. **Ollama** - [Download Ollama](https://ollama.ai/)
+3. **Node.js 18+** (for GUI development) - [Download Node.js](https://nodejs.org/)
 
 ---
 
@@ -30,13 +67,7 @@
 
 > **New to open source or AI projects?** See our [Beginner's Guide](docs/BEGINNER_GUIDE.md) for step-by-step instructions.
 
-### Prerequisites
-
-1. **Python 3.9+** - [Download Python](https://www.python.org/downloads/)
-2. **Ollama** - [Download Ollama](https://ollama.ai/)
-3. **Node.js 18+** (for GUI, optional) - [Download Node.js](https://nodejs.org/)
-
-### One-Command Setup (Recommended)
+### One-Command Setup (From Source)
 
 ```bash
 git clone https://github.com/NAME0x0/AVA.git

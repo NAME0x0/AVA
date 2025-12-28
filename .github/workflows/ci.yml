@@ -274,3 +274,121 @@ jobs:
       - name: Check formatting
         working-directory: ui/src-tauri
         run: cargo fmt --check || true
+
+  # ============================================================================
+  # Build Installer (on main branch after all checks pass)
+  # ============================================================================
+  build-installer:
+    name: Build Installer
+    runs-on: windows-latest
+    needs: [lint, test, tauri]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ui/src-tauri
+
+      - name: Install frontend dependencies
+        working-directory: ui
+        run: npm install
+
+      - name: Get version
+        id: version
+        run: |
+          $version = Get-Content VERSION -Raw
+          $version = $version.Trim()
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SKIP_ENV_VALIDATION: true
+        with:
+          projectPath: ui
+
+      - name: Generate update manifest
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          $date = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
+
+          # Find the installer files
+          $nsisPath = Get-ChildItem -Path "ui/src-tauri/target/release/bundle/nsis/*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+
+          if ($nsisPath) {
+            $fileName = $nsisPath.Name
+            $url = "https://github.com/NAME0x0/AVA/releases/download/v$version/$fileName"
+
+            # Create latest.json for Tauri updater
+            $manifest = @{
+              version = $version
+              notes = "AVA v$version - Auto-update from CI build"
+              pub_date = $date
+              platforms = @{
+                "windows-x86_64" = @{
+                  signature = ""
+                  url = $url
+                }
+              }
+            }
+
+            $manifest | ConvertTo-Json -Depth 4 | Out-File -FilePath "latest.json" -Encoding utf8
+            Write-Host "Generated latest.json for version $version"
+          }
+        shell: pwsh
+
+      - name: Upload installer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-windows
+          path: |
+            ui/src-tauri/target/release/bundle/nsis/*.exe
+            ui/src-tauri/target/release/bundle/msi/*.msi
+            latest.json
+
+      - name: Create dev release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}-dev
+          name: AVA v${{ steps.version.outputs.VERSION }} (Development Build)
+          body: |
+            ## Development Build
+
+            This is an automated development build from the main branch.
+
+            **Version:** ${{ steps.version.outputs.VERSION }}
+            **Commit:** ${{ github.sha }}
+            **Build Date:** ${{ github.event.head_commit.timestamp }}
+
+            ### Downloads
+            - Windows Installer (.exe)
+            - Windows MSI Package (.msi)
+
+            > ⚠️ This is a development build. For stable releases, see [Releases](https://github.com/NAME0x0/AVA/releases).
+          files: |
+            ui/src-tauri/target/release/bundle/nsis/*.exe
+            ui/src-tauri/target/release/bundle/msi/*.msi
+            latest.json
+          prerelease: true
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

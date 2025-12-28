@@ -13,6 +13,11 @@
   "tauri": {
     "allowlist": {
       "all": false,
+      "http": {
+        "all": true,
+        "request": true,
+        "scope": ["https://github.com/**", "https://api.github.com/**"]
+      },
       "shell": {
         "open": true,
         "execute": false,
@@ -90,7 +95,12 @@
       "csp": null
     },
     "updater": {
-      "active": false
+      "active": true,
+      "dialog": true,
+      "endpoints": [
+        "https://github.com/NAME0x0/AVA/releases/latest/download/latest.json"
+      ],
+      "pubkey": ""
     },
     "windows": [
       {

@@ -88,6 +88,43 @@ jobs:
         with:
           projectPath: ui
 
+      - name: Extract version from tag
+        id: version
+        run: |
+          $version = "${{ github.ref_name }}" -replace '^v', ''
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Generate update manifest
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          $date = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
+
+          # Find the installer files
+          $nsisPath = Get-ChildItem -Path "ui/src-tauri/target/release/bundle/nsis/*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+
+          if ($nsisPath) {
+            $fileName = $nsisPath.Name
+            $url = "https://github.com/NAME0x0/AVA/releases/download/v$version/$fileName"
+
+            # Create latest.json for Tauri updater
+            $manifest = @{
+              version = $version
+              notes = "AVA v$version release"
+              pub_date = $date
+              platforms = @{
+                "windows-x86_64" = @{
+                  signature = ""
+                  url = $url
+                }
+              }
+            }
+
+            $manifest | ConvertTo-Json -Depth 4 | Out-File -FilePath "latest.json" -Encoding utf8
+            Write-Host "Generated latest.json for version $version"
+          }
+        shell: pwsh
+
       - name: Upload Tauri artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -95,6 +132,7 @@ jobs:
           path: |
             ui/src-tauri/target/release/bundle/msi/*.msi
             ui/src-tauri/target/release/bundle/nsis/*.exe
+            latest.json
 
   # ============================================================================
   # Build Frontend (for non-Tauri users)
@@ -218,6 +256,7 @@ jobs:
             frontend-build.tar.gz
             tauri-build/**/*.exe
             tauri-build/**/*.msi
+            tauri-build/latest.json
           draft: false
           prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
         env:
