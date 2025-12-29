@@ -82,7 +82,12 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": [
+        "../../server.py",
+        "../../src/**/*",
+        "../../config/**/*",
+        "../../requirements.txt"
+      ],
       "shortDescription": "AVA Neural Interface",
       "targets": "all",
       "windows": {
@@ -95,7 +100,12 @@
       "csp": null
     },
     "updater": {
-      "active": false
+      "active": true,
+      "dialog": true,
+      "endpoints": [
+        "https://github.com/NAME0x0/AVA/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDgzQjE3Rjk0RDBCMTEzRUQKUldUdEU3SFFsSCt4ZzQ3SHRkMnRSSDRuakVMaVZOSnBWcDFQMUd3RExmelZPZFFmRWNHYk0vY1gK"
     },
     "windows": [
       {

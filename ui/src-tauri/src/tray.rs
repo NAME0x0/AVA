@@ -13,6 +13,7 @@ use tauri::{
 
 /// Connection status for tray icon
 #[derive(Clone, Copy, Debug, PartialEq)]
+#[allow(dead_code)]
 pub enum TrayStatus {
     Idle,
     Connected,
@@ -117,9 +118,10 @@ pub fn update_tray_status(app: &AppHandle, status: TrayStatus) {
 }
 
 /// Update memory status in tray
+#[allow(dead_code)]
 pub fn update_memory_status(app: &AppHandle, used_mb: u64, total_mb: u64) {
     if let Some(tray) = app.tray_handle().try_get_item("status_memory") {
-        let status_text = format!("Memory: {} / {} MB", used_mb, total_mb);
+        let status_text = format!("Memory: {used_mb} / {total_mb} MB");
         let _ = tray.set_title(&status_text);
     }
 }

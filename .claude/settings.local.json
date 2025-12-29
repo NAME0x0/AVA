@@ -41,7 +41,14 @@
       "Bash(cargo check:*)",
       "Bash(npm run lint)",
       "Bash(npx tsc:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "WebFetch(domain:v1.tauri.app)",
+      "Bash(npx @tauri-apps/cli signer generate:*)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m ruff:*)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m black:*)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\pip.exe\" install ruff black bandit --quiet)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m bandit:*)",
+      "Bash(cargo clippy:*)"
     ]
   }
 }

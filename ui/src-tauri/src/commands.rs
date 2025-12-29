@@ -2,9 +2,9 @@
 //!
 //! IPC bridge between the Next.js frontend and AVA Python backend
 
+use crate::state::AppState;
 use serde::{Deserialize, Serialize};
 use tauri::State;
-use crate::state::AppState;
 
 /// Response from the chat endpoint
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -59,126 +59,113 @@ pub async fn send_message(
     state: State<'_, AppState>,
 ) -> Result<ChatResponse, String> {
     let base_url = state.backend_url.lock().await.clone();
-    
+
     let client = reqwest::Client::new();
     let start = std::time::Instant::now();
-    
+
     let resp = client
-        .post(format!("{}/chat", base_url))
+        .post(format!("{base_url}/chat"))
         .json(&serde_json::json!({ "message": message }))
         .send()
         .await
-        .map_err(|e| format!("Request failed: {}", e))?;
-    
+        .map_err(|e| format!("Request failed: {e}"))?;
+
     let elapsed = start.elapsed().as_millis() as f64;
-    
+
     let mut data: ChatResponse = resp
         .json()
         .await
-        .map_err(|e| format!("Failed to parse response: {}", e))?;
-    
+        .map_err(|e| format!("Failed to parse response: {e}"))?;
+
     data.response_time_ms = elapsed;
-    
+
     Ok(data)
 }
 
 /// Get current system state
 #[tauri::command]
-pub async fn get_system_state(
-    state: State<'_, AppState>,
-) -> Result<SystemState, String> {
+pub async fn get_system_state(state: State<'_, AppState>) -> Result<SystemState, String> {
     let base_url = state.backend_url.lock().await.clone();
-    
+
     let client = reqwest::Client::new();
     let resp = client
-        .get(format!("{}/system/state", base_url))
+        .get(format!("{base_url}/system/state"))
         .send()
         .await
-        .map_err(|e| format!("Request failed: {}", e))?;
-    
+        .map_err(|e| format!("Request failed: {e}"))?;
+
     resp.json()
         .await
-        .map_err(|e| format!("Failed to parse response: {}", e))
+        .map_err(|e| format!("Failed to parse response: {e}"))
 }
 
 /// Get cognitive state from Medulla
 #[tauri::command]
-pub async fn get_cognitive_state(
-    state: State<'_, AppState>,
-) -> Result<CognitiveState, String> {
+pub async fn get_cognitive_state(state: State<'_, AppState>) -> Result<CognitiveState, String> {
     let base_url = state.backend_url.lock().await.clone();
-    
+
     let client = reqwest::Client::new();
     let resp = client
-        .get(format!("{}/cognitive", base_url))
+        .get(format!("{base_url}/cognitive"))
         .send()
         .await
-        .map_err(|e| format!("Request failed: {}", e))?;
-    
+        .map_err(|e| format!("Request failed: {e}"))?;
+
     resp.json()
         .await
-        .map_err(|e| format!("Failed to parse response: {}", e))
+        .map_err(|e| format!("Failed to parse response: {e}"))
 }
 
 /// Get Titans memory statistics
 #[tauri::command]
-pub async fn get_memory_stats(
-    state: State<'_, AppState>,
-) -> Result<MemoryStats, String> {
+pub async fn get_memory_stats(state: State<'_, AppState>) -> Result<MemoryStats, String> {
     let base_url = state.backend_url.lock().await.clone();
-    
+
     let client = reqwest::Client::new();
     let resp = client
-        .get(format!("{}/memory", base_url))
+        .get(format!("{base_url}/memory"))
         .send()
         .await
-        .map_err(|e| format!("Request failed: {}", e))?;
-    
+        .map_err(|e| format!("Request failed: {e}"))?;
+
     resp.json()
         .await
-        .map_err(|e| format!("Failed to parse response: {}", e))
+        .map_err(|e| format!("Failed to parse response: {e}"))
 }
 
 /// Force Cortex invocation for next response
 #[tauri::command]
-pub async fn force_cortex(
-    state: State<'_, AppState>,
-) -> Result<(), String> {
+pub async fn force_cortex(state: State<'_, AppState>) -> Result<(), String> {
     let base_url = state.backend_url.lock().await.clone();
-    
+
     let client = reqwest::Client::new();
     client
-        .post(format!("{}/force_cortex", base_url))
+        .post(format!("{base_url}/force_cortex"))
         .send()
         .await
-        .map_err(|e| format!("Request failed: {}", e))?;
-    
+        .map_err(|e| format!("Request failed: {e}"))?;
+
     Ok(())
 }
 
 /// Force sleep cycle
 #[tauri::command]
-pub async fn force_sleep(
-    state: State<'_, AppState>,
-) -> Result<(), String> {
+pub async fn force_sleep(state: State<'_, AppState>) -> Result<(), String> {
     let base_url = state.backend_url.lock().await.clone();
-    
+
     let client = reqwest::Client::new();
     client
-        .post(format!("{}/sleep", base_url))
+        .post(format!("{base_url}/sleep"))
         .send()
         .await
-        .map_err(|e| format!("Request failed: {}", e))?;
-    
+        .map_err(|e| format!("Request failed: {e}"))?;
+
     Ok(())
 }
 
 /// Set the backend URL
 #[tauri::command]
-pub async fn set_backend_url(
-    url: String,
-    state: State<'_, AppState>,
-) -> Result<(), String> {
+pub async fn set_backend_url(url: String, state: State<'_, AppState>) -> Result<(), String> {
     let mut backend_url = state.backend_url.lock().await;
     *backend_url = url;
     Ok(())
@@ -187,5 +174,5 @@ pub async fn set_backend_url(
 /// Simple greeting for testing
 #[tauri::command]
 pub fn greet(name: &str) -> String {
-    format!("Hello, {}! AVA Cortex-Medulla system is ready.", name)
+    format!("Hello, {name}! AVA Cortex-Medulla system is ready.")
 }

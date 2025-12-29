@@ -85,6 +85,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SKIP_ENV_VALIDATION: true
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           projectPath: ui
 
@@ -102,10 +104,18 @@ jobs:
 
           # Find the installer files
           $nsisPath = Get-ChildItem -Path "ui/src-tauri/target/release/bundle/nsis/*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          $sigPath = Get-ChildItem -Path "ui/src-tauri/target/release/bundle/nsis/*.sig" -ErrorAction SilentlyContinue | Select-Object -First 1
 
           if ($nsisPath) {
             $fileName = $nsisPath.Name
             $url = "https://github.com/NAME0x0/AVA/releases/download/v$version/$fileName"
+
+            # Read signature if available
+            $signature = ""
+            if ($sigPath -and (Test-Path $sigPath.FullName)) {
+              $signature = Get-Content $sigPath.FullName -Raw
+              $signature = $signature.Trim()
+            }
 
             # Create latest.json for Tauri updater
             $manifest = @{
@@ -114,7 +124,7 @@ jobs:
               pub_date = $date
               platforms = @{
                 "windows-x86_64" = @{
-                  signature = ""
+                  signature = $signature
                   url = $url
                 }
               }
@@ -122,6 +132,7 @@ jobs:
 
             $manifest | ConvertTo-Json -Depth 4 | Out-File -FilePath "latest.json" -Encoding utf8
             Write-Host "Generated latest.json for version $version"
+            Write-Host "Signature: $signature"
           }
         shell: pwsh
 

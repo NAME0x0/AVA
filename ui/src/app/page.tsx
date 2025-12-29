@@ -9,6 +9,7 @@ import { CommandPalette } from "@/components/CommandPalette";
 import { SettingsPanel } from "@/components/settings/SettingsPanel";
 import { ToolsPanel } from "@/components/tools/ToolsPanel";
 import { BugReportDialog } from "@/components/feedback/BugReportDialog";
+import { ServerStartup } from "@/components/startup/ServerStartup";
 import { useCoreStore } from "@/stores/core";
 import { useSystemPolling } from "@/hooks/useSystemPolling";
 
@@ -27,6 +28,9 @@ export default function Home() {
     setSettingsPanelOpen,
     connectWebSocket,
   } = useCoreStore();
+
+  // Server startup state (for Tauri)
+  const [serverReady, setServerReady] = useState(!isTauri);
 
   // Bug report dialog state
   const [bugReportOpen, setBugReportOpen] = useState(false);
@@ -135,9 +139,15 @@ export default function Home() {
   }, [handleKeyDown]);
 
   return (
-    <main className="flex flex-col h-screen bg-neural-void overflow-hidden rounded-xl border border-neural-hover/50">
-      {/* Custom Title Bar for Tauri */}
-      <TitleBar />
+    <>
+      {/* Server Startup Screen (Tauri only) */}
+      {!serverReady && (
+        <ServerStartup onReady={() => setServerReady(true)} />
+      )}
+
+      <main className={`flex flex-col h-screen bg-neural-void overflow-hidden rounded-xl border border-neural-hover/50 ${!serverReady ? 'hidden' : ''}`}>
+        {/* Custom Title Bar for Tauri */}
+        <TitleBar />
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
@@ -174,6 +184,7 @@ export default function Home() {
         }}
         errorMessage={bugReportError}
       />
-    </main>
+      </main>
+    </>
   );
 }

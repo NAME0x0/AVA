@@ -6,18 +6,22 @@
 //! - IPC bridge to Python backend
 //! - Hardware monitoring
 //! - Automated bug reporting
+//! - Server lifecycle management
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod backend;
 mod bug_report;
 mod commands;
+mod server_launcher;
 mod state;
 mod tray;
 
+use server_launcher::ServerLauncher;
+use std::sync::Arc;
 use tauri::Manager;
 use tauri_plugin_autostart::MacosLauncher;
-use tracing_subscriber;
+use tokio::sync::Mutex;
 
 fn main() {
     // Initialize logging
@@ -39,7 +43,7 @@ fn main() {
         ))
         // System tray
         .system_tray(tray::create_tray_menu())
-        .on_system_tray_event(|app, event| tray::handle_tray_event(app, event))
+        .on_system_tray_event(tray::handle_tray_event)
         // Window close behavior - hide to tray instead of quit
         .on_window_event(|event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event.event() {
@@ -52,13 +56,40 @@ fn main() {
             // Initialize app state
             app.manage(state::AppState::new());
 
-            // Start backend connection monitor
+            // Create server launcher and store it for later access
+            let launcher = ServerLauncher::new(app.handle());
+            let launcher_arc = Arc::new(Mutex::new(launcher.clone()));
+            app.manage(launcher_arc.clone());
+
+            // Start the Python backend server
+            let launcher_for_startup = launcher.clone();
+            tauri::async_runtime::spawn(async move {
+                tracing::info!("Starting AVA backend server...");
+                match launcher_for_startup.start().await {
+                    Ok(()) => {
+                        tracing::info!("Backend server started successfully");
+                    }
+                    Err(e) => {
+                        tracing::error!("Failed to start backend server: {}", e);
+                        // Error is emitted to frontend via server-status event
+                    }
+                }
+            });
+
+            // Start backend connection monitor (for status updates)
             let app_handle = app.handle();
             tauri::async_runtime::spawn(async move {
                 backend::start_connection_monitor(app_handle).await;
             });
 
             Ok(())
+        })
+        // Handle app exit - stop server gracefully
+        .on_menu_event(|event| {
+            if event.menu_item_id() == "quit" {
+                // Server will be stopped when the launcher is dropped
+                std::process::exit(0);
+            }
         })
         .invoke_handler(tauri::generate_handler![
             // Existing commands

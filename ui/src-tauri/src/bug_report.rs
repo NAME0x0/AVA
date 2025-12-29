@@ -137,9 +137,7 @@ impl BugReport {
         let encoded_body = urlencoding(&body);
 
         format!(
-            "https://github.com/NAME0x0/AVA/issues/new?title={}&body={}&labels=bug,auto-reported",
-            encoded_title,
-            encoded_body
+            "https://github.com/NAME0x0/AVA/issues/new?title={encoded_title}&body={encoded_body}&labels=bug,auto-reported"
         )
     }
 }
@@ -180,7 +178,7 @@ fn urlencoding(s: &str) -> String {
             '\r' => {}
             _ => {
                 for byte in c.to_string().as_bytes() {
-                    result.push_str(&format!("%{:02X}", byte));
+                    result.push_str(&format!("%{byte:02X}"));
                 }
             }
         }
@@ -237,7 +235,7 @@ pub fn create_bug_report(error_message: String) -> Result<BugReport, String> {
 #[tauri::command]
 pub fn open_bug_report_url(report: BugReport) -> Result<(), String> {
     let url = report.generate_github_url();
-    open::that(&url).map_err(|e| format!("Failed to open browser: {}", e))
+    open::that(&url).map_err(|e| format!("Failed to open browser: {e}"))
 }
 
 /// Tauri command to check if error is reportable

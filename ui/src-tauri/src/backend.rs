@@ -16,7 +16,7 @@ pub async fn start_connection_monitor(app: AppHandle) {
         let state = app.state::<crate::state::AppState>();
         let url = state.backend_url.lock().await.clone();
         
-        let connected = match client.get(format!("{}/health", url)).send().await {
+        let connected = match client.get(format!("{url}/health")).send().await {
             Ok(resp) => resp.status().is_success(),
             Err(_) => false,
         };
