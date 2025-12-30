@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useCallback, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { TitleBar } from "@/components/layout/TitleBar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ChatArea } from "@/components/chat/ChatArea";
@@ -10,6 +11,7 @@ import { SettingsPanel } from "@/components/settings/SettingsPanel";
 import { ToolsPanel } from "@/components/tools/ToolsPanel";
 import { BugReportDialog } from "@/components/feedback/BugReportDialog";
 import { ServerStartup } from "@/components/startup/ServerStartup";
+import { WizardOverlay } from "@/components/wizard";
 import { useCoreStore } from "@/stores/core";
 import { useSystemPolling } from "@/hooks/useSystemPolling";
 
@@ -27,14 +29,25 @@ export default function Home() {
     toggleSettingsPanel,
     setSettingsPanelOpen,
     connectWebSocket,
+    setupState,
   } = useCoreStore();
 
   // Server startup state (for Tauri)
   const [serverReady, setServerReady] = useState(!isTauri);
 
+  // Wizard state
+  const [showWizard, setShowWizard] = useState(false);
+
   // Bug report dialog state
   const [bugReportOpen, setBugReportOpen] = useState(false);
   const [bugReportError, setBugReportError] = useState("");
+
+  // Show wizard on first run
+  useEffect(() => {
+    if (!setupState.hasCompletedSetup && serverReady) {
+      setShowWizard(true);
+    }
+  }, [setupState.hasCompletedSetup, serverReady]);
 
   // Start polling for system state
   useSystemPolling();
@@ -185,6 +198,13 @@ export default function Home() {
         errorMessage={bugReportError}
       />
       </main>
+
+      {/* First-Run Wizard */}
+      <AnimatePresence>
+        {showWizard && (
+          <WizardOverlay onComplete={() => setShowWizard(false)} />
+        )}
+      </AnimatePresence>
     </>
   );
 }

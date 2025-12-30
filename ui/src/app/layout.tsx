@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,9 +15,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AVA • Cortex-Medulla Interface",
+  title: "AVA - Neural Second Brain",
   description: "Adaptive Virtual Agent - Biomimetic Neural Architecture",
-  keywords: ["AI", "assistant", "neural", "cortex", "medulla", "AVA"],
+  keywords: ["AI", "assistant", "neural", "cortex", "medulla", "AVA", "second brain"],
   authors: [{ name: "Muhammad Afsah Mumtaz" }],
 };
 
@@ -24,7 +25,10 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#00D4C8",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FAFBFC" },
+    { media: "(prefers-color-scheme: dark)", color: "#08080C" },
+  ],
 };
 
 export default function RootLayout({
@@ -33,11 +37,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans min-h-screen bg-neural-void overflow-hidden`}
       >
-        <ErrorBoundary>{children}</ErrorBoundary>
+        <ThemeProvider defaultMode="system">
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </ThemeProvider>
       </body>
     </html>
   );

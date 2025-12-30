@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Wifi, WifiOff, Sparkles, Eye, Download, Trash2, Settings } from "lucide-react";
+import { X, Wifi, WifiOff, Sparkles, Eye, Download, Trash2, Settings, Sun, Moon, Monitor } from "lucide-react";
 import { useCoreStore } from "@/stores/core";
+import { useTheme } from "@/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 
 interface SettingsSectionProps {
@@ -116,6 +117,33 @@ export function SettingsPanel() {
     clearMessages,
     messages,
   } = useCoreStore();
+
+  const { mode, setMode } = useTheme();
+
+  const themeOptions = [
+    { value: 'light' as const, label: 'Light', icon: <Sun className="w-4 h-4" /> },
+    { value: 'dark' as const, label: 'Dark', icon: <Moon className="w-4 h-4" /> },
+    { value: 'system' as const, label: 'System', icon: <Monitor className="w-4 h-4" /> },
+  ];
+
+  const fontSizeOptions = [
+    { value: 'small' as const, label: 'S' },
+    { value: 'medium' as const, label: 'M' },
+    { value: 'large' as const, label: 'L' },
+  ];
+
+  const handleThemeChange = (newMode: 'light' | 'dark' | 'system') => {
+    setMode(newMode);
+    updatePreference('theme', { ...preferences.theme, mode: newMode });
+  };
+
+  const handleFontSizeChange = (fontSize: 'small' | 'medium' | 'large') => {
+    updatePreference('theme', { ...preferences.theme, fontSize });
+  };
+
+  const handleReduceMotionChange = (reduceMotion: boolean) => {
+    updatePreference('theme', { ...preferences.theme, reduceMotion });
+  };
 
   const handleExportChat = () => {
     const data = {
@@ -234,6 +262,73 @@ export function SettingsPanel() {
                       { value: "http", label: "HTTP" },
                     ]}
                     onChange={(v) => updatePreference("streamingMode", v as "http" | "websocket")}
+                  />
+                </SettingsSection>
+
+                {/* Appearance Section */}
+                <SettingsSection title="Appearance" icon={<Sun className="w-4 h-4" />}>
+                  {/* Theme Selection */}
+                  <div className="p-3 rounded-lg bg-neural-elevated/50">
+                    <div className="text-sm font-medium text-text-primary mb-3">Theme</div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {themeOptions.map((option) => (
+                        <motion.button
+                          key={option.value}
+                          onClick={() => handleThemeChange(option.value)}
+                          className={cn(
+                            "flex flex-col items-center gap-1 py-3 px-2 rounded-lg border transition-all duration-200",
+                            mode === option.value
+                              ? "border-accent-primary bg-accent-subtle"
+                              : "border-neural-border bg-neural-surface hover:border-accent-dim"
+                          )}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <span className={cn(
+                            "transition-colors",
+                            mode === option.value ? "text-accent-primary" : "text-text-muted"
+                          )}>
+                            {option.icon}
+                          </span>
+                          <span className={cn(
+                            "text-xs transition-colors",
+                            mode === option.value ? "text-accent-primary" : "text-text-secondary"
+                          )}>
+                            {option.label}
+                          </span>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Font Size Selection */}
+                  <div className="p-3 rounded-lg bg-neural-elevated/50">
+                    <div className="text-sm font-medium text-text-primary mb-3">Font Size</div>
+                    <div className="flex gap-2">
+                      {fontSizeOptions.map((option) => (
+                        <motion.button
+                          key={option.value}
+                          onClick={() => handleFontSizeChange(option.value)}
+                          className={cn(
+                            "w-10 h-10 rounded-lg border font-mono transition-all duration-200",
+                            preferences.theme.fontSize === option.value
+                              ? "border-accent-primary bg-accent-subtle text-accent-primary"
+                              : "border-neural-border bg-neural-surface text-text-muted hover:border-accent-dim"
+                          )}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {option.label}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Toggle
+                    label="Reduce Motion"
+                    description="Minimize animations"
+                    checked={preferences.theme.reduceMotion}
+                    onChange={handleReduceMotionChange}
                   />
                 </SettingsSection>
 

@@ -128,11 +128,25 @@ interface CoreStore {
     streamingMode: 'http' | 'websocket';
     animations: 'full' | 'reduced' | 'none';
     showToolsUsed: boolean;
+    theme: {
+      mode: 'light' | 'dark' | 'system';
+      fontSize: 'small' | 'medium' | 'large';
+      reduceMotion: boolean;
+    };
   };
   updatePreference: <K extends keyof CoreStore['preferences']>(
     key: K,
     value: CoreStore['preferences'][K]
   ) => void;
+
+  // Setup/Wizard State
+  setupState: {
+    hasCompletedSetup: boolean;
+    userName: string | null;
+    setupTimestamp: number | null;
+  };
+  setSetupComplete: (userName?: string) => void;
+  resetSetup: () => void;
 
   // WebSocket State
   wsConnected: boolean;
@@ -282,11 +296,39 @@ export const useCoreStore = create<CoreStore>()(
       streamingMode: 'websocket',
       animations: 'full',
       showToolsUsed: true,
+      theme: {
+        mode: 'system',
+        fontSize: 'medium',
+        reduceMotion: false,
+      },
     },
     updatePreference: (key, value) =>
       set((s) => ({
         preferences: { ...s.preferences, [key]: value },
       })),
+
+    // Setup/Wizard State
+    setupState: {
+      hasCompletedSetup: false,
+      userName: null,
+      setupTimestamp: null,
+    },
+    setSetupComplete: (userName) =>
+      set({
+        setupState: {
+          hasCompletedSetup: true,
+          userName: userName || null,
+          setupTimestamp: Date.now(),
+        },
+      }),
+    resetSetup: () =>
+      set({
+        setupState: {
+          hasCompletedSetup: false,
+          userName: null,
+          setupTimestamp: null,
+        },
+      }),
 
     // WebSocket State
     wsConnected: false,
@@ -594,6 +636,7 @@ export const useCoreStore = create<CoreStore>()(
         splitPaneRatio: state.splitPaneRatio,
         backendUrl: state.backendUrl,
         preferences: state.preferences,
+        setupState: state.setupState,
       }),
     }
   )

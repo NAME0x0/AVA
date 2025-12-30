@@ -123,13 +123,14 @@ export function ParticleWave({
   className = "",
 }: ParticleWaveProps) {
   // Color based on cognitive state
+  // Primary uses cyan (#00D4C8), secondary uses gold (#F5A623) for Cortex
   const colors = useMemo(() => {
     const stateColors: Record<string, { primary: string; secondary: string }> = {
-      FLOW: { primary: "#00D4C8", secondary: "#8B5CF6" },
+      FLOW: { primary: "#00D4C8", secondary: "#F5A623" },
       HESITATION: { primary: "#F59E0B", secondary: "#EAB308" },
       CONFUSION: { primary: "#EF4444", secondary: "#F97316" },
-      CREATIVE: { primary: "#06B6D4", secondary: "#0EA5E9" },
-      VERIFYING: { primary: "#3B82F6", secondary: "#2563EB" },
+      CREATIVE: { primary: "#06B6D4", secondary: "#F5A623" },
+      VERIFYING: { primary: "#3B82F6", secondary: "#F5A623" },
     };
     return stateColors[cognitiveState] || stateColors.FLOW;
   }, [cognitiveState]);

@@ -48,7 +48,9 @@
       "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m black:*)",
       "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\pip.exe\" install ruff black bandit --quiet)",
       "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m bandit:*)",
-      "Bash(cargo clippy:*)"
+      "Bash(cargo clippy:*)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m ruff check:*)",
+      "Bash(npm audit:*)"
     ]
   }
 }

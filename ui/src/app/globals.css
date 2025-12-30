@@ -3,71 +3,134 @@
 @tailwind utilities;
 
 @layer base {
+  /* Light mode (default) */
   :root {
+    /* Backgrounds */
+    --neural-void: #FAFBFC;
+    --neural-surface: #F4F5F7;
+    --neural-elevated: #FFFFFF;
+    --neural-hover: #EBEDF0;
+    --neural-border: #D1D5DB;
+
+    /* Text */
+    --text-primary: #18181B;
+    --text-secondary: #52525B;
+    --text-muted: #A1A1AA;
+
+    /* Shadcn-style variables */
+    --background: 250 251 252;
+    --foreground: 24 24 27;
+
+    --card: 244 245 247;
+    --card-foreground: 24 24 27;
+
+    --popover: 255 255 255;
+    --popover-foreground: 24 24 27;
+
+    --primary: 0 212 200;
+    --primary-foreground: 24 24 27;
+
+    --secondary: 235 237 240;
+    --secondary-foreground: 24 24 27;
+
+    --muted: 244 245 247;
+    --muted-foreground: 113 113 122;
+
+    --accent: 0 212 200;
+    --accent-foreground: 24 24 27;
+
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+
+    --border: 209 213 219;
+    --input: 235 237 240;
+    --ring: 0 212 200;
+
+    --radius: 0.75rem;
+  }
+
+  /* Dark mode */
+  .dark {
+    /* Backgrounds */
+    --neural-void: #08080C;
+    --neural-surface: #0F0F14;
+    --neural-elevated: #16161D;
+    --neural-hover: #1E1E28;
+    --neural-border: #2A2A36;
+
+    /* Text */
+    --text-primary: #FFFFFF;
+    --text-secondary: #A1A1AA;
+    --text-muted: #71717A;
+
+    /* Shadcn-style variables */
     --background: 8 8 12;
-    --foreground: 240 240 245;
-    
-    --card: 14 14 20;
-    --card-foreground: 240 240 245;
-    
-    --popover: 14 14 20;
-    --popover-foreground: 240 240 245;
-    
+    --foreground: 255 255 255;
+
+    --card: 15 15 20;
+    --card-foreground: 255 255 255;
+
+    --popover: 15 15 20;
+    --popover-foreground: 255 255 255;
+
     --primary: 0 212 200;
     --primary-foreground: 8 8 12;
-    
-    --secondary: 22 22 30;
-    --secondary-foreground: 240 240 245;
-    
-    --muted: 30 30 42;
-    --muted-foreground: 100 100 120;
-    
+
+    --secondary: 22 22 29;
+    --secondary-foreground: 255 255 255;
+
+    --muted: 30 30 40;
+    --muted-foreground: 113 113 122;
+
     --accent: 0 212 200;
     --accent-foreground: 8 8 12;
-    
-    --destructive: 255 80 80;
-    --destructive-foreground: 240 240 245;
-    
-    --border: 30 30 42;
-    --input: 22 22 30;
+
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+
+    --border: 42 42 54;
+    --input: 22 22 29;
     --ring: 0 212 200;
-    
-    --radius: 0.75rem;
   }
 }
 
 @layer base {
   * {
-    @apply border-neural-hover;
+    @apply border-neural-border;
   }
-  
+
   body {
     @apply bg-neural-void text-text-primary font-sans antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
-  
+
   ::-webkit-scrollbar-track {
     @apply bg-neural-surface;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     @apply bg-neural-hover rounded-full;
     transition: background-color 0.2s;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-accent-dim;
   }
-  
+
   /* Selection */
   ::selection {
     @apply bg-accent-glow text-text-primary;
+  }
+
+  /* Smooth theme transitions */
+  html {
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 
@@ -76,83 +139,89 @@
   .glow-accent {
     box-shadow: 0 0 20px rgba(0, 212, 200, 0.3);
   }
-  
+
   .glow-cortex {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 0 20px rgba(245, 166, 35, 0.3);
   }
-  
+
   .glow-medulla {
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 20px rgba(0, 212, 200, 0.3);
   }
-  
+
   /* Glass morphism */
   .glass {
-    @apply bg-neural-surface/80 backdrop-blur-md border border-neural-hover/50;
+    @apply bg-neural-surface/80 backdrop-blur-md border border-neural-border/50;
   }
-  
+
   .glass-elevated {
-    @apply bg-neural-elevated/90 backdrop-blur-lg border border-neural-hover;
+    @apply bg-neural-elevated/90 backdrop-blur-lg border border-neural-border;
   }
-  
+
   /* Neural card */
   .neural-card {
-    @apply bg-neural-surface border border-neural-hover rounded-xl p-4;
+    @apply bg-neural-surface border border-neural-border rounded-xl p-4;
     transition: all 0.2s ease;
   }
-  
+
   .neural-card:hover {
     @apply border-accent-dim shadow-neural;
   }
-  
+
   /* Input styles */
   .neural-input {
-    @apply bg-neural-elevated border border-neural-hover rounded-lg px-4 py-3;
+    @apply bg-neural-elevated border border-neural-border rounded-lg px-4 py-3;
     @apply text-text-primary placeholder:text-text-muted;
     @apply focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary/50;
     transition: all 0.2s ease;
   }
-  
+
   /* Button styles */
   .neural-button {
-    @apply bg-neural-elevated border border-neural-hover rounded-lg px-4 py-2;
+    @apply bg-neural-elevated border border-neural-border rounded-lg px-4 py-2;
     @apply text-text-secondary hover:text-text-primary;
     @apply hover:border-accent-dim hover:bg-neural-hover;
-    @apply active:bg-neural-surface;
+    @apply active:scale-[0.98];
     @apply transition-all duration-200;
   }
-  
+
   .neural-button-primary {
     @apply bg-accent-primary border-accent-primary text-neural-void;
     @apply hover:bg-accent-dim hover:border-accent-dim;
     @apply shadow-neural;
   }
-  
+
+  .neural-button-cortex {
+    @apply bg-cortex-active border-cortex-active text-neural-void;
+    @apply hover:bg-cortex-idle hover:border-cortex-idle;
+    @apply shadow-cortex;
+  }
+
   /* Status indicator */
   .status-dot {
     @apply w-2 h-2 rounded-full;
   }
-  
+
   .status-dot-animated {
     @apply animate-pulse;
   }
-  
+
   /* Message bubbles */
   .message-user {
     @apply bg-accent-primary/10 border border-accent-dim/30 text-text-primary;
   }
-  
+
   .message-assistant {
-    @apply bg-neural-surface border border-neural-hover text-text-primary;
+    @apply bg-neural-surface border border-neural-border text-text-primary;
   }
-  
+
   .message-cortex {
     @apply bg-cortex-active/10 border border-cortex-active/30;
   }
-  
+
   .message-medulla {
     @apply bg-medulla-active/10 border border-medulla-active/30;
   }
-  
+
   /* Waveform animation */
   .waveform {
     display: flex;
@@ -160,22 +229,51 @@
     gap: 2px;
     height: 24px;
   }
-  
+
   .waveform-bar {
     @apply bg-accent-primary w-1 rounded-full;
     animation: waveform 1s ease-in-out infinite;
   }
-  
+
   @keyframes waveform {
     0%, 100% { height: 20%; }
     50% { height: 100%; }
   }
-  
+
   .waveform-bar:nth-child(1) { animation-delay: 0ms; }
   .waveform-bar:nth-child(2) { animation-delay: 100ms; }
   .waveform-bar:nth-child(3) { animation-delay: 200ms; }
   .waveform-bar:nth-child(4) { animation-delay: 300ms; }
   .waveform-bar:nth-child(5) { animation-delay: 400ms; }
+
+  /* ASCII Box styling */
+  .ascii-box {
+    @apply font-mono text-sm leading-tight;
+  }
+
+  /* Theme toggle button */
+  .theme-toggle {
+    @apply neural-button p-2 rounded-lg;
+    @apply hover:bg-neural-hover;
+  }
+
+  /* Micro-interaction: Button hover lift */
+  .btn-lift {
+    @apply transition-transform duration-150;
+  }
+
+  .btn-lift:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-lift:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  /* Focus ring for accessibility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-accent-primary/50 focus:ring-offset-2 focus:ring-offset-neural-void;
+  }
 }
 
 @layer utilities {
@@ -183,13 +281,28 @@
   .text-gradient-neural {
     @apply bg-gradient-to-r from-accent-primary to-state-creative bg-clip-text text-transparent;
   }
-  
+
+  .text-gradient-cortex {
+    @apply bg-gradient-to-r from-cortex-active to-cortex-idle bg-clip-text text-transparent;
+  }
+
   /* No drag for Tauri */
   .no-drag {
     -webkit-app-region: no-drag;
   }
-  
+
   .drag {
     -webkit-app-region: drag;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

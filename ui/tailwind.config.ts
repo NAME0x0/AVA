@@ -10,32 +10,34 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Primary palette - Deep space blacks
+        // Primary palette - Theme-aware backgrounds via CSS variables
         neural: {
-          void: "#08080C",
-          surface: "#0E0E14",
-          elevated: "#16161E",
-          hover: "#1E1E2A",
+          void: "var(--neural-void)",
+          surface: "var(--neural-surface)",
+          elevated: "var(--neural-elevated)",
+          hover: "var(--neural-hover)",
+          border: "var(--neural-border)",
         },
-        // Text hierarchy
+        // Text hierarchy - Theme-aware
         text: {
-          primary: "#F0F0F5",
-          secondary: "#A0A0AF",
-          muted: "#64647B",
+          primary: "var(--text-primary)",
+          secondary: "var(--text-secondary)",
+          muted: "var(--text-muted)",
         },
-        // Neural accent - Electric cyan/teal
+        // Neural accent - Electric cyan (consistent across themes)
         accent: {
           primary: "#00D4C8",
-          dim: "#00968C",
+          dim: "#00A89E",
           glow: "rgba(0, 212, 200, 0.3)",
+          subtle: "rgba(0, 212, 200, 0.1)",
         },
         // Cognitive state colors
         state: {
-          flow: "#50C878",
-          hesitation: "#FFC850",
-          confusion: "#FF6464",
-          creative: "#B464FF",
-          thinking: "#6496FF",
+          flow: "#00D4C8",
+          hesitation: "#F5A623",
+          confusion: "#EF4444",
+          creative: "#8B5CF6",
+          thinking: "#F5A623",
         },
         // Sleep phases
         sleep: {
@@ -47,23 +49,26 @@ const config: Config = {
         // Memory/Learning
         memory: {
           episodic: "#64B4FF",
-          surprise: "#FF9632",
+          surprise: "#F5A623",
           semantic: "#64FFAA",
         },
         // System status
         status: {
-          success: "#50C878",
-          warning: "#FFB432",
-          error: "#FF5050",
+          success: "#10B981",
+          warning: "#F5A623",
+          error: "#EF4444",
+          info: "#00D4C8",
         },
-        // Cortex/Medulla specific
+        // Cortex - Warm Gold (replacing purple)
         cortex: {
-          active: "#8B5CF6",
-          idle: "#4C4C64",
+          active: "#F5A623",
+          idle: "#C4841D",
+          glow: "rgba(245, 166, 35, 0.3)",
         },
+        // Medulla - Cool Teal (unified with accent)
         medulla: {
-          active: "#10B981",
-          processing: "#34D399",
+          active: "#00D4C8",
+          processing: "#2DD4BF",
         },
       },
       fontFamily: {
@@ -78,6 +83,8 @@ const config: Config = {
         "fade-in": "fade-in 0.3s ease-out",
         "slide-up": "slide-up 0.4s ease-out",
         "slide-in-right": "slide-in-right 0.3s ease-out",
+        "shake": "shake 0.5s ease-in-out",
+        "golden-pulse": "golden-pulse 2s ease-in-out infinite",
       },
       keyframes: {
         glow: {
@@ -104,15 +111,27 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateX(10px)" },
           "100%": { opacity: "1", transform: "translateX(0)" },
         },
+        "shake": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "10%, 30%, 50%, 70%, 90%": { transform: "translateX(-2px)" },
+          "20%, 40%, 60%, 80%": { transform: "translateX(2px)" },
+        },
+        "golden-pulse": {
+          "0%, 100%": { boxShadow: "0 0 5px rgba(245, 166, 35, 0.3)" },
+          "50%": { boxShadow: "0 0 20px rgba(245, 166, 35, 0.6)" },
+        },
       },
       boxShadow: {
         "neural": "0 0 30px rgba(0, 212, 200, 0.15)",
         "neural-strong": "0 0 50px rgba(0, 212, 200, 0.3)",
-        "cortex": "0 0 20px rgba(139, 92, 246, 0.3)",
-        "medulla": "0 0 20px rgba(16, 185, 129, 0.3)",
+        "cortex": "0 0 20px rgba(245, 166, 35, 0.3)",
+        "medulla": "0 0 20px rgba(0, 212, 200, 0.3)",
       },
       backdropBlur: {
         xs: "2px",
+      },
+      transitionProperty: {
+        'theme': 'background-color, border-color, color, fill, stroke',
       },
     },
   },
