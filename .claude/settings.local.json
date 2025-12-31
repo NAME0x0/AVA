@@ -50,7 +50,10 @@
       "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m bandit:*)",
       "Bash(cargo clippy:*)",
       "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m ruff check:*)",
-      "Bash(npm audit:*)"
+      "Bash(npm audit:*)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m black \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\server.py\" --check)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\":*)",
+      "Bash(\"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m py_compile \"C:\\\\Users\\\\Afsah\\\\OneDrive\\\\Documents\\\\AVA\\\\server.py\")"
     ]
   }
 }
