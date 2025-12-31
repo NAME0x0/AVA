@@ -194,11 +194,12 @@ export function useConnectionHealth(): ConnectionHealth {
             setConnected(true);
             clearTimers();
           } else if (serverError) {
-            // Server failed to start
-            setState('server_unavailable');
-            setError('Server failed to start');
-            setErrorDetails(serverError);
-            setConnected(false);
+            // Server launcher failed - but don't block connection attempts
+            // The user might have the server running externally
+            console.warn('Tauri server launcher failed:', serverError);
+            setErrorDetails(`Launcher: ${serverError}. Trying external server...`);
+            // Still try to connect via fetch - don't set to server_unavailable yet
+            checkConnection();
           } else {
             // Server is starting (show stage in UI)
             setState('checking');
@@ -215,7 +216,7 @@ export function useConnectionHealth(): ConnectionHealth {
     return () => {
       if (unlisten) unlisten();
     };
-  }, [setConnected, clearTimers]);
+  }, [setConnected, clearTimers, checkConnection]);
 
   // Initial check on mount
   useEffect(() => {
