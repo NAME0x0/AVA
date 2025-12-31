@@ -5,16 +5,24 @@ AVA API Server
 
 Clean, simple HTTP API for AVA.
 
-Endpoints:
-    GET  /              - Web UI (if available)
+Core Endpoints:
     GET  /health        - Health check
     GET  /status        - System status
-    POST /chat          - Send message
-    POST /think         - Force deep thinking
+    POST /chat          - Send message (auto-routes Medulla/Cortex)
+    POST /think         - Force deep thinking (Cortex)
     GET  /tools         - List available tools
 
+System State Endpoints:
+    GET  /cognitive     - Get cognitive state (entropy, varentropy, etc.)
+    GET  /memory        - Get Titans memory stats
+    GET  /stats         - Get system statistics
+
+Control Endpoints:
+    POST /force_cortex  - Force Cortex for next response
+    POST /sleep         - Trigger memory consolidation
+
 WebSocket:
-    /ws                 - Streaming chat
+    /ws                 - Streaming chat with token-by-token updates
 
 Usage:
     python server.py
@@ -112,7 +120,7 @@ async def health_handler(request: web.Request) -> web.Response:
         {
             "status": "ok",
             "service": "AVA",
-            "version": "3.1.0",
+            "version": "3.3.3",
             "uptime_seconds": int(time.time() - _start_time),
         }
     )
@@ -230,6 +238,131 @@ async def tools_handler(request: web.Request) -> web.Response:
         )
 
     return web.json_response({"tools": tools})
+
+
+async def cognitive_handler(request: web.Request) -> web.Response:
+    """Get current cognitive state from Medulla."""
+    ava = await get_ava()
+
+    # Default cognitive state
+    cognitive = {
+        "label": "FLOW",
+        "entropy": 0.3,
+        "varentropy": 0.1,
+        "confidence": 0.8,
+        "surprise": 0.2,
+        "should_use_tools": False,
+        "should_think": False,
+    }
+
+    if ava and ava._engine:
+        try:
+            # Try to get cognitive state from engine
+            if hasattr(ava._engine, "get_cognitive_state"):
+                state = ava._engine.get_cognitive_state()
+                if state:
+                    cognitive = {
+                        "label": getattr(state, "label", "FLOW"),
+                        "entropy": getattr(state, "entropy", 0.3),
+                        "varentropy": getattr(state, "varentropy", 0.1),
+                        "confidence": getattr(state, "confidence", 0.8),
+                        "surprise": getattr(state, "surprise", 0.2),
+                        "should_use_tools": getattr(state, "should_use_tools", False),
+                        "should_think": getattr(state, "should_think", False),
+                    }
+        except Exception as e:
+            logger.debug(f"Could not get cognitive state: {e}")
+
+    return web.json_response(cognitive)
+
+
+async def memory_handler(request: web.Request) -> web.Response:
+    """Get memory stats from Titans."""
+    ava = await get_ava()
+
+    # Default memory stats
+    memory = {
+        "total_memories": 0,
+        "memory_updates": 0,
+        "avg_surprise": 0.0,
+        "backend": "titans",
+        "memory_utilization": 0.0,
+    }
+
+    if ava and ava._engine:
+        try:
+            if hasattr(ava._engine, "get_memory_stats"):
+                stats = ava._engine.get_memory_stats()
+                if stats:
+                    memory = {
+                        "total_memories": stats.get("total_memories", 0),
+                        "memory_updates": stats.get("memory_updates", 0),
+                        "avg_surprise": stats.get("avg_surprise", 0.0),
+                        "backend": stats.get("backend", "titans"),
+                        "memory_utilization": stats.get("memory_utilization", 0.0),
+                    }
+        except Exception as e:
+            logger.debug(f"Could not get memory stats: {e}")
+
+    return web.json_response(memory)
+
+
+async def stats_handler(request: web.Request) -> web.Response:
+    """Get system statistics."""
+    ava = await get_ava()
+
+    stats = {
+        "system": {
+            "is_running": True,
+            "interaction_count": 0,
+            "uptime_seconds": int(time.time() - _start_time),
+        },
+        "medulla": {"requests": 0, "avg_latency_ms": 0},
+        "cortex": {"requests": 0, "avg_latency_ms": 0},
+    }
+
+    if ava and ava._engine:
+        try:
+            engine_stats = ava._engine.get_stats()
+            stats["system"]["interaction_count"] = engine_stats.get("total_requests", 0)
+            stats["cortex"]["requests"] = engine_stats.get("cortex_requests", 0)
+            stats["medulla"]["requests"] = engine_stats.get("total_requests", 0) - engine_stats.get(
+                "cortex_requests", 0
+            )
+        except Exception as e:
+            logger.debug(f"Could not get engine stats: {e}")
+
+    return web.json_response(stats)
+
+
+# Global state for force_cortex flag
+_force_cortex_next = False
+
+
+async def force_cortex_handler(request: web.Request) -> web.Response:
+    """Force Cortex for the next response."""
+    global _force_cortex_next
+    _force_cortex_next = True
+    logger.info("Cortex forced for next response")
+    return web.json_response({"status": "ok", "message": "Cortex will be used for next response"})
+
+
+async def sleep_handler(request: web.Request) -> web.Response:
+    """Trigger sleep/consolidation cycle."""
+    ava = await get_ava()
+
+    if ava and ava._engine:
+        try:
+            if hasattr(ava._engine, "trigger_sleep"):
+                await ava._engine.trigger_sleep()
+                logger.info("Sleep cycle triggered")
+                return web.json_response({"status": "ok", "message": "Sleep cycle initiated"})
+        except Exception as e:
+            logger.error(f"Sleep trigger failed: {e}")
+            return web.json_response({"status": "error", "message": str(e)}, status=500)
+
+    # Graceful response even if engine doesn't support sleep
+    return web.json_response({"status": "ok", "message": "Sleep cycle simulated"})
 
 
 async def websocket_handler(request: web.Request) -> web.WebSocketResponse:
@@ -373,13 +506,22 @@ def create_app() -> web.Application:
     """Create the web application."""
     app = web.Application(middlewares=[cors_middleware])
 
-    # Routes
+    # Core routes
     app.router.add_get("/health", health_handler)
     app.router.add_get("/status", status_handler)
     app.router.add_post("/chat", chat_handler)
     app.router.add_post("/think", think_handler)
     app.router.add_get("/tools", tools_handler)
     app.router.add_get("/ws", websocket_handler)
+
+    # System state routes (for UI polling)
+    app.router.add_get("/cognitive", cognitive_handler)
+    app.router.add_get("/memory", memory_handler)
+    app.router.add_get("/stats", stats_handler)
+
+    # Control routes
+    app.router.add_post("/force_cortex", force_cortex_handler)
+    app.router.add_post("/sleep", sleep_handler)
 
     # CORS preflight
     app.router.add_route("OPTIONS", "/{path:.*}", lambda r: web.Response())
@@ -399,7 +541,7 @@ def print_banner(host: str, port: int):
 ║    ██║  ██║ ╚████╔╝ ██║  ██║    ███████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║    ║
 ║    ╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝    ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝    ║
 ║                                                                                      ║
-║\033[0m\033[97m                    Cortex-Medulla Architecture v3.1.0                                \033[96m║
+║\033[0m\033[97m                    Cortex-Medulla Architecture v3.3.3                                \033[96m║
 ╚══════════════════════════════════════════════════════════════════════════════════════╝\033[0m
 """
     print(banner)

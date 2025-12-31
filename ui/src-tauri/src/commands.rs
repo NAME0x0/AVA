@@ -9,12 +9,18 @@ use tauri::State;
 /// Response from the chat endpoint
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChatResponse {
+    #[serde(alias = "text")]
     pub response: String,
-    pub cognitive_state: Option<CognitiveState>,
+    pub cognitive_state: Option<String>,
+    #[serde(default)]
     pub surprise: Option<f32>,
+    #[serde(default)]
     pub tokens_generated: Option<u32>,
+    #[serde(default)]
     pub used_cortex: bool,
-    pub policy_selected: String,
+    #[serde(default)]
+    pub confidence: f64,
+    #[serde(default)]
     pub response_time_ms: f64,
 }
 
@@ -89,14 +95,30 @@ pub async fn get_system_state(state: State<'_, AppState>) -> Result<SystemState,
 
     let client = reqwest::Client::new();
     let resp = client
-        .get(format!("{base_url}/system/state"))
+        .get(format!("{base_url}/stats"))
         .send()
         .await
         .map_err(|e| format!("Request failed: {e}"))?;
 
-    resp.json()
+    // Parse the stats response and map to SystemState
+    let stats: serde_json::Value = resp
+        .json()
         .await
-        .map_err(|e| format!("Failed to parse response: {e}"))
+        .map_err(|e| format!("Failed to parse response: {e}"))?;
+
+    Ok(SystemState {
+        connected: true,
+        system_state: if stats["system"]["is_running"].as_bool().unwrap_or(true) {
+            "running".to_string()
+        } else {
+            "paused".to_string()
+        },
+        active_component: "idle".to_string(),
+        uptime_seconds: stats["system"]["uptime_seconds"].as_u64().unwrap_or(0),
+        total_interactions: stats["system"]["interaction_count"].as_u64().unwrap_or(0),
+        cortex_invocations: stats["cortex"]["requests"].as_u64().unwrap_or(0),
+        avg_response_time_ms: 0.0,
+    })
 }
 
 /// Get cognitive state from Medulla

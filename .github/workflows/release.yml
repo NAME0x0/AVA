@@ -177,7 +177,12 @@ jobs:
       - name: Create frontend archive
         run: |
           cd ..
-          tar -czvf frontend-build.tar.gz ui/.next ui/public
+          # Create archive with .next and public (if exists)
+          if [ -d "ui/public" ]; then
+            tar -czvf frontend-build.tar.gz ui/.next ui/public
+          else
+            tar -czvf frontend-build.tar.gz ui/.next
+          fi
 
       - name: Upload Frontend artifacts
         uses: actions/upload-artifact@v4
