@@ -12,7 +12,7 @@ pub struct AppState {
 impl AppState {
     pub fn new() -> Self {
         Self {
-            backend_url: Mutex::new("http://localhost:8080".to_string()),
+            backend_url: Mutex::new("http://localhost:8085".to_string()),
             connected: Mutex::new(false),
         }
     }

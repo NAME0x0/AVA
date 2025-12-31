@@ -10,7 +10,6 @@ Usage:
 """
 
 import argparse
-import asyncio
 import sys
 from pathlib import Path
 
@@ -24,9 +23,9 @@ def check_environment():
     Provides helpful error messages if running from wrong environment.
     """
     required_packages = {
-        'textual': 'TUI framework',
-        'rich': 'Rich text rendering',
-        'httpx': 'Async HTTP client',
+        "textual": "TUI framework",
+        "rich": "Rich text rendering",
+        "httpx": "Async HTTP client",
     }
 
     missing = []

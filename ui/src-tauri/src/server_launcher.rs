@@ -1,27 +1,38 @@
 //! Server Launcher Module for AVA
 //!
-//! Manages the lifecycle of the Python backend server as a helper function:
-//! - Detects Python/venv installation
-//! - Spawns server.py process
+//! Manages the lifecycle of the Python backend server:
+//! - Production: Uses PyInstaller sidecar (ava-server.exe)
+//! - Development: Falls back to system Python with server.py
 //! - Monitors health and emits status events
 //! - Clean shutdown on app exit
 
 use std::path::{Path, PathBuf};
-use std::process::{Child, Command, Stdio};
+use std::process::{Child, Command as StdCommand, Stdio};
 use std::sync::Arc;
 use std::time::Duration;
+use tauri::api::process::{Command, CommandChild, CommandEvent};
 use tauri::{AppHandle, Manager};
 use tokio::sync::Mutex;
 
 use crate::tray::{update_tray_status, TrayStatus};
 
-/// Server process state
-struct ServerProcess {
-    child: Option<Child>,
-    port: u16,
+/// Default port for the AVA backend server
+pub const DEFAULT_SERVER_PORT: u16 = 8085;
+
+/// Server process state - can be either sidecar or Python subprocess
+enum ServerChild {
+    Sidecar(CommandChild),
+    Python(Child),
 }
 
-/// Server launcher - manages Python backend as a helper process
+/// Server process state
+struct ServerProcess {
+    child: Option<ServerChild>,
+    port: u16,
+    is_sidecar: bool,
+}
+
+/// Server launcher - manages Python backend as sidecar or subprocess
 pub struct ServerLauncher {
     process: Arc<Mutex<ServerProcess>>,
     app_handle: AppHandle,
@@ -42,15 +53,179 @@ impl ServerLauncher {
         Self {
             process: Arc::new(Mutex::new(ServerProcess {
                 child: None,
-                port: 8085,
+                port: DEFAULT_SERVER_PORT,
+                is_sidecar: false,
             })),
             app_handle,
         }
     }
 
+    /// Start the backend server - tries sidecar first, falls back to Python
+    pub async fn start(&self) -> Result<(), String> {
+        // Try sidecar first (production mode)
+        match self.start_sidecar().await {
+            Ok(()) => {
+                tracing::info!("Server started via sidecar");
+                return Ok(());
+            }
+            Err(e) => {
+                tracing::warn!("Sidecar failed: {}, trying Python fallback", e);
+            }
+        }
+
+        // Fall back to Python (development mode)
+        self.start_python_fallback().await
+    }
+
+    /// Start server using Tauri sidecar (PyInstaller executable)
+    async fn start_sidecar(&self) -> Result<(), String> {
+        let mut process = self.process.lock().await;
+
+        if process.child.is_some() {
+            tracing::info!("Server already running");
+            return Ok(());
+        }
+
+        self.emit_status(ServerStatus {
+            running: false,
+            port: process.port,
+            stage: "Starting sidecar...".to_string(),
+            error: None,
+        });
+
+        // Spawn sidecar
+        let (mut rx, child) = Command::new_sidecar("ava-server")
+            .map_err(|e| format!("Sidecar not found: {e}. Is the app built with sidecar?"))?
+            .args(["--host", "127.0.0.1", "--port", &process.port.to_string()])
+            .spawn()
+            .map_err(|e| format!("Failed to spawn sidecar: {e}"))?;
+
+        tracing::info!("Sidecar spawned, monitoring output...");
+
+        // Monitor sidecar output in background
+        let app_handle = self.app_handle.clone();
+        tauri::async_runtime::spawn(async move {
+            while let Some(event) = rx.recv().await {
+                match event {
+                    CommandEvent::Stdout(line) => {
+                        tracing::info!("[ava-server] {}", line);
+                    }
+                    CommandEvent::Stderr(line) => {
+                        tracing::warn!("[ava-server] {}", line);
+                    }
+                    CommandEvent::Error(e) => {
+                        tracing::error!("[ava-server] Error: {}", e);
+                    }
+                    CommandEvent::Terminated(payload) => {
+                        tracing::info!("[ava-server] Terminated: {:?}", payload);
+                        update_tray_status(&app_handle, TrayStatus::Error);
+                    }
+                    _ => {}
+                }
+            }
+        });
+
+        process.child = Some(ServerChild::Sidecar(child));
+        process.is_sidecar = true;
+        let port = process.port;
+        drop(process);
+
+        // Wait for server to be ready
+        self.wait_for_ready(port).await?;
+
+        update_tray_status(&self.app_handle, TrayStatus::Connected);
+
+        self.emit_status(ServerStatus {
+            running: true,
+            port,
+            stage: "Ready".to_string(),
+            error: None,
+        });
+
+        Ok(())
+    }
+
+    /// Start server using Python (development fallback)
+    async fn start_python_fallback(&self) -> Result<(), String> {
+        let mut process = self.process.lock().await;
+
+        if process.child.is_some() {
+            tracing::info!("Server already running");
+            return Ok(());
+        }
+
+        self.emit_status(ServerStatus {
+            running: false,
+            port: process.port,
+            stage: "Finding Python...".to_string(),
+            error: None,
+        });
+
+        let python = self.find_python()?;
+
+        self.emit_status(ServerStatus {
+            running: false,
+            port: process.port,
+            stage: "Finding server script...".to_string(),
+            error: None,
+        });
+
+        let server_script = self.find_server_script()?;
+        let working_dir = self.get_working_dir(&server_script);
+
+        self.emit_status(ServerStatus {
+            running: false,
+            port: process.port,
+            stage: "Starting server...".to_string(),
+            error: None,
+        });
+
+        tracing::info!(
+            "Starting Python server: {:?} {:?} --port {}",
+            python,
+            server_script,
+            process.port
+        );
+
+        // Spawn the server process
+        let child = StdCommand::new(&python)
+            .arg(&server_script)
+            .arg("--host")
+            .arg("127.0.0.1")
+            .arg("--port")
+            .arg(process.port.to_string())
+            .current_dir(&working_dir)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .map_err(|e| format!("Failed to start server: {e}"))?;
+
+        let pid = child.id();
+        process.child = Some(ServerChild::Python(child));
+        process.is_sidecar = false;
+        tracing::info!("Python server started with PID: {}", pid);
+
+        let port = process.port;
+        drop(process);
+
+        // Wait for server to be ready
+        self.wait_for_ready(port).await?;
+
+        update_tray_status(&self.app_handle, TrayStatus::Connected);
+
+        self.emit_status(ServerStatus {
+            running: true,
+            port,
+            stage: "Ready".to_string(),
+            error: None,
+        });
+
+        tracing::info!("Server is ready and accepting connections");
+        Ok(())
+    }
+
     /// Find Python executable - checks venv first, then system PATH
     fn find_python(&self) -> Result<PathBuf, String> {
-        // Get the app's resource directory
         let resource_dir = self
             .app_handle
             .path_resolver()
@@ -65,14 +240,11 @@ impl ServerLauncher {
         }
 
         // Check for development venv relative to project root
-        // Resource dir is usually ui/src-tauri/target/debug or release
-        // Project root is 3 levels up from src-tauri
         if let Some(project_root) = resource_dir
-            .parent() // target
-            .and_then(|p| p.parent()) // src-tauri
-            .and_then(|p| p.parent()) // ui
+            .parent()
             .and_then(|p| p.parent())
-        // project root
+            .and_then(|p| p.parent())
+            .and_then(|p| p.parent())
         {
             let dev_venv = project_root.join("venv").join("Scripts").join("python.exe");
             if dev_venv.exists() {
@@ -82,7 +254,7 @@ impl ServerLauncher {
         }
 
         // Fall back to system Python
-        let output = Command::new("python").arg("--version").output();
+        let output = StdCommand::new("python").arg("--version").output();
 
         match output {
             Ok(out) if out.status.success() => {
@@ -90,8 +262,7 @@ impl ServerLauncher {
                 Ok(PathBuf::from("python"))
             }
             _ => {
-                // Try python3
-                let output3 = Command::new("python3").arg("--version").output();
+                let output3 = StdCommand::new("python3").arg("--version").output();
                 match output3 {
                     Ok(out) if out.status.success() => {
                         tracing::info!("Using system Python3");
@@ -146,88 +317,6 @@ impl ServerLauncher {
             .unwrap_or_else(|| PathBuf::from("."))
     }
 
-    /// Start the backend server
-    pub async fn start(&self) -> Result<(), String> {
-        let mut process = self.process.lock().await;
-
-        // Don't start if already running
-        if process.child.is_some() {
-            tracing::info!("Server already running");
-            return Ok(());
-        }
-
-        // Emit starting status
-        self.emit_status(ServerStatus {
-            running: false,
-            port: process.port,
-            stage: "Finding Python...".to_string(),
-            error: None,
-        });
-
-        let python = self.find_python()?;
-
-        self.emit_status(ServerStatus {
-            running: false,
-            port: process.port,
-            stage: "Finding server script...".to_string(),
-            error: None,
-        });
-
-        let server_script = self.find_server_script()?;
-        let working_dir = self.get_working_dir(&server_script);
-
-        self.emit_status(ServerStatus {
-            running: false,
-            port: process.port,
-            stage: "Starting server...".to_string(),
-            error: None,
-        });
-
-        tracing::info!(
-            "Starting server: {:?} {:?} --port {}",
-            python,
-            server_script,
-            process.port
-        );
-
-        // Spawn the server process
-        let child = Command::new(&python)
-            .arg(&server_script)
-            .arg("--host")
-            .arg("127.0.0.1")
-            .arg("--port")
-            .arg(process.port.to_string())
-            .current_dir(&working_dir)
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()
-            .map_err(|e| format!("Failed to start server: {e}"))?;
-
-        let pid = child.id();
-        process.child = Some(child);
-        tracing::info!("Server process started with PID: {}", pid);
-
-        // Release lock during health check
-        let port = process.port;
-        drop(process);
-
-        // Wait for server to be ready
-        self.wait_for_ready(port).await?;
-
-        // Update tray status
-        update_tray_status(&self.app_handle, TrayStatus::Connected);
-
-        self.emit_status(ServerStatus {
-            running: true,
-            port,
-            stage: "Ready".to_string(),
-            error: None,
-        });
-
-        tracing::info!("Server is ready and accepting connections");
-        Ok(())
-    }
-
     /// Wait for server health endpoint to respond
     async fn wait_for_ready(&self, port: u16) -> Result<(), String> {
         let client = reqwest::Client::builder()
@@ -263,17 +352,8 @@ impl ServerLauncher {
             }
 
             tokio::time::sleep(Duration::from_secs(1)).await;
-
-            // Check if process is still running
-            let process = self.process.lock().await;
-            if let Some(ref child) = process.child {
-                // Try to check if process exited
-                // Note: We can't easily check exit status without consuming the child
-                tracing::debug!("Process PID {} still registered", child.id());
-            }
         }
 
-        // Server failed to start
         update_tray_status(&self.app_handle, TrayStatus::Error);
 
         Err("Server failed to start within 30 seconds. Check if Python dependencies are installed and Ollama is running.".to_string())
@@ -284,32 +364,38 @@ impl ServerLauncher {
     pub async fn stop(&self) -> Result<(), String> {
         let mut process = self.process.lock().await;
 
-        if let Some(mut child) = process.child.take() {
-            let pid = child.id();
-            tracing::info!("Stopping server process with PID: {}", pid);
-
-            // On Windows, use taskkill for clean shutdown of process tree
-            #[cfg(windows)]
-            {
-                let _ = Command::new("taskkill")
-                    .args(["/PID", &pid.to_string(), "/T", "/F"])
-                    .output();
+        match process.child.take() {
+            Some(ServerChild::Sidecar(child)) => {
+                tracing::info!("Stopping sidecar server");
+                child.kill().map_err(|e| format!("Failed to kill sidecar: {e}"))?;
             }
+            Some(ServerChild::Python(mut child)) => {
+                let pid = child.id();
+                tracing::info!("Stopping Python server with PID: {}", pid);
 
-            // On Unix, send SIGTERM
-            #[cfg(not(windows))]
-            {
-                let _ = child.kill();
+                #[cfg(windows)]
+                {
+                    let _ = StdCommand::new("taskkill")
+                        .args(["/PID", &pid.to_string(), "/T", "/F"])
+                        .output();
+                }
+
+                #[cfg(not(windows))]
+                {
+                    let _ = child.kill();
+                }
+
+                match child.wait() {
+                    Ok(status) => {
+                        tracing::info!("Server process exited with status: {}", status);
+                    }
+                    Err(e) => {
+                        tracing::warn!("Error waiting for server process: {}", e);
+                    }
+                }
             }
-
-            // Wait for process to exit
-            match child.wait() {
-                Ok(status) => {
-                    tracing::info!("Server process exited with status: {}", status);
-                }
-                Err(e) => {
-                    tracing::warn!("Error waiting for server process: {}", e);
-                }
+            None => {
+                tracing::info!("No server process to stop");
             }
         }
 
@@ -317,7 +403,7 @@ impl ServerLauncher {
 
         self.emit_status(ServerStatus {
             running: false,
-            port: 8085,
+            port: DEFAULT_SERVER_PORT,
             stage: "Stopped".to_string(),
             error: None,
         });
@@ -349,11 +435,8 @@ impl Clone for ServerLauncher {
     }
 }
 
-// Ensure server is stopped when launcher is dropped
 impl Drop for ServerLauncher {
     fn drop(&mut self) {
-        // We can't do async cleanup in drop, but the process will be killed
-        // when the Child handle is dropped anyway
         tracing::debug!("ServerLauncher dropped");
     }
 }

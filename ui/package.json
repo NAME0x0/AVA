@@ -1,6 +1,6 @@
 {
   "name": "ava-ui",
-  "version": "3.2.0",
+  "version": "3.3.2",
   "description": "AVA Neural Interface - Cortex-Medulla Architecture",
   "private": true,
   "scripts": {
@@ -13,7 +13,11 @@
     "format:check": "prettier --check .",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build"
+    "tauri:build": "tauri build",
+    "build:sidecar": "cd .. && python scripts/build_sidecar.py",
+    "build:sidecar:clean": "cd .. && python scripts/build_sidecar.py --clean",
+    "tauri:build:full": "npm run build:sidecar && tauri build",
+    "tauri:build:release": "npm run build:sidecar:clean && tauri build --release"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.4",

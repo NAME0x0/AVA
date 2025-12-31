@@ -75,6 +75,11 @@ interface CoreStore {
   setConnected: (connected: boolean) => void;
   setBackendUrl: (url: string) => void;
 
+  // Server Launch State (Tauri)
+  serverLaunchState: 'not_started' | 'starting' | 'ready' | 'failed';
+  serverError: string | null;
+  setServerLaunchState: (state: CoreStore['serverLaunchState'], error?: string) => void;
+
   // System State
   systemState: SystemState;
   setSystemState: (state: Partial<SystemState>) => void;
@@ -181,6 +186,16 @@ export const useCoreStore = create<CoreStore>()(
       backendUrl: DEFAULT_BACKEND_URL,
       setConnected: (connected) => set({ connected }),
       setBackendUrl: (backendUrl) => set({ backendUrl }),
+
+      // Server Launch State (Tauri)
+      serverLaunchState: 'not_started',
+      serverError: null,
+      setServerLaunchState: (state, error) => set({
+        serverLaunchState: state,
+        serverError: error || null,
+        // Also update connected state based on server state
+        connected: state === 'ready',
+      }),
 
     // System State
     systemState: {

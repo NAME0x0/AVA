@@ -33,7 +33,7 @@ def create_neural_icon(size: int) -> Image.Image:
 
     # Create image with anti-aliasing (2x then downscale)
     render_size = size * 2
-    img = Image.new('RGBA', (render_size, render_size), bg_color + (255,))
+    img = Image.new("RGBA", (render_size, render_size), bg_color + (255,))
     draw = ImageDraw.Draw(img)
 
     center = render_size // 2
@@ -91,17 +91,13 @@ def create_neural_icon(size: int) -> Image.Image:
         glow_alpha = 30 - glow_offset * 5
         glow_color = cyan_dim + (max(0, glow_alpha),)
         x, y = nodes[0]
-        draw.ellipse([
-            x - glow_size, y - glow_size,
-            x + glow_size, y + glow_size
-        ], fill=glow_color)
+        draw.ellipse([x - glow_size, y - glow_size, x + glow_size, y + glow_size], fill=glow_color)
 
     # Central node (brightest, main focal point)
     x, y = nodes[0]
-    draw.ellipse([
-        x - central_size, y - central_size,
-        x + central_size, y + central_size
-    ], fill=cyan + (255,))
+    draw.ellipse(
+        [x - central_size, y - central_size, x + central_size, y + central_size], fill=cyan + (255,)
+    )
 
     # Inner ring nodes (purple)
     for i in range(1, 7):
@@ -110,22 +106,20 @@ def create_neural_icon(size: int) -> Image.Image:
         for glow_offset in range(3, 0, -1):
             glow_size = inner_size + glow_offset * 2
             glow_alpha = 20 - glow_offset * 5
-            draw.ellipse([
-                x - glow_size, y - glow_size,
-                x + glow_size, y + glow_size
-            ], fill=purple_dim + (max(0, glow_alpha),))
-        draw.ellipse([
-            x - inner_size, y - inner_size,
-            x + inner_size, y + inner_size
-        ], fill=purple + (255,))
+            draw.ellipse(
+                [x - glow_size, y - glow_size, x + glow_size, y + glow_size],
+                fill=purple_dim + (max(0, glow_alpha),),
+            )
+        draw.ellipse(
+            [x - inner_size, y - inner_size, x + inner_size, y + inner_size], fill=purple + (255,)
+        )
 
     # Outer ring nodes (cyan, smaller)
     for i in range(7, 15):
         x, y = nodes[i]
-        draw.ellipse([
-            x - outer_size, y - outer_size,
-            x + outer_size, y + outer_size
-        ], fill=cyan + (220,))
+        draw.ellipse(
+            [x - outer_size, y - outer_size, x + outer_size, y + outer_size], fill=cyan + (220,)
+        )
 
     # Downscale with anti-aliasing
     img = img.resize((size, size), Image.Resampling.LANCZOS)
@@ -139,24 +133,24 @@ def create_icon_set(output_dir: Path):
 
     # Generate PNG icons
     sizes = {
-        '32x32.png': 32,
-        '128x128.png': 128,
-        '128x128@2x.png': 256,  # Retina is 2x
+        "32x32.png": 32,
+        "128x128.png": 128,
+        "128x128@2x.png": 256,  # Retina is 2x
     }
 
     for filename, size in sizes.items():
         icon = create_neural_icon(size)
-        icon.save(output_dir / filename, 'PNG')
+        icon.save(output_dir / filename, "PNG")
         print(f"Created {filename} ({size}x{size})")
 
     # Create ICO (Windows) - multi-resolution
     ico_sizes = [16, 32, 48, 256]
     ico_images = [create_neural_icon(s) for s in ico_sizes]
     ico_images[0].save(
-        output_dir / 'icon.ico',
-        format='ICO',
+        output_dir / "icon.ico",
+        format="ICO",
         sizes=[(s, s) for s in ico_sizes],
-        append_images=ico_images[1:]
+        append_images=ico_images[1:],
     )
     print("Created icon.ico (multi-resolution)")
 
@@ -166,22 +160,18 @@ def create_icon_set(output_dir: Path):
 
     # ICNS format using Pillow
     try:
-        icns_images[0].save(
-            output_dir / 'icon.icns',
-            format='ICNS',
-            append_images=icns_images[1:]
-        )
+        icns_images[0].save(output_dir / "icon.icns", format="ICNS", append_images=icns_images[1:])
         print("Created icon.icns (macOS)")
     except Exception as e:
         # Fallback: just create a PNG that macOS can use
         print(f"ICNS creation failed ({e}), creating 512x512 PNG instead")
-        create_neural_icon(512).save(output_dir / 'icon.png', 'PNG')
+        create_neural_icon(512).save(output_dir / "icon.png", "PNG")
         print("Created icon.png (512x512 fallback)")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     script_dir = Path(__file__).parent.parent
-    icons_dir = script_dir / 'ui' / 'src-tauri' / 'icons'
+    icons_dir = script_dir / "ui" / "src-tauri" / "icons"
 
     print("Generating neural-themed AVA icons...")
     print(f"Output directory: {icons_dir}")

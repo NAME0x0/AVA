@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "AVA",
-    "version": "3.2.0"
+    "version": "3.3.2"
   },
   "tauri": {
     "allowlist": {
@@ -21,7 +21,14 @@
       "shell": {
         "open": true,
         "execute": false,
-        "sidecar": false
+        "sidecar": true,
+        "scope": [
+          {
+            "name": "binaries/ava-server",
+            "sidecar": true,
+            "args": true
+          }
+        ]
       },
       "window": {
         "all": true,
@@ -85,8 +92,7 @@
       "resources": [
         "../../server.py",
         "../../src/**/*",
-        "../../config/**/*",
-        "../../requirements.txt"
+        "../../config/**/*"
       ],
       "shortDescription": "AVA Neural Interface",
       "targets": "all",

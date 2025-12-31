@@ -19,8 +19,8 @@ Usage:
     python examples/demo.py --deep  # Force deep thinking for all queries
 """
 
-import asyncio
 import argparse
+import asyncio
 import sys
 from pathlib import Path
 
@@ -150,15 +150,9 @@ async def interactive_demo():
 async def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="AVA Demo Script")
+    parser.add_argument("--interactive", "-i", action="store_true", help="Run in interactive mode")
     parser.add_argument(
-        "--interactive", "-i",
-        action="store_true",
-        help="Run in interactive mode"
-    )
-    parser.add_argument(
-        "--deep", "-d",
-        action="store_true",
-        help="Force deep thinking for all queries"
+        "--deep", "-d", action="store_true", help="Force deep thinking for all queries"
     )
     args = parser.parse_args()
 

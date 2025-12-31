@@ -13,8 +13,8 @@ Exit codes:
     1 - Some checks failed
 """
 
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 # Colors for terminal output
@@ -43,11 +43,7 @@ def check_python_version() -> bool:
     """Check Python version is 3.10+."""
     version = sys.version_info
     passed = version >= (3, 10)
-    print_check(
-        "Python version",
-        passed,
-        f"Python {version.major}.{version.minor}.{version.micro}"
-    )
+    print_check("Python version", passed, f"Python {version.major}.{version.minor}.{version.micro}")
     return passed
 
 
@@ -58,7 +54,7 @@ def check_package(package: str, import_name: str = None) -> bool:
         __import__(import_name)
         print_check(f"Package: {package}", True)
         return True
-    except ImportError as e:
+    except ImportError:
         print_check(f"Package: {package}", False, f"pip install {package}")
         return False
 
@@ -67,6 +63,7 @@ def check_ollama() -> bool:
     """Check if Ollama is reachable."""
     try:
         import httpx
+
         response = httpx.get("http://localhost:11434/api/tags", timeout=5.0)
         if response.status_code == 200:
             models = response.json().get("models", [])
@@ -79,8 +76,8 @@ def check_ollama() -> bool:
     except ImportError:
         print_check("Ollama connection", False, "httpx not installed")
         return False
-    except Exception as e:
-        print_check("Ollama connection", False, f"Start with: ollama serve")
+    except Exception:
+        print_check("Ollama connection", False, "Start with: ollama serve")
         return False
 
 
@@ -91,7 +88,7 @@ def check_gpu() -> bool:
             ["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader"],
             capture_output=True,
             text=True,
-            timeout=5
+            timeout=5,
         )
         if result.returncode == 0 and result.stdout.strip():
             gpu_info = result.stdout.strip().split("\n")[0]
@@ -139,7 +136,8 @@ def check_ava_import() -> bool:
         root = Path(__file__).parent.parent
         sys.path.insert(0, str(root / "src"))
 
-        from ava import AVA, __version__
+        from ava import __version__
+
         print_check("AVA import", True, f"Version {__version__}")
         return True
     except ImportError as e:
@@ -189,7 +187,7 @@ def main() -> int:
 
     if all(results):
         print(f"{GREEN}{BOLD}All {total} checks passed!{RESET}")
-        print(f"\nAVA is ready to use. Start with:")
+        print("\nAVA is ready to use. Start with:")
         print(f"  {CYAN}python server.py{RESET}     # HTTP API server")
         print(f"  {CYAN}python run_tui.py{RESET}   # Terminal UI")
         print(f"  {CYAN}ava doctor{RESET}          # Quick diagnostics")
@@ -197,9 +195,9 @@ def main() -> int:
     else:
         failed = total - passed
         print(f"{YELLOW}{BOLD}{passed}/{total} checks passed ({failed} failed){RESET}")
-        print(f"\nTo fix missing packages:")
+        print("\nTo fix missing packages:")
         print(f"  {CYAN}pip install -r requirements.txt{RESET}")
-        print(f"\nTo start Ollama:")
+        print("\nTo start Ollama:")
         print(f"  {CYAN}ollama serve{RESET}")
         return 1
 

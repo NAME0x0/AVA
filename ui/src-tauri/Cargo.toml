@@ -1,6 +1,6 @@
 [package]
 name = "ava-ui"
-version = "3.2.0"
+version = "3.3.2"
 description = "AVA Neural Interface - Cortex-Medulla Architecture"
 authors = ["AVA Project"]
 edition = "2021"
@@ -11,6 +11,7 @@ tauri-build = { version = "1.5", features = [] }
 [dependencies]
 tauri = { version = "1.6", features = [
     "shell-open",
+    "shell-sidecar",
     "window-all",
     "clipboard-write-text",
     "clipboard-read-text",

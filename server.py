@@ -12,7 +12,7 @@ Endpoints:
     POST /chat          - Send message
     POST /think         - Force deep thinking
     GET  /tools         - List available tools
-    
+
 WebSocket:
     /ws                 - Streaming chat
 
@@ -29,21 +29,16 @@ import logging
 import sys
 import time
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from aiohttp import web
 import aiohttp
+from aiohttp import web
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("ava-server")
 
 # Global AVA instance (thread-safe initialization)
@@ -66,6 +61,7 @@ async def get_ava():
         if _ava is None:
             try:
                 from ava import AVA
+
                 _ava = AVA()
                 await _ava.start()
                 logger.info("AVA initialized successfully")
@@ -80,56 +76,60 @@ async def get_ava():
 # Response Models
 # =============================================================================
 
+
 @dataclass
 class ChatResponse:
     """Response from chat endpoint."""
+
     text: str = ""
     used_cortex: bool = False
     cognitive_state: str = "FLOW"
     confidence: float = 0.8
     tools_used: list = field(default_factory=list)
     response_time_ms: float = 0.0
-    error: Optional[str] = None
+    error: str | None = None
 
 
 @dataclass
 class StatusResponse:
     """System status."""
+
     status: str = "ok"
     uptime_seconds: int = 0
     total_requests: int = 0
     cortex_requests: int = 0
-    models: Dict[str, str] = field(default_factory=dict)
+    models: dict[str, str] = field(default_factory=dict)
 
 
 # =============================================================================
 # Handlers
 # =============================================================================
 
+
 async def health_handler(request: web.Request) -> web.Response:
     """Health check."""
-    return web.json_response({
-        "status": "ok",
-        "service": "AVA",
-        "version": "3.1.0",
-        "uptime_seconds": int(time.time() - _start_time)
-    })
+    return web.json_response(
+        {
+            "status": "ok",
+            "service": "AVA",
+            "version": "3.1.0",
+            "uptime_seconds": int(time.time() - _start_time),
+        }
+    )
 
 
 async def status_handler(request: web.Request) -> web.Response:
     """Get system status."""
     ava = await get_ava()
-    
-    response = StatusResponse(
-        uptime_seconds=int(time.time() - _start_time)
-    )
-    
+
+    response = StatusResponse(uptime_seconds=int(time.time() - _start_time))
+
     if ava and ava._engine:
         stats = ava._engine.get_stats()
         response.total_requests = stats.get("total_requests", 0)
         response.cortex_requests = stats.get("cortex_requests", 0)
         response.models = stats.get("models", {})
-    
+
     return web.json_response(asdict(response))
 
 
@@ -138,28 +138,29 @@ async def chat_handler(request: web.Request) -> web.Response:
     try:
         data = await request.json()
         message = data.get("message", "")
-        
+
         if not message:
             return web.json_response({"error": "No message provided"}, status=400)
-        
+
         ava = await get_ava()
-        
+
         if ava is None:
             return web.json_response(
-                {"error": "AVA not initialized. Is Ollama running?"},
-                status=503
+                {"error": "AVA not initialized. Is Ollama running?"}, status=503
             )
-        
+
         start = time.time()
         result = await ava.chat(message)
-        
+
         # Convert cognitive_state to string if it's an object
         cog_state = result.cognitive_state
-        if hasattr(cog_state, 'label'):
+        if hasattr(cog_state, "label"):
             # CognitiveState object - extract label
-            cog_state = cog_state.label if isinstance(cog_state.label, str) else cog_state.label.value
-        elif hasattr(cog_state, 'to_dict'):
-            cog_state = cog_state.to_dict().get('label', 'FLOW')
+            cog_state = (
+                cog_state.label if isinstance(cog_state.label, str) else cog_state.label.value
+            )
+        elif hasattr(cog_state, "to_dict"):
+            cog_state = cog_state.to_dict().get("label", "FLOW")
         elif not isinstance(cog_state, str):
             cog_state = str(cog_state)
 
@@ -169,14 +170,15 @@ async def chat_handler(request: web.Request) -> web.Response:
             cognitive_state=cog_state,
             confidence=result.confidence,
             tools_used=result.tools_used,
-            response_time_ms=(time.time() - start) * 1000
+            response_time_ms=(time.time() - start) * 1000,
         )
-        
+
         return web.json_response(asdict(response))
-        
+
     except Exception as e:
         logger.error(f"Chat error: {e}")
         import traceback
+
         traceback.print_exc()
         return web.json_response({"error": str(e)}, status=500)
 
@@ -186,32 +188,29 @@ async def think_handler(request: web.Request) -> web.Response:
     try:
         data = await request.json()
         message = data.get("message", "")
-        
+
         if not message:
             return web.json_response({"error": "No message provided"}, status=400)
-        
+
         ava = await get_ava()
-        
+
         if ava is None:
-            return web.json_response(
-                {"error": "AVA not initialized"},
-                status=503
-            )
-        
+            return web.json_response({"error": "AVA not initialized"}, status=503)
+
         start = time.time()
         result = await ava.think(message)
-        
+
         response = ChatResponse(
             text=result.text,
             used_cortex=True,
             cognitive_state=result.cognitive_state,
             confidence=result.confidence,
             tools_used=result.tools_used,
-            response_time_ms=(time.time() - start) * 1000
+            response_time_ms=(time.time() - start) * 1000,
         )
-        
+
         return web.json_response(asdict(response))
-        
+
     except Exception as e:
         logger.error(f"Think error: {e}")
         return web.json_response({"error": str(e)}, status=500)
@@ -220,18 +219,16 @@ async def think_handler(request: web.Request) -> web.Response:
 async def tools_handler(request: web.Request) -> web.Response:
     """List available tools."""
     ava = await get_ava()
-    
+
     if ava is None or ava._tools is None:
         return web.json_response({"tools": []})
-    
+
     tools = []
     for defn in ava._tools.list_tools():
-        tools.append({
-            "name": defn.name,
-            "description": defn.description,
-            "parameters": defn.parameters
-        })
-    
+        tools.append(
+            {"name": defn.name, "description": defn.description, "parameters": defn.parameters}
+        )
+
     return web.json_response({"tools": tools})
 
 
@@ -250,26 +247,27 @@ async def websocket_handler(request: web.Request) -> web.WebSocketResponse:
                 force_deep = data.get("force_deep", False)
 
                 if not message:
-                    await ws.send_json({
-                        "type": "error",
-                        "message": "No message provided"
-                    })
+                    await ws.send_json({"type": "error", "message": "No message provided"})
                     continue
 
                 ava = await get_ava()
                 if not ava:
-                    await ws.send_json({
-                        "type": "error",
-                        "message": "AVA not initialized. Please wait and try again."
-                    })
+                    await ws.send_json(
+                        {
+                            "type": "error",
+                            "message": "AVA not initialized. Please wait and try again.",
+                        }
+                    )
                     continue
 
                 # Send processing started
-                await ws.send_json({
-                    "type": "status",
-                    "status": "processing",
-                    "message": "Analyzing your request..."
-                })
+                await ws.send_json(
+                    {
+                        "type": "status",
+                        "status": "processing",
+                        "message": "Analyzing your request...",
+                    }
+                )
 
                 try:
                     # Get response (with streaming simulation for now)
@@ -283,51 +281,61 @@ async def websocket_handler(request: web.Request) -> web.WebSocketResponse:
                     chunk_size = 20  # Characters per chunk
 
                     for i in range(0, len(response_text), chunk_size):
-                        chunk = response_text[i:i + chunk_size]
-                        await ws.send_json({
-                            "type": "chunk",
-                            "text": chunk,
-                            "done": False
-                        })
+                        chunk = response_text[i : i + chunk_size]
+                        await ws.send_json({"type": "chunk", "text": chunk, "done": False})
                         await asyncio.sleep(0.02)  # Small delay for streaming effect
 
                     # Send completion message
-                    await ws.send_json({
-                        "type": "response",
-                        "text": response_text,
-                        "used_cortex": result.used_cortex,
-                        "cognitive_state": result.cognitive_state if hasattr(result, 'cognitive_state') else None,
-                        "response_time_ms": result.response_time_ms if hasattr(result, 'response_time_ms') else None,
-                        "done": True
-                    })
+                    await ws.send_json(
+                        {
+                            "type": "response",
+                            "text": response_text,
+                            "used_cortex": result.used_cortex,
+                            "cognitive_state": (
+                                result.cognitive_state
+                                if hasattr(result, "cognitive_state")
+                                else None
+                            ),
+                            "response_time_ms": (
+                                result.response_time_ms
+                                if hasattr(result, "response_time_ms")
+                                else None
+                            ),
+                            "done": True,
+                        }
+                    )
 
                 except asyncio.TimeoutError:
-                    await ws.send_json({
-                        "type": "error",
-                        "message": "Request timed out. Please try a simpler question.",
-                        "error_type": "timeout"
-                    })
+                    await ws.send_json(
+                        {
+                            "type": "error",
+                            "message": "Request timed out. Please try a simpler question.",
+                            "error_type": "timeout",
+                        }
+                    )
                 except Exception as e:
                     logger.exception(f"Error processing WebSocket message: {e}")
-                    await ws.send_json({
-                        "type": "error",
-                        "message": f"An error occurred: {type(e).__name__}",
-                        "error_type": "processing_error"
-                    })
+                    await ws.send_json(
+                        {
+                            "type": "error",
+                            "message": f"An error occurred: {type(e).__name__}",
+                            "error_type": "processing_error",
+                        }
+                    )
 
             except json.JSONDecodeError:
-                await ws.send_json({
-                    "type": "error",
-                    "message": "Invalid JSON format",
-                    "error_type": "parse_error"
-                })
+                await ws.send_json(
+                    {"type": "error", "message": "Invalid JSON format", "error_type": "parse_error"}
+                )
             except Exception as e:
                 logger.exception(f"Unexpected WebSocket error: {e}")
-                await ws.send_json({
-                    "type": "error",
-                    "message": "An unexpected error occurred",
-                    "error_type": "unknown"
-                })
+                await ws.send_json(
+                    {
+                        "type": "error",
+                        "message": "An unexpected error occurred",
+                        "error_type": "unknown",
+                    }
+                )
 
         elif msg.type == aiohttp.WSMsgType.ERROR:
             logger.error(f"WebSocket error: {ws.exception()}")
@@ -340,6 +348,7 @@ async def websocket_handler(request: web.Request) -> web.WebSocketResponse:
 # Middleware
 # =============================================================================
 
+
 @web.middleware
 async def cors_middleware(request: web.Request, handler):
     """Add CORS headers."""
@@ -347,11 +356,11 @@ async def cors_middleware(request: web.Request, handler):
         response = web.Response()
     else:
         response = await handler(request)
-    
+
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    
+
     return response
 
 
@@ -359,10 +368,11 @@ async def cors_middleware(request: web.Request, handler):
 # Application
 # =============================================================================
 
+
 def create_app() -> web.Application:
     """Create the web application."""
     app = web.Application(middlewares=[cors_middleware])
-    
+
     # Routes
     app.router.add_get("/health", health_handler)
     app.router.add_get("/status", status_handler)
@@ -370,10 +380,10 @@ def create_app() -> web.Application:
     app.router.add_post("/think", think_handler)
     app.router.add_get("/tools", tools_handler)
     app.router.add_get("/ws", websocket_handler)
-    
+
     # CORS preflight
     app.router.add_route("OPTIONS", "/{path:.*}", lambda r: web.Response())
-    
+
     return app
 
 
@@ -397,13 +407,27 @@ def print_banner(host: str, port: int):
     print(f"\033[93m  📡 WebSocket:\033[0m ws://{host}:{port}/ws")
     print()
     print("\033[96m  ┌─────────────────────────────────────────────────────────┐\033[0m")
-    print("\033[96m  │\033[0m  \033[97mEndpoints:\033[0m                                             \033[96m│\033[0m")
-    print("\033[96m  │\033[0m    \033[92mGET\033[0m   /health  ─  Health check                       \033[96m│\033[0m")
-    print("\033[96m  │\033[0m    \033[92mGET\033[0m   /status  ─  System status                      \033[96m│\033[0m")
-    print("\033[96m  │\033[0m    \033[93mPOST\033[0m  /chat    ─  Send message                       \033[96m│\033[0m")
-    print("\033[96m  │\033[0m    \033[93mPOST\033[0m  /think   ─  Force deep thinking                \033[96m│\033[0m")
-    print("\033[96m  │\033[0m    \033[92mGET\033[0m   /tools   ─  List available tools               \033[96m│\033[0m")
-    print("\033[96m  │\033[0m    \033[95mWS\033[0m    /ws      ─  WebSocket streaming                \033[96m│\033[0m")
+    print(
+        "\033[96m  │\033[0m  \033[97mEndpoints:\033[0m                                             \033[96m│\033[0m"
+    )
+    print(
+        "\033[96m  │\033[0m    \033[92mGET\033[0m   /health  ─  Health check                       \033[96m│\033[0m"
+    )
+    print(
+        "\033[96m  │\033[0m    \033[92mGET\033[0m   /status  ─  System status                      \033[96m│\033[0m"
+    )
+    print(
+        "\033[96m  │\033[0m    \033[93mPOST\033[0m  /chat    ─  Send message                       \033[96m│\033[0m"
+    )
+    print(
+        "\033[96m  │\033[0m    \033[93mPOST\033[0m  /think   ─  Force deep thinking                \033[96m│\033[0m"
+    )
+    print(
+        "\033[96m  │\033[0m    \033[92mGET\033[0m   /tools   ─  List available tools               \033[96m│\033[0m"
+    )
+    print(
+        "\033[96m  │\033[0m    \033[95mWS\033[0m    /ws      ─  WebSocket streaming                \033[96m│\033[0m"
+    )
     print("\033[96m  └─────────────────────────────────────────────────────────┘\033[0m")
     print()
 
@@ -414,19 +438,19 @@ async def main():
     parser.add_argument("--host", default="127.0.0.1", help="Host to bind to")
     parser.add_argument("--port", type=int, default=8085, help="Port to listen on")
     args = parser.parse_args()
-    
+
     app = create_app()
-    
+
     print_banner(args.host, args.port)
-    
+
     runner = web.AppRunner(app)
     await runner.setup()
-    
+
     site = web.TCPSite(runner, args.host, args.port)
     await site.start()
-    
+
     logger.info("Server ready. Press Ctrl+C to stop.")
-    
+
     # Keep running
     stop_event = asyncio.Event()
     try:
@@ -437,9 +461,9 @@ async def main():
 
 def run():
     """Entry point."""
-    if sys.platform == 'win32':
+    if sys.platform == "win32":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    
+
     try:
         asyncio.run(main())
     except KeyboardInterrupt:

@@ -3,6 +3,17 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useCoreStore } from '@/stores/core';
 
+// Check if we're in Tauri environment
+const isTauri = typeof window !== 'undefined' && '__TAURI__' in window;
+
+// Server status event from Tauri backend
+interface ServerStatusEvent {
+  running: boolean;
+  port: number;
+  stage: string;
+  error: string | null;
+}
+
 export type ConnectionState =
   | 'initializing'
   | 'checking'
@@ -160,6 +171,51 @@ export function useConnectionHealth(): ConnectionHealth {
       setState(error?.includes('Ollama') ? 'ollama_unavailable' : 'server_unavailable');
     }
   }, [clearTimers, state, error]);
+
+  // Listen to Tauri server-status events
+  useEffect(() => {
+    if (!isTauri) return;
+
+    let unlisten: (() => void) | undefined;
+
+    const setupTauriListener = async () => {
+      try {
+        const { listen } = await import('@tauri-apps/api/event');
+
+        unlisten = await listen<ServerStatusEvent>('server-status', (event) => {
+          const { running, stage, error: serverError } = event.payload;
+
+          if (running) {
+            // Server is ready
+            setState('connected');
+            setError(null);
+            setErrorDetails(null);
+            setRetryCount(0);
+            setConnected(true);
+            clearTimers();
+          } else if (serverError) {
+            // Server failed to start
+            setState('server_unavailable');
+            setError('Server failed to start');
+            setErrorDetails(serverError);
+            setConnected(false);
+          } else {
+            // Server is starting (show stage in UI)
+            setState('checking');
+            setErrorDetails(stage);
+          }
+        });
+      } catch (err) {
+        console.error('Failed to setup Tauri server-status listener:', err);
+      }
+    };
+
+    setupTauriListener();
+
+    return () => {
+      if (unlisten) unlisten();
+    };
+  }, [setConnected, clearTimers]);
 
   // Initial check on mount
   useEffect(() => {
