@@ -79,7 +79,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
             {/* Error Description */}
             <p className="text-text-muted text-center mb-4">
-              AVA encountered an unexpected error. Don't worry, your data is safe.
+              AVA encountered an unexpected error. Don&apos;t worry, your data is safe.
             </p>
 
             {/* Error Details (collapsible) */}

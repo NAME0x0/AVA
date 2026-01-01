@@ -54,7 +54,7 @@ export function SystemCheckStep({ onNext, onBack }: SystemCheckStepProps) {
           updateCheck('ollama', { status: 'checking' });
           await new Promise((r) => setTimeout(r, 300));
 
-          if (data.ollama_status === 'available' || data.ollama !== false) {
+          if (data.ollama_status === 'connected' || data.ollama_status === 'available' || data.ollama !== false) {
             updateCheck('ollama', {
               status: 'success',
               detail: 'Running',

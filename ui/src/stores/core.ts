@@ -155,6 +155,7 @@ interface CoreStore {
 
   // WebSocket State
   wsConnected: boolean;
+  wsDisabled: boolean;
   wsRef: WebSocket | null;
   setWsConnected: (connected: boolean) => void;
   connectWebSocket: () => void;
@@ -348,9 +349,12 @@ export const useCoreStore = create<CoreStore>()(
     // WebSocket State
     wsConnected: false,
     wsRef: null,
+    wsDisabled: false, // Set to true if WS endpoint doesn't exist
     setWsConnected: (wsConnected) => set({ wsConnected }),
     connectWebSocket: () => {
       const state = get();
+      // Don't retry if WS is disabled (server doesn't support it)
+      if (state.wsDisabled) return;
       if (state.wsRef?.readyState === WebSocket.OPEN) return;
 
       if (typeof window === "undefined") return;
@@ -458,8 +462,10 @@ export const useCoreStore = create<CoreStore>()(
           set({ wsConnected: false, wsRef: null });
         };
 
-        ws.onerror = () => {
-          set({ wsConnected: false });
+        ws.onerror = (error) => {
+          // Disable WS retry if server doesn't support it (404 or connection refused)
+          console.log("[AVA] WebSocket error - disabling future reconnection attempts. Use HTTP polling instead.");
+          set({ wsConnected: false, wsDisabled: true });
         };
 
         set({ wsRef: ws });

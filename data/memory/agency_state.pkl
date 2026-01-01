@@ -1,0 +1,1 @@
+{"beliefs": {"user_intent": {"USER_IDLE": 0.7, "USER_QUERYING": 0.2, "USER_URGENT": 0.05, "USER_CONFUSED": 0.05}, "knowledge_state": {"KNOWLEDGE_CERTAIN": 0.5, "KNOWLEDGE_UNCERTAIN": 0.3, "KNOWLEDGE_MISSING": 0.2}, "interaction_state": {"INTERACTION_ROUTINE": 0.6, "INTERACTION_NOVEL": 0.3, "INTERACTION_COMPLEX": 0.1}}, "action_history": []}

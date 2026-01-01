@@ -1,7 +1,7 @@
 /**
  * System Polling Hook
  * 
- * Polls the backend for system state, cognitive state, and memory stats.
+ * Polls the backend for system state, cognitive state, memory stats, and belief state.
  */
 
 import { useEffect, useCallback, useRef } from "react";
@@ -17,6 +17,7 @@ export function useSystemPolling() {
     setCognitiveState,
     setMemoryStats,
     setSystemState,
+    setBeliefState,
   } = useCoreStore();
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -38,8 +39,8 @@ export function useSystemPolling() {
               varentropy: (cognitive as any).varentropy,
               confidence: (cognitive as any).confidence,
               surprise: (cognitive as any).surprise,
-              shouldUseTools: (cognitive as any).should_use_tools,
-              shouldThink: (cognitive as any).should_think,
+              shouldUseTools: (cognitive as any).should_use_tools || (cognitive as any).shouldUseTools,
+              shouldThink: (cognitive as any).should_think || (cognitive as any).shouldThink,
             });
           }
         } catch {}
@@ -54,6 +55,19 @@ export function useSystemPolling() {
               avgSurprise: (memory as any).avg_surprise,
               backend: (memory as any).backend,
               memoryUtilization: (memory as any).memory_utilization || 0,
+            });
+          }
+        } catch {}
+
+        // Poll belief state
+        try {
+          const belief = await invoke("get_belief_state");
+          if (belief) {
+            setBeliefState({
+              currentState: (belief as any).currentState || (belief as any).current_state,
+              stateDistribution: (belief as any).stateDistribution || (belief as any).state_distribution || {},
+              policyDistribution: (belief as any).policyDistribution || (belief as any).policy_distribution || {},
+              freeEnergy: (belief as any).freeEnergy || (belief as any).free_energy || 0,
             });
           }
         } catch {}
@@ -96,8 +110,8 @@ export function useSystemPolling() {
                   varentropy: cognitive.varentropy,
                   confidence: cognitive.confidence,
                   surprise: cognitive.surprise,
-                  shouldUseTools: cognitive.should_use_tools,
-                  shouldThink: cognitive.should_think,
+                  shouldUseTools: cognitive.should_use_tools || cognitive.shouldUseTools,
+                  shouldThink: cognitive.should_think || cognitive.shouldThink,
                 });
               }
             } catch {}
@@ -117,14 +131,31 @@ export function useSystemPolling() {
               }
             } catch {}
 
-            // Poll system state
+            // Poll belief state
+            try {
+              const beliefRes = await fetch(`${backendUrl}/belief`);
+              if (beliefRes.ok) {
+                const belief = await beliefRes.json();
+                setBeliefState({
+                  currentState: belief.currentState || belief.current_state,
+                  stateDistribution: belief.stateDistribution || belief.state_distribution || {},
+                  policyDistribution: belief.policyDistribution || belief.policy_distribution || {},
+                  freeEnergy: belief.freeEnergy || belief.free_energy || 0,
+                });
+              }
+            } catch {}
+
+            // Poll system state / stats
             try {
               const sysRes = await fetch(`${backendUrl}/stats`);
               if (sysRes.ok) {
                 const stats = await sysRes.json();
                 setSystemState({
-                  systemState: stats.system?.is_running ? "running" : "paused",
-                  totalInteractions: stats.system?.interaction_count || 0,
+                  systemState: "running",
+                  totalInteractions: stats.total_requests || 0,
+                  cortexInvocations: stats.cortex_requests || 0,
+                  uptimeSeconds: stats.uptime_seconds || 0,
+                  avgResponseTimeMs: stats.avg_response_time_ms || 0,
                 });
               }
             } catch {}
@@ -136,7 +167,7 @@ export function useSystemPolling() {
     } catch (error) {
       setConnected(false);
     }
-  }, [backendUrl, setConnected, setCognitiveState, setMemoryStats, setSystemState]);
+  }, [backendUrl, setConnected, setCognitiveState, setMemoryStats, setSystemState, setBeliefState]);
 
   useEffect(() => {
     // Initial poll

@@ -1,0 +1,28 @@
+# AVA Configuration File
+# ======================
+# This file configures the unified AVA application.
+# Place this file next to the AVA executable for portable mode.
+
+[server]
+# HTTP server settings
+host = "127.0.0.1"
+port = 8085
+cors_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "tauri://localhost",
+]
+
+[engine]
+# Model settings
+fast_model = "gemma3:4b"       # Quick responses
+deep_model = "qwen2.5:32b"     # Deep thinking (force_cortex)
+max_tokens = 2048
+temperature = 0.7
+top_p = 0.9
+context_window = 8192
+
+[ollama]
+# Ollama connection settings
+host = "http://localhost:11434"
+timeout_secs = 120

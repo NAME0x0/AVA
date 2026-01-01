@@ -1,10 +1,11 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Wifi, WifiOff, Sparkles, Eye, Download, Trash2, Settings, Sun, Moon, Monitor } from "lucide-react";
+import { X, Server, Sparkles, Eye, Download, Trash2, Settings, Sun, Moon, Monitor } from "lucide-react";
 import { useCoreStore } from "@/stores/core";
 import { useTheme } from "@/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
+import { BackendSettings } from "./BackendSettings";
 
 interface SettingsSectionProps {
   title: string;
@@ -109,11 +110,6 @@ export function SettingsPanel() {
     setSettingsPanelOpen,
     preferences,
     updatePreference,
-    backendUrl,
-    setBackendUrl,
-    wsConnected,
-    connectWebSocket,
-    disconnectWebSocket,
     clearMessages,
     messages,
   } = useCoreStore();
@@ -207,51 +203,12 @@ export function SettingsPanel() {
 
               {/* Content */}
               <div className="flex-1 overflow-y-auto p-4">
-                {/* Connection Section */}
+                {/* Backend Connection Section */}
                 <SettingsSection
-                  title="Connection"
-                  icon={wsConnected ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
+                  title="Backend"
+                  icon={<Server className="w-4 h-4" />}
                 >
-                  <div className="p-3 rounded-lg bg-neural-elevated/50">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-text-primary">Backend URL</span>
-                      <span
-                        className={cn(
-                          "px-2 py-0.5 rounded text-xs",
-                          wsConnected
-                            ? "bg-state-flow/20 text-state-flow"
-                            : "bg-state-confusion/20 text-state-confusion"
-                        )}
-                      >
-                        {wsConnected ? "Connected" : "Disconnected"}
-                      </span>
-                    </div>
-                    <input
-                      type="text"
-                      value={backendUrl}
-                      onChange={(e) => setBackendUrl(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-neural-surface border border-neural-hover text-text-primary text-sm focus:outline-none focus:border-accent-primary"
-                      placeholder="http://localhost:8085"
-                    />
-                    <div className="flex gap-2 mt-2">
-                      <motion.button
-                        onClick={connectWebSocket}
-                        className="flex-1 py-2 rounded-lg bg-accent-primary/20 text-accent-primary text-sm font-medium hover:bg-accent-primary/30 transition-colors"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        Connect
-                      </motion.button>
-                      <motion.button
-                        onClick={disconnectWebSocket}
-                        className="flex-1 py-2 rounded-lg bg-state-confusion/20 text-state-confusion text-sm font-medium hover:bg-state-confusion/30 transition-colors"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        Disconnect
-                      </motion.button>
-                    </div>
-                  </div>
+                  <BackendSettings />
 
                   <SelectOption
                     label="Streaming Mode"

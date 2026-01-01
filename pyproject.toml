@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ava-agent"
-version = "3.2.0"
+version = "3.3.3"
 description = "Research-grade AI assistant with biomimetic dual-brain architecture"
 readme = "README.md"
 license = {text = "MIT"}
@@ -94,9 +94,11 @@ Changelog = "https://github.com/NAME0x0/AVA/blob/main/CHANGELOG.md"
 
 [project.scripts]
 ava = "ava.cli:app"
+ava-server = "ava_server:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+py-modules = ["ava_server", "server"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

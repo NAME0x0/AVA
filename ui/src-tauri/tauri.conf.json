@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
     "beforeBuildCommand": "npm run build",
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "",
     "devPath": "http://localhost:3000",
     "distDir": "../out"
   },
@@ -19,8 +19,14 @@
         "scope": [
           "http://localhost:8085/**",
           "http://127.0.0.1:8085/**",
-          "http://localhost:8080/**",
-          "http://127.0.0.1:8080/**",
+          "http://localhost:8086/**",
+          "http://127.0.0.1:8086/**",
+          "http://localhost:8087/**",
+          "http://127.0.0.1:8087/**",
+          "http://localhost:11434/**",
+          "http://127.0.0.1:11434/**",
+          "http://localhost:3000/**",
+          "http://127.0.0.1:3000/**",
           "https://github.com/**",
           "https://api.github.com/**"
         ]
@@ -28,14 +34,8 @@
       "shell": {
         "open": true,
         "execute": false,
-        "sidecar": true,
-        "scope": [
-          {
-            "name": "binaries/ava-server",
-            "sidecar": true,
-            "args": true
-          }
-        ]
+        "sidecar": false,
+        "scope": []
       },
       "window": {
         "all": true,
@@ -65,6 +65,18 @@
       },
       "os": {
         "all": true
+      },
+      "path": {
+        "all": true
+      },
+      "fs": {
+        "scope": ["$APP/**", "$RESOURCE/**"],
+        "all": false,
+        "readFile": true,
+        "writeFile": true,
+        "readDir": true,
+        "createDir": true,
+        "exists": true
       }
     },
     "systemTray": {
@@ -75,7 +87,7 @@
     "bundle": {
       "active": true,
       "category": "DeveloperTool",
-      "copyright": "© 2024 AVA Project",
+      "copyright": "© 2024-2026 AVA Project",
       "deb": {
         "depends": []
       },
@@ -88,7 +100,7 @@
         "icons/icon.ico"
       ],
       "identifier": "com.ava.neural-interface",
-      "longDescription": "AVA Neural Interface - Cortex-Medulla Biomimetic Architecture",
+      "longDescription": "AVA Neural Interface - A unified, portable AI assistant with biomimetic Cortex-Medulla architecture. Single executable, no Python required.",
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
@@ -97,16 +109,23 @@
         "signingIdentity": null
       },
       "resources": [
-        "../../server.py",
-        "../../src/**/*",
-        "../../config/**/*"
+        "config/*"
       ],
-      "shortDescription": "AVA Neural Interface",
+      "shortDescription": "AVA - Unified Neural Interface",
       "targets": "all",
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
-        "timestampUrl": ""
+        "timestampUrl": "",
+        "wix": null,
+        "nsis": {
+          "installerIcon": "icons/icon.ico",
+          "headerImage": null,
+          "sidebarImage": null,
+          "installMode": "currentUser",
+          "license": null,
+          "compression": "lzma"
+        }
       }
     },
     "security": {
@@ -122,7 +141,7 @@
     },
     "windows": [
       {
-        "title": "AVA • Cortex-Medulla Interface",
+        "title": "AVA • Neural Interface",
         "width": 1400,
         "height": 900,
         "minWidth": 900,
@@ -130,7 +149,7 @@
         "resizable": true,
         "fullscreen": false,
         "decorations": false,
-        "transparent": true,
+        "transparent": false,
         "center": true,
         "visible": true,
         "focus": true,

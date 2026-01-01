@@ -9,8 +9,13 @@ interface BeliefStateCardProps {
 }
 
 export function BeliefStateCard({ state }: BeliefStateCardProps) {
+  // Safe defaults for potentially undefined values
+  const currentState = state?.currentState ?? "IDLE";
+  const freeEnergy = state?.freeEnergy ?? 0;
+  const policyDistribution = state?.policyDistribution ?? {};
+  
   // Get top 3 policies by probability
-  const topPolicies = Object.entries(state.policyDistribution)
+  const topPolicies = Object.entries(policyDistribution)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 3);
 
@@ -20,7 +25,7 @@ export function BeliefStateCard({ state }: BeliefStateCardProps) {
       <div className="flex items-center justify-between">
         <span className="text-xs text-text-muted">Current State</span>
         <span className="text-sm font-medium text-text-primary">
-          {state.currentState || "IDLE"}
+          {currentState || "IDLE"}
         </span>
       </div>
 
@@ -34,12 +39,12 @@ export function BeliefStateCard({ state }: BeliefStateCardProps) {
             <motion.div
               className="h-full bg-gradient-to-r from-state-flow to-state-confusion rounded-full"
               initial={{ width: 0 }}
-              animate={{ width: `${Math.min(100, state.freeEnergy * 20)}%` }}
+              animate={{ width: `${Math.min(100, freeEnergy * 20)}%` }}
               transition={{ duration: 0.5 }}
             />
           </motion.div>
           <span className="text-xs text-text-secondary tabular-nums w-10 text-right">
-            {state.freeEnergy.toFixed(2)}
+            {freeEnergy.toFixed(2)}
           </span>
         </div>
       </div>

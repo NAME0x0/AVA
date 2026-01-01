@@ -4,7 +4,9 @@
   "description": "AVA Neural Interface - Cortex-Medulla Architecture",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3000",
+    "dev:wait": "wait-on http://localhost:3000 -t 30000",
+    "tauri:dev": "concurrently -k \"npm run dev\" \"npm run dev:wait && tauri dev\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -12,7 +14,6 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "tauri": "tauri",
-    "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "build:sidecar": "cd .. && python scripts/build_sidecar.py",
     "build:sidecar:clean": "cd .. && python scripts/build_sidecar.py --clean",
@@ -24,8 +25,8 @@
     "@radix-ui/react-scroll-area": "^1.2.2",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.4",
-    "@react-three/fiber": "^8.15.0",
     "@react-three/drei": "^9.88.0",
+    "@react-three/fiber": "^8.15.0",
     "@tauri-apps/api": "^1.6.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -48,10 +49,12 @@
     "@types/react-window": "^1.8.8",
     "@types/three": "^0.160.0",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.2.1",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.2.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "wait-on": "^9.0.3"
   }
 }

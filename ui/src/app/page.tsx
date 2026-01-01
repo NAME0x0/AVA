@@ -44,7 +44,9 @@ export default function Home() {
 
   // Show wizard on first run
   useEffect(() => {
+    console.log('[AVA] Setup check:', { hasCompletedSetup: setupState.hasCompletedSetup, serverReady, showWizard });
     if (!setupState.hasCompletedSetup && serverReady) {
+      console.log('[AVA] Showing wizard overlay');
       setShowWizard(true);
     }
   }, [setupState.hasCompletedSetup, serverReady]);
@@ -151,14 +153,22 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('[AVA] serverReady:', serverReady, 'isTauri:', isTauri);
+  }, [serverReady]);
+
   return (
     <>
       {/* Server Startup Screen (Tauri only) */}
-      {!serverReady && (
-        <ServerStartup onReady={() => setServerReady(true)} />
+      {!serverReady && isTauri && (
+        <ServerStartup onReady={() => {
+          console.log('[AVA] Server ready, transitioning to main app');
+          setServerReady(true);
+        }} />
       )}
 
-      <main className={`flex flex-col h-screen bg-neural-void overflow-hidden rounded-xl border border-neural-hover/50 ${!serverReady ? 'hidden' : ''}`}>
+      <main className={`flex flex-col h-screen bg-neural-void overflow-hidden rounded-xl border border-neural-hover/50 ${!serverReady && isTauri ? 'invisible' : ''}`}>
         {/* Custom Title Bar for Tauri */}
         <TitleBar />
 

@@ -155,6 +155,36 @@ pub async fn get_memory_stats(state: State<'_, AppState>) -> Result<MemoryStats,
         .map_err(|e| format!("Failed to parse response: {e}"))
 }
 
+/// Belief state response (Active Inference)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BeliefState {
+    #[serde(alias = "currentState", alias = "current_state")]
+    pub current_state: String,
+    #[serde(alias = "stateDistribution", alias = "state_distribution")]
+    pub state_distribution: std::collections::HashMap<String, f32>,
+    #[serde(alias = "policyDistribution", alias = "policy_distribution")]
+    pub policy_distribution: std::collections::HashMap<String, f32>,
+    #[serde(alias = "freeEnergy", alias = "free_energy")]
+    pub free_energy: f32,
+}
+
+/// Get belief state (Active Inference metrics)
+#[tauri::command]
+pub async fn get_belief_state(state: State<'_, AppState>) -> Result<BeliefState, String> {
+    let base_url = state.backend_url.lock().await.clone();
+
+    let client = reqwest::Client::new();
+    let resp = client
+        .get(format!("{base_url}/belief"))
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {e}"))?;
+
+    resp.json()
+        .await
+        .map_err(|e| format!("Failed to parse response: {e}"))
+}
+
 /// Force Cortex invocation for next response
 #[tauri::command]
 pub async fn force_cortex(state: State<'_, AppState>) -> Result<(), String> {

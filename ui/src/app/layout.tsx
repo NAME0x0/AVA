@@ -37,11 +37,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="h-full">
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} font-sans min-h-screen bg-neural-void overflow-hidden`}
+        className={`${inter.variable} ${jetbrainsMono.variable} font-sans h-full bg-neural-void overflow-hidden`}
+        style={{ backgroundColor: '#08080C' }} // Ensure solid background even before CSS loads
       >
-        <ThemeProvider defaultMode="system">
+        <ThemeProvider defaultMode="dark">
           <ErrorBoundary>{children}</ErrorBoundary>
         </ThemeProvider>
       </body>

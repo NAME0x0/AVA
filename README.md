@@ -13,8 +13,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/NAME0x0/AVA/releases/latest/download/AVA_3.2.0_x64-setup.exe">
-    <img src="https://img.shields.io/badge/Download-Windows%20Installer-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download Windows Installer">
+  <a href="https://github.com/NAME0x0/AVA/releases/latest">
+    <img src="https://img.shields.io/badge/Download-Latest%20Release-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download Latest Release">
   </a>
 </p>
 
@@ -33,9 +33,68 @@
 
 ---
 
+## Two-App Architecture
+
+AVA v3.3+ uses a **two-app architecture** for improved reliability:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  AVA SERVER (Backend)                                           │
+│  - Standalone executable or Python script                       │
+│  - Handles all AI processing via Ollama                         │
+│  - Runs on http://localhost:8085                                │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ HTTP / WebSocket
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  AVA UI (Frontend)                                              │
+│  - Desktop app (Tauri) or browser                               │
+│  - Connects to the server automatically                         │
+│  - Shows diagnostics if server isn't running                    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Start the server first**, then launch the UI. This separation ensures:
+- Clear error messages when something goes wrong
+- Ability to run server and UI on different machines
+- Independent updates for backend and frontend
+
+---
+
 ## Installation
 
-### Windows Installer (Recommended)
+### Prerequisites
+
+1. **Ollama** - [Download Ollama](https://ollama.ai/) - **Required**
+   ```bash
+   ollama pull gemma3:4b
+   ollama serve
+   ```
+2. **Python 3.10+** - [Download Python](https://www.python.org/downloads/) (for pip install or source)
+3. **Node.js 20+** (for UI development) - [Download Node.js](https://nodejs.org/)
+
+### Quick Start
+
+**Step 1: Start the Backend**
+
+```bash
+# Option A: Standalone executable (download from Releases)
+./ava-server.exe
+
+# Option B: Python package
+pip install ava-agent
+ava-server --port 8085
+
+# Option C: From source
+python ava_server.py
+```
+
+**Step 2: Launch the UI**
+
+Download and run the desktop app from [Releases](https://github.com/NAME0x0/AVA/releases/latest), or open http://localhost:3000 in your browser (after running `npm run dev` in the ui/ directory).
+
+### Windows Installer
 
 <p align="center">
   <a href="https://github.com/NAME0x0/AVA/releases/latest">
@@ -43,21 +102,9 @@
   </a>
 </p>
 
-1. Download the installer from [Releases](https://github.com/NAME0x0/AVA/releases/latest)
-2. Run `AVA_x.x.x_x64-setup.exe`
-3. Follow the installation wizard
-4. Launch AVA from the Start Menu or Desktop shortcut
-
-**Features included:**
-- Desktop application with system tray
-- Auto-start on Windows boot (optional)
-- One-click bug reporting
-
-### Prerequisites (for all installation methods)
-
-1. **Python 3.10+** - [Download Python](https://www.python.org/downloads/)
-2. **Ollama** - [Download Ollama](https://ollama.ai/)
-3. **Node.js 18+** (for GUI development) - [Download Node.js](https://nodejs.org/)
+The release includes:
+- `ava-server.exe` - Standalone backend server
+- `AVA_x.x.x_x64-setup.exe` - Desktop UI installer
 
 ---
 
@@ -97,24 +144,39 @@ python server.py        # Start the API server
 
 ## Running AVA
 
-### HTTP API Server (Primary)
+### 1. Start the Server (Required)
+
 ```bash
+# With preflight checks and verbose logging (recommended)
+python ava_server.py
+
+# Or the simpler server.py
 python server.py
-# Runs on http://localhost:8085
+
+# Check dependencies without starting
+python ava_server.py --check
+
+# Run on a different port
+python ava_server.py --port 8080
 ```
 
-### Terminal UI (Power Users)
-```bash
-python run_tui.py
-# Full-featured terminal interface with keybindings
-```
+### 2. Connect with UI
 
-### Desktop App (GUI)
+**Desktop App (GUI)**
 ```bash
 cd ui
 npm install
 npm run tauri dev
 ```
+
+**Terminal UI (Power Users)**
+```bash
+python run_tui.py
+# Full-featured terminal interface with keybindings
+```
+
+**Browser**
+Open http://localhost:3000 after starting the UI dev server.
 
 ### Core System (Direct)
 ```bash

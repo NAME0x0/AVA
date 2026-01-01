@@ -9,8 +9,17 @@ interface CognitiveStateCardProps {
 }
 
 export function CognitiveStateCard({ state }: CognitiveStateCardProps) {
-  const stateColor = getCognitiveStateColor(state.label);
-  const stateBgColor = getCognitiveStateBgColor(state.label);
+  // Safe defaults for potentially undefined values
+  const label = state?.label ?? "UNKNOWN";
+  const confidence = state?.confidence ?? 0;
+  const entropy = state?.entropy ?? 0;
+  const varentropy = state?.varentropy ?? 0;
+  const surprise = state?.surprise ?? 0;
+  const shouldThink = state?.shouldThink ?? false;
+  const shouldUseTools = state?.shouldUseTools ?? false;
+
+  const stateColor = getCognitiveStateColor(label);
+  const stateBgColor = getCognitiveStateBgColor(label);
 
   return (
     <motion.div
@@ -35,12 +44,12 @@ export function CognitiveStateCard({ state }: CognitiveStateCardProps) {
               ease: "easeInOut",
             }}
           />
-          <span className={cn("font-semibold", stateColor)}>{state.label}</span>
+          <span className={cn("font-semibold", stateColor)}>{label}</span>
         </div>
 
         {/* Confidence Badge */}
         <div className="text-xs text-text-muted bg-neural-void/50 px-2 py-0.5 rounded-full">
-          {(state.confidence * 100).toFixed(0)}% conf
+          {(confidence * 100).toFixed(0)}% conf
         </div>
       </div>
 
@@ -48,26 +57,26 @@ export function CognitiveStateCard({ state }: CognitiveStateCardProps) {
       <div className="mt-2 flex gap-4 text-xs">
         <div>
           <span className="text-text-muted">H:</span>
-          <span className="text-text-secondary ml-1">{state.entropy.toFixed(2)}</span>
+          <span className="text-text-secondary ml-1">{entropy.toFixed(2)}</span>
         </div>
         <div>
           <span className="text-text-muted">V:</span>
-          <span className="text-text-secondary ml-1">{state.varentropy.toFixed(2)}</span>
+          <span className="text-text-secondary ml-1">{varentropy.toFixed(2)}</span>
         </div>
         <div>
           <span className="text-text-muted">σ:</span>
-          <span className="text-text-secondary ml-1">{state.surprise.toFixed(2)}</span>
+          <span className="text-text-secondary ml-1">{surprise.toFixed(2)}</span>
         </div>
       </div>
 
       {/* Flags */}
       <div className="mt-2 flex gap-2">
-        {state.shouldThink && (
+        {shouldThink && (
           <span className="text-[10px] px-2 py-0.5 rounded bg-cortex-active/20 text-cortex-active border border-cortex-active/30">
             THINKING
           </span>
         )}
-        {state.shouldUseTools && (
+        {shouldUseTools && (
           <span className="text-[10px] px-2 py-0.5 rounded bg-accent-primary/20 text-accent-primary border border-accent-primary/30">
             TOOLS
           </span>

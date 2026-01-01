@@ -1,31 +1,44 @@
-//! AVA Neural Interface - Tauri Backend
+//! AVA Neural Interface - Unified Application
 //!
-//! Rust backend for the Cortex-Medulla UI providing:
-//! - Native performance for state management
+//! A single, portable application that includes:
+//! - Embedded HTTP server (Rust, replaces Python backend)
+//! - Native desktop UI (Tauri)
 //! - System tray integration
-//! - IPC bridge to Python backend
-//! - Hardware monitoring
-//! - Automated bug reporting
-//! - Server lifecycle management
+//! - No external dependencies except Ollama
+//!
+//! This is the production entry point for the distributed application.
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod backend;
 mod bug_report;
 mod commands;
-mod server_launcher;
+mod engine;
 mod state;
 mod tray;
 
-use server_launcher::ServerLauncher;
+use engine::config::AppConfig;
 use std::sync::Arc;
 use tauri::Manager;
 use tauri_plugin_autostart::MacosLauncher;
 use tokio::sync::Mutex;
+use tracing::{error, info};
+
+/// Application version
+const VERSION: &str = "3.3.3";
 
 fn main() {
-    // Initialize logging
-    tracing_subscriber::fmt::init();
+    // Initialize logging with environment filter
+    tracing_subscriber::fmt()
+        .with_env_filter(
+            tracing_subscriber::EnvFilter::from_default_env()
+                .add_directive("ava=info".parse().unwrap())
+                .add_directive("tower_http=debug".parse().unwrap()),
+        )
+        .init();
+
+    info!("Starting AVA Neural Interface v{}", VERSION);
+    info!("Architecture: Unified Rust (Cortex-Medulla)");
 
     tauri::Builder::default()
         // Single instance plugin - prevent multiple windows
@@ -48,30 +61,75 @@ fn main() {
         .on_window_event(|event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event.event() {
                 // Hide window instead of closing
-                event.window().hide().unwrap();
+                let _ = event.window().hide();
                 api.prevent_close();
             }
         })
         .setup(|app| {
-            // Initialize app state
+            info!("Setting up AVA application...");
+
+            // Initialize app state for Tauri
             app.manage(state::AppState::new());
 
-            // Create server launcher and store it for later access
-            let launcher = ServerLauncher::new(app.handle());
-            let launcher_arc = Arc::new(Mutex::new(launcher.clone()));
-            app.manage(launcher_arc.clone());
+            // Load configuration
+            let config = AppConfig::load();
+            let port = config.server.port;
 
-            // Start the Python backend server
-            let launcher_for_startup = launcher.clone();
+            // Store server handle for cleanup
+            let server_handle: Arc<Mutex<Option<engine::server::ServerHandle>>> =
+                Arc::new(Mutex::new(None));
+            let server_handle_clone = server_handle.clone();
+            app.manage(server_handle);
+
+            // Start the embedded HTTP server
+            let app_handle = app.handle();
             tauri::async_runtime::spawn(async move {
-                tracing::info!("Starting AVA backend server...");
-                match launcher_for_startup.start().await {
-                    Ok(()) => {
-                        tracing::info!("Backend server started successfully");
+                info!("Starting embedded AVA server...");
+
+                // Check if port is available, find alternative if not
+                let actual_port = if engine::server::is_port_available(port) {
+                    port
+                } else {
+                    let new_port = engine::server::find_available_port(port);
+                    info!("Port {} in use, using {} instead", port, new_port);
+                    new_port
+                };
+
+                // Update config with actual port
+                let mut config = config;
+                config.server.port = actual_port;
+
+                match engine::start_embedded_server(config).await {
+                    Ok(handle) => {
+                        info!("Embedded server started on port {}", handle.port);
+
+                        // Store handle for cleanup
+                        *server_handle_clone.lock().await = Some(handle);
+
+                        // Emit success event to frontend
+                        let _ = app_handle.emit_all(
+                            "server-status",
+                            serde_json::json!({
+                                "running": true,
+                                "port": actual_port,
+                                "stage": "Ready",
+                                "error": null
+                            }),
+                        );
                     }
                     Err(e) => {
-                        tracing::error!("Failed to start backend server: {}", e);
-                        // Error is emitted to frontend via server-status event
+                        error!("Failed to start embedded server: {}", e);
+
+                        // Emit error event to frontend
+                        let _ = app_handle.emit_all(
+                            "server-status",
+                            serde_json::json!({
+                                "running": false,
+                                "port": actual_port,
+                                "stage": "Error",
+                                "error": e
+                            }),
+                        );
                     }
                 }
             });
@@ -82,12 +140,13 @@ fn main() {
                 backend::start_connection_monitor(app_handle).await;
             });
 
+            info!("AVA setup complete");
             Ok(())
         })
         // Handle app exit - stop server gracefully
         .on_menu_event(|event| {
             if event.menu_item_id() == "quit" {
-                // Server will be stopped when the launcher is dropped
+                info!("Quit requested, shutting down...");
                 std::process::exit(0);
             }
         })
@@ -97,6 +156,7 @@ fn main() {
             commands::get_system_state,
             commands::get_cognitive_state,
             commands::get_memory_stats,
+            commands::get_belief_state,
             commands::force_cortex,
             commands::force_sleep,
             commands::set_backend_url,
@@ -105,7 +165,23 @@ fn main() {
             bug_report::create_bug_report,
             bug_report::open_bug_report_url,
             bug_report::is_error_reportable,
+            // New commands for embedded server
+            get_server_port,
+            get_app_version,
         ])
         .run(tauri::generate_context!())
         .expect("error while running AVA");
+}
+
+/// Get the server port (useful for frontend)
+#[tauri::command]
+fn get_server_port() -> u16 {
+    // Default port - frontend will also check via health endpoint
+    8085
+}
+
+/// Get application version
+#[tauri::command]
+fn get_app_version() -> String {
+    VERSION.to_string()
 }

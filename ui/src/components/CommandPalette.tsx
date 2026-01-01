@@ -425,7 +425,7 @@ export function CommandPalette({
 
               {filteredCommands.length === 0 && (
                 <div className="px-4 py-8 text-center text-text-muted" role="status">
-                  No commands found for "{query}"
+                  No commands found for &ldquo;{query}&rdquo;
                 </div>
               )}
             </div>

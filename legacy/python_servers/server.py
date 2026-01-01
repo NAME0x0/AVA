@@ -115,13 +115,32 @@ class StatusResponse:
 
 
 async def health_handler(request: web.Request) -> web.Response:
-    """Health check."""
+    """Health check with Ollama status for UI diagnostics."""
+    # Check Ollama connectivity
+    ollama_status = "unknown"
+    ollama_error = None
+    try:
+        import httpx
+
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.get("http://localhost:11434/api/tags")
+            if resp.status_code == 200:
+                ollama_status = "connected"
+            else:
+                ollama_status = "error"
+                ollama_error = f"Status {resp.status_code}"
+    except Exception as e:
+        ollama_status = "unavailable"
+        ollama_error = str(e)
+
     return web.json_response(
         {
             "status": "ok",
             "service": "AVA",
             "version": "3.3.3",
             "uptime_seconds": int(time.time() - _start_time),
+            "ollama_status": ollama_status,
+            "ollama_error": ollama_error,
         }
     )
 
@@ -365,6 +384,62 @@ async def sleep_handler(request: web.Request) -> web.Response:
     return web.json_response({"status": "ok", "message": "Sleep cycle simulated"})
 
 
+async def system_handler(request: web.Request) -> web.Response:
+    """Get detailed system information for diagnostics."""
+    import platform
+
+    ava = await get_ava()
+
+    # Ollama info
+    ollama_info = {"status": "unknown", "models": []}
+    try:
+        import httpx
+
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get("http://localhost:11434/api/tags")
+            if resp.status_code == 200:
+                data = resp.json()
+                ollama_info = {
+                    "status": "connected",
+                    "models": [m.get("name", "unknown") for m in data.get("models", [])],
+                }
+            else:
+                ollama_info = {"status": "error", "code": resp.status_code}
+    except Exception as e:
+        ollama_info = {"status": "unavailable", "error": str(e)}
+
+    # Engine stats
+    engine_stats = {}
+    if ava and ava._engine:
+        try:
+            engine_stats = ava._engine.get_stats()
+        except Exception:
+            pass
+
+    system_info = {
+        "version": "3.3.3",
+        "python": {
+            "version": sys.version,
+            "executable": sys.executable,
+        },
+        "platform": {
+            "system": platform.system(),
+            "release": platform.release(),
+            "machine": platform.machine(),
+            "platform": platform.platform(),
+        },
+        "server": {
+            "uptime_seconds": int(time.time() - _start_time),
+            "start_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(_start_time)),
+        },
+        "ollama": ollama_info,
+        "engine": engine_stats,
+        "ava_initialized": ava is not None,
+    }
+
+    return web.json_response(system_info)
+
+
 async def websocket_handler(request: web.Request) -> web.WebSocketResponse:
     """WebSocket for streaming chat with token-by-token updates."""
     ws = web.WebSocketResponse()
@@ -518,6 +593,7 @@ def create_app() -> web.Application:
     app.router.add_get("/cognitive", cognitive_handler)
     app.router.add_get("/memory", memory_handler)
     app.router.add_get("/stats", stats_handler)
+    app.router.add_get("/system", system_handler)
 
     # Control routes
     app.router.add_post("/force_cortex", force_cortex_handler)
