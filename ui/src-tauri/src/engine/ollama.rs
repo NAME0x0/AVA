@@ -13,7 +13,7 @@ use reqwest::Client;
 use std::time::Duration;
 use thiserror::Error;
 use tokio::sync::mpsc;
-use tracing::{debug, error, warn};
+use tracing::{debug, warn};
 
 /// Default Ollama host
 pub const DEFAULT_OLLAMA_HOST: &str = "http://localhost:11434";
