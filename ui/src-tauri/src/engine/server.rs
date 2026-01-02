@@ -15,6 +15,7 @@ use tower_http::trace::TraceLayer;
 use tracing::{error, info};
 
 /// Server handle for managing the embedded server
+#[allow(dead_code)]
 pub struct ServerHandle {
     pub shutdown_tx: oneshot::Sender<()>,
     pub port: u16,
@@ -54,9 +55,9 @@ pub async fn start_embedded_server(config: AppConfig) -> Result<ServerHandle, St
         .layer(TraceLayer::new_for_http());
     
     // Parse address
-    let addr: SocketAddr = format!("{}:{}", host, port)
+    let addr: SocketAddr = format!("{host}:{port}")
         .parse()
-        .map_err(|e| format!("Invalid address: {}", e))?;
+        .map_err(|e| format!("Invalid address: {e}"))?;
     
     // Create shutdown channel
     let (shutdown_tx, shutdown_rx) = oneshot::channel::<()>();

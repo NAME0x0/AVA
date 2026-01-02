@@ -172,7 +172,7 @@ async fn chat(
             return (
                 StatusCode::SERVICE_UNAVAILABLE,
                 Json(ChatResponse {
-                    error: Some(format!("Engine not ready: {}", e)),
+                    error: Some(format!("Engine not ready: {e}")),
                     ..Default::default()
                 }),
             );
@@ -200,7 +200,7 @@ async fn think(
             return (
                 StatusCode::SERVICE_UNAVAILABLE,
                 Json(ChatResponse {
-                    error: Some(format!("Engine not ready: {}", e)),
+                    error: Some(format!("Engine not ready: {e}")),
                     ..Default::default()
                 }),
             );

@@ -27,6 +27,7 @@ from .components.settings_panel import SettingsPanel
 from .components.status_bar import StatusBar
 from .components.thinking_indicator import ThinkingIndicator
 from .components.tools_panel import ToolsPanel
+from .screens.help_screen import HelpScreen
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +62,8 @@ class AVATUI(App):
         Binding("ctrl+k", "command_palette", "Commands", show=True),
         Binding("ctrl+l", "clear_chat", "Clear", show=True),
         Binding("ctrl+t", "toggle_metrics", "Metrics", show=True),
+        Binding("ctrl+e", "export_conversation", "Export", show=True),
+        Binding("ctrl+m", "cycle_model", "Model", show=True),
         Binding("ctrl+s", "force_search", "Search", show=False),
         Binding("ctrl+d", "deep_think", "Think", show=False),
         Binding("f1", "help", "Help", show=True),
@@ -82,6 +85,10 @@ class AVATUI(App):
         self._ava = None
         self._force_search = False
         self._force_cortex = False
+        
+        # Model selection
+        self._available_models: list[str] = []
+        self._current_model: str = ""
         
         # Initialize conversation persistence
         from .persistence import ConversationStore
@@ -168,6 +175,12 @@ class AVATUI(App):
                     # Update metrics panel
                     metrics = self.query_one("#metrics", MetricsPanel)
                     metrics.update_state(data)
+                    
+                    # Update available models
+                    if "ollama_models" in data:
+                        self._available_models = data["ollama_models"]
+                    if "active_model" in data:
+                        self._current_model = data["active_model"]
         except Exception as e:
             logger.debug(f"Polling error: {e}")
 
@@ -357,41 +370,85 @@ class AVATUI(App):
         self._force_search = False
         self.notify("Deep thinking enabled for next query", severity="information")
 
+    def action_export_conversation(self) -> None:
+        """Export current conversation to a file."""
+        from pathlib import Path
+        from datetime import datetime
+        
+        if not self._session_id:
+            self.notify("No conversation to export", severity="warning")
+            return
+        
+        # Export to both JSON and Markdown
+        export_dir = Path(__file__).parent.parent / "data" / "exports"
+        export_dir.mkdir(parents=True, exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Export as Markdown (human-readable)
+        md_content = self._store.export_session(self._session_id, format="markdown")
+        if md_content:
+            md_path = export_dir / f"conversation_{timestamp}.md"
+            md_path.write_text(md_content, encoding="utf-8")
+            
+            # Also export as JSON (for re-import)
+            json_content = self._store.export_session(self._session_id, format="json")
+            json_path = export_dir / f"conversation_{timestamp}.json"
+            json_path.write_text(json_content, encoding="utf-8")
+            
+            self.notify(
+                f"Exported to data/exports/conversation_{timestamp}.[md|json]",
+                severity="information",
+                timeout=5,
+            )
+        else:
+            self.notify("Export failed - session not found", severity="error")
+
+    def action_cycle_model(self) -> None:
+        """Cycle through available Ollama models (Ctrl+M)."""
+        if not self._available_models:
+            self.notify("No models available - check Ollama connection", severity="warning")
+            return
+        
+        if not self._current_model:
+            # No current model, select first
+            next_model = self._available_models[0]
+        else:
+            # Find current model index and cycle to next
+            try:
+                current_idx = self._available_models.index(self._current_model)
+                next_idx = (current_idx + 1) % len(self._available_models)
+                next_model = self._available_models[next_idx]
+            except ValueError:
+                # Current model not in list, select first
+                next_model = self._available_models[0]
+        
+        # Request model switch from backend
+        asyncio.create_task(self._switch_model(next_model))
+    
+    async def _switch_model(self, model_name: str) -> None:
+        """Send model switch request to backend."""
+        try:
+            import httpx
+            
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{self.backend_url}/settings",
+                    json={"model": model_name},
+                    timeout=5.0,
+                )
+                if response.status_code == 200:
+                    self._current_model = model_name
+                    self.notify(f"Switched to model: {model_name}", severity="information")
+                else:
+                    self.notify(f"Failed to switch model: {response.status_code}", severity="error")
+        except Exception as e:
+            self.notify(f"Model switch failed: {e}", severity="error")
+            logger.error(f"Model switch error: {e}")
+
     def action_help(self) -> None:
-        """Show help screen."""
-        help_text = """
-# AVA TUI Keybindings
-
-## Navigation (Accessibility)
-| Key | Action |
-|-----|--------|
-| Tab | Focus next panel |
-| Shift+Tab | Focus previous panel |
-| Ctrl+1 | Focus input |
-| Ctrl+2 | Focus chat |
-| Ctrl+3 | Focus metrics |
-| Ctrl+4 | Toggle settings |
-| Ctrl+5 | Toggle tools |
-
-## Chat Scrolling
-| Key | Action |
-|-----|--------|
-| ↑/↓ or j/k | Scroll chat |
-| Page Up/Down | Scroll page |
-| Home/End | Jump to top/bottom |
-
-## Commands
-| Key | Action |
-|-----|--------|
-| Ctrl+K | Command palette |
-| Ctrl+L | Clear chat |
-| Ctrl+T | Toggle metrics |
-| Ctrl+S | Force search |
-| Ctrl+D | Deep think |
-| F1 | Help |
-| Ctrl+Q | Quit |
-        """
-        self.notify(help_text, timeout=15)
+        """Show help screen with keyboard shortcuts."""
+        self.push_screen(HelpScreen())
 
     def action_close_overlay(self) -> None:
         """Close any open overlay."""

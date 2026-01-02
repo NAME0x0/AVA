@@ -10,6 +10,7 @@ pub use crate::engine::cognitive::EngineConfig;
 
 /// Main application configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Default)]
 pub struct AppConfig {
     #[serde(default)]
     pub server: ServerConfig,
@@ -19,15 +20,6 @@ pub struct AppConfig {
     pub ollama: OllamaConfig,
 }
 
-impl Default for AppConfig {
-    fn default() -> Self {
-        Self {
-            server: ServerConfig::default(),
-            engine: EngineConfigFile::default(),
-            ollama: OllamaConfig::default(),
-        }
-    }
-}
 
 /// HTTP server configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -149,16 +141,11 @@ impl AppConfig {
             PathBuf::from("ava.toml"),
         ];
         
-        for path in locations {
-            if path.exists() {
-                return Some(path);
-            }
-        }
-        
-        None
+        locations.into_iter().find(|path| path.exists())
     }
 
     /// Get the data directory for portable mode
+    #[allow(dead_code)]
     pub fn data_dir() -> PathBuf {
         // Portable: next to executable
         if let Ok(exe_path) = std::env::current_exe() {
@@ -194,6 +181,7 @@ impl AppConfig {
 }
 
 /// Generate a default configuration file
+#[allow(dead_code)]
 pub fn generate_default_config() -> String {
     let config = AppConfig::default();
     toml::to_string_pretty(&config).unwrap_or_default()

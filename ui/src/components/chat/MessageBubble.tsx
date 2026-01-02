@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Brain, Zap, Clock, User, Bot, Copy, Check, Wrench } from "lucide-react";
-import { Message } from "@/stores/core";
+import { Brain, Zap, Clock, User, Bot, Copy, Check, Wrench, RefreshCw, AlertTriangle } from "lucide-react";
+import { Message, useCoreStore } from "@/stores/core";
 import { cn, getCognitiveStateColor, getCognitiveStateBgColor } from "@/lib/utils";
 
 // Tool icon mapping
@@ -60,6 +60,9 @@ function StreamingCursor() {
 export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const isStreaming = message.isStreaming;
+  const isError = message.error;
+  const retryMessage = useCoreStore((state) => state.retryMessage);
+  const isGenerating = useCoreStore((state) => state.isGenerating);
 
   // Use client-side only rendering for timestamp to avoid hydration mismatch
   const [mounted, setMounted] = useState(false);
@@ -81,9 +84,11 @@ export function MessageBubble({ message }: MessageBubbleProps) {
     }
   }, [message.content]);
 
-  // Determine message style based on whether Cortex was used
+  // Determine message style based on whether Cortex was used or error
   const messageStyle = isUser
     ? "message-user"
+    : isError
+    ? "message-error"
     : message.usedCortex
     ? "message-cortex"
     : "message-medulla";
@@ -249,6 +254,43 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               <ToolBadge key={tool} name={tool} />
             ))}
           </div>
+        )}
+
+        {/* Retry button for failed messages */}
+        {!isUser && isError && !isStreaming && (
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 mt-2"
+          >
+            <AlertTriangle className="w-3.5 h-3.5 text-status-error" />
+            <span className="text-xs text-status-error">
+              {message.errorType === "network" && "Network error"}
+              {message.errorType === "timeout" && "Request timed out"}
+              {message.errorType === "server" && "Server error"}
+              {message.errorType === "unknown" && "Error"}
+            </span>
+            {message.originalContent && (message.retryCount || 0) < 3 && (
+              <motion.button
+                onClick={() => retryMessage(message.id)}
+                disabled={isGenerating}
+                className={cn(
+                  "flex items-center gap-1 px-2 py-1 rounded text-xs",
+                  "bg-accent-primary/20 text-accent-primary",
+                  "hover:bg-accent-primary/30 transition-colors",
+                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                )}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <RefreshCw className={cn("w-3 h-3", isGenerating && "animate-spin")} />
+                Retry
+                {(message.retryCount || 0) > 0 && (
+                  <span className="opacity-60">({message.retryCount}/3)</span>
+                )}
+              </motion.button>
+            )}
+          </motion.div>
         )}
       </div>
     </motion.div>

@@ -59,7 +59,6 @@ jobs:
 
       - name: Run MyPy
         run: mypy src/ --ignore-missing-imports
-        continue-on-error: true  # Allow failures but report them
 
   # ============================================================================
   # Tests
@@ -216,11 +215,9 @@ jobs:
 
       - name: Type check
         run: npm run type-check
-        continue-on-error: true
 
       - name: Lint
         run: npm run lint
-        continue-on-error: true
 
       - name: Build
         run: npm run build
@@ -271,12 +268,10 @@ jobs:
       - name: Run Rust tests
         working-directory: ui/src-tauri
         run: cargo test --release
-        continue-on-error: true
 
       - name: Run Clippy
         working-directory: ui/src-tauri
         run: cargo clippy -- -D warnings
-        continue-on-error: true
 
       - name: Check formatting
         working-directory: ui/src-tauri

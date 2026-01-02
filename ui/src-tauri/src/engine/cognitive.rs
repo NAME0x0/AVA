@@ -470,6 +470,7 @@ impl CognitiveEngine {
     }
 
     /// Force Cortex for next response
+    #[allow(dead_code)]
     pub fn force_cortex(&self) {
         // This is handled per-request via ChatRequest.force_cortex
     }

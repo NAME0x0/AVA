@@ -1,10 +1,227 @@
-# AVA v3 Architecture
+# AVA v4 Architecture
 
-This document describes the internal architecture of AVA's Cortex-Medulla dual-brain system.
+> **Note**: This document covers the v4.x architecture. For v3 Python-based architecture (deprecated), see the legacy section at the bottom.
 
 ## Overview
 
-AVA implements a **biomimetic architecture** inspired by the human nervous system:
+AVA v4 introduces a **unified Rust backend** that replaces the Python server. This provides:
+
+- **Single binary distribution** - No Python dependencies required
+- **Better performance** - Native code with async I/O
+- **Smaller footprint** - ~50MB vs ~500MB for Python stack
+- **Cross-platform** - Windows, macOS, Linux support
+
+The core **Cortex-Medulla architecture** is preserved but now implemented in Rust.
+
+## I. System Architecture (v4)
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           USER INTERFACES                                │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                      │
+│  │  Desktop    │  │    TUI      │  │   Browser   │                      │
+│  │   (Tauri)   │  │  (Textual)  │  │  (Next.js)  │                      │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘                      │
+└─────────┼────────────────┼────────────────┼─────────────────────────────┘
+          │                │                │
+          ▼                ▼                ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         RUST BACKEND (unified)                           │
+│  ┌────────────────────────────────────────────────────────────────────┐ │
+│  │                      HTTP/WebSocket API (Axum)                     │ │
+│  │   /chat  /health  /status  /settings  /ws  /chat/stream           │ │
+│  └────────────────────────────────────────────────────────────────────┘ │
+│                                   │                                      │
+│  ┌────────────────────────────────┴───────────────────────────────────┐ │
+│  │                      Cognitive Engine (cognitive.rs)                │ │
+│  │  ┌─────────────┐                           ┌─────────────┐         │ │
+│  │  │   MEDULLA   │  ◄─── Query Routing ───►  │   CORTEX    │         │ │
+│  │  │ (fast path) │                           │ (deep path) │         │ │
+│  │  │  gemma3:4b  │                           │ qwen2.5:32b │         │ │
+│  │  └─────────────┘                           └─────────────┘         │ │
+│  └────────────────────────────────────────────────────────────────────┘ │
+│                                   │                                      │
+│  ┌────────────────────────────────┴───────────────────────────────────┐ │
+│  │                      Ollama Client (ollama.rs)                      │ │
+│  │              HTTP client with connection pooling                    │ │
+│  └────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                            OLLAMA SERVICE                                │
+│                    (External LLM inference server)                       │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+## II. Rust Backend Structure
+
+```
+ui/src-tauri/src/
+├── main.rs           # Application entry point
+├── backend.rs        # Backend lifecycle management
+├── commands.rs       # Tauri IPC commands
+├── state.rs          # Shared application state
+├── tray.rs           # System tray integration
+├── bug_report.rs     # Bug reporting utilities
+└── engine/
+    ├── mod.rs        # Engine module exports
+    ├── cognitive.rs  # Cortex-Medulla implementation
+    ├── config.rs     # Configuration management
+    ├── models.rs     # Data structures
+    ├── ollama.rs     # Ollama client
+    ├── routes.rs     # HTTP API endpoints
+    ├── server.rs     # Axum server setup
+    └── state.rs      # Engine state
+```
+
+## III. Key Components
+
+### A. Cognitive Engine (`cognitive.rs`)
+
+The unified Rust implementation of Cortex-Medulla:
+
+```rust
+pub struct CognitiveEngine {
+    ollama: OllamaClient,        // LLM client
+    config: EngineConfig,        // Runtime config
+    conversation_history: Arc<RwLock<Vec<ConversationMessage>>>,
+    total_requests: AtomicU64,   // Statistics
+    cortex_requests: AtomicU64,
+    current_state: Arc<RwLock<CognitiveStateInfo>>,
+    active_model: Arc<RwLock<String>>,
+}
+```
+
+**Query Routing Logic:**
+1. Calculate query complexity (length, keywords, structure)
+2. Route simple queries to Medulla (fast model)
+3. Route complex queries to Cortex (deep model)
+4. Support forced routing via `force_cortex` flag
+
+### B. Ollama Client (`ollama.rs`)
+
+High-performance async client for Ollama:
+
+- Connection pooling via `reqwest`
+- Configurable timeouts
+- Health checking
+- Model listing
+- Chat and streaming endpoints
+
+### C. HTTP API (`routes.rs`)
+
+RESTful API using Axum framework:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Health check with Ollama status |
+| `/chat` | POST | Send message, get response |
+| `/chat/stream` | POST | Server-sent events streaming |
+| `/status` | GET | System status and statistics |
+| `/info` | GET | Detailed system information |
+| `/settings` | GET/POST | Configuration management |
+| `/ws` | WebSocket | Real-time bidirectional chat |
+
+## IV. User Interfaces
+
+### Desktop Application (Tauri)
+
+- Built with Tauri 1.6 + Next.js 14
+- Single-window, system tray integration
+- Auto-update support
+- Native file dialogs
+
+### Terminal UI (Textual)
+
+- Python-based TUI using Textual
+- Full keyboard navigation
+- Conversation persistence (SQLite)
+- Syntax highlighting for code blocks
+
+### Browser Interface
+
+- Next.js 14 with React 18
+- Real-time streaming via WebSocket
+- Framer Motion animations
+- Responsive design
+
+## V. Configuration
+
+Configuration hierarchy:
+1. `config/base_config.yaml` - Defaults
+2. `config/user_config.yaml` - User overrides
+3. Environment variables - Runtime overrides
+
+Key settings:
+```yaml
+server:
+  port: 8085
+  host: "127.0.0.1"
+
+cognitive:
+  fast_model: "gemma3:4b"
+  deep_model: "qwen2.5:32b"
+  temperature: 0.7
+  max_tokens: 2048
+  cortex_threshold: 0.7
+
+ollama:
+  host: "http://localhost:11434"
+  timeout: 120
+```
+
+## VI. Testing
+
+### Rust Tests
+```bash
+cd ui/src-tauri
+cargo test
+```
+
+Test modules:
+- `tests/ollama_tests.rs` - Ollama client tests
+- `tests/state_tests.rs` - AppState tests
+- `tests/routes_tests.rs` - API endpoint tests
+- `tests/models_tests.rs` - Data model tests
+
+### Frontend Tests
+```bash
+cd ui
+npm run lint
+npm run type-check
+```
+
+## VII. Build & Distribution
+
+### Windows Installer
+```bash
+cd ui
+npm run tauri:build:release
+```
+
+Produces:
+- MSI installer
+- NSIS installer (.exe)
+- Update signature for auto-updates
+
+### Standalone Server
+```bash
+python scripts/build_server.py --clean
+```
+
+Produces `ava-server.exe` - standalone backend without UI.
+
+---
+
+## Legacy v3 Architecture
+
+<details>
+<summary>Click to expand v3 Python-based architecture (deprecated)</summary>
+
+### Overview
+
+AVA v3 implemented a **biomimetic architecture** inspired by the human nervous system:
 
 - **Medulla** (brainstem): Always-on, fast reflexive processing
 - **Cortex** (neocortex): Deep reasoning, activated on-demand
@@ -326,3 +543,4 @@ graph TD
 - **Multi-Modal**: Image understanding via CLIP integration
 - **Federated Learning**: Privacy-preserving model updates
 - **Edge Deployment**: ARM optimization for mobile devices
+</details>

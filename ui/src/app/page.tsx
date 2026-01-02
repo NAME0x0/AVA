@@ -49,7 +49,7 @@ export default function Home() {
       console.log('[AVA] Showing wizard overlay');
       setShowWizard(true);
     }
-  }, [setupState.hasCompletedSetup, serverReady]);
+  }, [setupState.hasCompletedSetup, serverReady, showWizard]);
 
   // Start polling for system state
   useSystemPolling();

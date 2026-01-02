@@ -94,6 +94,7 @@ pub fn handle_tray_event(app: &AppHandle, event: SystemTrayEvent) {
 }
 
 /// Update tray icon based on status
+#[allow(dead_code)]
 pub fn update_tray_status(app: &AppHandle, status: TrayStatus) {
     let _icon_path = match status {
         TrayStatus::Idle => "icons/tray/idle.ico",

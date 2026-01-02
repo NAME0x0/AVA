@@ -194,7 +194,7 @@ export function CommandPalette({
         category: "Help",
       },
     ],
-    [forceCortex, forceSleep, clearMessages, toggleSidebar, toggleSettingsPanel, toggleToolsPanel, preferences, updatePreference, messages, onClose]
+    [forceCortex, forceSleep, clearMessages, toggleSidebar, toggleSettingsPanel, toggleToolsPanel, preferences, updatePreference, messages, onClose, setInputValue]
   );
 
   const allCommands = useMemo(

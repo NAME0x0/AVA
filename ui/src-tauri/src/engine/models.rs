@@ -2,6 +2,10 @@
 //!
 //! These structs mirror the Python dataclasses but in idiomatic Rust.
 
+// Allow dead code for API response structures that may not be used currently
+// but are part of the complete Ollama API contract
+#![allow(dead_code)]
+
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 

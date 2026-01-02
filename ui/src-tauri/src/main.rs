@@ -17,6 +17,9 @@ mod engine;
 mod state;
 mod tray;
 
+#[cfg(test)]
+mod tests;
+
 use engine::config::AppConfig;
 use std::sync::Arc;
 use tauri::Manager;
@@ -25,7 +28,7 @@ use tokio::sync::Mutex;
 use tracing::{error, info};
 
 /// Application version
-const VERSION: &str = "4.0.0";
+const VERSION: &str = "4.1.0";
 
 fn main() {
     // Initialize logging with environment filter

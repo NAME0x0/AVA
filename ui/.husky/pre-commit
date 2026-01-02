@@ -1,0 +1,21 @@
+#!/bin/sh
+# Pre-commit hook for AVA
+
+echo "🔍 Running pre-commit checks..."
+
+# Run lint-staged for frontend
+npx lint-staged
+
+# Check Rust formatting
+if [ -d "src-tauri" ]; then
+  echo "🦀 Checking Rust formatting..."
+  cd src-tauri
+  cargo fmt --check
+  if [ $? -ne 0 ]; then
+    echo "❌ Rust code is not formatted. Run 'cargo fmt' to fix."
+    exit 1
+  fi
+  cd ..
+fi
+
+echo "✅ Pre-commit checks passed!"

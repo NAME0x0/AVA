@@ -5,6 +5,45 @@ All notable changes to AVA will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.0] - 2026-01-02
+
+### Added
+- **Comprehensive Rust Test Suite**: 38+ tests across 4 modules
+  - `ollama_tests.rs`: Ollama client testing
+  - `state_tests.rs`: AppState and initialization tests
+  - `routes_tests.rs`: HTTP API endpoint tests
+  - `models_tests.rs`: Data model serialization tests
+- **TUI Enhancements**:
+  - Full syntax highlighting for code blocks (Pygments via Rich)
+  - Modal help screen with keyboard shortcuts guide (F1)
+  - Conversation export to Markdown/JSON (Ctrl+E)
+  - Model cycling hotkey (Ctrl+M)
+  - SQLite migration system for persistence upgrades
+- **UI/UX Improvements**:
+  - Loading skeleton components for perceived performance
+  - Toast notification system for backend status
+  - Improved error messages with error type classification
+  - Retry logic for failed messages (up to 3 retries)
+- **Documentation**:
+  - Enhanced rustdoc with architecture diagrams
+  - Updated ARCHITECTURE.md for v4.x
+  - New TUI_USER_GUIDE.md
+- **CI/CD Improvements**:
+  - Pre-commit hooks with husky and lint-staged
+  - Removed `continue-on-error` for strict CI
+  - Verified release workflow for Windows builds
+
+### Changed
+- Tower dependency updated to include `util` feature for ServiceExt
+- Streaming messages now convert to Markdown-rendered widgets after completion
+- Clippy warnings fixed with strategic `#[allow(dead_code)]` annotations
+- ESLint warnings fixed in React components
+
+### Fixed
+- `test_empty_json_to_defaults` test failure (roundtrip serialization)
+- React hooks dependency array warnings
+- Unused import warnings in Rust code
+
 ## [4.0.0] - 2026-01-02
 
 ### Added

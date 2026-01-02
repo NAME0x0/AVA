@@ -1,6 +1,6 @@
 {
   "name": "ava-ui",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "AVA Neural Interface - Cortex-Medulla Architecture",
   "private": true,
   "scripts": {
@@ -18,7 +18,8 @@
     "build:sidecar": "cd .. && python scripts/build_sidecar.py",
     "build:sidecar:clean": "cd .. && python scripts/build_sidecar.py --clean",
     "tauri:build:full": "npm run build:sidecar && tauri build",
-    "tauri:build:release": "npm run build:sidecar:clean && tauri build --release"
+    "tauri:build:release": "npm run build:sidecar:clean && tauri build --release",
+    "prepare": "husky"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.4",
@@ -52,9 +53,20 @@
     "concurrently": "^9.2.1",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.2.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2",
     "wait-on": "^9.0.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
+    ]
   }
 }

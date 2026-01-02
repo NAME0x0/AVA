@@ -3,6 +3,10 @@
 //! Provides async communication with the Ollama API for LLM inference.
 //! Supports both streaming and non-streaming chat completions.
 
+// Allow dead code for API methods that are part of the complete Ollama API contract
+// but may not be currently used
+#![allow(dead_code)]
+
 use crate::engine::models::*;
 use futures_util::StreamExt;
 use reqwest::Client;
@@ -111,7 +115,7 @@ impl OllamaClient {
         }
 
         let tags: OllamaTagsResponse = response.json().await.map_err(|e| {
-            OllamaError::InvalidResponse(format!("Failed to parse response: {}", e))
+            OllamaError::InvalidResponse(format!("Failed to parse response: {e}"))
         })?;
 
         Ok(tags.models)
@@ -121,7 +125,7 @@ impl OllamaClient {
     pub async fn has_model(&self, model_name: &str) -> Result<bool, OllamaError> {
         let models = self.list_models().await?;
         Ok(models.iter().any(|m| {
-            m.name == model_name || m.name.starts_with(&format!("{}:", model_name))
+            m.name == model_name || m.name.starts_with(&format!("{model_name}:"))
         }))
     }
 
@@ -166,13 +170,12 @@ impl OllamaClient {
             }
             
             return Err(OllamaError::RequestFailed(format!(
-                "Status: {}, Body: {}",
-                status, body
+                "Status: {status}, Body: {body}"
             )));
         }
 
         let chat_response: OllamaChatResponse = response.json().await.map_err(|e| {
-            OllamaError::InvalidResponse(format!("Failed to parse response: {}", e))
+            OllamaError::InvalidResponse(format!("Failed to parse response: {e}"))
         })?;
 
         debug!(
@@ -221,7 +224,7 @@ impl OllamaClient {
             if status.as_u16() == 404 {
                 return Err(OllamaError::ModelNotFound(model.to_string()));
             }
-            return Err(OllamaError::RequestFailed(format!("Status: {}", status)));
+            return Err(OllamaError::RequestFailed(format!("Status: {status}")));
         }
 
         // Create a channel for streaming chunks
@@ -304,7 +307,7 @@ impl OllamaClient {
         }
 
         let embed_response: EmbeddingResponse = response.json().await.map_err(|e| {
-            OllamaError::InvalidResponse(format!("Failed to parse embeddings: {}", e))
+            OllamaError::InvalidResponse(format!("Failed to parse embeddings: {e}"))
         })?;
 
         Ok(embed_response.embedding)

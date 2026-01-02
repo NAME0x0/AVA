@@ -3,6 +3,7 @@ AVA TUI - Conversation Persistence
 ===================================
 
 Handles saving and loading conversation history to SQLite database.
+Includes automatic schema migrations for forward compatibility.
 """
 
 import json
@@ -14,6 +15,9 @@ from typing import Optional
 from dataclasses import dataclass, asdict
 
 logger = logging.getLogger(__name__)
+
+# Current schema version
+SCHEMA_VERSION = 1
 
 
 @dataclass
@@ -60,7 +64,7 @@ class Session:
 
 
 class ConversationStore:
-    """SQLite-based conversation persistence."""
+    """SQLite-based conversation persistence with automatic migrations."""
 
     def __init__(self, db_path: Optional[Path] = None):
         """Initialize the conversation store.
@@ -75,10 +79,17 @@ class ConversationStore:
         self.db_path = db_path
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()
+        self._run_migrations()
 
     def _init_db(self) -> None:
         """Initialize database schema."""
         with sqlite3.connect(self.db_path) as conn:
+            # Create schema_version table for migrations
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS schema_version (
+                    version INTEGER PRIMARY KEY
+                )
+            """)
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS sessions (
                     id TEXT PRIMARY KEY,
@@ -103,6 +114,50 @@ class ConversationStore:
                 ON messages(session_id)
             """)
             conn.commit()
+
+    def _get_schema_version(self) -> int:
+        """Get the current schema version from the database."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("SELECT MAX(version) FROM schema_version")
+            result = cursor.fetchone()[0]
+            return result if result is not None else 0
+
+    def _set_schema_version(self, version: int) -> None:
+        """Set the schema version in the database."""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("INSERT OR REPLACE INTO schema_version (version) VALUES (?)", (version,))
+            conn.commit()
+
+    def _run_migrations(self) -> None:
+        """Run any pending database migrations."""
+        current_version = self._get_schema_version()
+        
+        if current_version < SCHEMA_VERSION:
+            logger.info(f"Migrating database from v{current_version} to v{SCHEMA_VERSION}")
+            
+            # Migration 1: Initial schema (already created in _init_db)
+            if current_version < 1:
+                # Add any additional columns/indexes for v1
+                with sqlite3.connect(self.db_path) as conn:
+                    # Check if model column exists in sessions
+                    cursor = conn.execute("PRAGMA table_info(sessions)")
+                    columns = [row[1] for row in cursor.fetchall()]
+                    
+                    if "model" not in columns:
+                        conn.execute("ALTER TABLE sessions ADD COLUMN model TEXT DEFAULT 'default'")
+                    
+                    if "token_count" not in columns:
+                        conn.execute("ALTER TABLE sessions ADD COLUMN token_count INTEGER DEFAULT 0")
+                    
+                    conn.commit()
+            
+            # Future migrations go here:
+            # if current_version < 2:
+            #     # Migration for schema version 2
+            #     pass
+            
+            self._set_schema_version(SCHEMA_VERSION)
+            logger.info(f"Database migration complete. Now at v{SCHEMA_VERSION}")
 
     def create_session(self, name: Optional[str] = None) -> str:
         """Create a new conversation session.

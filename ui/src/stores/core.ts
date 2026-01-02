@@ -59,6 +59,11 @@ export interface Message {
   responseTimeMs?: number;
   isStreaming?: boolean;
   toolsUsed?: string[];
+  // Retry support
+  error?: boolean;
+  errorType?: "network" | "timeout" | "server" | "unknown";
+  retryCount?: number;
+  originalContent?: string;  // For retrying failed user messages
 }
 
 export interface BeliefState {
@@ -101,6 +106,7 @@ interface CoreStore {
   addMessage: (message: Omit<Message, "id" | "timestamp">) => void;
   updateMessage: (id: string, updates: Partial<Message>) => void;
   clearMessages: () => void;
+  retryMessage: (messageId: string) => Promise<void>;
 
   // UI State
   sidebarOpen: boolean;
@@ -609,12 +615,136 @@ export const useCoreStore = create<CoreStore>()(
         setIsGenerating(false);
         setThinkingStage("idle");
       } catch (error) {
+        // Determine error type for better UX
+        let errorType: "network" | "timeout" | "server" | "unknown" = "unknown";
+        let errorMessage = "An unexpected error occurred";
+        
+        if (error instanceof Error) {
+          const message = error.message.toLowerCase();
+          if (message.includes("network") || message.includes("fetch") || message.includes("connection")) {
+            errorType = "network";
+            errorMessage = "Unable to connect to AVA backend. Please check your connection.";
+          } else if (message.includes("timeout") || message.includes("timed out")) {
+            errorType = "timeout";
+            errorMessage = "Request timed out. The server may be busy. Try again?";
+          } else if (message.includes("500") || message.includes("server")) {
+            errorType = "server";
+            errorMessage = "Server error. This has been logged for investigation.";
+          } else {
+            errorMessage = error.message;
+          }
+        }
+        
         updateMessage(assistantId, {
-          content: `Error: ${error instanceof Error ? error.message : "Connection failed"}`,
+          content: errorMessage,
           isStreaming: false,
+          error: true,
+          errorType,
+          retryCount: 0,
+          originalContent: content,  // Store for retry
         });
         setIsGenerating(false);
         setThinkingStage("idle");
+      }
+    },
+
+    // Retry a failed message
+    retryMessage: async (messageId: string) => {
+      const { messages, sendMessage, updateMessage, setIsGenerating } = get();
+      
+      // Find the failed message
+      const failedMessage = messages.find(m => m.id === messageId && m.error);
+      if (!failedMessage || !failedMessage.originalContent) {
+        console.error("Cannot retry: message not found or no original content");
+        return;
+      }
+      
+      const retryCount = (failedMessage.retryCount || 0) + 1;
+      if (retryCount > 3) {
+        updateMessage(messageId, {
+          content: "Maximum retries reached. Please try again later.",
+          retryCount,
+        });
+        return;
+      }
+      
+      // Reset the message to streaming state
+      updateMessage(messageId, {
+        content: "",
+        isStreaming: true,
+        error: false,
+        errorType: undefined,
+        retryCount,
+      });
+      
+      setIsGenerating(true);
+      
+      // Resend the original message
+      try {
+        const { backendUrl, setCognitiveState, setSystemState, setThinkingStage } = get();
+        
+        setThinkingStage("perceiving");
+        
+        const res = await fetch(`${backendUrl}/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: failedMessage.originalContent }),
+        });
+        const response = await res.json();
+        
+        updateMessage(messageId, {
+          content: response.response || response.error || "No response",
+          isStreaming: false,
+          error: false,
+          errorType: undefined,
+          cognitiveState: response.cognitive_state
+            ? {
+                label: response.cognitive_state.label,
+                entropy: response.cognitive_state.entropy,
+                varentropy: response.cognitive_state.varentropy,
+                confidence: response.cognitive_state.confidence,
+                surprise: response.cognitive_state.surprise,
+                shouldUseTools: response.cognitive_state.should_use_tools,
+                shouldThink: response.cognitive_state.should_think,
+              }
+            : undefined,
+          surprise: response.surprise,
+          usedCortex: response.used_cortex,
+          policySelected: response.policy_selected,
+          responseTimeMs: response.response_time_ms,
+          toolsUsed: response.tools_used,
+        });
+        
+        if (response.cognitive_state) {
+          setCognitiveState({
+            label: response.cognitive_state.label,
+            entropy: response.cognitive_state.entropy,
+            varentropy: response.cognitive_state.varentropy,
+            confidence: response.cognitive_state.confidence,
+            surprise: response.cognitive_state.surprise,
+            shouldUseTools: response.cognitive_state.should_use_tools,
+            shouldThink: response.cognitive_state.should_think,
+          });
+        }
+        
+        setSystemState({
+          totalInteractions: get().systemState.totalInteractions + 1,
+          cortexInvocations: response.used_cortex
+            ? get().systemState.cortexInvocations + 1
+            : get().systemState.cortexInvocations,
+        });
+        
+        setIsGenerating(false);
+        setThinkingStage("idle");
+      } catch (error) {
+        updateMessage(messageId, {
+          content: `Retry failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+          isStreaming: false,
+          error: true,
+          retryCount,
+        });
+        setIsGenerating(false);
+        get().setThinkingStage("idle");
       }
     },
 

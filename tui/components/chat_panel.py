@@ -13,12 +13,18 @@ Accessibility Features:
 Streaming Features:
 - StreamingMessageWidget for real-time token display
 - Blinking cursor animation during streaming
+
+Syntax Highlighting:
+- Full Pygments-powered syntax highlighting for code blocks
+- Support for 100+ programming languages
+- Custom theme optimized for terminal display
 """
 
 from datetime import datetime
 from typing import Any
 
 from rich.markdown import Markdown
+from rich.syntax import Syntax
 from rich.text import Text
 from textual.binding import Binding
 from textual.containers import ScrollableContainer
@@ -47,7 +53,7 @@ class MessageWidget(Static):
         self.timestamp = timestamp or datetime.now()
 
     def compose(self):
-        """Render the message."""
+        """Render the message with syntax highlighting for code blocks."""
         # Format based on role
         if self.role == "user":
             style = "bold cyan"
@@ -69,9 +75,15 @@ class MessageWidget(Static):
 
         yield Static(header)
 
-        # Render content as markdown
+        # Render content as markdown with syntax highlighting
+        # Rich's Markdown class automatically applies Pygments highlighting
+        # to fenced code blocks (```python, ```javascript, etc.)
         try:
-            md = Markdown(self.content)
+            md = Markdown(
+                self.content,
+                code_theme="monokai",  # Use monokai theme for code blocks
+                inline_code_theme="monokai",
+            )
             yield Static(md, classes="message-content")
         except Exception:
             yield Static(self.content, classes="message-content")
@@ -309,7 +321,10 @@ class ChatPanel(ScrollableContainer):
         metadata: dict[str, Any] | None = None,
     ) -> None:
         """
-        Finalize a streaming message, optionally replacing with static widget.
+        Finalize a streaming message, replacing with Markdown-rendered widget.
+
+        This enables full syntax highlighting for code blocks after streaming
+        completes, providing better readability for code-heavy responses.
 
         Args:
             streaming_widget: The streaming widget to finalize
@@ -317,10 +332,10 @@ class ChatPanel(ScrollableContainer):
         """
         streaming_widget.complete(metadata)
 
-        # Optionally replace with static MessageWidget for markdown rendering
-        # Uncomment below if you want full markdown support after streaming
-        # static_widget = streaming_widget.to_message_widget()
-        # streaming_widget.remove()
-        # self.mount(static_widget)
+        # Replace with static MessageWidget for full Markdown/syntax highlighting
+        # This renders code blocks with proper syntax highlighting via Rich
+        static_widget = streaming_widget.to_message_widget()
+        streaming_widget.remove()
+        self.mount(static_widget)
 
         self.scroll_end(animate=False)

@@ -1,6 +1,6 @@
 [package]
 name = "ava"
-version = "4.0.0"
+version = "4.1.0"
 description = "AVA Neural Interface - Unified Cortex-Medulla Architecture"
 authors = ["AVA Project"]
 edition = "2021"
@@ -36,7 +36,7 @@ tauri-plugin-autostart = { git = "https://github.com/tauri-apps/plugins-workspac
 
 # Embedded HTTP Server (replaces Python backend)
 axum = "0.7"
-tower = "0.4"
+tower = { version = "0.4", features = ["util"] }
 tower-http = { version = "0.5", features = ["cors", "trace"] }
 
 # For opening URLs (GitHub issues)

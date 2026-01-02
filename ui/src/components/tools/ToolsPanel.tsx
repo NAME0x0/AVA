@@ -75,6 +75,7 @@ export function ToolsPanel() {
     if (toolsPanelOpen) {
       fetchTools();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toolsPanelOpen, backendUrl]);
 
   const fetchTools = async () => {

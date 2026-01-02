@@ -124,6 +124,7 @@ export function useConnectionHealth(): ConnectionHealth {
       setConnected(false);
       scheduleRetry();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backendUrl, setConnected]);
 
   const scheduleRetry = useCallback(() => {

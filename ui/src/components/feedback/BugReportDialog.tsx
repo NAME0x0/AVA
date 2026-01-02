@@ -50,6 +50,7 @@ export function BugReportDialog({
       checkReportability();
       createReport();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, errorMessage]);
 
   const checkReportability = async () => {

@@ -10,6 +10,7 @@ use tokio::sync::RwLock;
 use tracing::info;
 
 /// Shared application state
+#[allow(dead_code)]
 pub struct AppState {
     /// The cognitive engine for processing
     pub engine: Arc<CognitiveEngine>,
@@ -72,6 +73,7 @@ impl AppState {
     }
 
     /// Get the last error
+    #[allow(dead_code)]
     pub async fn get_last_error(&self) -> Option<String> {
         self.last_error.read().await.clone()
     }
