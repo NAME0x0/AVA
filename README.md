@@ -18,14 +18,16 @@
   </a>
 </p>
 
-**AVA v3** is a research-grade AI assistant with a **biomimetic dual-brain architecture** inspired by the human nervous system. It runs locally on constrained hardware (4GB VRAM) and prioritizes accuracy over speed.
+**AVA v4** is a research-grade AI assistant with a **biomimetic dual-brain architecture** inspired by the human nervous system. It runs locally on constrained hardware (4GB VRAM) and prioritizes accuracy over speed.
 
-## What's New in v3
+## What's New in v4
 
+- **Unified Rust Backend**: Single portable executable with embedded HTTP server (no Python required)
 - **Cortex-Medulla Architecture**: Fast reflexive responses for simple queries, deep reasoning for complex ones
 - **Desktop App**: Native Tauri + Next.js GUI with real-time neural activity visualization
+- **Active Inference Metrics**: Free Energy calculation and belief state visualization
 - **System Tray**: Run in background with minimal resource usage
-- **Terminal UI**: Phenomenal TUI for power users built with Textual
+- **Terminal UI**: Power-user TUI built with Textual (streaming support coming soon)
 - **Search-First Paradigm**: Web search as default for informational queries
 - **Titans Neural Memory**: Infinite context through test-time learning
 - **Active Inference**: Autonomous behavior using Free Energy Principle
@@ -33,32 +35,40 @@
 
 ---
 
-## Two-App Architecture
+## Architecture
 
-AVA v3.3+ uses a **two-app architecture** for improved reliability:
+AVA v4 uses a **unified single-app architecture** for maximum portability:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  AVA SERVER (Backend)                                           │
-│  - Standalone executable or Python script                       │
-│  - Handles all AI processing via Ollama                         │
-│  - Runs on http://localhost:8085                                │
+│  AVA Desktop App (Single Executable)                            │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  Embedded Rust Backend (Axum HTTP Server)               │   │
+│  │  - All AI processing via Ollama                         │   │
+│  │  - Runs on http://127.0.0.1:8085                        │   │
+│  │  - Active Inference metrics calculation                 │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                  │
+│                              │ Internal HTTP                    │
+│                              ▼                                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  Next.js Frontend                                        │   │
+│  │  - Real-time neural activity visualization               │   │
+│  │  - Metrics dashboard with Free Energy display            │   │
+│  │  - Chat interface with streaming responses               │   │
+│  └─────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
                               │
-                              │ HTTP / WebSocket
+                              │ HTTP API
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  AVA UI (Frontend)                                              │
-│  - Desktop app (Tauri) or browser                               │
-│  - Connects to the server automatically                         │
-│  - Shows diagnostics if server isn't running                    │
+│  Ollama (Local LLM Server)                                      │
+│  - gemma3:4b (fast mode)                                       │
+│  - llama3.2:latest (deep thinking mode)                        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Start the server first**, then launch the UI. This separation ensures:
-- Clear error messages when something goes wrong
-- Ability to run server and UI on different machines
-- Independent updates for backend and frontend
+**Single executable** - no Python installation required for end users.
 
 ---
 
@@ -69,30 +79,34 @@ AVA v3.3+ uses a **two-app architecture** for improved reliability:
 1. **Ollama** - [Download Ollama](https://ollama.ai/) - **Required**
    ```bash
    ollama pull gemma3:4b
+   ollama pull llama3.2:latest  # For deep thinking mode
    ollama serve
    ```
-2. **Python 3.10+** - [Download Python](https://www.python.org/downloads/) (for pip install or source)
-3. **Node.js 20+** (for UI development) - [Download Node.js](https://nodejs.org/)
 
 ### Quick Start
 
-**Step 1: Start the Backend**
+**Option A: Download Pre-built App (Recommended)**
+
+Download and run the desktop app from [Releases](https://github.com/NAME0x0/AVA/releases/latest).
+- `AVA_4.0.0_x64-setup.exe` - Windows installer
+- `AVA_4.0.0_x64_en-US.msi` - Windows MSI package
+
+**Option B: Build from Source**
 
 ```bash
-# Option A: Standalone executable (download from Releases)
-./ava-server.exe
-
-# Option B: Python package
-pip install ava-agent
-ava-server --port 8085
-
-# Option C: From source
-python ava_server.py
+git clone https://github.com/NAME0x0/AVA.git
+cd AVA/ui
+npm install
+npm run tauri build
 ```
 
-**Step 2: Launch the UI**
+**Option C: Development Mode**
 
-Download and run the desktop app from [Releases](https://github.com/NAME0x0/AVA/releases/latest), or open http://localhost:3000 in your browser (after running `npm run dev` in the ui/ directory).
+```bash
+cd AVA/ui
+npm install
+npm run tauri dev
+```
 
 ### Windows Installer
 
@@ -103,8 +117,8 @@ Download and run the desktop app from [Releases](https://github.com/NAME0x0/AVA/
 </p>
 
 The release includes:
-- `ava-server.exe` - Standalone backend server
-- `AVA_x.x.x_x64-setup.exe` - Desktop UI installer
+- `AVA_4.0.0_x64-setup.exe` - Desktop app installer (single executable, no Python needed)
+- `AVA_4.0.0_x64_en-US.msi` - Windows MSI package
 
 ---
 
@@ -112,58 +126,11 @@ The release includes:
 
 > **New to open source or AI projects?** See our [Beginner's Guide](docs/BEGINNER_GUIDE.md) for step-by-step instructions.
 
-### One-Command Setup (From Source)
+### Running AVA
 
+**Desktop App (Recommended)**
 ```bash
-git clone https://github.com/NAME0x0/AVA.git
-cd AVA
-python setup_ava.py
-```
-
-The setup script shows live progress and handles everything:
-```
-[Step 3/7] Installing Dependencies
-  [████████████░░░░░░░░] 60%  Installing httpx
-  Done: 15 OK
-```
-
-**Setup options:**
-- `python setup_ava.py --minimal` - Faster setup with small models
-- `python setup_ava.py --full` - Complete setup with all models
-- `python setup_ava.py --verbose` - Show detailed output
-- `python setup_ava.py --check` - Verify existing installation
-
-### Start AVA
-
-```bash
-python server.py        # Start the API server
-# Then open http://localhost:8085
-```
-
----
-
-## Running AVA
-
-### 1. Start the Server (Required)
-
-```bash
-# With preflight checks and verbose logging (recommended)
-python ava_server.py
-
-# Or the simpler server.py
-python server.py
-
-# Check dependencies without starting
-python ava_server.py --check
-
-# Run on a different port
-python ava_server.py --port 8080
-```
-
-### 2. Connect with UI
-
-**Desktop App (GUI)**
-```bash
+# Download from Releases, or build from source:
 cd ui
 npm install
 npm run tauri dev
@@ -171,17 +138,31 @@ npm run tauri dev
 
 **Terminal UI (Power Users)**
 ```bash
-python run_tui.py
-# Full-featured terminal interface with keybindings
+# Requires Python environment
+pip install -e .
+python -m tui.app
 ```
 
-**Browser**
-Open http://localhost:3000 after starting the UI dev server.
+The TUI provides a keyboard-driven interface with:
+- Real-time metrics display
+- Command palette (Ctrl+K)
+- Force modes (Ctrl+S for search, Ctrl+D for deep thinking)
+- Settings management
 
-### Core System (Direct)
-```bash
-python run_core.py --simulation
-```
+---
+
+## API Endpoints
+
+The embedded server exposes these endpoints on `http://127.0.0.1:8085`:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Server health check |
+| `/chat` | POST | Send message, get AI response |
+| `/cognitive` | GET | Current cognitive state (entropy, surprise, varentropy) |
+| `/memory` | GET | Memory statistics |
+| `/belief` | GET | Active Inference belief state and free energy |
+| `/stats` | GET | System statistics |
 
 ---
 
@@ -260,33 +241,28 @@ User Input
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/health` | GET | Health check |
-| `/status` | GET | System status with metrics |
-| `/chat` | POST | Send message (auto-routes Medulla/Cortex) |
-| `/think` | POST | Force deep thinking (Cortex) |
-| `/tools` | GET | List available tools |
-| `/ws` | WebSocket | Streaming chat |
+| `/chat` | POST | Send message (auto-routes based on force mode) |
+| `/cognitive` | GET | Cognitive state (entropy, surprise, varentropy) |
+| `/memory` | GET | Memory statistics |
+| `/belief` | GET | Active Inference belief state and free energy |
+| `/stats` | GET | System statistics |
 
-### Python API
+### Using the API
 
-```python
-from ava import AVA
-import asyncio
+```bash
+# Health check
+curl http://127.0.0.1:8085/health
 
-async def main():
-    ava = AVA()
-    await ava.start()
+# Send a message
+curl -X POST http://127.0.0.1:8085/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What is Python?"}'
 
-    # Auto-routes based on complexity
-    response = await ava.chat("What is Python?")
-    print(response.text)
+# Get cognitive state
+curl http://127.0.0.1:8085/cognitive
 
-    # Force deep thinking
-    response = await ava.think("Explain quantum computing")
-    print(response.text)
-
-    await ava.stop()
-
-asyncio.run(main())
+# Get belief state with free energy
+curl http://127.0.0.1:8085/belief
 ```
 
 ---
@@ -340,10 +316,10 @@ AVA/
 │   ├── config/          # Installer configuration
 │   ├── nsis/            # NSIS scripts (Windows)
 │   └── scripts/         # Build automation
-├── legacy/              # Archived v2 code
+├── legacy/              # Archived Python server code
 ├── models/              # Model adapters
 ├── src/
-│   ├── ava/             # Clean public API
+│   ├── ava/             # Python API (for TUI/development)
 │   ├── core/            # Cortex-Medulla system
 │   ├── hippocampus/     # Titans memory
 │   ├── cortex/          # Utilities
@@ -353,11 +329,11 @@ AVA/
 │   └── tools/           # Tool implementations
 ├── tests/               # Test suite
 ├── tui/                 # Terminal UI (Textual)
-├── ui/                  # Desktop GUI (Next.js + Tauri)
-│   └── src-tauri/       # Rust backend (system tray, bug reports)
-├── server.py            # HTTP API server
-├── run_core.py          # Direct core CLI
-└── run_tui.py           # TUI entry point
+└── ui/                  # Desktop GUI (Next.js + Tauri)
+    └── src-tauri/       # Rust backend (embedded server)
+        └── src/
+            ├── main.rs      # Application entry point
+            └── engine/      # HTTP server (Axum)
 ```
 
 ---
@@ -388,12 +364,24 @@ ollama serve
 ### "No models available"
 ```bash
 ollama pull gemma3:4b
+ollama pull llama3.2:latest
+```
+
+### "Port 8085 already in use"
+```bash
+# Windows
+netstat -ano | findstr :8085
+taskkill /F /PID <pid>
+
+# Linux/macOS
+lsof -i :8085
+kill -9 <pid>
 ```
 
 ### Slow Responses
 - First response is slower (model loading)
-- Deep thinking takes 5-30 seconds
-- Use `--simulation` flag for testing
+- Deep thinking (Cortex mode) takes 5-30 seconds
+- Use simulation mode for testing without models
 
 ---
 

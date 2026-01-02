@@ -16,7 +16,7 @@ cors_origins = [
 [engine]
 # Model settings
 fast_model = "gemma3:4b"       # Quick responses
-deep_model = "qwen2.5:32b"     # Deep thinking (force_cortex)
+deep_model = "llama3.2:latest" # Deep thinking (force_cortex) - use larger model when available
 max_tokens = 2048
 temperature = 0.7
 top_p = 0.9

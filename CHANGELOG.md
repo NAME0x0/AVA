@@ -5,9 +5,15 @@ All notable changes to AVA will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [4.0.0] - 2026-01-02
 
 ### Added
+- **Unified Rust Backend**: Complete rewrite of server in Rust
+  - Embedded HTTP server (Axum) replacing Python backend
+  - Single portable executable (no Python required for users)
+  - All API endpoints ported: `/health`, `/chat`, `/cognitive`, `/memory`, `/belief`, `/stats`
+  - Active Inference metrics with Free Energy calculation
+  - Ollama integration for LLM inference
 - **Installer Infrastructure**: Foundation for Windows installer distribution
   - Installer build scripts (`installer/scripts/build_installer.py`)
   - NSIS configuration for Windows installer
@@ -28,18 +34,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - VERSION file as single source of truth
 
 ### Changed
+- **Architecture**: Migrated from Python HTTP server to embedded Rust server
+  - Python server moved to `legacy/python_servers/`
+  - Desktop app is now fully self-contained
 - Updated Tauri to include system-tray, process, and global-shortcut features
 - Added tauri-plugin-single-instance and tauri-plugin-autostart
 - Replaced alert() with inline help modal in CommandPalette
 - Added WebGL fallback for 3D visualizations
 - Improved canvas null safety checks
 - Removed deprecated setup.py (using pyproject.toml only)
-- CI/CD now builds Tauri app for Windows
+- CI/CD improvements:
+  - Replaced deprecated `actions-rs/toolchain` with `dtolnay/rust-toolchain`
+  - Added Rust tests in CI pipeline
+  - Standardized Node.js to v20
+  - Improved linting enforcement
 
 ### Fixed
 - Fixed broken Tailwind class in SplitPane component
 - Fixed potential canvas context null errors
-- Fixed version inconsistency (setup.py vs pyproject.toml)
+- Fixed version inconsistency across VERSION, pyproject.toml, Cargo.toml
+- Fixed 209MB model file blocking git push
+- Fixed Cortex mode "No response" when model not installed
 
 ---
 

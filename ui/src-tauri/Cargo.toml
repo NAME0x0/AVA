@@ -1,6 +1,6 @@
 [package]
 name = "ava"
-version = "3.3.3"
+version = "4.0.0"
 description = "AVA Neural Interface - Unified Cortex-Medulla Architecture"
 authors = ["AVA Project"]
 edition = "2021"

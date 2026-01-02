@@ -25,7 +25,7 @@ use tokio::sync::Mutex;
 use tracing::{error, info};
 
 /// Application version
-const VERSION: &str = "3.3.3";
+const VERSION: &str = "4.0.0";
 
 fn main() {
     // Initialize logging with environment filter

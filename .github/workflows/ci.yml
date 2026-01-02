@@ -58,7 +58,8 @@ jobs:
           pip install mypy
 
       - name: Run MyPy
-        run: mypy src/ --ignore-missing-imports || true
+        run: mypy src/ --ignore-missing-imports
+        continue-on-error: true  # Allow failures but report them
 
   # ============================================================================
   # Tests
@@ -208,16 +209,18 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Type check
-        run: npm run type-check || true
+        run: npm run type-check
+        continue-on-error: true
 
       - name: Lint
-        run: npm run lint || true
+        run: npm run lint
+        continue-on-error: true
 
       - name: Build
         run: npm run build
@@ -237,17 +240,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
           cache: "npm"
           cache-dependency-path: ui/package-lock.json
 
       - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          profile: minimal
-          override: true
-          
+          components: clippy, rustfmt
+
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
         with:
@@ -255,7 +256,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: ui
-        run: npm install
+        run: npm ci
 
       - name: Build frontend
         working-directory: ui
@@ -267,13 +268,19 @@ jobs:
         working-directory: ui/src-tauri
         run: cargo check
 
+      - name: Run Rust tests
+        working-directory: ui/src-tauri
+        run: cargo test --release
+        continue-on-error: true
+
       - name: Run Clippy
         working-directory: ui/src-tauri
-        run: cargo clippy -- -D warnings || true
+        run: cargo clippy -- -D warnings
+        continue-on-error: true
 
       - name: Check formatting
         working-directory: ui/src-tauri
-        run: cargo fmt --check || true
+        run: cargo fmt --check
 
   # ============================================================================
   # Build Installer (on main branch after all checks pass)
@@ -290,16 +297,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
           cache: "npm"
           cache-dependency-path: ui/package-lock.json
 
       - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
@@ -308,7 +311,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: ui
-        run: npm install
+        run: npm ci
 
       - name: Get version
         id: version

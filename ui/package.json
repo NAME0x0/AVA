@@ -1,6 +1,6 @@
 {
   "name": "ava-ui",
-  "version": "3.3.3",
+  "version": "4.0.0",
   "description": "AVA Neural Interface - Cortex-Medulla Architecture",
   "private": true,
   "scripts": {

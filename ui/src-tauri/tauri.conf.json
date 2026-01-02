@@ -2,13 +2,13 @@
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
     "beforeBuildCommand": "npm run build",
-    "beforeDevCommand": "",
+    "beforeDevCommand": "npm run dev",
     "devPath": "http://localhost:3000",
     "distDir": "../out"
   },
   "package": {
     "productName": "AVA",
-    "version": "3.3.3"
+    "version": "4.0.0"
   },
   "tauri": {
     "allowlist": {

@@ -36,8 +36,15 @@ DIST_DIR = PROJECT_ROOT / "dist"
 BUILD_DIR = PROJECT_ROOT / "build"
 SPEC_FILE = PROJECT_ROOT / "ava_server.spec"
 
-# Version from pyproject.toml
-VERSION = "3.3.3"
+# Version from VERSION file (single source of truth)
+def get_version() -> str:
+    """Read version from VERSION file."""
+    version_file = PROJECT_ROOT / "VERSION"
+    if version_file.exists():
+        return version_file.read_text().strip()
+    return "4.0.0"
+
+VERSION = get_version()
 
 
 def get_exe_extension() -> str:
