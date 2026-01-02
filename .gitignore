@@ -33,11 +33,19 @@ venv.bak/
 Thumbs.db
 ehthumbs.db
 
-# Data and Models (examples - customize as needed)
-# models/base_models/*
-# !models/base_models/.gitkeep
-# data/raw_data/*
-# !data/raw_data/.gitkeep
+# Data and Models - large files excluded from git
+models/base_models/
+models/fine_tuned_adapters/
+models/adapters/
+!models/.gitkeep
+!models/base_models/.gitkeep
+!models/fine_tuned_adapters/.gitkeep
+!models/adapters/.gitkeep
+*.npz
+*.safetensors
+*.bin
+*.gguf
+*.ggml
 
 # Compiled files
 *.so
