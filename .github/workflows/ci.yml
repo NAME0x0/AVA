@@ -55,10 +55,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install mypy
+          pip install mypy types-PyYAML
 
       - name: Run MyPy
-        run: mypy src/ --ignore-missing-imports
+        run: mypy src/ tui/ --config-file pyproject.toml
 
   # ============================================================================
   # Tests
