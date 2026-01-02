@@ -422,10 +422,7 @@ class EnhancedWebSearch:
                         )
                         results.append(search_result)
                 else:
-                    raise ValueError(
-                        f"Google API returned status {
-                            response.status}"
-                    )
+                    raise ValueError(f"Google API returned status {response.status}")
 
         except Exception as e:
             logger.error(f"Google Custom Search error: {str(e)}")
@@ -480,10 +477,7 @@ class EnhancedWebSearch:
                         )
                         results.append(search_result)
                 else:
-                    raise ValueError(
-                        f"Bing API returned status {
-                            response.status}"
-                    )
+                    raise ValueError(f"Bing API returned status {response.status}")
 
         except Exception as e:
             logger.error(f"Bing search error: {str(e)}")
@@ -536,10 +530,7 @@ class EnhancedWebSearch:
                         )
                         results.append(search_result)
                 else:
-                    raise ValueError(
-                        f"SerpApi returned status {
-                            response.status}"
-                    )
+                    raise ValueError(f"SerpApi returned status {response.status}")
 
         except Exception as e:
             logger.error(f"SerpApi search error: {str(e)}")
@@ -582,10 +573,7 @@ class EnhancedWebSearch:
                         )
                         results.append(search_result)
                 else:
-                    raise ValueError(
-                        f"Brave API returned status {
-                            response.status}"
-                    )
+                    raise ValueError(f"Brave API returned status {response.status}")
 
         except Exception as e:
             logger.error(f"Brave search error: {str(e)}")
