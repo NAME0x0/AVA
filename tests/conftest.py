@@ -193,28 +193,12 @@ def sample_queries() -> list[str]:
 
 @pytest.fixture
 async def test_server(simulation_mode, mock_ollama, tmp_path):
-    """Start a test server instance."""
-    from aiohttp import web
-    from aiohttp.test_utils import TestServer
-
-    # Import server routes
-    sys.path.insert(0, str(Path(__file__).parent.parent))
-    import server
-
-    # Create app
-    app = web.Application()
-    app.router.add_get("/health", server.health_handler)
-    app.router.add_get("/status", server.status_handler)
-    app.router.add_post("/chat", server.chat_handler)
-    app.router.add_post("/think", server.think_handler)
-    app.router.add_get("/tools", server.tools_handler)
-
-    test_server = TestServer(app)
-    await test_server.start_server()
-
-    yield test_server
-
-    await test_server.close()
+    """Start a test server instance.
+    
+    NOTE: This fixture is for the legacy Python server which has been
+    replaced by the Rust backend in v4.x. Skip tests that use this fixture.
+    """
+    pytest.skip("Legacy Python server replaced by Rust backend in v4.x")
 
 
 @pytest.fixture

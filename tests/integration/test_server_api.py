@@ -3,6 +3,10 @@ AVA Server API Integration Tests
 ================================
 
 Tests for the HTTP API endpoints.
+
+NOTE: These tests are for the legacy Python server (server.py) which has been
+superseded by the Rust backend in v4.x. Tests are skipped by default.
+The server module has moved to legacy/python_servers/.
 """
 
 import sys
@@ -12,6 +16,9 @@ import pytest
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+
+# Skip all tests in this module - legacy Python server replaced by Rust backend
+pytestmark = pytest.mark.skip(reason="Legacy Python server tests - server.py moved to legacy/python_servers/")
 
 
 class TestHealthEndpoint:
