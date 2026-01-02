@@ -21,7 +21,7 @@ fn test_client_default_construction() {
 fn test_client_custom_config() {
     let custom_host = "http://localhost:12345";
     let custom_timeout = 60;
-    
+
     let client = OllamaClient::with_config(custom_host, custom_timeout);
     // Client should be created without panicking
     assert!(true, "Custom client construction succeeded");
@@ -34,7 +34,7 @@ fn test_client_host_normalization() {
     let _client1 = OllamaClient::with_config("http://localhost:11434", 60);
     let _client2 = OllamaClient::with_config("http://localhost:11434/", 60);
     let _client3 = OllamaClient::with_config("http://localhost:11434///", 60);
-    
+
     assert!(true, "Host normalization succeeded");
 }
 
@@ -43,12 +43,15 @@ fn test_client_host_normalization() {
 async fn test_health_check_unreachable_host() {
     // Use a port that's almost certainly not running Ollama
     let client = OllamaClient::with_config("http://127.0.0.1:59999", 2);
-    
+
     let result = client.health_check().await;
-    
+
     // Should return an error, not panic
-    assert!(result.is_err(), "Health check should fail for unreachable host");
-    
+    assert!(
+        result.is_err(),
+        "Health check should fail for unreachable host"
+    );
+
     // Verify it's a connection error
     match result {
         Err(OllamaError::ConnectionFailed(_)) => {
@@ -70,20 +73,26 @@ async fn test_health_check_unreachable_host() {
 #[tokio::test]
 async fn test_list_models_unreachable_host() {
     let client = OllamaClient::with_config("http://127.0.0.1:59999", 2);
-    
+
     let result = client.list_models().await;
-    
-    assert!(result.is_err(), "list_models should fail for unreachable host");
+
+    assert!(
+        result.is_err(),
+        "list_models should fail for unreachable host"
+    );
 }
 
 /// Test has_model with unreachable host
 #[tokio::test]
 async fn test_has_model_unreachable_host() {
     let client = OllamaClient::with_config("http://127.0.0.1:59999", 2);
-    
+
     let result = client.has_model("llama2").await;
-    
-    assert!(result.is_err(), "has_model should fail for unreachable host");
+
+    assert!(
+        result.is_err(),
+        "has_model should fail for unreachable host"
+    );
 }
 
 /// Integration test: Health check against real Ollama (if running)
@@ -92,9 +101,9 @@ async fn test_has_model_unreachable_host() {
 #[ignore]
 async fn test_real_ollama_health_check() {
     let client = OllamaClient::new();
-    
+
     let result = client.health_check().await;
-    
+
     match result {
         Ok(healthy) => {
             println!("Ollama health check returned: {}", healthy);
@@ -112,9 +121,9 @@ async fn test_real_ollama_health_check() {
 #[ignore]
 async fn test_real_ollama_list_models() {
     let client = OllamaClient::new();
-    
+
     let result = client.list_models().await;
-    
+
     match result {
         Ok(models) => {
             println!("Found {} models:", models.len());

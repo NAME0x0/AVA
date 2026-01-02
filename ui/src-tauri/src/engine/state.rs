@@ -14,16 +14,16 @@ use tracing::info;
 pub struct AppState {
     /// The cognitive engine for processing
     pub engine: Arc<CognitiveEngine>,
-    
+
     /// Application configuration
     pub config: AppConfig,
-    
+
     /// Server start time
     pub start_time: Instant,
-    
+
     /// Initialization status
     pub initialized: Arc<RwLock<bool>>,
-    
+
     /// Last error message
     pub last_error: Arc<RwLock<Option<String>>>,
 }
@@ -33,7 +33,7 @@ impl AppState {
     pub fn new(config: AppConfig) -> Self {
         let engine_config = config.to_engine_config();
         let engine = Arc::new(CognitiveEngine::new(engine_config));
-        
+
         Self {
             engine,
             config,
@@ -46,7 +46,7 @@ impl AppState {
     /// Initialize the state (connect to Ollama, etc.)
     pub async fn initialize(&self) -> Result<(), String> {
         info!("Initializing AVA application state...");
-        
+
         match self.engine.initialize().await {
             Ok(()) => {
                 *self.initialized.write().await = true;

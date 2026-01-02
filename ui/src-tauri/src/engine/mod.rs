@@ -48,10 +48,10 @@
 //!
 //! ```rust,ignore
 //! use ava::engine::start_embedded_server;
-//! 
+//!
 //! // Start the embedded server on port 8085
 //! let handle = start_embedded_server(8085).await?;
-//! 
+//!
 //! // Server runs in background, use handle to manage lifecycle
 //! ```
 //!
@@ -67,12 +67,12 @@
 //! | `/settings` | GET/POST | Read/update settings |
 //! | `/ws` | WebSocket | Real-time bidirectional chat |
 
+pub mod cognitive;
+pub mod config;
 pub mod models;
 pub mod ollama;
 pub mod routes;
 pub mod server;
 pub mod state;
-pub mod cognitive;
-pub mod config;
 
 pub use server::start_embedded_server;

@@ -26,28 +26,22 @@ pub fn create_router(state: Arc<AppState>) -> Router {
         .route("/health", get(health))
         .route("/status", get(status))
         .route("/system", get(system_info))
-        
         // Chat endpoints
         .route("/chat", post(chat))
         .route("/think", post(think))
-        
         // State endpoints
         .route("/cognitive", get(cognitive_state))
         .route("/memory", get(memory_stats))
         .route("/belief", get(belief_state))
         .route("/stats", get(stats))
-        
         // Control endpoints
         .route("/force_cortex", post(force_cortex))
         .route("/sleep", post(sleep_consolidate))
         .route("/clear_history", post(clear_history))
-        
         // Tools
         .route("/tools", get(list_tools))
-        
         // WebSocket stub (returns JSON with info, not actual WS yet)
         .route("/ws", get(websocket_stub))
-        
         // Add state
         .with_state(state)
 }
@@ -70,25 +64,37 @@ async fn root() -> impl IntoResponse {
 /// Always returns 200 so the app can start - Ollama status is reported in response
 async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     let initialized = state.is_initialized().await;
-    
+
     // Check Ollama connection (with timeout to prevent blocking)
     let (ollama_status, ollama_error) = match tokio::time::timeout(
         std::time::Duration::from_secs(2),
-        state.engine.ollama().health_check()
-    ).await {
+        state.engine.ollama().health_check(),
+    )
+    .await
+    {
         Ok(Ok(true)) => ("connected".to_string(), None),
-        Ok(Ok(false)) => ("disconnected".to_string(), Some("Ollama returned error".to_string())),
+        Ok(Ok(false)) => (
+            "disconnected".to_string(),
+            Some("Ollama returned error".to_string()),
+        ),
         Ok(Err(e)) => ("disconnected".to_string(), Some(e.to_string())),
-        Err(_) => ("timeout".to_string(), Some("Ollama health check timed out".to_string())),
+        Err(_) => (
+            "timeout".to_string(),
+            Some("Ollama health check timed out".to_string()),
+        ),
     };
-    
+
     // Server is "healthy" as long as it's running - Ollama status is separate
     let status = if ollama_status == "connected" {
-        if initialized { "healthy" } else { "initializing" }
+        if initialized {
+            "healthy"
+        } else {
+            "initializing"
+        }
     } else {
         "degraded" // Server works but AI features need Ollama
     };
-    
+
     let response = HealthResponse {
         status: status.to_string(),
         service: "AVA Neural Interface".to_string(),
@@ -97,7 +103,7 @@ async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
         ollama_error,
         uptime_seconds: state.uptime_seconds(),
     };
-    
+
     // Always return 200 - the frontend can check ollama_status for details
     (StatusCode::OK, Json(response))
 }
@@ -105,17 +111,22 @@ async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
 /// System status endpoint
 async fn status(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     let (total_requests, cortex_requests) = state.engine.get_stats();
-    
+
     // Get Ollama info
     let (ollama_connected, ollama_models) = match state.engine.ollama().list_models().await {
         Ok(models) => (true, models.iter().map(|m| m.name.clone()).collect()),
         Err(_) => (false, Vec::new()),
     };
-    
+
     let active_model = state.engine.get_active_model().await;
-    
+
     let response = SystemStatus {
-        status: if state.is_initialized().await { "running" } else { "initializing" }.to_string(),
+        status: if state.is_initialized().await {
+            "running"
+        } else {
+            "initializing"
+        }
+        .to_string(),
         version: VERSION.to_string(),
         python_version: "N/A (Rust native)".to_string(),
         platform: format!("{} {}", std::env::consts::OS, std::env::consts::ARCH),
@@ -126,7 +137,7 @@ async fn status(State(state): State<Arc<AppState>>) -> impl IntoResponse {
         total_requests,
         cortex_requests,
     };
-    
+
     Json(response)
 }
 
@@ -134,9 +145,9 @@ async fn status(State(state): State<Arc<AppState>>) -> impl IntoResponse {
 async fn system_info(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     let mut sys = System::new_all();
     sys.refresh_all();
-    
+
     let (total_requests, cortex_requests) = state.engine.get_stats();
-    
+
     Json(serde_json::json!({
         "version": VERSION,
         "runtime": "Rust",
@@ -165,7 +176,7 @@ async fn chat(
     Json(request): Json<ChatRequest>,
 ) -> impl IntoResponse {
     debug!("Chat request: {:?}", request.message);
-    
+
     if !state.is_initialized().await {
         // Try to initialize on first request
         if let Err(e) = state.initialize().await {
@@ -178,9 +189,9 @@ async fn chat(
             );
         }
     }
-    
+
     let response = state.engine.process(&request).await;
-    
+
     if response.error.is_some() {
         (StatusCode::INTERNAL_SERVER_ERROR, Json(response))
     } else {
@@ -194,7 +205,7 @@ async fn think(
     Json(mut request): Json<ChatRequest>,
 ) -> impl IntoResponse {
     request.force_cortex = true;
-    
+
     if !state.is_initialized().await {
         if let Err(e) = state.initialize().await {
             return (
@@ -206,9 +217,9 @@ async fn think(
             );
         }
     }
-    
+
     let response = state.engine.process(&request).await;
-    
+
     if response.error.is_some() {
         (StatusCode::INTERNAL_SERVER_ERROR, Json(response))
     } else {
@@ -237,7 +248,7 @@ async fn belief_state(State(state): State<Arc<AppState>>) -> impl IntoResponse {
 /// Get general statistics
 async fn stats(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     let (total, cortex) = state.engine.get_stats();
-    
+
     Json(serde_json::json!({
         "total_requests": total,
         "cortex_requests": cortex,
@@ -260,7 +271,7 @@ async fn force_cortex() -> impl IntoResponse {
 async fn sleep_consolidate(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     // Clear history as a simple "consolidation"
     state.engine.clear_history().await;
-    
+
     Json(serde_json::json!({
         "status": "ok",
         "message": "Memory consolidation triggered (history cleared)"
@@ -270,7 +281,7 @@ async fn sleep_consolidate(State(state): State<Arc<AppState>>) -> impl IntoRespo
 /// Clear conversation history
 async fn clear_history(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     state.engine.clear_history().await;
-    
+
     Json(serde_json::json!({
         "status": "ok",
         "message": "Conversation history cleared"
@@ -298,7 +309,7 @@ async fn list_tools() -> impl IntoResponse {
             "reason": "Requires API key configuration"
         }),
     ];
-    
+
     Json(serde_json::json!({
         "tools": tools,
         "total": tools.len()
@@ -314,6 +325,6 @@ async fn websocket_stub() -> impl IntoResponse {
             "error": "WebSocket not implemented",
             "message": "Real-time WebSocket streaming is not yet implemented in the Rust backend. Please use HTTP polling via /cognitive endpoint.",
             "alternative": "/cognitive"
-        }))
+        })),
     )
 }

@@ -38,9 +38,9 @@ impl std::fmt::Display for CognitiveState {
 #[serde(rename_all = "lowercase")]
 pub enum ProcessingMode {
     #[default]
-    Medulla,  // Fast, reflexive
-    Cortex,   // Deep, thoughtful
-    Hybrid,   // Both (verify with Cortex)
+    Medulla, // Fast, reflexive
+    Cortex, // Deep, thoughtful
+    Hybrid, // Both (verify with Cortex)
 }
 
 /// Chat request from the client
@@ -103,7 +103,7 @@ pub struct HealthResponse {
 pub struct SystemStatus {
     pub status: String,
     pub version: String,
-    pub python_version: String,  // Keep for compatibility, will be "N/A (Rust)"
+    pub python_version: String, // Keep for compatibility, will be "N/A (Rust)"
     pub platform: String,
     pub ollama_connected: bool,
     pub ollama_models: Vec<String>,
@@ -116,7 +116,7 @@ pub struct SystemStatus {
 /// Cognitive state response
 #[derive(Debug, Clone, Serialize)]
 pub struct CognitiveStateResponse {
-    pub label: String,  // Changed from 'state' to match frontend
+    pub label: String, // Changed from 'state' to match frontend
     pub entropy: f32,
     pub varentropy: f32,
     pub surprise: f32,
@@ -184,7 +184,7 @@ pub struct ToolParameter {
 #[derive(Debug, Clone, Serialize)]
 pub struct StreamChunk {
     #[serde(rename = "type")]
-    pub chunk_type: String,  // "token", "thinking", "complete", "error"
+    pub chunk_type: String, // "token", "thinking", "complete", "error"
     pub content: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<StreamMetadata>,
@@ -202,7 +202,7 @@ pub struct StreamMetadata {
 /// Conversation message for history
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ConversationMessage {
-    pub role: String,  // "user", "assistant", "system"
+    pub role: String, // "user", "assistant", "system"
     pub content: String,
     pub timestamp: i64,
     #[serde(skip_serializing_if = "Option::is_none")]

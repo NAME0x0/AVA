@@ -24,12 +24,12 @@ fn create_test_state() -> Arc<AppState> {
 async fn test_root_endpoint() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let response = app
         .oneshot(Request::builder().uri("/").body(Body::empty()).unwrap())
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -38,7 +38,7 @@ async fn test_root_endpoint() {
 async fn test_health_endpoint() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let response = app
         .oneshot(
             Request::builder()
@@ -48,7 +48,7 @@ async fn test_health_endpoint() {
         )
         .await
         .unwrap();
-    
+
     // Health should always return 200, even if degraded
     assert_eq!(response.status(), StatusCode::OK);
 }
@@ -58,7 +58,7 @@ async fn test_health_endpoint() {
 async fn test_status_endpoint() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let response = app
         .oneshot(
             Request::builder()
@@ -68,7 +68,7 @@ async fn test_status_endpoint() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -77,7 +77,7 @@ async fn test_status_endpoint() {
 async fn test_cognitive_endpoint() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let response = app
         .oneshot(
             Request::builder()
@@ -87,7 +87,7 @@ async fn test_cognitive_endpoint() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -96,7 +96,7 @@ async fn test_cognitive_endpoint() {
 async fn test_memory_endpoint() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let response = app
         .oneshot(
             Request::builder()
@@ -106,7 +106,7 @@ async fn test_memory_endpoint() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -115,7 +115,7 @@ async fn test_memory_endpoint() {
 async fn test_stats_endpoint() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let response = app
         .oneshot(
             Request::builder()
@@ -125,7 +125,7 @@ async fn test_stats_endpoint() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -134,7 +134,7 @@ async fn test_stats_endpoint() {
 async fn test_tools_endpoint() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let response = app
         .oneshot(
             Request::builder()
@@ -144,7 +144,7 @@ async fn test_tools_endpoint() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -153,7 +153,7 @@ async fn test_tools_endpoint() {
 async fn test_system_endpoint() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let response = app
         .oneshot(
             Request::builder()
@@ -163,7 +163,7 @@ async fn test_system_endpoint() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -172,7 +172,7 @@ async fn test_system_endpoint() {
 async fn test_belief_endpoint() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let response = app
         .oneshot(
             Request::builder()
@@ -182,7 +182,7 @@ async fn test_belief_endpoint() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -191,7 +191,7 @@ async fn test_belief_endpoint() {
 async fn test_not_found() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let response = app
         .oneshot(
             Request::builder()
@@ -201,7 +201,7 @@ async fn test_not_found() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
@@ -210,7 +210,7 @@ async fn test_not_found() {
 async fn test_chat_requires_post() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let response = app
         .oneshot(
             Request::builder()
@@ -221,7 +221,7 @@ async fn test_chat_requires_post() {
         )
         .await
         .unwrap();
-    
+
     // GET on POST-only route should return 405 Method Not Allowed
     assert_eq!(response.status(), StatusCode::METHOD_NOT_ALLOWED);
 }
@@ -231,11 +231,11 @@ async fn test_chat_requires_post() {
 async fn test_chat_with_body() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let body = serde_json::json!({
         "message": "Hello, AVA!"
     });
-    
+
     let response = app
         .oneshot(
             Request::builder()
@@ -247,11 +247,11 @@ async fn test_chat_with_body() {
         )
         .await
         .unwrap();
-    
+
     // Chat will likely return 200 even if Ollama isn't running (with error in body)
     // or 500/503 if something goes wrong (503 when backend unavailable)
     assert!(
-        response.status() == StatusCode::OK 
+        response.status() == StatusCode::OK
             || response.status() == StatusCode::INTERNAL_SERVER_ERROR
             || response.status() == StatusCode::SERVICE_UNAVAILABLE,
         "Chat should return OK or error status, got {:?}",
@@ -264,7 +264,7 @@ async fn test_chat_with_body() {
 async fn test_clear_history() {
     let state = create_test_state();
     let app = create_router(state);
-    
+
     let response = app
         .oneshot(
             Request::builder()
@@ -275,6 +275,6 @@ async fn test_clear_history() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }

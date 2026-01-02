@@ -35,14 +35,14 @@ pub struct CognitiveEngine {
     ollama: OllamaClient,
     config: EngineConfig,
     conversation_history: Arc<RwLock<Vec<ConversationMessage>>>,
-    
+
     // Statistics
     total_requests: AtomicU64,
     cortex_requests: AtomicU64,
-    
+
     // Current state
     current_state: Arc<RwLock<CognitiveStateInfo>>,
-    
+
     // Active model
     active_model: Arc<RwLock<String>>,
 }
@@ -103,7 +103,7 @@ impl CognitiveEngine {
     /// Create a new cognitive engine
     pub fn new(config: EngineConfig) -> Self {
         let ollama = OllamaClient::with_config(&config.ollama_host, 120);
-        
+
         Self {
             ollama,
             config: config.clone(),
@@ -118,21 +118,21 @@ impl CognitiveEngine {
     /// Initialize the engine and verify Ollama connection
     pub async fn initialize(&self) -> Result<(), OllamaError> {
         info!("Initializing AVA Cognitive Engine...");
-        
+
         // Check Ollama health
         self.ollama.health_check().await?;
         info!("Ollama connection verified");
-        
+
         // Verify model availability
         let models = self.ollama.list_models().await?;
         let model_names: Vec<&str> = models.iter().map(|m| m.name.as_str()).collect();
         info!("Available models: {:?}", model_names);
-        
+
         // Select best available model
         let selected_model = self.select_model(&model_names).await;
         *self.active_model.write().await = selected_model.clone();
         info!("Selected model: {}", selected_model);
-        
+
         info!("AVA Cognitive Engine initialized successfully");
         Ok(())
     }
@@ -149,7 +149,7 @@ impl CognitiveEngine {
             "qwen2.5:7b",
             "mistral:7b",
         ];
-        
+
         for pref in preferences {
             for model in available {
                 if model.starts_with(pref) || *model == pref {
@@ -157,35 +157,41 @@ impl CognitiveEngine {
                 }
             }
         }
-        
+
         // Fall back to first available
-        available.first().map(|s| s.to_string()).unwrap_or_else(|| "gemma3:4b".to_string())
+        available
+            .first()
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| "gemma3:4b".to_string())
     }
 
     /// Process a chat message
     pub async fn process(&self, request: &ChatRequest) -> ChatResponse {
         let start = Instant::now();
         self.total_requests.fetch_add(1, Ordering::Relaxed);
-        
+
         // Determine processing mode
         let use_cortex = request.force_cortex || self.should_use_cortex(&request.message).await;
-        
+
         if use_cortex {
             self.cortex_requests.fetch_add(1, Ordering::Relaxed);
         }
-        
+
         // Get model to use
         let model = if use_cortex {
             self.config.deep_model.clone()
         } else {
             self.active_model.read().await.clone()
         };
-        
-        debug!("Processing message with model: {} (cortex={})", model, use_cortex);
-        
+
+        debug!(
+            "Processing message with model: {} (cortex={})",
+            model, use_cortex
+        );
+
         // Build messages for Ollama
         let messages = self.build_messages(&request.message).await;
-        
+
         // Configure options
         let options = Some(OllamaOptions {
             temperature: Some(self.config.temperature),
@@ -194,21 +200,22 @@ impl CognitiveEngine {
             repeat_penalty: Some(1.1),
             top_k: Some(40),
         });
-        
+
         // Call Ollama
         match self.ollama.chat(&model, messages, options).await {
             Ok(response) => {
                 let elapsed = start.elapsed().as_secs_f64() * 1000.0;
-                
+
                 // Update state
                 let mut state = self.current_state.write().await;
                 state.last_response_time_ms = elapsed;
                 state.confidence = self.calculate_confidence(&response);
                 state.state = self.determine_cognitive_state(&response);
-                
+
                 // Store in history
-                self.add_to_history(&request.message, &response.message.content).await;
-                
+                self.add_to_history(&request.message, &response.message.content)
+                    .await;
+
                 ChatResponse {
                     text: response.message.content,
                     used_cortex: use_cortex,
@@ -238,76 +245,89 @@ impl CognitiveEngine {
     async fn should_use_cortex(&self, message: &str) -> bool {
         // Simple heuristics for now
         let complexity_indicators = [
-            "explain", "analyze", "compare", "contrast", "evaluate",
-            "synthesize", "create", "design", "develop", "implement",
-            "why", "how does", "what if", "prove", "derive",
-            "code", "program", "algorithm", "debug",
+            "explain",
+            "analyze",
+            "compare",
+            "contrast",
+            "evaluate",
+            "synthesize",
+            "create",
+            "design",
+            "develop",
+            "implement",
+            "why",
+            "how does",
+            "what if",
+            "prove",
+            "derive",
+            "code",
+            "program",
+            "algorithm",
+            "debug",
         ];
-        
+
         let lower = message.to_lowercase();
-        
+
         // Check for complexity indicators
         let has_complexity = complexity_indicators.iter().any(|&ind| lower.contains(ind));
-        
+
         // Check message length (longer messages often need more thought)
         let is_long = message.len() > 200;
-        
+
         // Check for multi-part questions
         let has_multiple_questions = message.matches('?').count() > 1;
-        
+
         has_complexity || is_long || has_multiple_questions
     }
 
     /// Build messages array for Ollama
     async fn build_messages(&self, user_message: &str) -> Vec<OllamaChatMessage> {
-        let mut messages = vec![
-            OllamaChatMessage {
-                role: "system".to_string(),
-                content: SYSTEM_PROMPT.to_string(),
-            },
-        ];
-        
+        let mut messages = vec![OllamaChatMessage {
+            role: "system".to_string(),
+            content: SYSTEM_PROMPT.to_string(),
+        }];
+
         // Add conversation history (last N turns)
         let history = self.conversation_history.read().await;
         let history_limit = 10; // Last 10 messages
         let start_idx = history.len().saturating_sub(history_limit);
-        
+
         for msg in &history[start_idx..] {
             messages.push(OllamaChatMessage {
                 role: msg.role.clone(),
                 content: msg.content.clone(),
             });
         }
-        
+
         // Add current message
         messages.push(OllamaChatMessage {
             role: "user".to_string(),
             content: user_message.to_string(),
         });
-        
+
         messages
     }
 
     /// Add a conversation turn to history
     async fn add_to_history(&self, user_msg: &str, assistant_msg: &str) {
         let mut history = self.conversation_history.write().await;
-        
+
         let now = chrono::Utc::now().timestamp();
-        
+
         history.push(ConversationMessage {
             role: "user".to_string(),
             content: user_msg.to_string(),
             timestamp: now,
             metadata: None,
         });
-        
+
         history.push(ConversationMessage {
             role: "assistant".to_string(),
             content: assistant_msg.to_string(),
             timestamp: now,
             metadata: None,
         });
-        
+
         // Trim history if too long
         let max_history = 50;
         if history.len() > max_history {
@@ -325,11 +345,13 @@ impl CognitiveEngine {
     /// Determine cognitive state based on response
     fn determine_cognitive_state(&self, response: &OllamaChatResponse) -> CognitiveState {
         let content = &response.message.content;
-        
+
         // Check for uncertainty markers
         let uncertainty_markers = ["i'm not sure", "i think", "possibly", "maybe", "uncertain"];
-        let has_uncertainty = uncertainty_markers.iter().any(|&m| content.to_lowercase().contains(m));
-        
+        let has_uncertainty = uncertainty_markers
+            .iter()
+            .any(|&m| content.to_lowercase().contains(m));
+
         if has_uncertainty {
             CognitiveState::Hesitation
         } else if content.contains("?") && content.len() < 100 {
@@ -344,7 +366,7 @@ impl CognitiveEngine {
         let state = self.current_state.read().await;
         let should_think = state.entropy > 3.5 || state.varentropy > 2.5;
         let should_use_tools = state.surprise > 0.7;
-        
+
         CognitiveStateResponse {
             label: state.state.to_string(),
             entropy: state.entropy,
@@ -367,7 +389,7 @@ impl CognitiveEngine {
     pub async fn get_memory_stats(&self) -> MemoryStats {
         let history = self.conversation_history.read().await;
         let state = self.current_state.read().await;
-        
+
         // Estimate tokens (rough: 1 token ≈ 4 chars)
         let total_chars: usize = history.iter().map(|m| m.content.len()).sum();
         let estimated_tokens = total_chars / 4;
@@ -376,7 +398,7 @@ impl CognitiveEngine {
         } else {
             0.0
         };
-        
+
         MemoryStats {
             conversation_turns: history.len() / 2,
             total_tokens_processed: estimated_tokens as u64,
@@ -398,11 +420,11 @@ impl CognitiveEngine {
         let state = self.current_state.read().await;
         let total = self.total_requests.load(Ordering::Relaxed);
         let cortex = self.cortex_requests.load(Ordering::Relaxed);
-        
+
         // Calculate free energy as a measure of prediction error / surprise
         // Higher entropy + higher surprise = higher free energy
         let free_energy = state.entropy * 0.3 + state.surprise * 0.5 + state.varentropy * 0.2;
-        
+
         // Build state distribution based on cognitive state
         let mut state_distribution = std::collections::HashMap::new();
         match state.state {
@@ -427,17 +449,25 @@ impl CognitiveEngine {
                 state_distribution.insert("CONFUSION".to_string(), 0.2);
             }
         }
-        
+
         // Build policy distribution based on usage patterns
         let mut policy_distribution = std::collections::HashMap::new();
-        let medulla_ratio = if total > 0 { (total - cortex) as f32 / total as f32 } else { 0.8 };
-        let cortex_ratio = if total > 0 { cortex as f32 / total as f32 } else { 0.2 };
-        
+        let medulla_ratio = if total > 0 {
+            (total - cortex) as f32 / total as f32
+        } else {
+            0.8
+        };
+        let cortex_ratio = if total > 0 {
+            cortex as f32 / total as f32
+        } else {
+            0.2
+        };
+
         policy_distribution.insert("MEDULLA_REFLEX".to_string(), medulla_ratio * 0.6);
         policy_distribution.insert("MEDULLA_SEARCH".to_string(), medulla_ratio * 0.4);
         policy_distribution.insert("CORTEX_DEEP".to_string(), cortex_ratio * 0.7);
         policy_distribution.insert("CORTEX_VERIFY".to_string(), cortex_ratio * 0.3);
-        
+
         BeliefStateResponse {
             current_state: state.state.to_string(),
             state_distribution,

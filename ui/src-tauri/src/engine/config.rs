@@ -9,8 +9,7 @@ use tracing::info;
 pub use crate::engine::cognitive::EngineConfig;
 
 /// Main application configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AppConfig {
     #[serde(default)]
     pub server: ServerConfig,
@@ -19,7 +18,6 @@ pub struct AppConfig {
     #[serde(default)]
     pub ollama: OllamaConfig,
 }
-
 
 /// HTTP server configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -109,24 +107,24 @@ impl AppConfig {
                 }
             }
         }
-        
+
         // Check environment variables
         let mut config = AppConfig::default();
-        
+
         if let Ok(host) = std::env::var("OLLAMA_HOST") {
             config.ollama.host = host;
         }
-        
+
         if let Ok(port) = std::env::var("AVA_PORT") {
             if let Ok(p) = port.parse() {
                 config.server.port = p;
             }
         }
-        
+
         if let Ok(model) = std::env::var("AVA_MODEL") {
             config.engine.fast_model = model;
         }
-        
+
         config
     }
 
@@ -134,13 +132,17 @@ impl AppConfig {
     fn find_config_file() -> Option<PathBuf> {
         let locations = [
             // Portable: next to executable
-            std::env::current_exe().ok()?.parent()?.join("config").join("ava.toml"),
+            std::env::current_exe()
+                .ok()?
+                .parent()?
+                .join("config")
+                .join("ava.toml"),
             std::env::current_exe().ok()?.parent()?.join("ava.toml"),
             // Current directory
             PathBuf::from("config/ava.toml"),
             PathBuf::from("ava.toml"),
         ];
-        
+
         locations.into_iter().find(|path| path.exists())
     }
 
@@ -156,12 +158,12 @@ impl AppConfig {
                 }
             }
         }
-        
+
         // Fallback to user data directory
         if let Some(dirs) = directories::ProjectDirs::from("com", "ava", "AVA") {
             return dirs.data_dir().to_path_buf();
         }
-        
+
         // Last resort: current directory
         PathBuf::from("data")
     }

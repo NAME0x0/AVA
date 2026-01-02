@@ -99,7 +99,10 @@ impl BugReport {
 
     /// Generate GitHub issue URL with pre-filled data
     pub fn generate_github_url(&self) -> String {
-        let title = format!("[Bug] {}", self.error_message.chars().take(80).collect::<String>());
+        let title = format!(
+            "[Bug] {}",
+            self.error_message.chars().take(80).collect::<String>()
+        );
 
         let body = format!(
             r#"## Bug Description
@@ -147,7 +150,9 @@ fn collect_system_info() -> SystemInfo {
     let mut sys = System::new_all();
     sys.refresh_all();
 
-    let cpu = sys.cpus().first()
+    let cpu = sys
+        .cpus()
+        .first()
         .map(|c| c.brand().to_string())
         .unwrap_or_else(|| "Unknown CPU".to_string());
 
@@ -191,7 +196,9 @@ pub fn categorize_error(error_msg: &str) -> ErrorCategory {
     let lower = error_msg.to_lowercase();
 
     // Missing dependency patterns
-    if lower.contains("ollama") && (lower.contains("not found") || lower.contains("connection refused")) {
+    if lower.contains("ollama")
+        && (lower.contains("not found") || lower.contains("connection refused"))
+    {
         return ErrorCategory::MissingDependency;
     }
     if lower.contains("python") && lower.contains("not found") {
@@ -199,7 +206,10 @@ pub fn categorize_error(error_msg: &str) -> ErrorCategory {
     }
 
     // Network patterns
-    if lower.contains("connection refused") || lower.contains("timeout") || lower.contains("unreachable") {
+    if lower.contains("connection refused")
+        || lower.contains("timeout")
+        || lower.contains("unreachable")
+    {
         return ErrorCategory::NetworkError;
     }
 

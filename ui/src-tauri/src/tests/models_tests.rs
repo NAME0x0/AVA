@@ -19,10 +19,10 @@ fn test_chat_response_serialization() {
         confidence: 0.95,
         response_time_ms: 150.0,
     };
-    
+
     let json = serde_json::to_string(&response).expect("Serialization should succeed");
     let parsed: ChatResponse = serde_json::from_str(&json).expect("Deserialization should succeed");
-    
+
     assert_eq!(parsed.response, "Hello, world!");
     assert_eq!(parsed.cognitive_state, Some("focused".to_string()));
     assert_eq!(parsed.surprise, Some(0.5));
@@ -37,9 +37,9 @@ fn test_chat_response_text_alias() {
         "confidence": 0.8,
         "response_time_ms": 200.0
     }"#;
-    
+
     let parsed: ChatResponse = serde_json::from_str(json).expect("Should parse with 'text' alias");
-    
+
     assert_eq!(parsed.response, "Hello from text field!");
 }
 
@@ -49,9 +49,9 @@ fn test_chat_response_minimal() {
     let json = r#"{
         "response": "Minimal response"
     }"#;
-    
+
     let parsed: ChatResponse = serde_json::from_str(json).expect("Should parse minimal response");
-    
+
     assert_eq!(parsed.response, "Minimal response");
     assert_eq!(parsed.cognitive_state, None);
     assert_eq!(parsed.surprise, None);
@@ -65,7 +65,7 @@ fn test_chat_response_minimal() {
 #[test]
 fn test_cognitive_state_default() {
     let state = CognitiveState::default();
-    
+
     assert!(state.label.is_empty());
     assert_eq!(state.entropy, 0.0);
     assert_eq!(state.varentropy, 0.0);
@@ -87,10 +87,11 @@ fn test_cognitive_state_serialization() {
         should_use_tools: true,
         should_think: false,
     };
-    
+
     let json = serde_json::to_string(&state).expect("Serialization should succeed");
-    let parsed: CognitiveState = serde_json::from_str(&json).expect("Deserialization should succeed");
-    
+    let parsed: CognitiveState =
+        serde_json::from_str(&json).expect("Deserialization should succeed");
+
     assert_eq!(parsed.label, "focused");
     assert_eq!(parsed.entropy, 1.5);
     assert!(parsed.should_use_tools);
@@ -100,7 +101,7 @@ fn test_cognitive_state_serialization() {
 #[test]
 fn test_system_state_default() {
     let state = SystemState::default();
-    
+
     assert!(!state.connected);
     assert!(state.system_state.is_empty());
     assert!(state.active_component.is_empty());
@@ -122,10 +123,10 @@ fn test_system_state_serialization() {
         cortex_invocations: 10,
         avg_response_time_ms: 250.5,
     };
-    
+
     let json = serde_json::to_string(&state).expect("Serialization should succeed");
     let parsed: SystemState = serde_json::from_str(&json).expect("Deserialization should succeed");
-    
+
     assert!(parsed.connected);
     assert_eq!(parsed.system_state, "running");
     assert_eq!(parsed.uptime_seconds, 3600);
@@ -135,7 +136,7 @@ fn test_system_state_serialization() {
 #[test]
 fn test_memory_stats_default() {
     let stats = MemoryStats::default();
-    
+
     assert_eq!(stats.total_memories, 0);
     assert_eq!(stats.memory_updates, 0);
     assert_eq!(stats.avg_surprise, 0.0);
@@ -153,10 +154,10 @@ fn test_memory_stats_serialization() {
         backend: "titans".to_string(),
         memory_utilization: 0.75,
     };
-    
+
     let json = serde_json::to_string(&stats).expect("Serialization should succeed");
     let parsed: MemoryStats = serde_json::from_str(&json).expect("Deserialization should succeed");
-    
+
     assert_eq!(parsed.total_memories, 500);
     assert_eq!(parsed.backend, "titans");
     assert_eq!(parsed.memory_utilization, 0.75);
@@ -170,12 +171,12 @@ fn test_default_serialization_roundtrip() {
     let json = serde_json::to_string(&cognitive).expect("Should serialize");
     let parsed: CognitiveState = serde_json::from_str(&json).expect("Should deserialize");
     assert!(parsed.label.is_empty());
-    
+
     let system = SystemState::default();
     let json = serde_json::to_string(&system).expect("Should serialize");
     let parsed: SystemState = serde_json::from_str(&json).expect("Should deserialize");
     assert!(!parsed.connected);
-    
+
     let memory = MemoryStats::default();
     let json = serde_json::to_string(&memory).expect("Should serialize");
     let parsed: MemoryStats = serde_json::from_str(&json).expect("Should deserialize");

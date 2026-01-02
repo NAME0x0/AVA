@@ -27,17 +27,20 @@ pub struct ServerHandle {
 pub async fn start_embedded_server(config: AppConfig) -> Result<ServerHandle, String> {
     let port = config.server.port;
     let host = config.server.host.clone();
-    
+
     // Create application state
     let state = Arc::new(AppState::new(config.clone()));
-    
+
     // Initialize the engine (connect to Ollama)
     info!("Initializing AVA engine...");
     if let Err(e) = state.initialize().await {
         // Log but continue - we'll retry on first request
-        error!("Initial engine initialization failed: {}. Will retry on first request.", e);
+        error!(
+            "Initial engine initialization failed: {}. Will retry on first request.",
+            e
+        );
     }
-    
+
     // Create router with CORS
     let cors = CorsLayer::new()
         .allow_origin([
@@ -49,22 +52,22 @@ pub async fn start_embedded_server(config: AppConfig) -> Result<ServerHandle, St
         .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
         .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION, header::ACCEPT])
         .allow_credentials(true);
-    
+
     let app = create_router(state)
         .layer(cors)
         .layer(TraceLayer::new_for_http());
-    
+
     // Parse address
     let addr: SocketAddr = format!("{host}:{port}")
         .parse()
         .map_err(|e| format!("Invalid address: {e}"))?;
-    
+
     // Create shutdown channel
     let (shutdown_tx, shutdown_rx) = oneshot::channel::<()>();
-    
+
     // Start server
     info!("Starting AVA embedded server on http://{}", addr);
-    
+
     tokio::spawn(async move {
         let listener = match tokio::net::TcpListener::bind(addr).await {
             Ok(l) => l,
@@ -73,9 +76,9 @@ pub async fn start_embedded_server(config: AppConfig) -> Result<ServerHandle, St
                 return;
             }
         };
-        
+
         info!("AVA server listening on http://{}", addr);
-        
+
         axum::serve(listener, app)
             .with_graceful_shutdown(async {
                 let _ = shutdown_rx.await;
@@ -83,13 +86,13 @@ pub async fn start_embedded_server(config: AppConfig) -> Result<ServerHandle, St
             })
             .await
             .unwrap_or_else(|e| error!("Server error: {}", e));
-        
+
         info!("AVA server stopped");
     });
-    
+
     // Give the server a moment to start
     tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-    
+
     Ok(ServerHandle { shutdown_tx, port })
 }
 

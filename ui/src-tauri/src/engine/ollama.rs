@@ -75,7 +75,7 @@ impl OllamaClient {
     /// Check if Ollama is running and accessible
     pub async fn health_check(&self) -> Result<bool, OllamaError> {
         let url = format!("{}/", self.host);
-        
+
         match self.client.get(&url).send().await {
             Ok(response) => Ok(response.status().is_success()),
             Err(e) => {
@@ -96,7 +96,7 @@ impl OllamaClient {
     /// List available models
     pub async fn list_models(&self) -> Result<Vec<OllamaModelInfo>, OllamaError> {
         let url = format!("{}/api/tags", self.host);
-        
+
         let response = self.client.get(&url).send().await.map_err(|e| {
             if e.is_timeout() {
                 OllamaError::Timeout
@@ -114,9 +114,10 @@ impl OllamaClient {
             )));
         }
 
-        let tags: OllamaTagsResponse = response.json().await.map_err(|e| {
-            OllamaError::InvalidResponse(format!("Failed to parse response: {e}"))
-        })?;
+        let tags: OllamaTagsResponse = response
+            .json()
+            .await
+            .map_err(|e| OllamaError::InvalidResponse(format!("Failed to parse response: {e}")))?;
 
         Ok(tags.models)
     }
@@ -124,9 +125,9 @@ impl OllamaClient {
     /// Check if a specific model is available
     pub async fn has_model(&self, model_name: &str) -> Result<bool, OllamaError> {
         let models = self.list_models().await?;
-        Ok(models.iter().any(|m| {
-            m.name == model_name || m.name.starts_with(&format!("{model_name}:"))
-        }))
+        Ok(models
+            .iter()
+            .any(|m| m.name == model_name || m.name.starts_with(&format!("{model_name}:"))))
     }
 
     /// Send a chat completion request (non-streaming)
@@ -137,7 +138,7 @@ impl OllamaClient {
         options: Option<OllamaOptions>,
     ) -> Result<OllamaChatResponse, OllamaError> {
         let url = format!("{}/api/chat", self.host);
-        
+
         let request = OllamaChatRequest {
             model: model.to_string(),
             messages,
@@ -164,19 +165,20 @@ impl OllamaClient {
         if !response.status().is_success() {
             let status = response.status();
             let body = response.text().await.unwrap_or_default();
-            
+
             if status.as_u16() == 404 {
                 return Err(OllamaError::ModelNotFound(model.to_string()));
             }
-            
+
             return Err(OllamaError::RequestFailed(format!(
                 "Status: {status}, Body: {body}"
             )));
         }
 
-        let chat_response: OllamaChatResponse = response.json().await.map_err(|e| {
-            OllamaError::InvalidResponse(format!("Failed to parse response: {e}"))
-        })?;
+        let chat_response: OllamaChatResponse = response
+            .json()
+            .await
+            .map_err(|e| OllamaError::InvalidResponse(format!("Failed to parse response: {e}")))?;
 
         debug!(
             "Chat response received: tokens={}, time={}ms",
@@ -195,7 +197,7 @@ impl OllamaClient {
         options: Option<OllamaOptions>,
     ) -> Result<mpsc::Receiver<Result<OllamaStreamChunk, OllamaError>>, OllamaError> {
         let url = format!("{}/api/chat", self.host);
-        
+
         let request = OllamaChatRequest {
             model: model.to_string(),
             messages,
@@ -232,24 +234,24 @@ impl OllamaClient {
 
         // Spawn a task to process the stream
         let mut stream = response.bytes_stream();
-        
+
         tokio::spawn(async move {
             let mut buffer = String::new();
-            
+
             while let Some(chunk_result) = stream.next().await {
                 match chunk_result {
                     Ok(bytes) => {
                         buffer.push_str(&String::from_utf8_lossy(&bytes));
-                        
+
                         // Process complete lines
                         while let Some(newline_pos) = buffer.find('\n') {
                             let line = buffer[..newline_pos].trim().to_string();
                             buffer = buffer[newline_pos + 1..].to_string();
-                            
+
                             if line.is_empty() {
                                 continue;
                             }
-                            
+
                             match serde_json::from_str::<OllamaStreamChunk>(&line) {
                                 Ok(chunk) => {
                                     let is_done = chunk.done;
@@ -280,7 +282,7 @@ impl OllamaClient {
     /// Generate embeddings for text
     pub async fn embeddings(&self, model: &str, text: &str) -> Result<Vec<f32>, OllamaError> {
         let url = format!("{}/api/embeddings", self.host);
-        
+
         let request = serde_json::json!({
             "model": model,
             "prompt": text

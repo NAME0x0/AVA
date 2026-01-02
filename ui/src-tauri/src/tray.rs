@@ -32,7 +32,10 @@ pub fn create_tray_menu() -> SystemTray {
     let status_menu = SystemTraySubmenu::new(
         "Status",
         SystemTrayMenu::new()
-            .add_item(CustomMenuItem::new("status_backend".to_string(), "Backend: Checking...").disabled())
+            .add_item(
+                CustomMenuItem::new("status_backend".to_string(), "Backend: Checking...")
+                    .disabled(),
+            )
             .add_item(CustomMenuItem::new("status_memory".to_string(), "Memory: --").disabled()),
     );
 
