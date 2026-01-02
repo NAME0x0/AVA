@@ -249,10 +249,12 @@ async fn test_chat_with_body() {
         .unwrap();
     
     // Chat will likely return 200 even if Ollama isn't running (with error in body)
-    // or 500 if something goes wrong
+    // or 500/503 if something goes wrong (503 when backend unavailable)
     assert!(
-        response.status() == StatusCode::OK || response.status() == StatusCode::INTERNAL_SERVER_ERROR,
-        "Chat should return either OK or error, got {:?}",
+        response.status() == StatusCode::OK 
+            || response.status() == StatusCode::INTERNAL_SERVER_ERROR
+            || response.status() == StatusCode::SERVICE_UNAVAILABLE,
+        "Chat should return OK or error status, got {:?}",
         response.status()
     );
 }

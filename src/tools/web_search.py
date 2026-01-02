@@ -274,10 +274,7 @@ class EnhancedWebSearch:
             # Check rate limiting
             if not self.rate_limiter.can_make_request():
                 wait_time = self.rate_limiter.wait_time()
-                raise ValueError(
-                    f"Rate limit exceeded. Wait {
-                        wait_time:.1f} seconds"
-                )
+                raise ValueError(f"Rate limit exceeded. Wait {wait_time:.1f} seconds")
 
             # Clean and preprocess query
             cleaned_query = self._preprocess_query(query)
