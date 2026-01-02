@@ -11,13 +11,27 @@ Features:
 - Keyboard-driven navigation
 - Split-pane view
 - ASCII thinking animations
+- Conversation persistence (SQLite)
+- Streaming response support (WebSocket/HTTP fallback)
 
 Usage:
-    python run_tui.py
+    python -m tui.app
     # or
-    python -m tui
+    from tui import AVATUI
+    app = AVATUI()
+    app.run()
 """
 
 from .app import AVATUI
+from .persistence import ConversationStore, Session, Message
+from .streaming import StreamingClient, StreamEvent, StreamEventType
 
-__all__ = ["AVATUI"]
+__all__ = [
+    "AVATUI",
+    "ConversationStore",
+    "Session",
+    "Message",
+    "StreamingClient",
+    "StreamEvent",
+    "StreamEventType",
+]

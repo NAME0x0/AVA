@@ -40,7 +40,7 @@ class AVATUI(App):
     """
 
     CSS_PATH = "styles/base.tcss"
-    TITLE = "AVA v3 - Neural Interface"
+    TITLE = "AVA v4 - Neural Interface"
     SUB_TITLE = "Cortex-Medulla Architecture"
 
     BINDINGS = [
@@ -82,6 +82,11 @@ class AVATUI(App):
         self._ava = None
         self._force_search = False
         self._force_cortex = False
+        
+        # Initialize conversation persistence
+        from .persistence import ConversationStore
+        self._store = ConversationStore()
+        self._session_id = None
 
     def compose(self) -> ComposeResult:
         """Create the UI layout."""
@@ -100,7 +105,7 @@ class AVATUI(App):
 
     async def on_mount(self) -> None:
         """Initialize on mount."""
-        self.title = "AVA v3"
+        self.title = "AVA v4"
         self.sub_title = "Connecting..."
 
         # Auto-focus the input for accessibility
@@ -109,6 +114,9 @@ class AVATUI(App):
             input_box.focus()
         except Exception:
             pass
+
+        # Create or resume session
+        self._session_id = self._store.create_session()
 
         # Handle offline mode
         if self.offline_mode:
@@ -173,6 +181,10 @@ class AVATUI(App):
 
         # Add user message
         chat.add_user_message(message)
+        
+        # Persist user message
+        if self._session_id:
+            self._store.add_message(self._session_id, "user", message)
 
         # Show thinking indicator
         self.thinking = True
@@ -201,16 +213,38 @@ class AVATUI(App):
 
                 if response.status_code == 200:
                     data = response.json()
+                    response_text = data.get("response", "")
+                    used_cortex = data.get("used_cortex", False)
+                    cognitive_state = data.get("cognitive_state", "FLOW")
+                    
                     chat.add_assistant_message(
-                        data.get("response", ""),
-                        used_cortex=data.get("used_cortex", False),
-                        cognitive_state=data.get("cognitive_state", "FLOW"),
+                        response_text,
+                        used_cortex=used_cortex,
+                        cognitive_state=cognitive_state,
                     )
+                    
+                    # Persist assistant message
+                    if self._session_id:
+                        self._store.add_message(
+                            self._session_id,
+                            "assistant",
+                            response_text,
+                            metadata={
+                                "used_cortex": used_cortex,
+                                "cognitive_state": cognitive_state,
+                            },
+                        )
                 else:
-                    chat.add_error_message(f"Error: {response.status_code}")
+                    error_msg = f"Error: {response.status_code}"
+                    chat.add_error_message(error_msg)
+                    if self._session_id:
+                        self._store.add_message(self._session_id, "error", error_msg)
 
         except Exception as e:
-            chat.add_error_message(f"Error: {str(e)}")
+            error_msg = f"Error: {str(e)}"
+            chat.add_error_message(error_msg)
+            if self._session_id:
+                self._store.add_message(self._session_id, "error", error_msg)
             logger.error(f"Send message error: {e}")
         finally:
             self.thinking = False
