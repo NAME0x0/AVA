@@ -95,7 +95,7 @@ def check_dependencies() -> bool:
         return False
 
     # Check entry point exists
-    entry_point = PROJECT_ROOT / "ava_server.py"
+    entry_point = PROJECT_ROOT / "legacy" / "python_servers" / "ava_server.py"
     if not entry_point.exists():
         print(f"  ERROR: Entry point not found: {entry_point}")
         return False
@@ -189,8 +189,8 @@ excludes = [
 ]
 
 a = Analysis(
-    [str(PROJECT_ROOT / 'ava_server.py')],
-    pathex=[str(PROJECT_ROOT), str(PROJECT_ROOT / 'src')],
+    [str(PROJECT_ROOT / 'legacy' / 'python_servers' / 'ava_server.py')],
+    pathex=[str(PROJECT_ROOT), str(PROJECT_ROOT / 'src'), str(PROJECT_ROOT / 'legacy' / 'python_servers')],
     binaries=[],
     datas=datas,
     hiddenimports=hidden_imports,
