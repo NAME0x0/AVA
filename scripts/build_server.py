@@ -178,7 +178,7 @@ hidden_imports = [
 datas = [
     (str(PROJECT_ROOT / 'config'), 'config'),
     (str(PROJECT_ROOT / 'src'), 'src'),
-    (str(PROJECT_ROOT / 'server.py'), '.'),  # Include server.py for imports
+    (str(PROJECT_ROOT / 'legacy' / 'python_servers' / 'server.py'), '.'),  # Include server.py for imports
 ]
 
 # Exclude large unused packages
