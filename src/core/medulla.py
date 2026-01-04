@@ -31,7 +31,15 @@ from pathlib import Path
 from typing import Any, Optional
 
 import numpy as np
-import torch
+
+# Optional: PyTorch for native inference
+try:
+    import torch
+
+    TORCH_AVAILABLE = True
+except ImportError:
+    torch = None  # type: ignore[assignment]
+    TORCH_AVAILABLE = False
 
 # Optional: GPU monitoring via pynvml
 try:
@@ -517,28 +525,34 @@ class Medulla:
 
         backend_mode = getattr(self.config, "backend_mode", "ollama")
         if backend_mode in ("native", "hybrid"):
-            try:
-                from mamba_ssm import MambaLMHeadModel
-
-                logger.info("Loading Mamba SSM model for native inference...")
-                device = self.config.device if hasattr(self.config, "device") else "cuda"
-                dtype = torch.float16 if self.config.use_fp16 else torch.float32
-
-                self._monitor_model = MambaLMHeadModel.from_pretrained(
-                    self.config.monitor_model,
-                    device=device,
-                    dtype=dtype,
-                )
-                logger.info("Mamba SSM model loaded successfully")
-                return
-            except ImportError:
+            if not TORCH_AVAILABLE:
                 logger.warning(
-                    "mamba-ssm not installed. Install with: pip install mamba-ssm causal-conv1d\n"
+                    "PyTorch not installed. Native inference requires torch.\n"
                     "Falling back to Ollama backend."
                 )
-            except Exception as e:
-                logger.warning(f"Failed to load Mamba model: {e}")
-                logger.warning("Falling back to Ollama backend")
+            else:
+                try:
+                    from mamba_ssm import MambaLMHeadModel
+
+                    logger.info("Loading Mamba SSM model for native inference...")
+                    device = self.config.device if hasattr(self.config, "device") else "cuda"
+                    dtype = torch.float16 if self.config.use_fp16 else torch.float32
+
+                    self._monitor_model = MambaLMHeadModel.from_pretrained(
+                        self.config.monitor_model,
+                        device=device,
+                        dtype=dtype,
+                    )
+                    logger.info("Mamba SSM model loaded successfully")
+                    return
+                except ImportError:
+                    logger.warning(
+                        "mamba-ssm not installed. Install with: pip install mamba-ssm causal-conv1d\n"
+                        "Falling back to Ollama backend."
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to load Mamba model: {e}")
+                    logger.warning("Falling back to Ollama backend")
 
         # Default: Use Ollama backend
         logger.info("Using Ollama backend for Medulla monitor")

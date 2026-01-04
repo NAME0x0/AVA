@@ -652,10 +652,19 @@ class MCPClient:
     """
 
     # Allowed commands for MCP server spawning (security whitelist)
-    ALLOWED_MCP_COMMANDS = frozenset({
-        "npx", "node", "python", "python3", "py",
-        "uv", "uvx", "deno", "bun",
-    })
+    ALLOWED_MCP_COMMANDS = frozenset(
+        {
+            "npx",
+            "node",
+            "python",
+            "python3",
+            "py",
+            "uv",
+            "uvx",
+            "deno",
+            "bun",
+        }
+    )
 
     # Characters that could indicate shell injection attempts
     DANGEROUS_CHARS = frozenset(";|&$`(){}[]<>\\'\"\n\r\t")
@@ -681,7 +690,10 @@ class MCPClient:
             command_name = command_name.rsplit(".", 1)[0]
 
         if command_name not in self.ALLOWED_MCP_COMMANDS:
-            return False, f"Command '{command_name}' not in allowed list: {self.ALLOWED_MCP_COMMANDS}"
+            return (
+                False,
+                f"Command '{command_name}' not in allowed list: {self.ALLOWED_MCP_COMMANDS}",
+            )
 
         # Check args for shell injection characters
         for arg in args:

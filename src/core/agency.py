@@ -1651,9 +1651,7 @@ class ActiveInferenceController:
                 text_lower = observation.text.lower()
 
                 # Detect user intent
-                if "?" in observation.text or any(
-                    w in text_lower for w in ["what", "how", "why"]
-                ):
+                if "?" in observation.text or any(w in text_lower for w in ["what", "how", "why"]):
                     self._shift_belief(self.beliefs.user_intent, HiddenState.USER_QUERYING, lr)
 
                 if any(w in text_lower for w in ["urgent", "asap", "immediately", "help"]):
