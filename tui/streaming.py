@@ -10,7 +10,7 @@ import asyncio
 import json
 import logging
 from dataclasses import dataclass
-from typing import AsyncIterator, Callable, Optional
+from typing import Any, AsyncIterator, Callable, Optional
 from enum import Enum
 
 logger = logging.getLogger(__name__)
@@ -223,10 +223,10 @@ class StreamingWidget:
             on_token: Callback for each new token
             on_complete: Callback when streaming completes
         """
-        self._buffer = []
+        self._buffer: list[str] = []
         self._on_token = on_token
         self._on_complete = on_complete
-        self._metadata = {}
+        self._metadata: dict[str, Any] = {}
 
     def append_token(self, token: str) -> None:
         """Add a token to the buffer and notify.

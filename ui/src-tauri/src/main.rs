@@ -35,8 +35,8 @@ fn main() {
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::from_default_env()
-                .add_directive("ava=info".parse().unwrap())
-                .add_directive("tower_http=debug".parse().unwrap()),
+                .add_directive("ava=info".parse().expect("valid directive"))
+                .add_directive("tower_http=debug".parse().expect("valid directive")),
         )
         .init();
 

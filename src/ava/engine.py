@@ -215,7 +215,7 @@ class AVAEngine:
             logger.info(f"Processing mode: {mode.name} ({reason})")
 
             # 3. Check if tools are needed
-            tools_used = []
+            tools_used: list[str] = []
             tool_context = ""
             if tools and self._needs_tools(user_input):
                 tools_used, tool_context = await self._execute_tools(user_input, tools)

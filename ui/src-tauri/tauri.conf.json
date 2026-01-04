@@ -14,7 +14,7 @@
     "allowlist": {
       "all": false,
       "http": {
-        "all": true,
+        "all": false,
         "request": true,
         "scope": [
           "http://localhost:8085/**",

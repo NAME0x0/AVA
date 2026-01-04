@@ -428,8 +428,8 @@ class ContinualLearner:
                     if self._meets_quality_threshold(SampleQuality(data.get("quality", "neutral"))):
                         if not unused_only or not data.get("has_been_used", False):
                             count += 1
-            except Exception:
-                pass
+            except (json.JSONDecodeError, OSError) as e:
+                logger.debug(f"Skipping corrupt/unreadable sample {sample_file.name}: {e}")
 
         return count
 

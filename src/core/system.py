@@ -405,7 +405,19 @@ class AVACoreSystem:
             return
 
         try:
-            storage_path = Path(self.config.episodic_memory_path)
+            storage_path = Path(self.config.episodic_memory_path).resolve()
+            allowed_base = Path(self.config.data_dir).resolve()
+
+            # Security: Ensure path is within allowed data directory
+            try:
+                storage_path.relative_to(allowed_base)
+            except ValueError:
+                logger.error(
+                    f"Security: Episodic memory path '{storage_path}' is outside "
+                    f"allowed directory '{allowed_base}'. Using default."
+                )
+                storage_path = allowed_base / "memory" / "episodic"
+
             storage_path.mkdir(parents=True, exist_ok=True)
 
             self._episodic_store = EpisodicMemoryStore(

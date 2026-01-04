@@ -42,16 +42,24 @@ pub async fn start_embedded_server(config: AppConfig) -> Result<ServerHandle, St
     }
 
     // Create router with CORS
+    // Note: These static origin strings are compile-time validated, expect() is safe here
     let cors = CorsLayer::new()
         .allow_origin([
-            "http://localhost:3000".parse::<HeaderValue>().unwrap(),
-            "http://127.0.0.1:3000".parse::<HeaderValue>().unwrap(),
-            "tauri://localhost".parse::<HeaderValue>().unwrap(),
-            "https://tauri.localhost".parse::<HeaderValue>().unwrap(),
+            "http://localhost:3000"
+                .parse::<HeaderValue>()
+                .expect("valid origin"),
+            "http://127.0.0.1:3000"
+                .parse::<HeaderValue>()
+                .expect("valid origin"),
+            "tauri://localhost"
+                .parse::<HeaderValue>()
+                .expect("valid origin"),
+            "https://tauri.localhost"
+                .parse::<HeaderValue>()
+                .expect("valid origin"),
         ])
         .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
-        .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION, header::ACCEPT])
-        .allow_credentials(true);
+        .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION, header::ACCEPT]);
 
     let app = create_router(state)
         .layer(cors)

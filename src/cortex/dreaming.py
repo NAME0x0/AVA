@@ -248,7 +248,7 @@ class Dreamer:
             List of results from this dream cycle
         """
         logger.info("Entering dream state...")
-        results = []
+        results: list[dict[str, Any]] = []
 
         try:
             self.state = DreamState.LIGHT_SLEEP

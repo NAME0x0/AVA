@@ -10,7 +10,7 @@ pub async fn start_connection_monitor(app: AppHandle) {
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(5))
         .build()
-        .unwrap();
+        .expect("Failed to build reqwest client - this should never fail with default settings");
 
     loop {
         let state = app.state::<crate::state::AppState>();

@@ -215,10 +215,27 @@ class ProjectionAdapter:
         logger.info(f"Saved projection adapter to {path}")
 
     def load(self, path: str) -> None:
-        """Load adapter weights from disk."""
-        data = np.load(path, allow_pickle=True)
+        """Load adapter weights from disk.
+
+        Note: Uses allow_pickle=False for security. The .npz format from
+        np.savez() contains only NumPy arrays and doesn't require pickling.
+
+        Raises:
+            ValueError: If loaded adapter dimensions don't match config.
+        """
+        data = np.load(path, allow_pickle=False)
 
         num_layers = int(data["num_layers"])
+
+        # Validate dimensions match current config before loading
+        if num_layers > 0:
+            loaded_input_dim = data["weight_0"].shape[0]
+            if loaded_input_dim != self.config.medulla_state_dim:
+                raise ValueError(
+                    f"Loaded adapter input dim ({loaded_input_dim}) doesn't match "
+                    f"config medulla_state_dim ({self.config.medulla_state_dim})"
+                )
+
         self.weights = [data[f"weight_{i}"] for i in range(num_layers)]
         self.biases = [data[f"bias_{i}"] for i in range(num_layers)]
 
@@ -273,7 +290,7 @@ class ContextCompressor:
         max_chars = self.max_tokens * chars_per_token
 
         # Build context from most recent to oldest
-        context_parts = []
+        context_parts: list[str] = []
         total_chars = len(current_query)
 
         for turn in reversed(conversation_history[-10:]):

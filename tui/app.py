@@ -281,7 +281,11 @@ class AVATUI(App):
                     "quit": self.action_quit,
                 }
                 if action_name in action_map:
-                    action_map[action_name]()
+                    result = action_map[action_name]()
+                    # Handle async actions (like action_quit from Textual)
+                    if hasattr(result, "__await__"):
+                        import asyncio
+                        asyncio.create_task(result)
 
         self.push_screen(CommandPalette(), handle_result)
 

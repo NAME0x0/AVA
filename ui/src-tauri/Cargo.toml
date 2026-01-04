@@ -20,7 +20,7 @@ tauri = { version = "1.6", features = [
     "process-relaunch",
     "global-shortcut-all",
     "os-all",
-    "http-all",
+    "http-request",
     "updater",
     "fs-create-dir",
     "fs-exists",

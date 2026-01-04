@@ -36,12 +36,24 @@ rich>=13.7.0,<14.0.0  # Enhanced CLI output and formatting
 # datasets>=2.16.0,<3.0.0
 
 # ============================================================================
-# Testing & Development
+# Native Model Loading (Optional - for non-Ollama backends)
 # ============================================================================
-pytest>=7.4.0
-pytest-asyncio>=0.23.0
-pytest-cov>=4.1.0
+# AirLLM: Layer-wise inference for 70B+ models on limited VRAM
+# Uncomment if using backend: "native" or "hybrid" in config
+# airllm>=2.10.0
 
+# Mamba SSM: State Space Models for O(N) inference
+# Requires CUDA - uncomment if using native Medulla models
+# mamba-ssm>=2.2.0
+# causal-conv1d>=1.4.0
+
+# llama-cpp-python: CPU/GPU GGUF quantized model inference
+# Alternative to BitNet, supports 1-bit to 8-bit quantization
+# llama-cpp-python>=0.3.0
+
+# ============================================================================
+# Core Dependencies
+# ============================================================================
 pydantic>=2.5.0,<3.0.0  # Data validation and structured output
 sse-starlette>=1.8.0,<2.0.0  # Server-sent events for token streaming
 

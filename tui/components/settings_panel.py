@@ -12,6 +12,7 @@ Accessibility Features:
 """
 
 from pathlib import Path
+from typing import Any
 
 import yaml
 from textual.message import Message
@@ -126,7 +127,7 @@ class SettingsPanel(Static):
         config_path = Path("config/cortex_medulla.yaml")
 
         # Load existing config
-        config = {}
+        config: dict[str, Any] = {}
         if config_path.exists():
             try:
                 with open(config_path) as f:

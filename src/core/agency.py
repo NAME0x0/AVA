@@ -274,7 +274,7 @@ class BeliefState:
 
     def to_vector(self) -> np.ndarray:
         """Convert beliefs to a flat probability vector."""
-        all_probs = []
+        all_probs: list[float] = []
         for distribution in [self.user_intent, self.knowledge_state, self.interaction_state]:
             all_probs.extend(distribution.values())
         return np.array(all_probs, dtype=np.float32)
@@ -1165,9 +1165,10 @@ class ActiveInferenceController:
         """
         self.config = config or AgencyConfig()
 
-        # Current belief state
+        # Current belief state (protected by lock for thread-safe updates)
         self.beliefs = BeliefState()
         self.beliefs.calculate_entropy()
+        self._belief_lock = asyncio.Lock()  # Protects concurrent belief updates
 
         # Expected Free Energy calculator
         self.efe_calculator = ExpectedFreeEnergy(self.config)
@@ -1640,58 +1641,70 @@ class ActiveInferenceController:
         Update belief state based on new observation.
 
         Uses Bayesian belief updating with surprise-weighted learning.
+        Thread-safe via _belief_lock.
         """
-        lr = self.config.belief_learning_rate
+        async with self._belief_lock:
+            lr = self.config.belief_learning_rate
 
-        # Update user intent beliefs based on observation
-        if observation.text:
-            text_lower = observation.text.lower()
+            # Update user intent beliefs based on observation
+            if observation.text:
+                text_lower = observation.text.lower()
 
-            # Detect user intent
-            if "?" in observation.text or any(w in text_lower for w in ["what", "how", "why"]):
-                self._shift_belief(self.beliefs.user_intent, HiddenState.USER_QUERYING, lr)
+                # Detect user intent
+                if "?" in observation.text or any(
+                    w in text_lower for w in ["what", "how", "why"]
+                ):
+                    self._shift_belief(self.beliefs.user_intent, HiddenState.USER_QUERYING, lr)
 
-            if any(w in text_lower for w in ["urgent", "asap", "immediately", "help"]):
-                self._shift_belief(self.beliefs.user_intent, HiddenState.USER_URGENT, lr * 2)
+                if any(w in text_lower for w in ["urgent", "asap", "immediately", "help"]):
+                    self._shift_belief(self.beliefs.user_intent, HiddenState.USER_URGENT, lr * 2)
 
-            if any(w in text_lower for w in ["confused", "don't understand", "what do you mean"]):
-                self._shift_belief(self.beliefs.user_intent, HiddenState.USER_CONFUSED, lr)
-        else:
-            # No text = likely idle
-            self._shift_belief(self.beliefs.user_intent, HiddenState.USER_IDLE, lr * 0.5)
+                if any(
+                    w in text_lower for w in ["confused", "don't understand", "what do you mean"]
+                ):
+                    self._shift_belief(self.beliefs.user_intent, HiddenState.USER_CONFUSED, lr)
+            else:
+                # No text = likely idle
+                self._shift_belief(self.beliefs.user_intent, HiddenState.USER_IDLE, lr * 0.5)
 
-        # Update knowledge beliefs based on surprise
-        if observation.surprise_signal > 1.5:
-            # High surprise = uncertain knowledge
-            self._shift_belief(self.beliefs.knowledge_state, HiddenState.KNOWLEDGE_UNCERTAIN, lr)
-        elif observation.surprise_signal > 0.5:
-            # Moderate surprise = somewhat certain
-            self._shift_belief(
-                self.beliefs.knowledge_state, HiddenState.KNOWLEDGE_CERTAIN, lr * 0.5
-            )
+            # Update knowledge beliefs based on surprise
+            if observation.surprise_signal > 1.5:
+                # High surprise = uncertain knowledge
+                self._shift_belief(
+                    self.beliefs.knowledge_state, HiddenState.KNOWLEDGE_UNCERTAIN, lr
+                )
+            elif observation.surprise_signal > 0.5:
+                # Moderate surprise = somewhat certain
+                self._shift_belief(
+                    self.beliefs.knowledge_state, HiddenState.KNOWLEDGE_CERTAIN, lr * 0.5
+                )
 
-        # Update interaction complexity
-        if observation.query_complexity > 0.7:
-            self._shift_belief(self.beliefs.interaction_state, HiddenState.INTERACTION_COMPLEX, lr)
-        elif observation.query_complexity > 0.3:
-            self._shift_belief(self.beliefs.interaction_state, HiddenState.INTERACTION_NOVEL, lr)
+            # Update interaction complexity
+            if observation.query_complexity > 0.7:
+                self._shift_belief(
+                    self.beliefs.interaction_state, HiddenState.INTERACTION_COMPLEX, lr
+                )
+            elif observation.query_complexity > 0.3:
+                self._shift_belief(
+                    self.beliefs.interaction_state, HiddenState.INTERACTION_NOVEL, lr
+                )
 
-        # Account for time passing (uncertainty grows with silence)
-        time_elapsed = (datetime.now() - self.last_observation_time).total_seconds()
-        if time_elapsed > 30:  # More than 30 seconds of silence
-            uncertainty_growth = time_elapsed * self.config.idle_uncertainty_rate
-            self._shift_belief(
-                self.beliefs.knowledge_state,
-                HiddenState.KNOWLEDGE_UNCERTAIN,
-                min(uncertainty_growth, lr),
-            )
+            # Account for time passing (uncertainty grows with silence)
+            time_elapsed = (datetime.now() - self.last_observation_time).total_seconds()
+            if time_elapsed > 30:  # More than 30 seconds of silence
+                uncertainty_growth = time_elapsed * self.config.idle_uncertainty_rate
+                self._shift_belief(
+                    self.beliefs.knowledge_state,
+                    HiddenState.KNOWLEDGE_UNCERTAIN,
+                    min(uncertainty_growth, lr),
+                )
 
-        # Recalculate entropy
-        self.beliefs.calculate_entropy()
-        self.beliefs.time_since_observation = time_elapsed
+            # Recalculate entropy
+            self.beliefs.calculate_entropy()
+            self.beliefs.time_since_observation = time_elapsed
 
-        # Update timing
-        self.last_observation_time = datetime.now()
+            # Update timing
+            self.last_observation_time = datetime.now()
 
     def _shift_belief(
         self,
@@ -2215,32 +2228,6 @@ class ActiveInferenceController:
         # Require majority of terms to match
         match_ratio = found_terms / len(key_terms)
         return match_ratio >= 0.5
-
-    def add_verification_warning(
-        self,
-        response: str,
-        verification: VerificationResult,
-    ) -> str:
-        """
-        Add a warning to a response that failed verification.
-
-        Args:
-            response: Original response
-            verification: Verification result
-
-        Returns:
-            Response with warning prepended
-        """
-        if not verification.needs_revision:
-            return response
-
-        warning = (
-            f"[Note: This response has {verification.confidence:.0%} verification "
-            f"confidence. {len(verification.unverified_claims)} claim(s) could not "
-            f"be verified against search results.]\n\n"
-        )
-
-        return warning + response
 
 
 # =============================================================================

@@ -151,13 +151,11 @@ disable_error_code = [
     "assignment",
     "misc",
     "call-arg",
-    "var-annotated",
     "dict-item",
     "operator",
     "override",
     "union-attr",
     "no-redef",
-    "unused-coroutine",
     "import-untyped",
 ]
 exclude = [

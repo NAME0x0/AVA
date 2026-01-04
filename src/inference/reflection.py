@@ -337,8 +337,8 @@ class ReflectionEngine:
         self, response: str, emotional_state: dict[str, float] | None
     ) -> dict[str, Any]:
         """Check if tone matches emotional context."""
-        issues = []
-        suggestions = []
+        issues: list[str] = []
+        suggestions: list[str] = []
         score = 1.0
 
         if not emotional_state:

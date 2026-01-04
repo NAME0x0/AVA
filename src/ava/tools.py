@@ -651,16 +651,57 @@ class MCPClient:
     Follows the MCP specification: https://modelcontextprotocol.io/
     """
 
+    # Allowed commands for MCP server spawning (security whitelist)
+    ALLOWED_MCP_COMMANDS = frozenset({
+        "npx", "node", "python", "python3", "py",
+        "uv", "uvx", "deno", "bun",
+    })
+
+    # Characters that could indicate shell injection attempts
+    DANGEROUS_CHARS = frozenset(";|&$`(){}[]<>\\'\"\n\r\t")
+
     def __init__(self):
         self.servers: dict[str, MCPServer] = {}
         self._processes: dict[str, subprocess.Popen] = {}
         self._tools: dict[str, dict[str, Any]] = {}  # server_name -> tools
 
+    def _validate_mcp_command(self, command: str, args: list[str]) -> tuple[bool, str]:
+        """
+        Validate MCP server command is safe to execute.
+
+        Returns:
+            Tuple of (is_valid, error_message)
+        """
+        from pathlib import Path
+
+        # Extract command name (handle full paths)
+        command_name = Path(command).name.lower()
+        # Remove .exe/.cmd suffix on Windows
+        if command_name.endswith((".exe", ".cmd", ".bat")):
+            command_name = command_name.rsplit(".", 1)[0]
+
+        if command_name not in self.ALLOWED_MCP_COMMANDS:
+            return False, f"Command '{command_name}' not in allowed list: {self.ALLOWED_MCP_COMMANDS}"
+
+        # Check args for shell injection characters
+        for arg in args:
+            dangerous_found = [c for c in arg if c in self.DANGEROUS_CHARS]
+            if dangerous_found:
+                return False, f"Dangerous characters {dangerous_found} found in arg: {arg[:50]}"
+
+        return True, ""
+
     async def add_server(self, server: MCPServer) -> bool:
         """Add and connect to an MCP server."""
         try:
             if server.transport == "stdio":
-                # Start the server process
+                # Security: Validate command before execution
+                is_valid, error_msg = self._validate_mcp_command(server.command, server.args)
+                if not is_valid:
+                    logger.error(f"Security: Blocked MCP server '{server.name}': {error_msg}")
+                    return False
+
+                # Start the server process (shell=False is already the default)
                 process = subprocess.Popen(
                     [server.command] + server.args,
                     stdin=subprocess.PIPE,

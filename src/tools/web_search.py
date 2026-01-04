@@ -118,7 +118,7 @@ class RateLimiter:
         """
         self.max_requests = max_requests
         self.time_window = time_window
-        self.requests = []
+        self.requests: list[float] = []
 
     def can_make_request(self) -> bool:
         """Check if a request can be made without exceeding rate limit."""

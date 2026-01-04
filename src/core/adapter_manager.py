@@ -499,31 +499,22 @@ class AdapterManager:
                 logger.warning(f"Adapter not found: {adapter_path}")
                 return False
 
-            # Load using PEFT if available
-            try:
-                # Apply adapter to model
-                # Note: In real implementation, this integrates with AirLLM
-                logger.info(f"Loading adapter: {adapter_name}")
+            # NOTE: PEFT integration not yet implemented
+            # Real adapter loading requires Phase 7 completion (native model loading)
+            # For now, track adapter state for when integration is ready
+            logger.info(f"Loading adapter: {adapter_name} (simulated)")
 
-                # For now, just mark as loaded (actual PEFT loading would go here)
-                # model = PeftModel.from_pretrained(model, str(adapter_path))
+            self._current_adapter_weights = adapter_name
+            self.active_adapter = adapter_type
+            self._adapter_loaded = True
 
-                self._current_adapter_weights = adapter_name  # Placeholder
-                self.active_adapter = adapter_type
-                self._adapter_loaded = True
+            # Record stats
+            load_time_ms = (time.time() - start_time) * 1000
+            self.stats[adapter_type].record_load(load_time_ms)
 
-                # Record stats
-                load_time_ms = (time.time() - start_time) * 1000
-                self.stats[adapter_type].record_load(load_time_ms)
-
-                logger.info(f"Adapter {adapter_name} loaded in {load_time_ms:.0f}ms")
-                return True
-
-            except ImportError:
-                logger.warning("PEFT not available - adapter loading simulated")
-                self.active_adapter = adapter_type
-                self._adapter_loaded = True
-                return True
+            logger.info(f"Adapter {adapter_name} registered in {load_time_ms:.0f}ms")
+            logger.debug("Real PEFT loading pending native model implementation")
+            return True
 
         except Exception as e:
             logger.error(f"Failed to load adapter {adapter_name}: {e}")

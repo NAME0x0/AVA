@@ -389,12 +389,47 @@ development:
   # Reduced Models for Testing
   use_small_models: false       # Use full models
   small_cortex_model: "meta-llama/Meta-Llama-3-8B-Instruct"
-  
+
   # Logging
   verbose_logging: true
   log_agency_decisions: true
   log_surprise_signals: true
-  
+
   # Performance Profiling
   enable_profiling: false
   profile_output_path: "data/profiles"
+
+# ----------------------------------------------------------------------------
+# BACKEND SELECTION
+# ----------------------------------------------------------------------------
+# Choose which inference backend to use for each component.
+# Options:
+#   - ollama: Use Ollama API (recommended, works out of box)
+#   - native: Use native Python models (AirLLM, Mamba, llama-cpp)
+#   - hybrid: Ollama for Cortex, native for Medulla
+# ----------------------------------------------------------------------------
+backend:
+  # Primary backend selection
+  mode: "ollama"                # Options: ollama, native, hybrid
+
+  # Ollama configuration (used when mode is "ollama" or "hybrid")
+  ollama:
+    host: "http://localhost:11434"
+    cortex_model: "llama3.2:latest"      # Model for deep reasoning
+    medulla_model: "gemma3:4b"           # Model for quick responses
+    timeout_seconds: 120
+
+  # Native model configuration (used when mode is "native" or "hybrid")
+  native:
+    # Cortex: AirLLM for layer-wise 70B inference
+    cortex_model_id: "meta-llama/Meta-Llama-3-70B-Instruct"
+    cortex_compression: "4bit"
+    cortex_use_safetensors: true
+
+    # Medulla Monitor: Mamba SSM
+    monitor_model_id: "state-spaces/mamba-2.8b-slimpj"
+
+    # Medulla Talker: llama-cpp with GGUF quantized model
+    talker_model_path: "models/gguf/gemma-2b-Q4_K_M.gguf"
+    talker_n_ctx: 512
+    talker_n_gpu_layers: -1  # Use all available GPU layers
