@@ -64,7 +64,8 @@
       "Bash(./venv/Scripts/python.exe -m pytest tests/unit/test_bridge.py -v --tb=short)",
       "Bash(./venv/Scripts/python.exe -m pytest tests/unit -v --tb=short)",
       "Bash(\"D:\\\\AVA\\\\venv\\\\Scripts\\\\python.exe\" -m mypy:*)",
-      "Bash(./venv/Scripts/python.exe -m pytest:*)"
+      "Bash(./venv/Scripts/python.exe -m pytest:*)",
+      "Bash(./venv/Scripts/python.exe:*)"
     ]
   }
 }
