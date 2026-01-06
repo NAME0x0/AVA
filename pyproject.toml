@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ava-agent"
-version = "4.1.0"
+version = "4.2.3"
 description = "Research-grade AI assistant with biomimetic dual-brain architecture"
 readme = "README.md"
 license = {text = "MIT"}

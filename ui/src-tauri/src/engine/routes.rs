@@ -1,22 +1,27 @@
 //! HTTP API Routes for AVA Engine
 //!
-//! Implements all HTTP endpoints that mirror the Python server API.
+//! Implements all HTTP endpoints that mirror the Python server API,
+//! including WebSocket streaming support for real-time responses.
 
 use crate::engine::models::*;
 use crate::engine::state::AppState;
 use axum::{
-    extract::{Json, State},
+    extract::{
+        ws::{Message, WebSocket, WebSocketUpgrade},
+        Json, State,
+    },
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
     Router,
 };
+use futures_util::{SinkExt, StreamExt};
 use std::sync::Arc;
 use sysinfo::System;
-use tracing::debug;
+use tracing::{debug, error, info, warn};
 
 /// Version constant
-const VERSION: &str = "3.3.3";
+const VERSION: &str = "4.2.3";
 
 /// Create the API router with all routes
 pub fn create_router(state: Arc<AppState>) -> Router {
@@ -40,8 +45,8 @@ pub fn create_router(state: Arc<AppState>) -> Router {
         .route("/clear_history", post(clear_history))
         // Tools
         .route("/tools", get(list_tools))
-        // WebSocket stub (returns JSON with info, not actual WS yet)
-        .route("/ws", get(websocket_stub))
+        // WebSocket streaming endpoint
+        .route("/ws", get(websocket_handler))
         // Add state
         .with_state(state)
 }
@@ -316,15 +321,171 @@ async fn list_tools() -> impl IntoResponse {
     }))
 }
 
-/// WebSocket stub - returns info that WebSocket is not yet implemented in Rust backend
-/// The frontend should gracefully handle this and use polling instead
-async fn websocket_stub() -> impl IntoResponse {
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "WebSocket not implemented",
-            "message": "Real-time WebSocket streaming is not yet implemented in the Rust backend. Please use HTTP polling via /cognitive endpoint.",
-            "alternative": "/cognitive"
-        })),
-    )
+/// WebSocket streaming handler for real-time chat
+/// Supports bidirectional communication with JSON messages
+async fn websocket_handler(
+    ws: WebSocketUpgrade,
+    State(state): State<Arc<AppState>>,
+) -> impl IntoResponse {
+    ws.on_upgrade(move |socket| handle_websocket(socket, state))
+}
+
+/// Handle WebSocket connection
+async fn handle_websocket(socket: WebSocket, state: Arc<AppState>) {
+    let (mut sender, mut receiver) = socket.split();
+    
+    info!("WebSocket client connected");
+
+    // Send connection acknowledgment
+    let ack = serde_json::json!({
+        "type": "connected",
+        "version": VERSION,
+        "message": "WebSocket connection established"
+    });
+    
+    if let Err(e) = sender.send(Message::Text(ack.to_string())).await {
+        error!("Failed to send WebSocket ack: {}", e);
+        return;
+    }
+
+    // Process incoming messages
+    while let Some(result) = receiver.next().await {
+        match result {
+            Ok(Message::Text(text)) => {
+                debug!("WebSocket received: {}", text);
+                
+                // Parse the incoming message
+                let request: Result<WebSocketRequest, _> = serde_json::from_str(&text);
+                
+                match request {
+                    Ok(ws_request) => {
+                        // Handle different request types
+                        match ws_request.request_type.as_str() {
+                            "chat" => {
+                                handle_chat_ws(&mut sender, &state, ws_request).await;
+                            }
+                            "ping" => {
+                                let pong = serde_json::json!({
+                                    "type": "pong",
+                                    "timestamp": chrono::Utc::now().to_rfc3339()
+                                });
+                                if let Err(e) = sender.send(Message::Text(pong.to_string())).await {
+                                    warn!("Failed to send pong: {}", e);
+                                    break;
+                                }
+                            }
+                            "status" => {
+                                let cog_state = state.engine.get_cognitive_state().await;
+                                let status = serde_json::json!({
+                                    "type": "status",
+                                    "cognitive_state": cog_state,
+                                    "timestamp": chrono::Utc::now().to_rfc3339()
+                                });
+                                if let Err(e) = sender.send(Message::Text(status.to_string())).await {
+                                    warn!("Failed to send status: {}", e);
+                                    break;
+                                }
+                            }
+                            _ => {
+                                let error = serde_json::json!({
+                                    "type": "error",
+                                    "message": format!("Unknown request type: {}", ws_request.request_type)
+                                });
+                                if let Err(e) = sender.send(Message::Text(error.to_string())).await {
+                                    warn!("Failed to send error: {}", e);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        let error = serde_json::json!({
+                            "type": "error",
+                            "message": format!("Invalid JSON: {}", e)
+                        });
+                        if let Err(e) = sender.send(Message::Text(error.to_string())).await {
+                            warn!("Failed to send parse error: {}", e);
+                            break;
+                        }
+                    }
+                }
+            }
+            Ok(Message::Close(_)) => {
+                info!("WebSocket client disconnected");
+                break;
+            }
+            Ok(Message::Ping(data)) => {
+                if let Err(e) = sender.send(Message::Pong(data)).await {
+                    warn!("Failed to send Pong: {}", e);
+                    break;
+                }
+            }
+            Ok(_) => {} // Ignore other message types
+            Err(e) => {
+                error!("WebSocket error: {}", e);
+                break;
+            }
+        }
+    }
+    
+    info!("WebSocket connection closed");
+}
+
+/// Handle chat request over WebSocket with streaming
+async fn handle_chat_ws(
+    sender: &mut futures_util::stream::SplitSink<WebSocket, Message>,
+    state: &Arc<AppState>,
+    request: WebSocketRequest,
+) {
+    let message = request.message.unwrap_or_default();
+    
+    // Send "thinking" status
+    let thinking = serde_json::json!({
+        "type": "thinking",
+        "message": "Processing your request..."
+    });
+    if let Err(e) = sender.send(Message::Text(thinking.to_string())).await {
+        error!("Failed to send thinking status: {}", e);
+        return;
+    }
+
+    // Create chat request
+    let chat_request = ChatRequest {
+        message: message.clone(),
+        conversation_id: request.conversation_id,
+        force_cortex: request.force_cortex.unwrap_or(false),
+        force_search: request.force_search.unwrap_or(false),
+        stream: true,
+        tools: request.tools.unwrap_or_default(),
+    };
+
+    // Process the request
+    let response = state.engine.process(&chat_request).await;
+
+    // For now, send the complete response (streaming can be enhanced later
+    // by modifying the cognitive engine to yield chunks)
+    let response_msg = serde_json::json!({
+        "type": "response",
+        "text": response.text,
+        "used_cortex": response.used_cortex,
+        "cognitive_state": response.cognitive_state,
+        "confidence": response.confidence,
+        "tools_used": response.tools_used,
+        "response_time_ms": response.response_time_ms,
+        "error": response.error,
+        "done": true
+    });
+
+    if let Err(e) = sender.send(Message::Text(response_msg.to_string())).await {
+        error!("Failed to send response: {}", e);
+    }
+
+    // Send completion message
+    let complete = serde_json::json!({
+        "type": "complete",
+        "message": "Response complete"
+    });
+    if let Err(e) = sender.send(Message::Text(complete.to_string())).await {
+        error!("Failed to send completion: {}", e);
+    }
 }

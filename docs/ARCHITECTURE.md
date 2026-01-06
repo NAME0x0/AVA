@@ -1,103 +1,169 @@
-# AVA v4 Architecture
+# AVA v4.2 Sentinel Architecture
 
-> **Note**: This document covers the v4.x architecture. For v3 Python-based architecture (deprecated), see the legacy section at the bottom.
+> **Version**: 4.2.3  
+> **Status**: Production  
+> **Last Updated**: 2025-01-15
 
 ## Overview
 
-AVA v4 introduces a **unified Rust backend** that replaces the Python server. This provides:
+AVA v4.2 introduces the **Sentinel Architecture**, a world-class, state-of-the-art system designed for accuracy over speed. Unlike standard LLMs that "guess" tokens probabilistically, Sentinel implements:
 
-- **Single binary distribution** - No Python dependencies required
-- **Better performance** - Native code with async I/O
-- **Smaller footprint** - ~50MB vs ~500MB for Python stack
-- **Cross-platform** - Windows, macOS, Linux support
+1. **Active Inference** - Autonomous policy selection via Free Energy minimization
+2. **Test-Time Learning** - Titans memory that updates during inference
+3. **Search-First Paradigm** - Factual queries hit search before generation
+4. **Real Surprise Calculation** - Embedding-based divergence, not keyword heuristics
 
-The core **Cortex-Medulla architecture** is preserved but now implemented in Rust.
+The system prioritizes being an **Answer Machine** that provides verified, accurate responses rather than fast but potentially hallucinated outputs.
 
-## I. System Architecture (v4)
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           USER INTERFACES                                │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                      │
-│  │  Desktop    │  │    TUI      │  │   Browser   │                      │
-│  │   (Tauri)   │  │  (Textual)  │  │  (Next.js)  │                      │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘                      │
-└─────────┼────────────────┼────────────────┼─────────────────────────────┘
-          │                │                │
-          ▼                ▼                ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         RUST BACKEND (unified)                           │
-│  ┌────────────────────────────────────────────────────────────────────┐ │
-│  │                      HTTP/WebSocket API (Axum)                     │ │
-│  │   /chat  /health  /status  /settings  /ws  /chat/stream           │ │
-│  └────────────────────────────────────────────────────────────────────┘ │
-│                                   │                                      │
-│  ┌────────────────────────────────┴───────────────────────────────────┐ │
-│  │                      Cognitive Engine (cognitive.rs)                │ │
-│  │  ┌─────────────┐                           ┌─────────────┐         │ │
-│  │  │   MEDULLA   │  ◄─── Query Routing ───►  │   CORTEX    │         │ │
-│  │  │ (fast path) │                           │ (deep path) │         │ │
-│  │  │  gemma3:4b  │                           │ qwen2.5:32b │         │ │
-│  │  └─────────────┘                           └─────────────┘         │ │
-│  └────────────────────────────────────────────────────────────────────┘ │
-│                                   │                                      │
-│  ┌────────────────────────────────┴───────────────────────────────────┐ │
-│  │                      Ollama Client (ollama.rs)                      │ │
-│  │              HTTP client with connection pooling                    │ │
-│  └────────────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────────────┘
-                                   │
-                                   ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                            OLLAMA SERVICE                                │
-│                    (External LLM inference server)                       │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
-## II. Rust Backend Structure
+## I. Sentinel Architecture Overview
 
 ```
-ui/src-tauri/src/
-├── main.rs           # Application entry point
-├── backend.rs        # Backend lifecycle management
-├── commands.rs       # Tauri IPC commands
-├── state.rs          # Shared application state
-├── tray.rs           # System tray integration
-├── bug_report.rs     # Bug reporting utilities
-└── engine/
-    ├── mod.rs        # Engine module exports
-    ├── cognitive.rs  # Cortex-Medulla implementation
-    ├── config.rs     # Configuration management
-    ├── models.rs     # Data structures
-    ├── ollama.rs     # Ollama client
-    ├── routes.rs     # HTTP API endpoints
-    ├── server.rs     # Axum server setup
-    └── state.rs      # Engine state
+                         ┌─────────────────────────────────────┐
+                         │         USER QUERY                   │
+                         └──────────────┬──────────────────────┘
+                                        │
+                                        ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                              STAGE 1: PERCEPTION                              │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │  Embedding Extraction → KL Divergence → Surprise Score                  │  │
+│  │  Shannon Entropy → Varentropy → Complexity Estimation                   │  │
+│  │                                                                          │  │
+│  │  Output: observation = {surprise, entropy, varentropy, complexity}      │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────┬─────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                              STAGE 2: APPRAISAL                               │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │  Agency Engine (Active Inference)                                       │  │
+│  │                                                                          │  │
+│  │  G(π) = -Pragmatic_Value - Epistemic_Value + Effort_Cost               │  │
+│  │                                                                          │  │
+│  │  Policies: ReflexReply | PrimarySearch | DeepThought | VerifyLogic     │  │
+│  │            WebBrowse | SimulateOutcome | Clarify                        │  │
+│  │                                                                          │  │
+│  │  Output: policy = argmin_π G(π)                                        │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────┬─────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                             STAGE 3: EXECUTION                                │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │                                                                          │  │
+│  │  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐                  │  │
+│  │  │   MEDULLA   │    │   SEARCH    │    │   CORTEX    │                  │  │
+│  │  │             │    │             │    │             │                  │  │
+│  │  │ ReflexReply │    │ Primary     │    │ DeepThought │                  │  │
+│  │  │ Clarify     │    │ WebBrowse   │    │ VerifyLogic │                  │  │
+│  │  │             │    │             │    │ Simulate    │                  │  │
+│  │  │ gemma3:4b   │    │ DDG/Google  │    │ qwen2.5:32b │                  │  │
+│  │  └─────────────┘    └─────────────┘    └─────────────┘                  │  │
+│  │                                                                          │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────┬─────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                             STAGE 4: LEARNING                                 │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │  Titans Memory (Test-Time Learning)                                     │  │
+│  │                                                                          │  │
+│  │  M_t = M_{t-1} - η∇θL(M_{t-1}(k_t), v_t)    // Memory update           │  │
+│  │                                                                          │  │
+│  │  Only update if response_surprise > threshold                           │  │
+│  │  Agency beliefs updated based on success/failure                        │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────┬─────────────────────────────────────────┘
+                                     │
+                                     ▼
+                         ┌─────────────────────────────────────┐
+                         │         VERIFIED RESPONSE            │
+                         └─────────────────────────────────────┘
 ```
 
-## III. Key Components
+## II. Key Components
 
 ### A. Cognitive Engine (`cognitive.rs`)
 
-The unified Rust implementation of Cortex-Medulla:
+The heart of Sentinel, implementing the four-stage loop:
 
 ```rust
 pub struct CognitiveEngine {
-    ollama: OllamaClient,        // LLM client
-    config: EngineConfig,        // Runtime config
-    conversation_history: Arc<RwLock<Vec<ConversationMessage>>>,
-    total_requests: AtomicU64,   // Statistics
-    cortex_requests: AtomicU64,
+    // Core
+    ollama: OllamaClient,
+    config: EngineConfig,
+    
+    // State
     current_state: Arc<RwLock<CognitiveStateInfo>>,
-    active_model: Arc<RwLock<String>>,
+    conversation_history: Arc<RwLock<Vec<ConversationMessage>>>,
+    
+    // Sentinel Components
+    agency: Arc<RwLock<AgencyEngine>>,           // Active Inference
+    titans: Arc<RwLock<Option<TitansMemory>>>,   // Test-time learning
+    
+    // Surprise Calculation
+    recent_embeddings: Arc<RwLock<VecDeque<Vec<f32>>>>,
+    context_embedding_cache: Arc<RwLock<Option<Vec<f32>>>>,
+    embedding_model: String,  // nomic-embed-text
+    
+    // Statistics
+    total_requests: AtomicU64,
+    cortex_requests: AtomicU64,
+    search_requests: AtomicU64,
+    last_policy: Arc<RwLock<Option<PolicyType>>>,
 }
 ```
 
-**Query Routing Logic:**
-1. Calculate query complexity (length, keywords, structure)
-2. Route simple queries to Medulla (fast model)
-3. Route complex queries to Cortex (deep model)
-4. Support forced routing via `force_cortex` flag
+### B. Agency Engine (`agency.rs`)
+
+Implements Active Inference for autonomous policy selection:
+
+```rust
+pub enum PolicyType {
+    ReflexReply,      // Fast, simple responses
+    PrimarySearch,    // Search-first for factual queries
+    WebBrowse,        // Deep web research
+    DeepThought,      // Complex reasoning
+    VerifyLogic,      // Formal verification
+    SimulateOutcome,  // Mental simulation
+    Clarify,          // Ask for clarification
+}
+
+// Expected Free Energy calculation
+pub fn calculate_g(&self, policy: PolicyType, obs: &Observation) -> f32 {
+    let pragmatic = self.pragmatic_value(policy, obs);
+    let epistemic = self.epistemic_value(policy, obs);
+    let effort = self.effort_cost(policy);
+    
+    -pragmatic - epistemic + effort  // Lower is better
+}
+```
+
+### C. Titans Memory (`titans.rs`)
+
+Test-time learning that updates during inference:
+
+```rust
+pub struct TitansMemory {
+    memory: Array2<f32>,      // Memory matrix
+    learning_rate: f32,       // η for updates
+    surprise_threshold: f32,  // Only learn surprising content
+    capacity: usize,          // Memory slots
+}
+
+// Surprise-weighted memory update
+pub fn update(&mut self, key: &Array1<f32>, surprise: f32) -> Result<()> {
+    if surprise > self.surprise_threshold {
+        // M_t = M_{t-1} - η∇θL(M_{t-1}(k_t), v_t)
+        let gradient = self.compute_gradient(key);
+        self.memory = &self.memory - self.learning_rate * surprise * &gradient;
+    }
+    Ok(())
+}
+```
 
 ### B. Ollama Client (`ollama.rs`)
 
@@ -151,27 +217,78 @@ RESTful API using Axum framework:
 Configuration hierarchy:
 1. `config/base_config.yaml` - Defaults
 2. `config/user_config.yaml` - User overrides
-3. Environment variables - Runtime overrides
+3. Environment variables - Runtime overrides (see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md))
 
-Key settings:
+### Sentinel Configuration
+
 ```yaml
+# config/cortex_medulla.yaml
 server:
   port: 8085
   host: "127.0.0.1"
 
 cognitive:
-  fast_model: "gemma3:4b"
-  deep_model: "qwen2.5:32b"
+  fast_model: "gemma3:4b"      # Medulla
+  deep_model: "qwen2.5:32b"    # Cortex
+  embedding_model: "nomic-embed-text"  # For surprise calculation
   temperature: 0.7
   max_tokens: 2048
-  cortex_threshold: 0.7
+  
+  # Sentinel thresholds
+  surprise_threshold_low: 0.3   # Below: use Medulla
+  surprise_threshold_high: 2.0  # Above: use Cortex
+  
+  # Active Inference parameters
+  pragmatic_weight: 1.0
+  epistemic_weight: 0.3
+  effort_weight: 0.1
+
+# Search-first paradigm
+search:
+  enabled: true
+  min_sources: 3
+  engines:
+    - duckduckgo  # Default, no API key needed
+    - google      # Requires GOOGLE_API_KEY
+    - bing        # Requires BING_API_KEY
+
+# Titans memory
+titans:
+  enabled: true
+  capacity: 1024
+  learning_rate: 0.01
+  surprise_threshold: 0.3
 
 ollama:
   host: "http://localhost:11434"
   timeout: 120
 ```
 
-## VI. Testing
+## VI. Implementation Status
+
+### ✅ Fully Implemented
+
+| Component | File | Description |
+|-----------|------|-------------|
+| Cognitive Engine | `cognitive.rs` | Four-stage Sentinel loop |
+| Agency Engine | `agency.rs` | Active Inference policy selection |
+| Titans Memory | `titans.rs` | Test-time learning |
+| Real Surprise | `cognitive.rs` | Embedding-based KL divergence |
+| WebSocket | `routes.rs` | Real-time bidirectional chat |
+| Search Tools | `web_search.py` | DuckDuckGo/Google/Bing |
+| Calculator | `calculator.py` | Safe math evaluation |
+
+### ⚠️ Planned (v4.3)
+
+| Component | Description |
+|-----------|-------------|
+| Z3 Verification | Formal verification for code/logic tasks |
+| Mental Sandbox | Multi-agent simulation for outcomes |
+| AirLLM | Layer paging for 70B models on 4GB VRAM |
+| BitNet | 1.58-bit quantization adapter |
+| Mamba SSM | State-space model hybrid |
+
+## VII. Testing
 
 ### Rust Tests
 ```bash

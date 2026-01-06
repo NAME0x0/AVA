@@ -52,9 +52,33 @@ pub struct ChatRequest {
     #[serde(default)]
     pub force_cortex: bool,
     #[serde(default)]
+    pub force_search: bool,
+    #[serde(default)]
     pub stream: bool,
     #[serde(default)]
     pub tools: Vec<String>,
+}
+
+/// WebSocket request message
+#[derive(Debug, Clone, Deserialize)]
+pub struct WebSocketRequest {
+    /// Type of request: "chat", "ping", "status"
+    #[serde(rename = "type")]
+    pub request_type: String,
+    /// Chat message (for "chat" type)
+    pub message: Option<String>,
+    /// Conversation ID for context
+    #[serde(default)]
+    pub conversation_id: Option<String>,
+    /// Force Cortex processing
+    #[serde(default)]
+    pub force_cortex: Option<bool>,
+    /// Force search-first routing
+    #[serde(default)]
+    pub force_search: Option<bool>,
+    /// List of tools to enable
+    #[serde(default)]
+    pub tools: Option<Vec<String>>,
 }
 
 /// Chat response to the client

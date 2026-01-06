@@ -1,7 +1,7 @@
 [package]
 name = "ava"
-version = "4.1.0"
-description = "AVA Neural Interface - Unified Cortex-Medulla Architecture"
+version = "4.2.3"
+description = "AVA Neural Interface - Sentinel Architecture v4.2"
 authors = ["AVA Project"]
 edition = "2021"
 
@@ -35,7 +35,7 @@ tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-wo
 tauri-plugin-autostart = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 
 # Embedded HTTP Server (replaces Python backend)
-axum = "0.7"
+axum = { version = "0.7", features = ["ws"] }
 tower = { version = "0.4", features = ["util"] }
 tower-http = { version = "0.5", features = ["cors", "trace"] }
 
