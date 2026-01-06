@@ -333,7 +333,7 @@ async fn websocket_handler(
 /// Handle WebSocket connection
 async fn handle_websocket(socket: WebSocket, state: Arc<AppState>) {
     let (mut sender, mut receiver) = socket.split();
-    
+
     info!("WebSocket client connected");
 
     // Send connection acknowledgment
@@ -342,7 +342,7 @@ async fn handle_websocket(socket: WebSocket, state: Arc<AppState>) {
         "version": VERSION,
         "message": "WebSocket connection established"
     });
-    
+
     if let Err(e) = sender.send(Message::Text(ack.to_string())).await {
         error!("Failed to send WebSocket ack: {}", e);
         return;
@@ -353,10 +353,10 @@ async fn handle_websocket(socket: WebSocket, state: Arc<AppState>) {
         match result {
             Ok(Message::Text(text)) => {
                 debug!("WebSocket received: {}", text);
-                
+
                 // Parse the incoming message
                 let request: Result<WebSocketRequest, _> = serde_json::from_str(&text);
-                
+
                 match request {
                     Ok(ws_request) => {
                         // Handle different request types
@@ -381,7 +381,8 @@ async fn handle_websocket(socket: WebSocket, state: Arc<AppState>) {
                                     "cognitive_state": cog_state,
                                     "timestamp": chrono::Utc::now().to_rfc3339()
                                 });
-                                if let Err(e) = sender.send(Message::Text(status.to_string())).await {
+                                if let Err(e) = sender.send(Message::Text(status.to_string())).await
+                                {
                                     warn!("Failed to send status: {}", e);
                                     break;
                                 }
@@ -391,7 +392,8 @@ async fn handle_websocket(socket: WebSocket, state: Arc<AppState>) {
                                     "type": "error",
                                     "message": format!("Unknown request type: {}", ws_request.request_type)
                                 });
-                                if let Err(e) = sender.send(Message::Text(error.to_string())).await {
+                                if let Err(e) = sender.send(Message::Text(error.to_string())).await
+                                {
                                     warn!("Failed to send error: {}", e);
                                     break;
                                 }
@@ -427,7 +429,7 @@ async fn handle_websocket(socket: WebSocket, state: Arc<AppState>) {
             }
         }
     }
-    
+
     info!("WebSocket connection closed");
 }
 
@@ -438,7 +440,7 @@ async fn handle_chat_ws(
     request: WebSocketRequest,
 ) {
     let message = request.message.unwrap_or_default();
-    
+
     // Send "thinking" status
     let thinking = serde_json::json!({
         "type": "thinking",

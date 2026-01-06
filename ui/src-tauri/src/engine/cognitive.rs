@@ -98,10 +98,10 @@ pub struct CognitiveEngine {
 
     /// Cache for context embeddings (sliding window)
     context_embedding_cache: Arc<RwLock<Option<Vec<f32>>>>,
-    
+
     /// Recent embeddings for surprise calculation (circular buffer)
     recent_embeddings: Arc<RwLock<VecDeque<Vec<f32>>>>,
-    
+
     /// Last selected policy for response metadata
     last_policy: Arc<RwLock<Option<PolicyType>>>,
 }
@@ -269,7 +269,7 @@ impl CognitiveEngine {
         // Stage 1: Perception - Calculate real surprise using embeddings
         // =====================================================================
         let (surprise, entropy) = self.calculate_real_metrics(&request.message).await;
-        
+
         // Update current state with real metrics
         {
             let mut state = self.current_state.write().await;
@@ -288,7 +288,9 @@ impl CognitiveEngine {
 
         let policy = {
             let mut agency = self.agency.write().await;
-            agency.select_policy(&observation).unwrap_or(PolicyType::ReflexReply)
+            agency
+                .select_policy(&observation)
+                .unwrap_or(PolicyType::ReflexReply)
         };
 
         // Store selected policy for response metadata
@@ -356,9 +358,10 @@ impl CognitiveEngine {
                 // =====================================================================
                 // Calculate post-response surprise (how surprising was our own output?)
                 let response_surprise = self.calculate_response_surprise(&response_text).await;
-                
+
                 // Update Titans memory with surprise-weighted learning
-                self.update_titans_memory(&response_text, response_surprise).await;
+                self.update_titans_memory(&response_text, response_surprise)
+                    .await;
 
                 // Update context embedding cache
                 self.update_embedding_cache(&response_text).await;
@@ -386,14 +389,18 @@ impl CognitiveEngine {
                     used_cortex: use_cortex,
                     cognitive_state: cognitive_state.to_string(),
                     confidence: self.current_state.read().await.confidence,
-                    tools_used: if use_search { vec!["search".to_string()] } else { Vec::new() },
+                    tools_used: if use_search {
+                        vec!["search".to_string()]
+                    } else {
+                        Vec::new()
+                    },
                     response_time_ms: elapsed,
                     error: None,
                 }
             }
             Err(e) => {
                 error!("Ollama chat error: {}", e);
-                
+
                 // Update Agency beliefs with failure
                 {
                     let mut agency = self.agency.write().await;
@@ -419,8 +426,14 @@ impl CognitiveEngine {
         let message_embedding = match self.ollama.embeddings(&self.embedding_model, message).await {
             Ok(emb) => emb,
             Err(e) => {
-                warn!("Failed to get message embedding: {}, falling back to proxy", e);
-                return (self.estimate_surprise_proxy(message), self.estimate_entropy(message));
+                warn!(
+                    "Failed to get message embedding: {}, falling back to proxy",
+                    e
+                );
+                return (
+                    self.estimate_surprise_proxy(message),
+                    self.estimate_entropy(message),
+                );
             }
         };
 
@@ -463,19 +476,22 @@ impl CognitiveEngine {
 
         // Calculate entropy for each recent embedding
         let entropies: Vec<f32> = recent.iter().map(|e| self.embedding_entropy(e)).collect();
-        
+
         // Calculate variance
         let mean = entropies.iter().sum::<f32>() / entropies.len() as f32;
-        let variance = entropies.iter()
-            .map(|e| (e - mean).powi(2))
-            .sum::<f32>() / entropies.len() as f32;
-        
+        let variance =
+            entropies.iter().map(|e| (e - mean).powi(2)).sum::<f32>() / entropies.len() as f32;
+
         variance.sqrt().clamp(0.0, 1.0)
     }
 
     /// Calculate surprise from our own response (for Titans learning)
     async fn calculate_response_surprise(&self, response: &str) -> f32 {
-        let response_embedding = match self.ollama.embeddings(&self.embedding_model, response).await {
+        let response_embedding = match self
+            .ollama
+            .embeddings(&self.embedding_model, response)
+            .await
+        {
             Ok(emb) => emb,
             Err(_) => return 0.5,
         };
@@ -494,7 +510,11 @@ impl CognitiveEngine {
         if let Some(ref mut titans) = *titans_lock {
             // Only update if surprise exceeds threshold (avoid learning routine)
             if surprise > LOW_SURPRISE_THRESHOLD {
-                match self.ollama.embeddings(&self.embedding_model, response).await {
+                match self
+                    .ollama
+                    .embeddings(&self.embedding_model, response)
+                    .await
+                {
                     Ok(embedding) => {
                         let embedding_array = Array1::from_vec(embedding);
                         if let Err(e) = titans.update(&embedding_array, surprise) {
@@ -513,7 +533,7 @@ impl CognitiveEngine {
     async fn update_embedding_cache(&self, text: &str) {
         if let Ok(embedding) = self.ollama.embeddings(&self.embedding_model, text).await {
             let mut cache = self.context_embedding_cache.write().await;
-            
+
             // Exponential moving average with existing cache
             if let Some(ref existing) = *cache {
                 let alpha = 0.3; // Learning rate for cache update
@@ -539,20 +559,20 @@ impl CognitiveEngine {
         let max_val = embedding.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
         let exp_vals: Vec<f32> = embedding.iter().map(|x| (x - max_val).exp()).collect();
         let sum: f32 = exp_vals.iter().sum();
-        
+
         if sum == 0.0 {
             return 0.5;
         }
 
         let probs: Vec<f32> = exp_vals.iter().map(|x| x / sum).collect();
-        
+
         // Shannon entropy
         let entropy: f32 = probs
             .iter()
             .filter(|&&p| p > 0.0)
             .map(|p| -p * p.log2())
             .sum();
-        
+
         // Normalize by max possible entropy (log2 of dimension)
         let max_entropy = (embedding.len() as f32).log2();
         if max_entropy > 0.0 {
@@ -566,9 +586,9 @@ impl CognitiveEngine {
     fn calculate_confidence_from_response(&self, response: &OllamaChatResponse) -> f32 {
         let content = &response.message.content;
         let lower = content.to_lowercase();
-        
+
         let mut confidence: f32 = 0.85; // Base confidence
-        
+
         // Reduce confidence for uncertainty markers
         let uncertainty_markers = [
             ("i'm not sure", 0.15),
@@ -581,13 +601,13 @@ impl CognitiveEngine {
             ("might be", 0.10),
             ("could be", 0.10),
         ];
-        
+
         for (marker, penalty) in uncertainty_markers {
             if lower.contains(marker) {
                 confidence -= penalty;
             }
         }
-        
+
         // Increase confidence for assertion markers
         let assertion_markers = [
             ("definitely", 0.05),
@@ -595,13 +615,13 @@ impl CognitiveEngine {
             ("clearly", 0.03),
             ("obviously", 0.03),
         ];
-        
+
         for (marker, boost) in assertion_markers {
             if lower.contains(marker) {
                 confidence += boost;
             }
         }
-        
+
         confidence.clamp(0.1, 0.99)
     }
 
