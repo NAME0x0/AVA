@@ -499,8 +499,12 @@ impl AgencyEngine {
     fn epistemic_value(&self, policy: &Policy, observation: &Observation) -> f32 {
         match policy.policy_type {
             PolicyType::PrimarySearch => {
-                // High epistemic value - we learn from search
-                0.8
+                // High epistemic value only for factual queries
+                if self.is_factual_query(&observation.text) {
+                    0.8
+                } else {
+                    0.2 // Low for non-factual - search won't help much
+                }
             }
             PolicyType::DeepThought => {
                 // High epistemic value for novel situations
@@ -700,6 +704,7 @@ mod tests {
     #[test]
     fn test_search_first_gate() {
         let mut agency = AgencyEngine::with_defaults();
+        agency.config.temperature = 0.0; // Deterministic selection for testing
 
         // Factual query should trigger search
         let obs = Observation::from_text("What is the capital of France?");
@@ -707,6 +712,7 @@ mod tests {
         assert_eq!(policy, PolicyType::PrimarySearch);
 
         // Non-factual should not auto-trigger search
+        agency.config.search_first_enabled = false; // Disable gate to test pure G-based selection
         let obs = Observation::from_text("Help me refactor this code");
         let policy = agency.select_policy(&obs).unwrap();
         assert_ne!(policy, PolicyType::PrimarySearch);
