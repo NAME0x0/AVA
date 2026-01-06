@@ -17,6 +17,19 @@
     --text-secondary: #52525B;
     --text-muted: #A1A1AA;
 
+    /* Enhanced Premium Colors */
+    --accent-cyan: #00FFE5;
+    --accent-teal: #00D4C8;
+    --accent-gold: #FFB347;
+    --accent-warm: #F5A623;
+    --accent-purple: #8B5CF6;
+    --accent-pink: #EC4899;
+
+    /* Glow colors */
+    --glow-cyan: rgba(0, 255, 229, 0.4);
+    --glow-gold: rgba(255, 179, 71, 0.4);
+    --glow-purple: rgba(139, 92, 246, 0.3);
+
     /* Shadcn-style variables */
     --background: 250 251 252;
     --foreground: 24 24 27;
@@ -49,48 +62,61 @@
     --radius: 0.75rem;
   }
 
-  /* Dark mode */
+  /* Dark mode - Premium Neural Theme */
   .dark {
-    /* Backgrounds */
-    --neural-void: #08080C;
-    --neural-surface: #0F0F14;
-    --neural-elevated: #16161D;
-    --neural-hover: #1E1E28;
-    --neural-border: #2A2A36;
+    /* Deeper, richer backgrounds */
+    --neural-void: #05050A;
+    --neural-surface: #0A0A10;
+    --neural-elevated: #12121A;
+    --neural-hover: #1A1A24;
+    --neural-border: #252532;
 
-    /* Text */
-    --text-primary: #FFFFFF;
-    --text-secondary: #A1A1AA;
-    --text-muted: #71717A;
+    /* Crisp text hierarchy */
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+
+    /* Enhanced Premium Colors - More vibrant */
+    --accent-cyan: #00FFE5;
+    --accent-teal: #00D4C8;
+    --accent-gold: #FFB347;
+    --accent-warm: #F5A623;
+    --accent-purple: #A78BFA;
+    --accent-pink: #F472B6;
+
+    /* Intense glows for dark mode */
+    --glow-cyan: rgba(0, 255, 229, 0.5);
+    --glow-gold: rgba(255, 179, 71, 0.5);
+    --glow-purple: rgba(167, 139, 250, 0.4);
 
     /* Shadcn-style variables */
-    --background: 8 8 12;
-    --foreground: 255 255 255;
+    --background: 5 5 10;
+    --foreground: 248 250 252;
 
-    --card: 15 15 20;
-    --card-foreground: 255 255 255;
+    --card: 10 10 16;
+    --card-foreground: 248 250 252;
 
-    --popover: 15 15 20;
-    --popover-foreground: 255 255 255;
+    --popover: 10 10 16;
+    --popover-foreground: 248 250 252;
 
-    --primary: 0 212 200;
-    --primary-foreground: 8 8 12;
+    --primary: 0 255 229;
+    --primary-foreground: 5 5 10;
 
-    --secondary: 22 22 29;
-    --secondary-foreground: 255 255 255;
+    --secondary: 18 18 26;
+    --secondary-foreground: 248 250 252;
 
-    --muted: 30 30 40;
-    --muted-foreground: 113 113 122;
+    --muted: 26 26 36;
+    --muted-foreground: 100 116 139;
 
-    --accent: 0 212 200;
-    --accent-foreground: 8 8 12;
+    --accent: 0 255 229;
+    --accent-foreground: 5 5 10;
 
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
 
-    --border: 42 42 54;
-    --input: 22 22 29;
-    --ring: 0 212 200;
+    --border: 37 37 50;
+    --input: 18 18 26;
+    --ring: 0 255 229;
   }
 }
 
@@ -205,21 +231,47 @@
     @apply animate-pulse;
   }
 
-  /* Message bubbles */
+  /* Message bubbles - Enhanced Glassmorphic */
   .message-user {
-    @apply bg-accent-primary/10 border border-accent-dim/30 text-text-primary;
+    @apply bg-accent-primary/10 border border-accent-primary/20 text-text-primary;
+    @apply backdrop-blur-sm shadow-lg;
+    background: linear-gradient(135deg, rgba(0, 212, 200, 0.12) 0%, rgba(0, 212, 200, 0.05) 100%);
   }
 
   .message-assistant {
-    @apply bg-neural-surface border border-neural-border text-text-primary;
+    @apply bg-neural-surface/60 border border-neural-border/50 text-text-primary;
+    @apply backdrop-blur-md shadow-md;
   }
 
   .message-cortex {
-    @apply bg-cortex-active/10 border border-cortex-active/30;
+    @apply backdrop-blur-md shadow-lg border-cortex-active/30;
+    background: linear-gradient(135deg, rgba(245, 166, 35, 0.15) 0%, rgba(245, 166, 35, 0.05) 100%);
+    box-shadow: 0 4px 20px rgba(245, 166, 35, 0.15), inset 0 1px 0 rgba(245, 166, 35, 0.2);
   }
 
   .message-medulla {
-    @apply bg-medulla-active/10 border border-medulla-active/30;
+    @apply backdrop-blur-md shadow-lg border-medulla-active/30;
+    background: linear-gradient(135deg, rgba(0, 212, 200, 0.12) 0%, rgba(0, 212, 200, 0.04) 100%);
+    box-shadow: 0 4px 20px rgba(0, 212, 200, 0.1), inset 0 1px 0 rgba(0, 212, 200, 0.15);
+  }
+
+  .message-error {
+    @apply backdrop-blur-md shadow-lg border-status-error/30;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%);
+  }
+
+  /* Thinking state glow effect */
+  .message-thinking {
+    animation: thinking-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes thinking-glow {
+    0%, 100% {
+      box-shadow: 0 4px 20px rgba(245, 166, 35, 0.2);
+    }
+    50% {
+      box-shadow: 0 4px 30px rgba(245, 166, 35, 0.4), 0 0 40px rgba(245, 166, 35, 0.2);
+    }
   }
 
   /* Waveform animation */

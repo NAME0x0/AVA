@@ -8,10 +8,9 @@ Press F1 or ? to open, Escape to close.
 
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Container, Vertical, Horizontal
+from textual.containers import Container
 from textual.screen import ModalScreen
-from textual.widgets import Static, Label
-
+from textual.widgets import Label, Static
 
 HELP_CONTENT = """
 ╭───────────────────────────────────────────────────────────────────────────────╮
@@ -111,7 +110,10 @@ class HelpScreen(ModalScreen[None]):
         with Container():
             yield Label("📚 AVA Help", id="help-title")
             yield Static(HELP_CONTENT, id="help-content")
-            yield Label("Press [bold cyan]Escape[/bold cyan] or [bold cyan]q[/bold cyan] to close", id="help-footer")
+            yield Label(
+                "Press [bold cyan]Escape[/bold cyan] or [bold cyan]q[/bold cyan] to close",
+                id="help-footer",
+            )
 
     def action_dismiss(self) -> None:
         """Close the help screen."""

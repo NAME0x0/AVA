@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Main gradient - Cyan to teal -->
+    <linearGradient id="neuralGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00FFE5;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00D4C8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00A89D;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Core glow gradient -->
+    <radialGradient id="coreGlow" cx="50%" cy="35%" r="50%">
+      <stop offset="0%" style="stop-color:#00FFE5;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#00D4C8;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#00A89D;stop-opacity:0" />
+    </radialGradient>
+
+    <!-- Warm accent gradient -->
+    <linearGradient id="warmAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFB347;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F5A623;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Soft glow for nodes -->
+    <filter id="nodeGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background (transparent for icon, can add solid for preview) -->
+  <!-- <rect width="512" height="512" fill="#0A0A0F"/> -->
+
+  <!-- Neural connection lines (back layer) -->
+  <g stroke="url(#neuralGradient)" stroke-width="2" fill="none" opacity="0.4">
+    <!-- Head to shoulder connections -->
+    <path d="M256 120 L180 200"/>
+    <path d="M256 120 L332 200"/>
+
+    <!-- Shoulder to torso -->
+    <path d="M180 200 L200 280"/>
+    <path d="M332 200 L312 280"/>
+
+    <!-- Cross connections -->
+    <path d="M180 200 L256 240"/>
+    <path d="M332 200 L256 240"/>
+
+    <!-- Torso structure -->
+    <path d="M200 280 L256 320"/>
+    <path d="M312 280 L256 320"/>
+    <path d="M200 280 L220 360"/>
+    <path d="M312 280 L292 360"/>
+
+    <!-- Lower connections -->
+    <path d="M220 360 L256 400"/>
+    <path d="M292 360 L256 400"/>
+    <path d="M256 320 L256 400"/>
+  </g>
+
+  <!-- Secondary neural web (subtle) -->
+  <g stroke="url(#neuralGradient)" stroke-width="1" fill="none" opacity="0.25">
+    <path d="M256 160 L220 180"/>
+    <path d="M256 160 L292 180"/>
+    <path d="M220 180 L200 220"/>
+    <path d="M292 180 L312 220"/>
+    <path d="M200 220 L180 260"/>
+    <path d="M312 220 L332 260"/>
+    <path d="M256 240 L240 300"/>
+    <path d="M256 240 L272 300"/>
+  </g>
+
+  <!-- Abstract female silhouette outline -->
+  <g fill="none" stroke="url(#neuralGradient)" stroke-width="2.5" filter="url(#glow)">
+    <!-- Head - elegant oval -->
+    <ellipse cx="256" cy="100" rx="45" ry="55"/>
+
+    <!-- Neck -->
+    <path d="M235 150 Q256 165 277 150"/>
+
+    <!-- Shoulders - graceful curve -->
+    <path d="M235 155 Q200 170 165 195 Q150 210 155 240"/>
+    <path d="M277 155 Q312 170 347 195 Q362 210 357 240"/>
+
+    <!-- Torso outline - feminine form -->
+    <path d="M155 240 Q165 300 190 340 Q210 380 230 420"/>
+    <path d="M357 240 Q347 300 322 340 Q302 380 282 420"/>
+
+    <!-- Waist curve -->
+    <path d="M190 340 Q256 355 322 340"/>
+  </g>
+
+  <!-- Core consciousness - glowing center in head -->
+  <circle cx="256" cy="95" r="25" fill="url(#coreGlow)" filter="url(#nodeGlow)"/>
+
+  <!-- Primary nodes (large) -->
+  <g fill="url(#neuralGradient)" filter="url(#nodeGlow)">
+    <!-- Head center (consciousness) -->
+    <circle cx="256" cy="95" r="12"/>
+
+    <!-- Forehead node -->
+    <circle cx="256" cy="65" r="6"/>
+
+    <!-- Temple nodes -->
+    <circle cx="225" cy="85" r="5"/>
+    <circle cx="287" cy="85" r="5"/>
+
+    <!-- Chin node -->
+    <circle cx="256" cy="140" r="5"/>
+
+    <!-- Shoulder nodes -->
+    <circle cx="180" cy="200" r="8"/>
+    <circle cx="332" cy="200" r="8"/>
+
+    <!-- Chest center -->
+    <circle cx="256" cy="240" r="9"/>
+
+    <!-- Mid-torso -->
+    <circle cx="200" cy="280" r="6"/>
+    <circle cx="312" cy="280" r="6"/>
+
+    <!-- Core energy (heart area) -->
+    <circle cx="256" cy="290" r="10" fill="url(#warmAccent)"/>
+
+    <!-- Lower torso -->
+    <circle cx="256" cy="340" r="7"/>
+    <circle cx="220" cy="360" r="5"/>
+    <circle cx="292" cy="360" r="5"/>
+
+    <!-- Base -->
+    <circle cx="256" cy="400" r="6"/>
+  </g>
+
+  <!-- Secondary nodes (small, subtle) -->
+  <g fill="url(#neuralGradient)" opacity="0.7">
+    <circle cx="240" cy="110" r="3"/>
+    <circle cx="272" cy="110" r="3"/>
+    <circle cx="205" cy="170" r="3"/>
+    <circle cx="307" cy="170" r="3"/>
+    <circle cx="190" cy="240" r="3"/>
+    <circle cx="322" cy="240" r="3"/>
+    <circle cx="230" cy="260" r="3"/>
+    <circle cx="282" cy="260" r="3"/>
+    <circle cx="215" cy="320" r="3"/>
+    <circle cx="297" cy="320" r="3"/>
+    <circle cx="240" cy="380" r="3"/>
+    <circle cx="272" cy="380" r="3"/>
+  </g>
+
+  <!-- Tertiary nodes (tiny, ambient) -->
+  <g fill="url(#neuralGradient)" opacity="0.4">
+    <circle cx="248" cy="75" r="2"/>
+    <circle cx="264" cy="75" r="2"/>
+    <circle cx="215" cy="95" r="2"/>
+    <circle cx="297" cy="95" r="2"/>
+    <circle cx="195" cy="185" r="2"/>
+    <circle cx="317" cy="185" r="2"/>
+    <circle cx="170" cy="220" r="2"/>
+    <circle cx="342" cy="220" r="2"/>
+    <circle cx="218" cy="240" r="2"/>
+    <circle cx="294" cy="240" r="2"/>
+    <circle cx="185" cy="260" r="2"/>
+    <circle cx="327" cy="260" r="2"/>
+    <circle cx="208" cy="300" r="2"/>
+    <circle cx="304" cy="300" r="2"/>
+    <circle cx="235" cy="340" r="2"/>
+    <circle cx="277" cy="340" r="2"/>
+  </g>
+
+  <!-- Accent highlights -->
+  <g fill="url(#warmAccent)" opacity="0.8" filter="url(#nodeGlow)">
+    <!-- Eye positions - subtle warm glow -->
+    <circle cx="240" cy="90" r="4"/>
+    <circle cx="272" cy="90" r="4"/>
+  </g>
+
+</svg>

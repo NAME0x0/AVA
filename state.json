@@ -1,0 +1,41 @@
+{
+  "sentinel": {
+    "version": "4.0.0",
+    "metrics": {
+      "total_queries": 0,
+      "verified_outputs": 0,
+      "simulation_cycles": 0,
+      "formal_checks_passed": 0,
+      "formal_checks_failed": 0,
+      "consensus_achieved": 0,
+      "max_cycles_reached": 0,
+      "average_cycles_to_consensus": 0.0
+    },
+    "verification": {
+      "code_blocks_verified": 0,
+      "logic_claims_verified": 0,
+      "contradictions_detected": 0,
+      "z3_timeouts": 0
+    },
+    "sandbox": {
+      "thinker_drafts": 0,
+      "verifier_passes": 0,
+      "verifier_failures": 0,
+      "butler_adaptations": 0,
+      "backtrack_events": 0
+    },
+    "beliefs": {
+      "user_intent": {},
+      "knowledge_state": {},
+      "interaction_state": {}
+    },
+    "last_updated": null
+  },
+  "session": {
+    "start_time": null,
+    "queries_this_session": 0,
+    "cortex_invocations": 0,
+    "medulla_responses": 0,
+    "thermal_throttles": 0
+  }
+}

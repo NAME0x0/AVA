@@ -85,13 +85,14 @@ class AVATUI(App):
         self._ava = None
         self._force_search = False
         self._force_cortex = False
-        
+
         # Model selection
         self._available_models: list[str] = []
         self._current_model: str = ""
-        
+
         # Initialize conversation persistence
         from .persistence import ConversationStore
+
         self._store = ConversationStore()
         self._session_id = None
 
@@ -175,7 +176,7 @@ class AVATUI(App):
                     # Update metrics panel
                     metrics = self.query_one("#metrics", MetricsPanel)
                     metrics.update_state(data)
-                    
+
                     # Update available models
                     if "ollama_models" in data:
                         self._available_models = data["ollama_models"]
@@ -194,7 +195,7 @@ class AVATUI(App):
 
         # Add user message
         chat.add_user_message(message)
-        
+
         # Persist user message
         if self._session_id:
             self._store.add_message(self._session_id, "user", message)
@@ -229,13 +230,13 @@ class AVATUI(App):
                     response_text = data.get("response", "")
                     used_cortex = data.get("used_cortex", False)
                     cognitive_state = data.get("cognitive_state", "FLOW")
-                    
+
                     chat.add_assistant_message(
                         response_text,
                         used_cortex=used_cortex,
                         cognitive_state=cognitive_state,
                     )
-                    
+
                     # Persist assistant message
                     if self._session_id:
                         self._store.add_message(
@@ -285,6 +286,7 @@ class AVATUI(App):
                     # Handle async actions (like action_quit from Textual)
                     if hasattr(result, "__await__"):
                         import asyncio
+
                         asyncio.create_task(result)
 
         self.push_screen(CommandPalette(), handle_result)
@@ -376,30 +378,30 @@ class AVATUI(App):
 
     def action_export_conversation(self) -> None:
         """Export current conversation to a file."""
-        from pathlib import Path
         from datetime import datetime
-        
+        from pathlib import Path
+
         if not self._session_id:
             self.notify("No conversation to export", severity="warning")
             return
-        
+
         # Export to both JSON and Markdown
         export_dir = Path(__file__).parent.parent / "data" / "exports"
         export_dir.mkdir(parents=True, exist_ok=True)
-        
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
+
         # Export as Markdown (human-readable)
         md_content = self._store.export_session(self._session_id, format="markdown")
         if md_content:
             md_path = export_dir / f"conversation_{timestamp}.md"
             md_path.write_text(md_content, encoding="utf-8")
-            
+
             # Also export as JSON (for re-import)
             json_content = self._store.export_session(self._session_id, format="json")
             json_path = export_dir / f"conversation_{timestamp}.json"
             json_path.write_text(json_content, encoding="utf-8")
-            
+
             self.notify(
                 f"Exported to data/exports/conversation_{timestamp}.[md|json]",
                 severity="information",
@@ -413,7 +415,7 @@ class AVATUI(App):
         if not self._available_models:
             self.notify("No models available - check Ollama connection", severity="warning")
             return
-        
+
         if not self._current_model:
             # No current model, select first
             next_model = self._available_models[0]
@@ -426,15 +428,15 @@ class AVATUI(App):
             except ValueError:
                 # Current model not in list, select first
                 next_model = self._available_models[0]
-        
+
         # Request model switch from backend
         asyncio.create_task(self._switch_model(next_model))
-    
+
     async def _switch_model(self, model_name: str) -> None:
         """Send model switch request to backend."""
         try:
             import httpx
-            
+
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     f"{self.backend_url}/settings",

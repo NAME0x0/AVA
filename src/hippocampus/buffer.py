@@ -418,14 +418,14 @@ class EpisodicBuffer:
                 SELECT * FROM episodes {where_clause}
                 ORDER BY priority_score * RANDOM() DESC
                 LIMIT ?
-            """
+            """  # nosec B608 - where_clause built from validated conditions, params are parameterized
         else:
             # Uniform random sampling
             query = f"""
                 SELECT * FROM episodes {where_clause}
                 ORDER BY RANDOM()
                 LIMIT ?
-            """
+            """  # nosec B608 - where_clause built from validated conditions, params are parameterized
 
         params.append(batch_size)
         cursor.execute(query, params)

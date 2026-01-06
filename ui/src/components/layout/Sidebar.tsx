@@ -115,6 +115,9 @@ export function Sidebar({ isOpen }: SidebarProps) {
                     cognitiveState={cognitiveState.label}
                     entropy={cognitiveState.entropy}
                     activity={cognitiveState.confidence}
+                    surprise={cognitiveState.surprise}
+                    varentropy={cognitiveState.varentropy}
+                    isThinking={cognitiveState.shouldThink}
                   />
                 </Suspense>
               </div>

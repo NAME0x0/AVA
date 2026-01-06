@@ -3,15 +3,34 @@
 //! Implements the Cortex-Medulla architecture in Rust:
 //! - Medulla: Fast, reflexive responses
 //! - Cortex: Deep, thoughtful reasoning (currently routes to larger model)
-//! - Intelligent routing based on query complexity
+//! - Intelligent routing based on query complexity and surprise
+//!
+//! # Sentinel Architecture (v4)
+//!
+//! The cognitive engine now integrates with the Sentinel architecture:
+//! - Real surprise calculation via embedding divergence
+//! - AgencyEngine for policy selection
+//! - TitansMemory for test-time learning
 
+use crate::engine::agency::{AgencyConfig, AgencyEngine, Observation, PolicyType};
 use crate::engine::models::*;
 use crate::engine::ollama::{OllamaClient, OllamaError};
+use crate::engine::titans::{TitansConfig, TitansMemory};
+use ndarray::Array1;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 use std::time::Instant;
 use tokio::sync::RwLock;
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, warn};
+
+/// Default embedding model for surprise calculation
+const DEFAULT_EMBEDDING_MODEL: &str = "nomic-embed-text";
+
+/// Low surprise threshold - below this, use Medulla (reflex)
+const LOW_SURPRISE_THRESHOLD: f32 = 0.3;
+
+/// High surprise threshold - above this, use Cortex (deep thought)
+const HIGH_SURPRISE_THRESHOLD: f32 = 2.0;
 
 /// System prompt for AVA
 const SYSTEM_PROMPT: &str = r#"You are AVA, an advanced AI assistant with a biomimetic dual-brain architecture.
@@ -45,6 +64,19 @@ pub struct CognitiveEngine {
 
     // Active model
     active_model: Arc<RwLock<String>>,
+
+    // Sentinel Architecture components (v4)
+    /// Agency engine for policy selection (Active Inference)
+    agency: Arc<RwLock<AgencyEngine>>,
+
+    /// Titans memory for test-time learning
+    titans: Arc<RwLock<Option<TitansMemory>>>,
+
+    /// Embedding model for surprise calculation
+    embedding_model: String,
+
+    /// Cache for context embeddings
+    context_embedding_cache: Arc<RwLock<Option<Vec<f32>>>>,
 }
 
 /// Internal cognitive state info
@@ -104,6 +136,29 @@ impl CognitiveEngine {
     pub fn new(config: EngineConfig) -> Self {
         let ollama = OllamaClient::with_config(&config.ollama_host, 120);
 
+        // Initialize AgencyEngine with default config
+        let agency = AgencyEngine::new(AgencyConfig {
+            pragmatic_weight: 0.4,
+            epistemic_weight: 0.6, // High curiosity
+            temperature: 1.0,
+            low_surprise_threshold: LOW_SURPRISE_THRESHOLD,
+            high_surprise_threshold: HIGH_SURPRISE_THRESHOLD,
+            search_first_enabled: true,
+            search_first_keywords: vec![
+                "what".to_string(),
+                "who".to_string(),
+                "where".to_string(),
+                "when".to_string(),
+                "how much".to_string(),
+                "define".to_string(),
+                "latest".to_string(),
+                "current".to_string(),
+            ],
+        });
+
+        // Initialize TitansMemory (may fail if config invalid, so wrap in Option)
+        let titans = TitansMemory::new(TitansConfig::default()).ok();
+
         Self {
             ollama,
             config: config.clone(),
@@ -112,6 +167,10 @@ impl CognitiveEngine {
             cortex_requests: AtomicU64::new(0),
             current_state: Arc::new(RwLock::new(CognitiveStateInfo::default())),
             active_model: Arc::new(RwLock::new(config.fast_model)),
+            agency: Arc::new(RwLock::new(agency)),
+            titans: Arc::new(RwLock::new(titans)),
+            embedding_model: DEFAULT_EMBEDDING_MODEL.to_string(),
+            context_embedding_cache: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -503,5 +562,322 @@ impl CognitiveEngine {
     #[allow(dead_code)]
     pub fn force_cortex(&self) {
         // This is handled per-request via ChatRequest.force_cortex
+    }
+
+    // =========================================================================
+    // Sentinel Architecture Methods (v4)
+    // These methods are being incrementally integrated into the main flow
+    // =========================================================================
+
+    /// Calculate surprise using embedding divergence
+    ///
+    /// Surprise is computed as the KL divergence between the response embedding
+    /// and the context embedding. High surprise indicates novel/unexpected content.
+    #[allow(dead_code)]
+    pub async fn calculate_surprise(&self, response: &str, context: &[ConversationMessage]) -> f32 {
+        // Get response embedding
+        let response_embedding = match self
+            .ollama
+            .embeddings(&self.embedding_model, response)
+            .await
+        {
+            Ok(emb) => emb,
+            Err(e) => {
+                warn!("Failed to get response embedding: {}", e);
+                return 0.5; // Default to medium surprise
+            }
+        };
+
+        // Get context embedding
+        let context_embedding = match self.get_context_embedding(context).await {
+            Some(emb) => emb,
+            None => {
+                // No context - everything is novel
+                return 1.5;
+            }
+        };
+
+        // Calculate KL divergence approximation
+        let surprise = self.kl_divergence(&response_embedding, &context_embedding);
+
+        // Clamp to reasonable range [0, 5]
+        surprise.clamp(0.0, 5.0)
+    }
+
+    /// Get or compute context embedding from conversation history
+    #[allow(dead_code)]
+    async fn get_context_embedding(&self, context: &[ConversationMessage]) -> Option<Vec<f32>> {
+        if context.is_empty() {
+            return None;
+        }
+
+        // Check cache first
+        {
+            let cache = self.context_embedding_cache.read().await;
+            if let Some(ref cached) = *cache {
+                return Some(cached.clone());
+            }
+        }
+
+        // Combine recent context into a single string
+        let context_text: String = context
+            .iter()
+            .rev()
+            .take(5) // Last 5 messages
+            .map(|m| m.content.as_str())
+            .collect::<Vec<_>>()
+            .join(" ");
+
+        // Get embedding
+        let embedding = match self
+            .ollama
+            .embeddings(&self.embedding_model, &context_text)
+            .await
+        {
+            Ok(emb) => emb,
+            Err(e) => {
+                warn!("Failed to get context embedding: {}", e);
+                return None;
+            }
+        };
+
+        // Update cache
+        {
+            let mut cache = self.context_embedding_cache.write().await;
+            *cache = Some(embedding.clone());
+        }
+
+        Some(embedding)
+    }
+
+    /// Approximate KL divergence between two embedding vectors
+    ///
+    /// Uses cosine distance as a proxy for divergence.
+    #[allow(dead_code)]
+    fn kl_divergence(&self, p: &[f32], q: &[f32]) -> f32 {
+        if p.len() != q.len() || p.is_empty() {
+            return 0.5;
+        }
+
+        // Cosine similarity
+        let dot: f32 = p.iter().zip(q.iter()).map(|(a, b)| a * b).sum();
+        let norm_p: f32 = p.iter().map(|x| x * x).sum::<f32>().sqrt();
+        let norm_q: f32 = q.iter().map(|x| x * x).sum::<f32>().sqrt();
+
+        if norm_p == 0.0 || norm_q == 0.0 {
+            return 0.5;
+        }
+
+        let cosine_sim = dot / (norm_p * norm_q);
+
+        // Convert to divergence: 1 - similarity, scaled
+        // Cosine sim in [-1, 1], we want surprise in [0, 5]
+        // Map: sim=1 → surprise=0, sim=0 → surprise=2.5, sim=-1 → surprise=5
+        let divergence = (1.0 - cosine_sim) * 2.5;
+
+        divergence.max(0.0)
+    }
+
+    /// Estimate query complexity for routing decisions
+    #[allow(dead_code)]
+    pub fn estimate_complexity(&self, query: &str) -> f32 {
+        let mut complexity = 0.0;
+
+        // Length factor
+        let word_count = query.split_whitespace().count();
+        complexity += (word_count as f32 / 50.0).min(1.0) * 0.2;
+
+        // Question complexity
+        let question_count = query.matches('?').count();
+        complexity += (question_count as f32 * 0.15).min(0.3);
+
+        // Code indicators
+        if query.contains("```")
+            || query.contains("def ")
+            || query.contains("fn ")
+            || query.contains("class ")
+        {
+            complexity += 0.3;
+        }
+
+        // Reasoning indicators
+        let reasoning_words = [
+            "explain", "why", "how", "analyze", "compare", "evaluate", "prove", "derive",
+        ];
+        let lower = query.to_lowercase();
+        for word in &reasoning_words {
+            if lower.contains(word) {
+                complexity += 0.1;
+            }
+        }
+
+        complexity.min(1.0)
+    }
+
+    /// Determine routing using surprise and policy selection
+    #[allow(dead_code)]
+    pub async fn determine_routing(&self, message: &str) -> (bool, PolicyType) {
+        // Get conversation history for context
+        let history = self.conversation_history.read().await;
+
+        // Calculate surprise from recent context
+        let surprise = if history.is_empty() {
+            0.5 // Medium surprise for first message
+        } else {
+            // Use a simple proxy: just estimate from message characteristics
+            // Full embedding-based surprise is computed after response
+            self.estimate_surprise_proxy(message)
+        };
+
+        // Calculate entropy estimate
+        let entropy = self.estimate_entropy(message);
+
+        // Create observation for agency
+        let observation = Observation::from_text(message)
+            .with_surprise(surprise)
+            .with_entropy(entropy);
+
+        // Let agency select policy
+        let mut agency = self.agency.write().await;
+        let policy = agency
+            .select_policy(&observation)
+            .unwrap_or(PolicyType::ReflexReply);
+
+        // Update state
+        {
+            let mut state = self.current_state.write().await;
+            state.surprise = surprise;
+            state.entropy = entropy;
+            state.complexity = self.estimate_complexity(message);
+        }
+
+        // Determine if cortex is needed based on policy
+        let use_cortex = matches!(
+            policy,
+            PolicyType::DeepThought | PolicyType::VerifyLogic | PolicyType::SimulateOutcome
+        );
+
+        (use_cortex, policy)
+    }
+
+    /// Quick surprise estimate without embeddings (pre-response)
+    #[allow(dead_code)]
+    fn estimate_surprise_proxy(&self, message: &str) -> f32 {
+        let mut surprise = 0.3; // Base
+
+        // Novel vocabulary increases surprise
+        let words: Vec<&str> = message.split_whitespace().collect();
+        let unique_ratio = {
+            let unique: std::collections::HashSet<_> = words.iter().collect();
+            if words.is_empty() {
+                0.0
+            } else {
+                unique.len() as f32 / words.len() as f32
+            }
+        };
+        surprise += unique_ratio * 0.5;
+
+        // Question marks increase surprise
+        let question_count = message.matches('?').count();
+        surprise += question_count as f32 * 0.1;
+
+        // Code blocks increase surprise
+        if message.contains("```") {
+            surprise += 0.3;
+        }
+
+        // Technical terms increase surprise
+        let technical = [
+            "algorithm",
+            "implementation",
+            "architecture",
+            "optimization",
+            "inference",
+            "neural",
+            "quantum",
+        ];
+        let lower = message.to_lowercase();
+        for term in &technical {
+            if lower.contains(term) {
+                surprise += 0.1;
+            }
+        }
+
+        surprise.min(3.0)
+    }
+
+    /// Estimate entropy from message characteristics
+    #[allow(dead_code)]
+    fn estimate_entropy(&self, message: &str) -> f32 {
+        // Shannon entropy approximation from character distribution
+        let mut char_counts = [0u32; 256];
+        let total = message.len() as f32;
+
+        if total == 0.0 {
+            return 0.0;
+        }
+
+        for byte in message.bytes() {
+            char_counts[byte as usize] += 1;
+        }
+
+        let mut entropy = 0.0;
+        for count in char_counts.iter() {
+            if *count > 0 {
+                let p = *count as f32 / total;
+                entropy -= p * p.log2();
+            }
+        }
+
+        // Normalize to [0, 1] range (max entropy for ASCII is ~7 bits)
+        (entropy / 7.0).min(1.0)
+    }
+
+    /// Update Titans memory with response (test-time learning)
+    #[allow(dead_code)]
+    pub async fn update_memory(&self, response: &str, surprise: f32) {
+        // Only update if we have Titans memory
+        let mut titans_lock = self.titans.write().await;
+        if let Some(ref mut titans) = *titans_lock {
+            // Get response embedding
+            match self
+                .ollama
+                .embeddings(&self.embedding_model, response)
+                .await
+            {
+                Ok(embedding) => {
+                    let embedding_array = Array1::from_vec(embedding);
+                    if let Err(e) = titans.update(&embedding_array, surprise) {
+                        warn!("Failed to update Titans memory: {}", e);
+                    } else {
+                        debug!("Titans memory updated with surprise={:.2}", surprise);
+                    }
+                }
+                Err(e) => {
+                    warn!("Failed to get embedding for Titans update: {}", e);
+                }
+            }
+        }
+    }
+
+    /// Invalidate context embedding cache
+    #[allow(dead_code)]
+    pub async fn invalidate_context_cache(&self) {
+        let mut cache = self.context_embedding_cache.write().await;
+        *cache = None;
+    }
+
+    /// Get Titans memory statistics
+    #[allow(dead_code)]
+    pub async fn get_titans_stats(&self) -> Option<crate::engine::titans::TitansStats> {
+        let titans_lock = self.titans.read().await;
+        titans_lock.as_ref().map(|t| t.stats().clone())
+    }
+
+    /// Get Agency statistics
+    #[allow(dead_code)]
+    pub async fn get_agency_stats(&self) -> crate::engine::agency::AgencyStats {
+        let agency = self.agency.read().await;
+        agency.stats().clone()
     }
 }

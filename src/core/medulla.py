@@ -213,7 +213,7 @@ class ThermalMonitor:
             try:
                 pynvml.nvmlShutdown()
             except Exception:
-                pass
+                pass  # nosec B110 - best-effort cleanup on shutdown
 
 
 @dataclass

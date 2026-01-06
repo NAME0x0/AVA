@@ -36,6 +36,7 @@
 //!
 //! # Module Overview
 //!
+//! - [`agency`]: Active Inference policy selection (Sentinel v4)
 //! - [`cognitive`]: Core AI processing logic with model routing
 //! - [`config`]: Configuration management and YAML loading
 //! - [`models`]: Data structures for API requests/responses
@@ -43,6 +44,7 @@
 //! - [`routes`]: HTTP API endpoints (health, chat, status, etc.)
 //! - [`server`]: HTTP server setup and middleware
 //! - [`state`]: Shared application state management
+//! - [`titans`]: Test-time learning memory buffer (Sentinel v4)
 //!
 //! # Example Usage
 //!
@@ -67,6 +69,7 @@
 //! | `/settings` | GET/POST | Read/update settings |
 //! | `/ws` | WebSocket | Real-time bidirectional chat |
 
+pub mod agency;
 pub mod cognitive;
 pub mod config;
 pub mod models;
@@ -74,5 +77,12 @@ pub mod ollama;
 pub mod routes;
 pub mod server;
 pub mod state;
+pub mod titans;
 
 pub use server::start_embedded_server;
+
+// Re-export Sentinel architecture components (allow unused during integration)
+#[allow(unused_imports)]
+pub use agency::AgencyEngine;
+#[allow(unused_imports)]
+pub use titans::TitansMemory;

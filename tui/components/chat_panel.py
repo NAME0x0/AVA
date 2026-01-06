@@ -24,7 +24,6 @@ from datetime import datetime
 from typing import Any
 
 from rich.markdown import Markdown
-from rich.syntax import Syntax
 from rich.text import Text
 from textual.binding import Binding
 from textual.containers import ScrollableContainer

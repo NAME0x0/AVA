@@ -106,6 +106,11 @@ class PolicyType(Enum):
     # System actions (require user confirmation)
     SYSTEM_COMMAND = auto()  # Execute system-level command (REQUIRES CONFIRMATION)
 
+    # Sentinel verification actions (v4)
+    VERIFY_LOGIC = auto()  # Z3 formal verification
+    SIMULATE_OUTCOME = auto()  # Mental sandbox simulation
+    FORMAL_CHECK = auto()  # MATH-VF critic check
+
 
 class HiddenState(Enum):
     """Hidden state factors in the generative world model."""
@@ -566,7 +571,7 @@ class ASEAController:
                 vram_allocated = torch.cuda.memory_allocated(0) / (1024 * 1024)
                 self.state.current_vram_mb = vram_allocated
             except Exception:
-                pass
+                pass  # nosec B110 - graceful fallback for VRAM monitoring
 
         # Calculate derived metrics
         self._calculate_pressure_metrics()
@@ -883,7 +888,7 @@ class ASEAController:
             try:
                 pynvml.nvmlShutdown()
             except Exception:
-                pass
+                pass  # nosec B110 - best-effort cleanup on shutdown
 
 
 class ExpectedFreeEnergy:

@@ -16,9 +16,26 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "AVA - Neural Second Brain",
-  description: "Adaptive Virtual Agent - Biomimetic Neural Architecture",
-  keywords: ["AI", "assistant", "neural", "cortex", "medulla", "AVA", "second brain"],
+  description: "Adaptive Virtual Agent - Biomimetic Neural Architecture with Cortex-Medulla dual-brain system",
+  keywords: ["AI", "assistant", "neural", "cortex", "medulla", "AVA", "second brain", "cognitive", "reasoning"],
   authors: [{ name: "Muhammad Afsah Mumtaz" }],
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  manifest: "/site.webmanifest",
+  openGraph: {
+    title: "AVA - Neural Second Brain",
+    description: "Adaptive Virtual Agent - Biomimetic Neural Architecture",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AVA Neural Interface" }],
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {

@@ -12,6 +12,7 @@ import { ToolsPanel } from "@/components/tools/ToolsPanel";
 import { BugReportDialog } from "@/components/feedback/BugReportDialog";
 import { ServerStartup } from "@/components/startup/ServerStartup";
 import { WizardOverlay } from "@/components/wizard";
+import { SynapticBackground } from "@/components/background";
 import { useCoreStore } from "@/stores/core";
 import { useSystemPolling } from "@/hooks/useSystemPolling";
 
@@ -168,7 +169,10 @@ export default function Home() {
         }} />
       )}
 
-      <main className={`flex flex-col h-screen bg-neural-void overflow-hidden rounded-xl border border-neural-hover/50 ${!serverReady && isTauri ? 'invisible' : ''}`}>
+      {/* Animated Synaptic Background */}
+      {serverReady && <SynapticBackground intensity={0.7} particleCount={50} />}
+
+      <main className={`flex flex-col h-screen bg-neural-void/80 overflow-hidden rounded-xl border border-neural-hover/50 backdrop-blur-sm ${!serverReady && isTauri ? 'invisible' : ''}`}>
         {/* Custom Title Bar for Tauri */}
         <TitleBar />
 

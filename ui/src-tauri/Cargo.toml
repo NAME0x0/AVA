@@ -70,6 +70,10 @@ uuid = { version = "1.6", features = ["v4"] }
 thiserror = "1.0"
 anyhow = "1.0"
 
+# Sentinel architecture - MLP memory buffer
+ndarray = "0.15"
+rand = "0.8"
+
 [features]
 default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]

@@ -143,6 +143,15 @@ textual>=0.40.0,<1.0.0  # Modern TUI framework with CSS-like styling
 # pip install faster-whisper
 
 # ============================================================================
+# AVA v4 Sentinel Architecture (Formal Verification)
+# ============================================================================
+# Z3 SMT Solver - Formal verification for code and logic
+z3-solver>=4.12.0,<5.0.0
+
+# SymPy - Symbolic mathematics for constraint translation
+sympy>=1.12,<2.0.0
+
+# ============================================================================
 # Notes:
 # ============================================================================
 # 1. CUDA-specific PyTorch installation:

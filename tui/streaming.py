@@ -9,15 +9,17 @@ Provides token-by-token display for better user experience.
 import asyncio
 import json
 import logging
+from collections.abc import AsyncIterator, Callable
 from dataclasses import dataclass
-from typing import Any, AsyncIterator, Callable, Optional
 from enum import Enum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
 class StreamEventType(Enum):
     """Types of streaming events."""
+
     TOKEN = "token"
     THINKING = "thinking"
     METRICS = "metrics"
@@ -28,14 +30,15 @@ class StreamEventType(Enum):
 @dataclass
 class StreamEvent:
     """A streaming event from the backend."""
+
     type: StreamEventType
     content: str = ""
-    metadata: Optional[dict] = None
+    metadata: dict | None = None
 
 
 class StreamingClient:
     """WebSocket client for streaming AVA responses.
-    
+
     Usage:
         client = StreamingClient("ws://localhost:8085/ws")
         async for event in client.stream("Hello, AVA!"):
@@ -44,10 +47,10 @@ class StreamingClient:
             elif event.type == StreamEventType.DONE:
                 print()
     """
-    
+
     def __init__(self, ws_url: str = "ws://localhost:8085/ws"):
         """Initialize the streaming client.
-        
+
         Args:
             ws_url: WebSocket endpoint URL
         """
@@ -57,12 +60,13 @@ class StreamingClient:
 
     async def connect(self) -> bool:
         """Establish WebSocket connection.
-        
+
         Returns:
             True if connected successfully
         """
         try:
             import websockets
+
             self._ws = await websockets.connect(self.ws_url)
             self._connected = True
             logger.info(f"Connected to {self.ws_url}")
@@ -82,18 +86,18 @@ class StreamingClient:
             self._connected = False
 
     async def stream(
-        self, 
+        self,
         message: str,
         force_search: bool = False,
         force_cortex: bool = False,
     ) -> AsyncIterator[StreamEvent]:
         """Stream a response from AVA.
-        
+
         Args:
             message: User message
             force_search: Force search-first mode
             force_cortex: Force deep thinking mode
-            
+
         Yields:
             StreamEvent objects as they arrive
         """
@@ -118,16 +122,16 @@ class StreamingClient:
                 try:
                     data = json.loads(raw_msg)
                     event_type = StreamEventType(data.get("type", "token"))
-                    
+
                     yield StreamEvent(
                         type=event_type,
                         content=data.get("content", ""),
                         metadata=data.get("metadata"),
                     )
-                    
+
                     if event_type == StreamEventType.DONE:
                         break
-                        
+
                 except json.JSONDecodeError:
                     # Plain text token
                     yield StreamEvent(type=StreamEventType.TOKEN, content=raw_msg)
@@ -146,19 +150,19 @@ class StreamingClient:
         force_cortex: bool = False,
     ) -> AsyncIterator[StreamEvent]:
         """Fallback to HTTP when WebSocket not available.
-        
+
         This provides a simulated streaming experience by yielding
         the full response at once after receiving it.
         """
         try:
             import httpx
-            
+
             # Yield thinking event
             yield StreamEvent(
                 type=StreamEventType.THINKING,
                 content="Processing...",
             )
-            
+
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     self.ws_url.replace("ws://", "http://").replace("/ws", "/chat"),
@@ -169,21 +173,21 @@ class StreamingClient:
                     },
                     timeout=300.0,
                 )
-                
+
                 if response.status_code == 200:
                     data = response.json()
                     content = data.get("response", "")
-                    
+
                     # Simulate streaming by yielding chunks
                     chunk_size = 20  # characters per chunk
                     for i in range(0, len(content), chunk_size):
                         yield StreamEvent(
                             type=StreamEventType.TOKEN,
-                            content=content[i:i + chunk_size],
+                            content=content[i : i + chunk_size],
                         )
                         # Small delay for visual effect
                         await asyncio.sleep(0.01)
-                    
+
                     # Done event with metadata
                     yield StreamEvent(
                         type=StreamEventType.DONE,
@@ -197,7 +201,7 @@ class StreamingClient:
                         type=StreamEventType.ERROR,
                         content=f"HTTP {response.status_code}",
                     )
-                    
+
         except Exception as e:
             yield StreamEvent(
                 type=StreamEventType.ERROR,
@@ -207,18 +211,18 @@ class StreamingClient:
 
 class StreamingWidget:
     """Helper for building streaming content in a widget.
-    
+
     Used by ChatPanel to accumulate streaming tokens and
     update the display progressively.
     """
-    
+
     def __init__(
         self,
         on_token: Callable[[str], None],
         on_complete: Callable[[str, dict], None],
     ):
         """Initialize the streaming widget helper.
-        
+
         Args:
             on_token: Callback for each new token
             on_complete: Callback when streaming completes
@@ -230,19 +234,19 @@ class StreamingWidget:
 
     def append_token(self, token: str) -> None:
         """Add a token to the buffer and notify.
-        
+
         Args:
             token: New token content
         """
         self._buffer.append(token)
         self._on_token(token)
 
-    def complete(self, metadata: Optional[dict] = None) -> str:
+    def complete(self, metadata: dict | None = None) -> str:
         """Mark streaming as complete.
-        
+
         Args:
             metadata: Final response metadata
-            
+
         Returns:
             Complete response text
         """

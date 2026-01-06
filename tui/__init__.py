@@ -23,8 +23,8 @@ Usage:
 """
 
 from .app import AVATUI
-from .persistence import ConversationStore, Session, Message
-from .streaming import StreamingClient, StreamEvent, StreamEventType
+from .persistence import ConversationStore, Message, Session
+from .streaming import StreamEvent, StreamEventType, StreamingClient
 
 __all__ = [
     "AVATUI",

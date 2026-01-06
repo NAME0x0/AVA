@@ -194,7 +194,7 @@ def sample_queries() -> list[str]:
 @pytest.fixture
 async def test_server(simulation_mode, mock_ollama, tmp_path):
     """Start a test server instance.
-    
+
     NOTE: This fixture is for the legacy Python server which has been
     replaced by the Rust backend in v4.x. Skip tests that use this fixture.
     """

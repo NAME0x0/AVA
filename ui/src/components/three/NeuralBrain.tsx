@@ -109,14 +109,48 @@ function Synapse({ start, end, color, activity = 0 }: SynapseProps) {
   );
 }
 
+interface DataParticleProps {
+  startPos: [number, number, number];
+  endPos: [number, number, number];
+  color: string;
+  speed?: number;
+}
+
+function DataParticle({ startPos, endPos, color, speed = 1 }: DataParticleProps) {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      // Move particle along path
+      const t = ((state.clock.elapsedTime * speed) % 2) / 2;
+      meshRef.current.position.x = startPos[0] + (endPos[0] - startPos[0]) * t;
+      meshRef.current.position.y = startPos[1] + (endPos[1] - startPos[1]) * t;
+      meshRef.current.position.z = startPos[2] + (endPos[2] - startPos[2]) * t;
+      // Fade based on position
+      const mat = meshRef.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = Math.sin(t * Math.PI) * 0.8;
+    }
+  });
+
+  return (
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[0.03, 8, 8]} />
+      <meshBasicMaterial color={color} transparent />
+    </mesh>
+  );
+}
+
 interface NeuralNetworkProps {
   activeComponent: "medulla" | "cortex" | "bridge" | "idle";
   cognitiveState: string;
   entropy: number;
   activity: number;
+  surprise: number;
+  varentropy: number;
+  isThinking: boolean;
 }
 
-function NeuralNetwork({ activeComponent, cognitiveState, entropy, activity }: NeuralNetworkProps) {
+function NeuralNetwork({ activeComponent, cognitiveState, entropy, activity, surprise, varentropy, isThinking }: NeuralNetworkProps) {
   const groupRef = useRef<THREE.Group>(null);
 
   // Generate neuron positions
@@ -272,6 +306,73 @@ function NeuralNetwork({ activeComponent, cognitiveState, entropy, activity }: N
           <meshBasicMaterial color={colors.primary} transparent opacity={0.1 + activity * 0.2} />
         </mesh>
       </Float>
+
+      {/* Data flow particles - active during processing */}
+      {(activeComponent !== "idle" || isThinking) && (
+        <>
+          {/* Medulla to Bridge flow */}
+          <DataParticle
+            startPos={[0, -1.5, 0]}
+            endPos={[0, -0.5, 0]}
+            color={colors.primary}
+            speed={0.8 + activity}
+          />
+          <DataParticle
+            startPos={[0.3, -1.3, 0.2]}
+            endPos={[0.1, -0.3, 0.1]}
+            color={colors.primary}
+            speed={0.6 + activity}
+          />
+          {/* Bridge to Cortex flow */}
+          {(activeComponent === "cortex" || isThinking) && (
+            <>
+              <DataParticle
+                startPos={[0, -0.3, 0]}
+                endPos={[0, 1.2, 0]}
+                color={colors.secondary}
+                speed={0.5 + entropy}
+              />
+              <DataParticle
+                startPos={[-0.2, -0.2, 0.1]}
+                endPos={[0.3, 1.5, 0.2]}
+                color={colors.secondary}
+                speed={0.7 + entropy}
+              />
+              <DataParticle
+                startPos={[0.1, -0.4, -0.2]}
+                endPos={[-0.2, 1.3, -0.1]}
+                color={colors.secondary}
+                speed={0.4 + entropy}
+              />
+            </>
+          )}
+        </>
+      )}
+
+      {/* Thinking pulse effect - expands outward when thinking */}
+      {isThinking && (
+        <mesh>
+          <sphereGeometry args={[1.8 + Math.sin(Date.now() * 0.003) * 0.2, 32, 32]} />
+          <meshBasicMaterial
+            color={colors.secondary}
+            transparent
+            opacity={0.05 + varentropy * 0.05}
+            wireframe
+          />
+        </mesh>
+      )}
+
+      {/* Surprise flash effect */}
+      {surprise > 0.5 && (
+        <mesh>
+          <sphereGeometry args={[2.5, 16, 16]} />
+          <meshBasicMaterial
+            color="#FFB347"
+            transparent
+            opacity={(surprise - 0.5) * 0.3}
+          />
+        </mesh>
+      )}
     </group>
   );
 }
@@ -281,6 +382,12 @@ interface NeuralBrainProps {
   cognitiveState?: string;
   entropy?: number;
   activity?: number;
+  /** Surprise level (0-1) - triggers flash effects */
+  surprise?: number;
+  /** Varentropy for uncertainty visualization */
+  varentropy?: number;
+  /** Whether the system is actively thinking */
+  isThinking?: boolean;
   className?: string;
 }
 
@@ -289,6 +396,9 @@ export function NeuralBrain({
   cognitiveState = "FLOW",
   entropy = 1.0,
   activity = 0.5,
+  surprise = 0,
+  varentropy = 0,
+  isThinking = false,
   className = "",
 }: NeuralBrainProps) {
   const [webGLSupported, setWebGLSupported] = useState(true);
@@ -321,6 +431,9 @@ export function NeuralBrain({
           cognitiveState={cognitiveState}
           entropy={entropy}
           activity={activity}
+          surprise={surprise}
+          varentropy={varentropy}
+          isThinking={isThinking}
         />
         <OrbitControls
           enableZoom={false}

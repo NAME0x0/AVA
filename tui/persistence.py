@@ -7,12 +7,11 @@ Includes automatic schema migrations for forward compatibility.
 """
 
 import json
-import sqlite3
 import logging
+import sqlite3
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
-from dataclasses import dataclass, asdict
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +22,11 @@ SCHEMA_VERSION = 1
 @dataclass
 class Message:
     """A single chat message."""
+
     role: str  # "user", "assistant", "error"
     content: str
     timestamp: str
-    metadata: Optional[dict] = None
+    metadata: dict | None = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary."""
@@ -46,6 +46,7 @@ class Message:
 @dataclass
 class Session:
     """A conversation session."""
+
     id: str
     name: str
     created_at: str
@@ -66,16 +67,16 @@ class Session:
 class ConversationStore:
     """SQLite-based conversation persistence with automatic migrations."""
 
-    def __init__(self, db_path: Optional[Path] = None):
+    def __init__(self, db_path: Path | None = None):
         """Initialize the conversation store.
-        
+
         Args:
             db_path: Path to SQLite database. Defaults to data/conversations.db
         """
         if db_path is None:
             # Default to project data directory
             db_path = Path(__file__).parent.parent / "data" / "conversations" / "tui_sessions.db"
-        
+
         self.db_path = db_path
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()
@@ -85,20 +86,25 @@ class ConversationStore:
         """Initialize database schema."""
         with sqlite3.connect(self.db_path) as conn:
             # Create schema_version table for migrations
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS schema_version (
                     version INTEGER PRIMARY KEY
                 )
-            """)
-            conn.execute("""
+            """
+            )
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS sessions (
                     id TEXT PRIMARY KEY,
                     name TEXT NOT NULL,
                     created_at TEXT NOT NULL,
                     updated_at TEXT NOT NULL
                 )
-            """)
-            conn.execute("""
+            """
+            )
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS messages (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     session_id TEXT NOT NULL,
@@ -108,11 +114,14 @@ class ConversationStore:
                     metadata TEXT,
                     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
                 )
-            """)
-            conn.execute("""
-                CREATE INDEX IF NOT EXISTS idx_messages_session 
+            """
+            )
+            conn.execute(
+                """
+                CREATE INDEX IF NOT EXISTS idx_messages_session
                 ON messages(session_id)
-            """)
+            """
+            )
             conn.commit()
 
     def _get_schema_version(self) -> int:
@@ -131,10 +140,10 @@ class ConversationStore:
     def _run_migrations(self) -> None:
         """Run any pending database migrations."""
         current_version = self._get_schema_version()
-        
+
         if current_version < SCHEMA_VERSION:
             logger.info(f"Migrating database from v{current_version} to v{SCHEMA_VERSION}")
-            
+
             # Migration 1: Initial schema (already created in _init_db)
             if current_version < 1:
                 # Add any additional columns/indexes for v1
@@ -142,59 +151,57 @@ class ConversationStore:
                     # Check if model column exists in sessions
                     cursor = conn.execute("PRAGMA table_info(sessions)")
                     columns = [row[1] for row in cursor.fetchall()]
-                    
+
                     if "model" not in columns:
                         conn.execute("ALTER TABLE sessions ADD COLUMN model TEXT DEFAULT 'default'")
-                    
+
                     if "token_count" not in columns:
-                        conn.execute("ALTER TABLE sessions ADD COLUMN token_count INTEGER DEFAULT 0")
-                    
+                        conn.execute(
+                            "ALTER TABLE sessions ADD COLUMN token_count INTEGER DEFAULT 0"
+                        )
+
                     conn.commit()
-            
+
             # Future migrations go here:
             # if current_version < 2:
             #     # Migration for schema version 2
             #     pass
-            
+
             self._set_schema_version(SCHEMA_VERSION)
             logger.info(f"Database migration complete. Now at v{SCHEMA_VERSION}")
 
-    def create_session(self, name: Optional[str] = None) -> str:
+    def create_session(self, name: str | None = None) -> str:
         """Create a new conversation session.
-        
+
         Args:
             name: Optional session name. Defaults to timestamp.
-            
+
         Returns:
             Session ID
         """
         import uuid
-        
+
         session_id = str(uuid.uuid4())[:8]
         now = datetime.now().isoformat()
-        
+
         if name is None:
             name = f"Session {datetime.now().strftime('%Y-%m-%d %H:%M')}"
-        
+
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
                 "INSERT INTO sessions (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)",
                 (session_id, name, now, now),
             )
             conn.commit()
-        
+
         logger.info(f"Created session: {session_id}")
         return session_id
 
     def add_message(
-        self, 
-        session_id: str, 
-        role: str, 
-        content: str, 
-        metadata: Optional[dict] = None
+        self, session_id: str, role: str, content: str, metadata: dict | None = None
     ) -> None:
         """Add a message to a session.
-        
+
         Args:
             session_id: Session ID
             role: Message role (user, assistant, error)
@@ -203,7 +210,7 @@ class ConversationStore:
         """
         now = datetime.now().isoformat()
         metadata_json = json.dumps(metadata) if metadata else None
-        
+
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
                 """
@@ -218,27 +225,27 @@ class ConversationStore:
             )
             conn.commit()
 
-    def get_session(self, session_id: str) -> Optional[Session]:
+    def get_session(self, session_id: str) -> Session | None:
         """Get a session with all messages.
-        
+
         Args:
             session_id: Session ID
-            
+
         Returns:
             Session object or None if not found
         """
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
-            
+
             # Get session info
             session_row = conn.execute(
                 "SELECT * FROM sessions WHERE id = ?",
                 (session_id,),
             ).fetchone()
-            
+
             if not session_row:
                 return None
-            
+
             # Get messages
             message_rows = conn.execute(
                 """
@@ -249,17 +256,19 @@ class ConversationStore:
                 """,
                 (session_id,),
             ).fetchall()
-            
+
             messages = []
             for row in message_rows:
                 metadata = json.loads(row["metadata"]) if row["metadata"] else None
-                messages.append(Message(
-                    role=row["role"],
-                    content=row["content"],
-                    timestamp=row["timestamp"],
-                    metadata=metadata,
-                ))
-            
+                messages.append(
+                    Message(
+                        role=row["role"],
+                        content=row["content"],
+                        timestamp=row["timestamp"],
+                        metadata=metadata,
+                    )
+                )
+
             return Session(
                 id=session_row["id"],
                 name=session_row["name"],
@@ -270,10 +279,10 @@ class ConversationStore:
 
     def list_sessions(self, limit: int = 20) -> list[dict]:
         """List recent sessions.
-        
+
         Args:
             limit: Maximum number of sessions to return
-            
+
         Returns:
             List of session summaries
         """
@@ -291,7 +300,7 @@ class ConversationStore:
                 """,
                 (limit,),
             ).fetchall()
-            
+
             return [
                 {
                     "id": row["id"],
@@ -305,10 +314,10 @@ class ConversationStore:
 
     def delete_session(self, session_id: str) -> bool:
         """Delete a session and all its messages.
-        
+
         Args:
             session_id: Session ID
-            
+
         Returns:
             True if deleted, False if not found
         """
@@ -321,11 +330,11 @@ class ConversationStore:
 
     def search_messages(self, query: str, limit: int = 50) -> list[dict]:
         """Search messages across all sessions.
-        
+
         Args:
             query: Search query (case-insensitive substring match)
             limit: Maximum results
-            
+
         Returns:
             List of matching messages with session info
         """
@@ -342,21 +351,25 @@ class ConversationStore:
                 """,
                 (f"%{query}%", limit),
             ).fetchall()
-            
+
             return [
                 {
                     "session_id": row["session_id"],
                     "session_name": row["session_name"],
                     "role": row["role"],
-                    "content": row["content"][:200] + "..." if len(row["content"]) > 200 else row["content"],
+                    "content": (
+                        row["content"][:200] + "..."
+                        if len(row["content"]) > 200
+                        else row["content"]
+                    ),
                     "timestamp": row["timestamp"],
                 }
                 for row in rows
             ]
 
-    def get_latest_session(self) -> Optional[str]:
+    def get_latest_session(self) -> str | None:
         """Get the ID of the most recent session.
-        
+
         Returns:
             Session ID or None if no sessions exist
         """
@@ -366,20 +379,20 @@ class ConversationStore:
             ).fetchone()
             return row[0] if row else None
 
-    def export_session(self, session_id: str, format: str = "json") -> Optional[str]:
+    def export_session(self, session_id: str, format: str = "json") -> str | None:
         """Export a session to a string.
-        
+
         Args:
             session_id: Session ID
             format: Export format (json, markdown)
-            
+
         Returns:
             Exported content or None if session not found
         """
         session = self.get_session(session_id)
         if not session:
             return None
-        
+
         if format == "json":
             return json.dumps(session.to_dict(), indent=2)
         elif format == "markdown":

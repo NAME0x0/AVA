@@ -18,7 +18,9 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 # Skip all tests in this module - legacy Python server replaced by Rust backend
-pytestmark = pytest.mark.skip(reason="Legacy Python server tests - server.py moved to legacy/python_servers/")
+pytestmark = pytest.mark.skip(
+    reason="Legacy Python server tests - server.py moved to legacy/python_servers/"
+)
 
 
 class TestHealthEndpoint:

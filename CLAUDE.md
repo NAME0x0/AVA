@@ -8,7 +8,39 @@ AVA is a **research-grade AI assistant** with a **biomimetic dual-brain architec
 
 **Core Paradigm:** Cortex-Medulla Architecture - fast reflexive responses for simple queries, deep reasoning for complex ones.
 
-## Architecture (v4)
+## Architecture (v4) - Sentinel
+
+### Sentinel Cognitive Loop
+
+AVA v4 implements the **Sentinel** architecture - a deliberate inference system that prioritizes accuracy over speed through formal verification and multi-agent simulation.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    SENTINEL REASONING LOOP                       │
+├─────────────────────────────────────────────────────────────────┤
+│  Stage 1: PERCEPTION (Medulla)                                  │
+│  ├─ Fast 8B model captures query                                │
+│  └─ Calculates Predictive Entropy & Surprise                    │
+│                           ↓                                      │
+│  Stage 2: APPRAISAL (Active Inference)                          │
+│  ├─ If entropy > threshold → enter "Thinking" state             │
+│  └─ No tokens emitted yet                                       │
+│                           ↓                                      │
+│  Stage 3: SIMULATION (Mental Sandbox)                           │
+│  ├─ Agent A (Thinker): Drafts solution                          │
+│  ├─ Agent B (Verifier): Z3 formal logic check                   │
+│  └─ Agent C (Butler): User context personalization              │
+│                           ↓                                      │
+│  Stage 4: CONSENSUS (Formal Output)                             │
+│  ├─ Loop until all agents agree (max 5 cycles)                  │
+│  └─ Emit only verified, personalized output                     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Key Principles:**
+- **Adaptive Verification:** Z3 formal checks triggered by entropy/complexity
+- **Consensus-Driven:** Output only after multi-agent agreement
+- **Accuracy Priority:** No latency budget - correctness over speed
 
 ### Dual System Architecture
 
@@ -45,7 +77,11 @@ User Input → Medulla (surprise calc) → Low Surprise → Quick Reply (<200ms)
 | **Agency** | `src/core/agency.py` | Active Inference (Free Energy Principle) |
 | **Titans** | `src/hippocampus/titans.py` | Test-time learning, infinite context |
 | **System** | `src/core/system.py` | Orchestrates all components (AVACoreSystem) |
+| **Verification** | `src/core/verification.py` | Z3 formal verifier (MATH-VF) |
+| **Sandbox** | `src/core/sandbox.py` | Mental Sandbox multi-agent simulation |
 | **Rust Backend** | `ui/src-tauri/src/engine/` | Embedded Axum HTTP server |
+| **Rust Titans** | `ui/src-tauri/src/engine/titans.rs` | MLP memory buffer (Rust) |
+| **Rust Agency** | `ui/src-tauri/src/engine/agency.rs` | FEP policy evaluator (Rust) |
 
 ## Commands
 
@@ -176,7 +212,13 @@ In `src/core/system.py` (AVACoreSystem):
 ### Policy Handlers
 Register via `_register_action_callbacks()` in `src/core/system.py`
 
-Available policies: `PRIMARY_SEARCH`, `REFLEX_REPLY`, `DEEP_THOUGHT`, `WEB_BROWSE`, `SELF_MONITOR`, `THERMAL_CHECK`, `SYSTEM_COMMAND`
+Available policies: `PRIMARY_SEARCH`, `REFLEX_REPLY`, `DEEP_THOUGHT`, `WEB_BROWSE`, `SELF_MONITOR`, `THERMAL_CHECK`, `SYSTEM_COMMAND`, `VERIFY_LOGIC`, `SIMULATE_OUTCOME`, `FORMAL_CHECK`
+
+### Sentinel Verification
+The Sentinel architecture adds formal verification via Z3:
+- **Adaptive Trigger:** Verification runs when `entropy > 0.7` OR code/logic detected
+- **MATH-VF Critic:** Translates claims to SMT-LIB, runs Z3 `s.check()`
+- **Consensus Loop:** Max 5 cycles until Thinker + Verifier + Butler agree
 
 ### Rust Backend Development
 - HTTP server: `ui/src-tauri/src/engine/`
