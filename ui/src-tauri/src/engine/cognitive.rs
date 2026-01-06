@@ -29,8 +29,10 @@
 //! - Active Inference: The Free Energy Principle in Mind, Brain, and Behavior
 
 use crate::engine::agency::{AgencyConfig, AgencyEngine, Observation, PolicyType};
-use crate::engine::models::*;
-use crate::engine::models::{OllamaChatResponse, OllamaOptions, *};
+use crate::engine::models::{
+    BeliefStateResponse, ChatRequest, ChatResponse, CognitiveState, CognitiveStateResponse,
+    ConversationMessage, MemoryStats, OllamaChatMessage, OllamaChatResponse, OllamaOptions,
+};
 use crate::engine::ollama::{OllamaClient, OllamaError};
 use crate::engine::titans::{TitansConfig, TitansMemory};
 use ndarray::Array1;
@@ -373,7 +375,7 @@ impl CognitiveEngine {
                     state.last_response_time_ms = elapsed;
                     state.confidence = self.calculate_confidence_from_response(&response);
                     state.state = self.determine_cognitive_state(&response);
-                    state.state.clone()
+                    state.state
                 };
 
                 // Store in history
@@ -604,6 +606,7 @@ impl CognitiveEngine {
     }
 
     /// Determine if we should use Cortex (deep thinking)
+    #[allow(dead_code)]
     async fn should_use_cortex(&self, message: &str) -> bool {
         // Simple heuristics for now
         let complexity_indicators = [
@@ -698,6 +701,7 @@ impl CognitiveEngine {
     }
 
     /// Calculate confidence based on response
+    #[allow(dead_code)]
     fn calculate_confidence(&self, _response: &OllamaChatResponse) -> f32 {
         // For now, return a reasonable default
         // In a full implementation, this would analyze the response
@@ -1019,6 +1023,7 @@ impl CognitiveEngine {
 
     /// Determine routing using surprise and policy selection
     /// Used by Sentinel Stage 2 (Appraisal) for policy selection.
+    #[allow(dead_code)]
     pub async fn determine_routing(&self, message: &str) -> (bool, PolicyType) {
         // Get conversation history for context
         let history = self.conversation_history.read().await;
@@ -1138,6 +1143,7 @@ impl CognitiveEngine {
 
     /// Update Titans memory with response (test-time learning)
     /// Used by Sentinel Stage 4 (Learning) for test-time learning.
+    #[allow(dead_code)]
     pub async fn update_memory(&self, response: &str, surprise: f32) {
         // Only update if we have Titans memory
         let mut titans_lock = self.titans.write().await;

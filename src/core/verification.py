@@ -204,12 +204,12 @@ class FormalVerifier:
             )
 
         try:
-            # Try to parse as arithmetic first
-            if self._is_arithmetic(claim):
-                result = await self._verify_arithmetic(claim)
-            # Try to parse as logical expression
-            elif self._is_logical(claim):
+            # Try to parse as logical expression first (more specific)
+            if self._is_logical(claim):
                 result = await self._verify_logical_expr(claim)
+            # Try to parse as arithmetic
+            elif self._is_arithmetic(claim):
+                result = await self._verify_arithmetic(claim)
             # Try to extract and verify constraints
             else:
                 result = await self._verify_constraints(claim, context)
@@ -471,16 +471,16 @@ class FormalVerifier:
             solver = z3.Solver()
             solver.set("timeout", self.config.timeout_ms)
 
-            # Normalize logical operators
-            expr_normalized = expr.upper()
-            expr_normalized = expr_normalized.replace(" AND ", " & ")
-            expr_normalized = expr_normalized.replace(" OR ", " | ")
-            expr_normalized = expr_normalized.replace(" NOT ", " ~ ")
+            # Normalize logical operators (case-insensitive replacement)
+            # Use regex to replace operators while preserving variable case
+            expr_normalized = re.sub(r"\band\b", "&", expr, flags=re.IGNORECASE)
+            expr_normalized = re.sub(r"\bor\b", "|", expr_normalized, flags=re.IGNORECASE)
+            expr_normalized = re.sub(r"\bnot\b", "~", expr_normalized, flags=re.IGNORECASE)
 
-            # Extract variables
+            # Extract variables (from original expression to preserve case)
             var_pattern = r"\b([a-zA-Z_][a-zA-Z0-9_]*)\b"
-            var_names = set(re.findall(var_pattern, expr))
-            var_names -= {"AND", "OR", "NOT", "TRUE", "FALSE"}
+            var_names = set(re.findall(var_pattern, expr_normalized))
+            var_names -= {"and", "or", "not", "true", "false", "AND", "OR", "NOT", "TRUE", "FALSE"}
 
             variables = {name: z3.Int(name) for name in var_names}
 
