@@ -1,176 +1,40 @@
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-
-# Conda environments
-.conda/
-env/
-
-# Virtual environments
-.env
-.venv
+.venv/
 venv/
-ENV/
-env.bak/
-venv.bak/
 
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IDEs and editors
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-Thumbs.db
-ehthumbs.db
-
-# Data and Models - large files excluded from git
-models/base_models/
-models/fine_tuned_adapters/
-models/adapters/
-!models/.gitkeep
-!models/base_models/.gitkeep
-!models/fine_tuned_adapters/.gitkeep
-!models/adapters/.gitkeep
-*.npz
-*.safetensors
-*.bin
-*.gguf
-*.ggml
-
-# Compiled files
-*.so
-*.o
-
-# Logs
-logs/
-*.log
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-!ui/src/lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-pytest_cache/
-.pytest_cache/
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-
-# dotenv
-.env
-
-# Sagar specific
+# Tool caches
 .mypy_cache/
-.dmypy.json
-dmypy.json
+.pytest_cache/
+.ruff_cache/
 
-# secrets
-secrets.yml
-secrets.json
-*.pem
-*.key
+# Local corpora and checkpoints
+corpora/raw/
+corpora/processed/
+checkpoints/
+sessions/*/checkpoints/
+sessions/*/logs/
+sessions/*/artifacts/*.bin
+sessions/*/artifacts/*.pt
+sessions/*/artifacts/*.pth
 
-# Ollama models (if stored in project and large)
-# ollama_models/
+# Build artifacts
+build/
+dist/
+*.egg-info/
 
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
 
-# db.sqlite3
-db.sqlite3
-./data/*
-*.db
-
-# Node.js / npm
-node_modules/
-**/node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.npm/
-.yarn/
-# Note: package-lock.json is needed for CI caching - do not ignore
-yarn.lock
-.pnpm-store/
-
-# UI build outputs
-ui/out/
-!ui/out/.gitkeep
-ui/dist/
+# UI leftovers
 ui/.next/
-ui/build/
+ui/node_modules/
+ui/out/
+ui/src-tauri/target/
 
-# rust build files
-/target/
-**/target/
-./ui/target/
-./ui/**/target/
-**/*.rlib
-**/*.rmeta
-**/*.dll
-**/*.dylib
-**/*.so
-**/*.exe
-**/*.pdb
-**/*.lib
-**/*.a
-**/*.app
-**/*.ilk
-**/*.exp
-./ui/target/debug/*
+.pytest-tmp/
 
-# Installer artifacts
-installer/build/
-installer/dist/
-*.nsi.log
-*.msi
-
-# Tauri bundle outputs (keep in target/)
-ui/src-tauri/target/release/bundle/
-
-# Windows installer specific
-*.iss.log
-*.wixobj
-*.wixpdb

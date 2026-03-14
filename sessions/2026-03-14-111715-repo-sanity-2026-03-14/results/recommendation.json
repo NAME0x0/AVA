@@ -1,0 +1,11 @@
+{
+  "recommended_model": "ava-59m-byte",
+  "recommended_protocol": "compact_tags",
+  "reason": "Start in the middle of the budget range: large enough to learn non-trivial language, math, science, and coding structure, small enough to keep pretraining on a 4 GB card realistic.",
+  "next_actions": [
+    "Pretrain the recommended byte-level baseline until the loss curve stabilizes.",
+    "Replace the byte tokenizer with a compact SentencePiece/BPE tokenizer and rerun the protocol sweep.",
+    "Distill calculator traces with the recommended compact protocol.",
+    "Run an ablation with Titans-inspired memory on and off after the base model can answer short tasks."
+  ]
+}

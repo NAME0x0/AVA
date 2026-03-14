@@ -1,0 +1,17 @@
+[
+  {
+    "protocol": "compact_tags",
+    "average_tokens": 24.25,
+    "total_tokens": 97
+  },
+  {
+    "protocol": "compact_json",
+    "average_tokens": 53.25,
+    "total_tokens": 213
+  },
+  {
+    "protocol": "compact_xml",
+    "average_tokens": 72.25,
+    "total_tokens": 289
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "label": "full-test-suite",
+  "command": "python -m pytest -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 8446
+}

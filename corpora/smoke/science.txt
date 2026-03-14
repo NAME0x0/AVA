@@ -1,0 +1,15 @@
+Question: What planet is known as the Red Planet?
+Answer: Mars
+
+Question: What force keeps planets in orbit around the Sun?
+Answer: gravity
+
+Question: What gas do plants absorb from the air for photosynthesis?
+Answer: carbon dioxide
+
+Question: What is the chemical symbol for water?
+Answer: H2O
+
+Worked example: Mars appears red because its surface contains iron oxide dust.
+
+Worked example: Gravity pulls planets toward the Sun and keeps them in orbit.

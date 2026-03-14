@@ -1,0 +1,5 @@
+{"question":"Use the calculator tool for 144 / 12.","answer":"12","rationale":"[calc]144 / 12=>12[/calc]"}
+{"question":"Use the calculator tool for sqrt(81).","answer":"9","rationale":"[calc]sqrt(81)=>9[/calc]"}
+{"question":"Use the calculator tool for 5 * 8.","answer":"40","rationale":"[calc]5 * 8=>40[/calc]"}
+{"question":"Use the calculator tool for 18 + 24.","answer":"42","rationale":"[calc]18 + 24=>42[/calc]"}
+{"question":"Use the calculator tool for 7 * 7.","answer":"49","rationale":"[calc]7 * 7=>49[/calc]"}

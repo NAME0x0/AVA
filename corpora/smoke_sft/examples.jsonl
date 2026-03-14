@@ -1,0 +1,13 @@
+{"prompt":"Rewrite this sentence in plain English: The plan ain't done.","response":"The plan is not finished yet."}
+{"prompt":"Summarize this sentence in fewer words: The cat slept on the warm window sill.","response":"The cat slept on the warm sill."}
+{"prompt":"What is 17 * 29?","response":"493"}
+{"prompt":"Solve for x: 2x + 6 = 14.","response":"4"}
+{"prompt":"What planet is known as the Red Planet?","response":"Mars"}
+{"prompt":"What force keeps planets in orbit around the Sun?","response":"gravity"}
+{"prompt":"In Python, which keyword defines a function?","response":"def"}
+{"prompt":"What does len('ava') return in Python?","response":"3"}
+{"prompt":"Use the calculator tool for 144 / 12.","response":"12"}
+{"prompt":"Use the calculator tool for sqrt(81).","response":"9"}
+{"prompt":"Rewrite this sentence in plain English: We gotta leave right now.","response":"We have to leave right now."}
+{"prompt":"What is 25 + 17?","response":"42"}
+{"prompt":"Use the calculator tool for 7 * 7.","response":"49"}

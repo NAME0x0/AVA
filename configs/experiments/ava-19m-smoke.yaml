@@ -1,0 +1,33 @@
+name: ava-19m-smoke
+tokenizer:
+  kind: byte
+  vocab_size: 260
+
+model:
+  block_size: 64
+  n_layer: 6
+  n_head: 8
+  n_embd: 512
+  dropout: 0.0
+  bias: false
+
+training:
+  device: cuda
+  dtype: float32
+  micro_batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 0.0008
+  weight_decay: 0.01
+  max_steps: 64
+  warmup_steps: 8
+  grad_clip: 1.0
+
+memory:
+  enabled: true
+  max_items: 256
+  write_surprise_threshold: 0.45
+  top_k: 4
+
+tools:
+  calculator: true
+  prompt_protocol: compact_tags

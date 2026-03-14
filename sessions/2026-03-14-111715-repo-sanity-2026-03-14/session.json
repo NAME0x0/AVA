@@ -1,0 +1,14 @@
+{
+  "name": "repo-sanity-2026-03-14",
+  "slug": "repo-sanity-2026-03-14",
+  "kind": "baseline",
+  "created_at_utc": "2026-03-14T11:17:15.213429+00:00",
+  "sources": [
+    "https://github.com/karpathy/build-nanogpt",
+    "https://github.com/karpathy/nanoGPT",
+    "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf",
+    "https://arxiv.org/abs/2501.00663",
+    "https://arxiv.org/abs/2302.04761",
+    "https://arxiv.org/abs/2306.11644"
+  ]
+}

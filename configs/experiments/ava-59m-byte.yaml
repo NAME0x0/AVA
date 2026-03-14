@@ -1,0 +1,33 @@
+name: ava-59m-byte
+tokenizer:
+  kind: byte
+  vocab_size: 260
+
+model:
+  block_size: 256
+  n_layer: 12
+  n_head: 10
+  n_embd: 640
+  dropout: 0.0
+  bias: false
+
+training:
+  device: cuda
+  dtype: bfloat16
+  micro_batch_size: 1
+  gradient_accumulation_steps: 64
+  learning_rate: 0.0003
+  weight_decay: 0.1
+  max_steps: 20000
+  warmup_steps: 500
+  grad_clip: 1.0
+
+memory:
+  enabled: true
+  max_items: 256
+  write_surprise_threshold: 0.45
+  top_k: 4
+
+tools:
+  calculator: true
+  prompt_protocol: compact_tags

@@ -1,209 +1,141 @@
-"""
-AVA Configuration System
-========================
+from __future__ import annotations
 
-Centralized configuration with sensible defaults.
-Can be loaded from YAML or environment variables.
-"""
-
-import os
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
 import yaml
 
 
-@dataclass
-class OllamaConfig:
-    """Ollama backend configuration."""
+@dataclass(slots=True)
+class TokenizerConfig:
+    kind: str = "byte"
+    vocab_size: int = 260
 
-    host: str = "http://localhost:11434"
-    timeout: int = 120
-
-    # Model selection
-    fast_model: str = "gemma3:4b"  # Quick responses
-    deep_model: str = "gemma3:4b"  # Deep reasoning (use larger if available)
-    embedding_model: str = "gemma3:4b"  # For embeddings
-
-    def __post_init__(self):
-        # Allow environment override
-        self.host = os.environ.get("OLLAMA_HOST", self.host)
+    @classmethod
+    def from_dict(cls, data: dict[str, Any] | None) -> "TokenizerConfig":
+        data = data or {}
+        return cls(
+            kind=str(data.get("kind", "byte")),
+            vocab_size=int(data.get("vocab_size", 260)),
+        )
 
 
-@dataclass
-class EngineConfig:
-    """Core engine configuration."""
+@dataclass(slots=True)
+class ModelConfig:
+    block_size: int = 256
+    n_layer: int = 12
+    n_head: int = 10
+    n_embd: int = 640
+    dropout: float = 0.0
+    bias: bool = False
 
-    ollama: OllamaConfig = field(default_factory=OllamaConfig)
+    @classmethod
+    def from_dict(cls, data: dict[str, Any] | None) -> "ModelConfig":
+        data = data or {}
+        return cls(
+            block_size=int(data.get("block_size", 256)),
+            n_layer=int(data.get("n_layer", 12)),
+            n_head=int(data.get("n_head", 10)),
+            n_embd=int(data.get("n_embd", 640)),
+            dropout=float(data.get("dropout", 0.0)),
+            bias=bool(data.get("bias", False)),
+        )
 
-    # Routing thresholds
-    cortex_surprise_threshold: float = 0.5  # When to use deep thinking
-    cortex_complexity_threshold: float = 0.4
-
-    # Keywords that trigger deep thinking
-    cortex_keywords: list[str] = field(
-        default_factory=lambda: [
-            "analyze",
-            "explain",
-            "compare",
-            "why",
-            "how does",
-            "what if",
-            "debug",
-            "optimize",
-            "step by step",
-            "think carefully",
-        ]
-    )
-
-    # Response settings
-    max_tokens: int = 2048
-    temperature: float = 0.7
-
-    # Accuracy settings
-    verify_responses: bool = True  # Double-check important responses
-    use_reflection: bool = True  # Allow self-correction
+    def estimated_parameters(self, vocab_size: int) -> int:
+        per_block = (12 * self.n_embd * self.n_embd) + (13 * self.n_embd)
+        token_embeddings = vocab_size * self.n_embd
+        positional_embeddings = self.block_size * self.n_embd
+        final_norm = 2 * self.n_embd
+        return token_embeddings + positional_embeddings + (self.n_layer * per_block) + final_norm
 
 
-@dataclass
-class ToolsConfig:
-    """Tool system configuration."""
+@dataclass(slots=True)
+class TrainingConfig:
+    device: str = "cuda"
+    dtype: str = "bfloat16"
+    micro_batch_size: int = 1
+    gradient_accumulation_steps: int = 64
+    learning_rate: float = 3e-4
+    weight_decay: float = 0.1
+    max_steps: int = 20_000
+    warmup_steps: int = 500
+    grad_clip: float = 1.0
+    loss_mode: str = "raw_lm"
 
-    enabled: bool = True
+    @classmethod
+    def from_dict(cls, data: dict[str, Any] | None) -> "TrainingConfig":
+        data = data or {}
+        return cls(
+            device=str(data.get("device", "cuda")),
+            dtype=str(data.get("dtype", "bfloat16")),
+            micro_batch_size=int(data.get("micro_batch_size", 1)),
+            gradient_accumulation_steps=int(data.get("gradient_accumulation_steps", 64)),
+            learning_rate=float(data.get("learning_rate", 3e-4)),
+            weight_decay=float(data.get("weight_decay", 0.1)),
+            max_steps=int(data.get("max_steps", 20_000)),
+            warmup_steps=int(data.get("warmup_steps", 500)),
+            grad_clip=float(data.get("grad_clip", 1.0)),
+            loss_mode=str(data.get("loss_mode", "raw_lm")),
+        )
 
-    # Built-in tools
-    enable_calculator: bool = True
-    enable_web_search: bool = True
-    enable_file_access: bool = True
 
-    # MCP (Model Context Protocol) settings
-    mcp_enabled: bool = True
-    mcp_servers: list[dict[str, Any]] = field(default_factory=list)
-
-    # Tool execution
-    timeout_seconds: int = 30
-    max_retries: int = 2
-
-
-@dataclass
+@dataclass(slots=True)
 class MemoryConfig:
-    """Memory and context configuration."""
+    enabled: bool = True
+    max_items: int = 256
+    write_surprise_threshold: float = 0.45
+    top_k: int = 4
 
-    max_history: int = 50  # Messages to keep in memory
-    context_window: int = 8192  # Token context window
-
-    # Persistence
-    persist_conversations: bool = True
-    data_dir: str = "data/conversations"
-
-    # Learning
-    enable_learning: bool = True
-    learning_data_dir: str = "data/learning"
-
-
-@dataclass
-class UIConfig:
-    """UI/API server configuration."""
-
-    host: str = "127.0.0.1"
-    port: int = 8085
-    enable_cors: bool = True
-    enable_streaming: bool = True
+    @classmethod
+    def from_dict(cls, data: dict[str, Any] | None) -> "MemoryConfig":
+        data = data or {}
+        return cls(
+            enabled=bool(data.get("enabled", True)),
+            max_items=int(data.get("max_items", 256)),
+            write_surprise_threshold=float(data.get("write_surprise_threshold", 0.45)),
+            top_k=int(data.get("top_k", 4)),
+        )
 
 
-@dataclass
-class AVAConfig:
-    """Master configuration for AVA."""
+@dataclass(slots=True)
+class ToolConfig:
+    calculator: bool = True
+    prompt_protocol: str = "compact_tags"
 
-    engine: EngineConfig = field(default_factory=EngineConfig)
-    tools: ToolsConfig = field(default_factory=ToolsConfig)
-    memory: MemoryConfig = field(default_factory=MemoryConfig)
-    ui: UIConfig = field(default_factory=UIConfig)
-
-    # Logging
-    log_level: str = "INFO"
-    log_file: str | None = None
-
-    # Data directory
-    data_dir: str = "data"
-
-    def __post_init__(self):
-        # Create data directories
-        Path(self.data_dir).mkdir(parents=True, exist_ok=True)
-        Path(self.memory.data_dir).mkdir(parents=True, exist_ok=True)
-        if self.memory.enable_learning:
-            Path(self.memory.learning_data_dir).mkdir(parents=True, exist_ok=True)
+    @classmethod
+    def from_dict(cls, data: dict[str, Any] | None) -> "ToolConfig":
+        data = data or {}
+        return cls(
+            calculator=bool(data.get("calculator", True)),
+            prompt_protocol=str(data.get("prompt_protocol", "compact_tags")),
+        )
 
 
-def load_config(path: str = None) -> AVAConfig:
-    """
-    Load configuration from file.
+@dataclass(slots=True)
+class ExperimentConfig:
+    name: str
+    tokenizer: TokenizerConfig
+    model: ModelConfig
+    training: TrainingConfig
+    memory: MemoryConfig
+    tools: ToolConfig
 
-    Args:
-        path: Path to YAML config file. If None, uses default config.
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "ExperimentConfig":
+        return cls(
+            name=str(data.get("name", "ava-experiment")),
+            tokenizer=TokenizerConfig.from_dict(data.get("tokenizer")),
+            model=ModelConfig.from_dict(data.get("model")),
+            training=TrainingConfig.from_dict(data.get("training")),
+            memory=MemoryConfig.from_dict(data.get("memory")),
+            tools=ToolConfig.from_dict(data.get("tools")),
+        )
 
-    Returns:
-        AVAConfig instance
-    """
-    if path is None:
-        # Check standard locations
-        for candidate in ["config/ava.yaml", "ava.yaml", "config.yaml"]:
-            if Path(candidate).exists():
-                path = candidate
-                break
-
-    if path and Path(path).exists():
-        with open(path) as f:
-            data = yaml.safe_load(f)
-        return _dict_to_config(data)
-
-    return AVAConfig()
-
-
-def _dict_to_config(data: dict) -> AVAConfig:
-    """Convert dictionary to config dataclass."""
-    config = AVAConfig()
-
-    if "engine" in data:
-        engine_data = data["engine"]
-        if "ollama" in engine_data:
-            config.engine.ollama = OllamaConfig(**engine_data.pop("ollama"))
-        for k, v in engine_data.items():
-            if hasattr(config.engine, k):
-                setattr(config.engine, k, v)
-
-    if "tools" in data:
-        for k, v in data["tools"].items():
-            if hasattr(config.tools, k):
-                setattr(config.tools, k, v)
-
-    if "memory" in data:
-        for k, v in data["memory"].items():
-            if hasattr(config.memory, k):
-                setattr(config.memory, k, v)
-
-    if "ui" in data:
-        for k, v in data["ui"].items():
-            if hasattr(config.ui, k):
-                setattr(config.ui, k, v)
-
-    for k in ["log_level", "log_file", "data_dir"]:
-        if k in data:
-            setattr(config, k, data[k])
-
-    return config
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
 
 
-def save_config(config: AVAConfig, path: str = "config/ava.yaml"):
-    """Save configuration to file."""
-    import dataclasses
-
-    def to_dict(obj):
-        if dataclasses.is_dataclass(obj):
-            return {k: to_dict(v) for k, v in dataclasses.asdict(obj).items()}
-        return obj
-
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w") as f:
-        yaml.dump(to_dict(config), f, default_flow_style=False)
+def load_experiment_config(path: str | Path) -> ExperimentConfig:
+    payload = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    return ExperimentConfig.from_dict(payload)

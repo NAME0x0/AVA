@@ -1,0 +1,58 @@
+[
+  {
+    "name": "ava-11m-smoke-sft",
+    "parameters": 10771968,
+    "train_vram_gb": 1.034,
+    "infer_vram_gb": 0.806,
+    "tokens_per_optimizer_step": 2048,
+    "fits_4gb": true
+  },
+  {
+    "name": "ava-11m-smoke",
+    "parameters": 10771968,
+    "train_vram_gb": 1.034,
+    "infer_vram_gb": 0.806,
+    "tokens_per_optimizer_step": 2048,
+    "fits_4gb": true
+  },
+  {
+    "name": "ava-11m-tool-sft",
+    "parameters": 10796544,
+    "train_vram_gb": 1.16,
+    "infer_vram_gb": 0.821,
+    "tokens_per_optimizer_step": 2048,
+    "fits_4gb": true
+  },
+  {
+    "name": "ava-19m-smoke",
+    "parameters": 19081216,
+    "train_vram_gb": 1.117,
+    "infer_vram_gb": 0.831,
+    "tokens_per_optimizer_step": 1024,
+    "fits_4gb": true
+  },
+  {
+    "name": "ava-34m-byte",
+    "parameters": 25484288,
+    "train_vram_gb": 1.09,
+    "infer_vram_gb": 0.804,
+    "tokens_per_optimizer_step": 16384,
+    "fits_4gb": true
+  },
+  {
+    "name": "ava-59m-byte",
+    "parameters": 59413760,
+    "train_vram_gb": 1.518,
+    "infer_vram_gb": 0.873,
+    "tokens_per_optimizer_step": 16384,
+    "fits_4gb": true
+  },
+  {
+    "name": "ava-99m-byte",
+    "parameters": 99628032,
+    "train_vram_gb": 2.008,
+    "infer_vram_gb": 0.954,
+    "tokens_per_optimizer_step": 24576,
+    "fits_4gb": true
+  }
+]

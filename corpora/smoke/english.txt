@@ -1,0 +1,17 @@
+Question: Rewrite this sentence in plain English: The plan ain't done.
+Answer: The plan is not finished yet.
+
+Question: Rewrite this sentence in plain English: She ain't ready for the test.
+Answer: She is not ready for the test.
+
+Question: Summarize this sentence in fewer words: The cat slept on the warm window sill.
+Answer: The cat slept on the warm sill.
+
+Question: Summarize this sentence in fewer words: The small robot carefully cleaned the dusty desk.
+Answer: The robot cleaned the dusty desk.
+
+Question: Rewrite this sentence in plain English: We gotta leave right now.
+Answer: We have to leave right now.
+
+Question: Summarize this sentence in fewer words: The teacher explained the lesson with clear examples.
+Answer: The teacher explained the lesson clearly.

@@ -1,0 +1,15 @@
+Question: In Python, which keyword defines a function?
+Answer: def
+
+Question: What does len('ava') return in Python?
+Answer: 3
+
+Question: In Python, which keyword starts a loop over items?
+Answer: for
+
+Question: What symbol starts a comment in Python?
+Answer: #
+
+Worked example: Use def name(...): to define a Python function.
+
+Worked example: len('ava') counts characters, so it returns 3.

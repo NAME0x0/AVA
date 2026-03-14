@@ -1,0 +1,27 @@
+Question: What is 17 * 29?
+Answer: 493
+
+Question: Solve for x: 2x + 6 = 14.
+Answer: 4
+
+Question: What is 12 * 12?
+Answer: 144
+
+Question: Solve for x: 3x = 21.
+Answer: 7
+
+Question: What is 144 / 12?
+Answer: 12
+
+Question: What is 9 squared?
+Answer: 81
+
+Question: Solve for x: x + 9 = 15.
+Answer: 6
+
+Question: What is 25 + 17?
+Answer: 42
+
+Worked example: To solve 2x + 6 = 14, subtract 6 from both sides to get 2x = 8, then divide by 2 to get x = 4.
+
+Worked example: To multiply 17 by 29, compute 17 * 30 = 510 and subtract 17 to get 493.

@@ -1,143 +1,80 @@
-"""
-AVA Memory System
-=================
+from __future__ import annotations
 
-Handles conversation memory, context management, and learning.
-"""
-
-import json
-import logging
+import math
 from dataclasses import dataclass, field
-from datetime import datetime
-from pathlib import Path
 from typing import Any
 
-from .config import MemoryConfig  # Import from config to avoid duplication
 
-logger = logging.getLogger(__name__)
+@dataclass(slots=True)
+class MemoryRecord:
+    text: str
+    surprise: float
+    metadata: dict[str, Any] = field(default_factory=dict)
+    accesses: int = 0
 
 
 @dataclass
-class Message:
-    """A single message in conversation."""
+class TitansMemory:
+    max_items: int = 256
+    write_surprise_threshold: float = 0.45
+    embedding_dim: int = 128
+    records: list[MemoryRecord] = field(init=False, default_factory=list)
+    vectors: list[list[float]] = field(init=False, default_factory=list)
 
-    role: str  # "user" or "assistant"
-    content: str
-    timestamp: datetime = field(default_factory=datetime.now)
-    metadata: dict[str, Any] = field(default_factory=dict)
+    def _embed(self, text: str) -> list[float]:
+        vector = [0.0] * self.embedding_dim
+        payload = text.encode("utf-8", errors="ignore")
+        for index, value in enumerate(payload):
+            vector[(value + index) % self.embedding_dim] += 1.0
+            if index:
+                vector[(payload[index - 1] * 31 + value) % self.embedding_dim] += 0.5
+        norm = math.sqrt(sum(item * item for item in vector))
+        if norm:
+            vector = [item / norm for item in vector]
+        return vector
 
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "role": self.role,
-            "content": self.content,
-            "timestamp": self.timestamp.isoformat(),
-            "metadata": self.metadata,
-        }
+    def _token_overlap(self, left: str, right: str) -> float:
+        left_tokens = set(left.lower().replace('.', ' ').replace(',', ' ').split())
+        right_tokens = set(right.lower().replace('.', ' ').replace(',', ' ').split())
+        if not left_tokens or not right_tokens:
+            return 0.0
+        return len(left_tokens & right_tokens) / len(left_tokens | right_tokens)
 
-    @classmethod
-    def from_dict(cls, data: dict) -> "Message":
-        return cls(
-            role=data["role"],
-            content=data["content"],
-            timestamp=datetime.fromisoformat(data.get("timestamp", datetime.now().isoformat())),
-            metadata=data.get("metadata", {}),
-        )
-
-
-class ConversationMemory:
-    """
-    Manages conversation history and context.
-
-    Features:
-    - Rolling window of recent messages
-    - Automatic persistence
-    - Context summarization (future)
-    """
-
-    def __init__(self, config: MemoryConfig = None):
-        self.config = config or MemoryConfig()
-        self.messages: list[Message] = []
-        self.session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-        # Create directories
-        if self.config.persist_conversations:
-            Path(self.config.data_dir).mkdir(parents=True, exist_ok=True)
-
-        logger.info(f"ConversationMemory initialized - Session: {self.session_id}")
-
-    def add_message(self, role: str, content: str, metadata: dict[str, Any] = None) -> Message:
-        """Add a message to history."""
-        msg = Message(role=role, content=content, metadata=metadata or {})
-        self.messages.append(msg)
-
-        # Trim if needed
-        if len(self.messages) > self.config.max_history:
-            self.messages = self.messages[-self.config.max_history :]
-
-        return msg
-
-    def add_exchange(self, user_msg: str, assistant_msg: str, metadata: dict[str, Any] = None):
-        """Add a user-assistant exchange."""
-        self.add_message("user", user_msg, metadata)
-        self.add_message("assistant", assistant_msg, metadata)
-
-    def get_history(self, n: int = None) -> list[dict[str, str]]:
-        """Get recent history in chat format."""
-        messages = self.messages[-n:] if n else self.messages
-        return [{"role": m.role, "content": m.content} for m in messages]
-
-    def get_context_string(self, n: int = 10) -> str:
-        """Get recent context as formatted string."""
-        recent = self.messages[-n:]
-        lines = []
-        for m in recent:
-            prefix = "User: " if m.role == "user" else "AVA: "
-            lines.append(f"{prefix}{m.content}")
-        return "\n".join(lines)
-
-    def clear(self):
-        """Clear all messages."""
-        self.messages = []
-
-    def save(self, filename: str = None):
-        """Save conversation to file."""
-        if not self.config.persist_conversations:
-            return
-
-        filename = filename or f"conversation_{self.session_id}.json"
-        path = Path(self.config.data_dir) / filename
-
-        data = {
-            "session_id": self.session_id,
-            "saved_at": datetime.now().isoformat(),
-            "messages": [m.to_dict() for m in self.messages],
-        }
-
-        with open(path, "w") as f:
-            json.dump(data, f, indent=2)
-
-        logger.info(f"Conversation saved to {path}")
-
-    def load(self, filename: str) -> bool:
-        """Load conversation from file."""
-        path = Path(self.config.data_dir) / filename
-
-        if not path.exists():
-            logger.warning(f"Conversation file not found: {path}")
+    def write(self, text: str, surprise: float, metadata: dict[str, Any] | None = None) -> bool:
+        if surprise < self.write_surprise_threshold:
             return False
-
-        try:
-            with open(path) as f:
-                data = json.load(f)
-
-            self.messages = [Message.from_dict(m) for m in data.get("messages", [])]
-            self.session_id = data.get("session_id", self.session_id)
-            logger.info(f"Loaded {len(self.messages)} messages from {path}")
+        record = MemoryRecord(text=text, surprise=surprise, metadata=metadata or {})
+        vector = self._embed(text)
+        if len(self.records) >= self.max_items:
+            lowest_index = min(range(len(self.records)), key=lambda idx: self.records[idx].surprise)
+            self.records[lowest_index] = record
+            self.vectors[lowest_index] = vector
             return True
+        self.records.append(record)
+        self.vectors.append(vector)
+        return True
 
-        except Exception as e:
-            logger.error(f"Failed to load conversation: {e}")
-            return False
+    def retrieve(self, query: str, top_k: int = 4) -> list[MemoryRecord]:
+        if not self.records:
+            return []
+        query_vector = self._embed(query)
+        scored: list[tuple[float, MemoryRecord]] = []
+        for vector, record in zip(self.vectors, self.records, strict=True):
+            similarity = sum(a * b for a, b in zip(query_vector, vector, strict=True))
+            overlap = self._token_overlap(query, record.text)
+            score = similarity + (1.5 * overlap) + (0.1 * record.surprise)
+            scored.append((score, record))
+        scored.sort(key=lambda item: item[0], reverse=True)
+        chosen = [record for _, record in scored[:top_k]]
+        for record in chosen:
+            record.accesses += 1
+        return chosen
 
-    def __len__(self) -> int:
-        return len(self.messages)
+    def summarize_context(self, query: str, top_k: int = 4) -> str:
+        hits = self.retrieve(query, top_k=top_k)
+        if not hits:
+            return ""
+        lines = ["Relevant memory:"]
+        for record in hits:
+            lines.append(f"- {record.text}")
+        return "\n".join(lines)
