@@ -1,0 +1,22 @@
+{
+  "corpus_root": "corpora\\general_sft",
+  "file_count": 2,
+  "text_count": 60,
+  "character_count": 5945,
+  "token_count": 6065,
+  "supervised_example_count": 59,
+  "files": [
+    {
+      "path": "corpora\\general_sft\\examples.jsonl",
+      "size_bytes": 7149,
+      "sha256": "7761ff6dfbf215a6c8ad47ae4871f9825a6db40675353423e1e7189859f4990a",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\general_sft\\README.md",
+      "size_bytes": 406,
+      "sha256": "918b3a48a99a7a2113e3d8cd698e53959f39abbc69e63494180a0cd785000b6e",
+      "relative_path": "README.md"
+    }
+  ]
+}

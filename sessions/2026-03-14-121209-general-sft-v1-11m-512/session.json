@@ -1,0 +1,10 @@
+{
+  "name": "general-sft-v1-11m-512",
+  "slug": "general-sft-v1-11m-512",
+  "kind": "training",
+  "created_at_utc": "2026-03-14T12:12:09.358766+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-general-sft-v1.yaml",
+    "corpora\\general_sft"
+  ]
+}

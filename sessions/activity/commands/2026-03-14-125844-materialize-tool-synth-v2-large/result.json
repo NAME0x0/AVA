@@ -1,0 +1,12 @@
+{
+  "label": "materialize-tool-synth-v2-large",
+  "command": "python -c \"from ava.synthetic import materialize_tool_sft_corpus; import json; print(json.dumps(materialize_tool_sft_corpus('corpora/tool_synth_v2_large', scale='large'), indent=2))\"",
+  "argv": [
+    "python",
+    "-c",
+    "from ava.synthetic import materialize_tool_sft_corpus; import json; print(json.dumps(materialize_tool_sft_corpus('corpora/tool_synth_v2_large', scale='large'), indent=2))"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 92
+}

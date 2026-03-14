@@ -197,8 +197,8 @@ def _environment_manifest(requested_device: str) -> dict[str, object]:
     }
 
 
-def _corpus_manifest(corpus_root: str | Path) -> dict[str, object]:
-    summary = summarize_corpus(corpus_root)
+def _corpus_manifest(corpus_root: str | Path, tokenizer_config: object | None = None) -> dict[str, object]:
+    summary = summarize_corpus(corpus_root, tokenizer_config)
     files = [Path(path) for path in summary["files"]]
     summary["files"] = [_file_manifest(path, root=corpus_root) for path in files]
     return summary
@@ -505,6 +505,10 @@ def render_training_notes(
         f"- Config: `{config_path}`",
         f"- Corpus root: `{corpus_root}`",
         f"- Requested device: `{environment['device_requested']}`",
+        f"- Tokenizer kind: `{training.get('tokenizer_kind', 'byte')}`",
+        f"- Tokenizer vocab size: `{training.get('tokenizer_vocab_size', 'unknown')}`",
+        *( [f"- Tokenizer artifact: `{training['tokenizer_path']}`"] if training.get("tokenizer_path") else [] ),
+        *( [f"- Init checkpoint: `{training['init_checkpoint']}`"] if training.get("init_checkpoint") else [] ),
         "",
         "## Environment",
         "",
@@ -541,6 +545,11 @@ def render_training_notes(
     lines.append(f"- Validation loss: `{training['val_loss']}`")
     lines.append(f"- Runtime seconds: `{training['runtime_seconds']}`")
     lines.append(f"- Tokens seen: `{training['tokens_seen']}`")
+    if training.get("supervised_stats"):
+        stats = training["supervised_stats"]
+        lines.append(f"- Supervised examples kept: `{stats['kept_examples']}/{stats['total_examples']}`")
+        lines.append(f"- Truncated supervised examples: `{stats['truncated_examples']}`")
+        lines.append(f"- Max prompt+response tokens: `{stats['max_full_tokens']}`")
     lines.append(f"- Checkpoint: `{training['checkpoint']}`")
     if training.get("checkpoint_sha256"):
         lines.append(f"- Checkpoint sha256: `{training['checkpoint_sha256']}`")
@@ -844,7 +853,7 @@ def training_session(
     (artifacts_dir / "command.txt").write_text(command + "\n", encoding="utf-8")
 
     environment = _environment_manifest(config.training.device)
-    corpus = _corpus_manifest(corpus_root)
+    corpus = _corpus_manifest(corpus_root, config.tokenizer)
     budget = dry_run_summary(config)
     write_json(session_dir / "results" / "environment.json", environment)
     write_json(session_dir / "results" / "corpus.json", corpus)

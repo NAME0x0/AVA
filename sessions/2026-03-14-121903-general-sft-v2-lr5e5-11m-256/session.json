@@ -1,0 +1,10 @@
+{
+  "name": "general-sft-v2-lr5e5-11m-256",
+  "slug": "general-sft-v2-lr5e5-11m-256",
+  "kind": "training",
+  "created_at_utc": "2026-03-14T12:19:03.282264+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-general-sft-v2-lr5e5.yaml",
+    "corpora\\general_sft"
+  ]
+}

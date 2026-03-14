@@ -1,0 +1,165 @@
+{"kind": "trace", "prompt": "Use the calculator tool for 11 + 5. Return a compact calculator trace followed by the final answer.", "response": "calc:11 + 5=16\n16"}
+{"kind": "trace", "prompt": "Use the calculator tool for 11 + 8. Return a compact calculator trace followed by the final answer.", "response": "calc:11 + 8=19\n19"}
+{"kind": "trace", "prompt": "Use the calculator tool for 11 + 12. Return a compact calculator trace followed by the final answer.", "response": "calc:11 + 12=23\n23"}
+{"kind": "trace", "prompt": "Use the calculator tool for 14 + 5. Return a compact calculator trace followed by the final answer.", "response": "calc:14 + 5=19\n19"}
+{"kind": "trace", "prompt": "Use the calculator tool for 14 + 8. Return a compact calculator trace followed by the final answer.", "response": "calc:14 + 8=22\n22"}
+{"kind": "trace", "prompt": "Use the calculator tool for 14 + 12. Return a compact calculator trace followed by the final answer.", "response": "calc:14 + 12=26\n26"}
+{"kind": "trace", "prompt": "Use the calculator tool for 17 + 5. Return a compact calculator trace followed by the final answer.", "response": "calc:17 + 5=22\n22"}
+{"kind": "trace", "prompt": "Use the calculator tool for 17 + 8. Return a compact calculator trace followed by the final answer.", "response": "calc:17 + 8=25\n25"}
+{"kind": "trace", "prompt": "Use the calculator tool for 17 + 12. Return a compact calculator trace followed by the final answer.", "response": "calc:17 + 12=29\n29"}
+{"kind": "trace", "prompt": "Use the calculator tool for 23 + 5. Return a compact calculator trace followed by the final answer.", "response": "calc:23 + 5=28\n28"}
+{"kind": "trace", "prompt": "Use the calculator tool for 23 + 8. Return a compact calculator trace followed by the final answer.", "response": "calc:23 + 8=31\n31"}
+{"kind": "trace", "prompt": "Use the calculator tool for 23 + 12. Return a compact calculator trace followed by the final answer.", "response": "calc:23 + 12=35\n35"}
+{"kind": "trace", "prompt": "Use the calculator tool for 29 + 5. Return a compact calculator trace followed by the final answer.", "response": "calc:29 + 5=34\n34"}
+{"kind": "trace", "prompt": "Use the calculator tool for 29 + 8. Return a compact calculator trace followed by the final answer.", "response": "calc:29 + 8=37\n37"}
+{"kind": "trace", "prompt": "Use the calculator tool for 29 + 12. Return a compact calculator trace followed by the final answer.", "response": "calc:29 + 12=41\n41"}
+{"kind": "trace", "prompt": "Use the calculator tool for 34 + 5. Return a compact calculator trace followed by the final answer.", "response": "calc:34 + 5=39\n39"}
+{"kind": "trace", "prompt": "Use the calculator tool for 34 + 8. Return a compact calculator trace followed by the final answer.", "response": "calc:34 + 8=42\n42"}
+{"kind": "trace", "prompt": "Use the calculator tool for 34 + 12. Return a compact calculator trace followed by the final answer.", "response": "calc:34 + 12=46\n46"}
+{"kind": "trace", "prompt": "Use the calculator tool for 41 + 5. Return a compact calculator trace followed by the final answer.", "response": "calc:41 + 5=46\n46"}
+{"kind": "trace", "prompt": "Use the calculator tool for 41 + 8. Return a compact calculator trace followed by the final answer.", "response": "calc:41 + 8=49\n49"}
+{"kind": "trace", "prompt": "Use the calculator tool for 41 + 12. Return a compact calculator trace followed by the final answer.", "response": "calc:41 + 12=53\n53"}
+{"kind": "trace", "prompt": "Use the calculator tool for 56 + 5. Return a compact calculator trace followed by the final answer.", "response": "calc:56 + 5=61\n61"}
+{"kind": "trace", "prompt": "Use the calculator tool for 56 + 8. Return a compact calculator trace followed by the final answer.", "response": "calc:56 + 8=64\n64"}
+{"kind": "trace", "prompt": "Use the calculator tool for 56 + 12. Return a compact calculator trace followed by the final answer.", "response": "calc:56 + 12=68\n68"}
+{"kind": "trace", "prompt": "Use the calculator tool for 21 - 3. Return a compact calculator trace followed by the final answer.", "response": "calc:21 - 3=18\n18"}
+{"kind": "trace", "prompt": "Use the calculator tool for 21 - 7. Return a compact calculator trace followed by the final answer.", "response": "calc:21 - 7=14\n14"}
+{"kind": "trace", "prompt": "Use the calculator tool for 21 - 9. Return a compact calculator trace followed by the final answer.", "response": "calc:21 - 9=12\n12"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 - 3. Return a compact calculator trace followed by the final answer.", "response": "calc:25 - 3=22\n22"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 - 7. Return a compact calculator trace followed by the final answer.", "response": "calc:25 - 7=18\n18"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 - 9. Return a compact calculator trace followed by the final answer.", "response": "calc:25 - 9=16\n16"}
+{"kind": "trace", "prompt": "Use the calculator tool for 30 - 3. Return a compact calculator trace followed by the final answer.", "response": "calc:30 - 3=27\n27"}
+{"kind": "trace", "prompt": "Use the calculator tool for 30 - 7. Return a compact calculator trace followed by the final answer.", "response": "calc:30 - 7=23\n23"}
+{"kind": "trace", "prompt": "Use the calculator tool for 30 - 9. Return a compact calculator trace followed by the final answer.", "response": "calc:30 - 9=21\n21"}
+{"kind": "trace", "prompt": "Use the calculator tool for 44 - 3. Return a compact calculator trace followed by the final answer.", "response": "calc:44 - 3=41\n41"}
+{"kind": "trace", "prompt": "Use the calculator tool for 44 - 7. Return a compact calculator trace followed by the final answer.", "response": "calc:44 - 7=37\n37"}
+{"kind": "trace", "prompt": "Use the calculator tool for 44 - 9. Return a compact calculator trace followed by the final answer.", "response": "calc:44 - 9=35\n35"}
+{"kind": "trace", "prompt": "Use the calculator tool for 58 - 3. Return a compact calculator trace followed by the final answer.", "response": "calc:58 - 3=55\n55"}
+{"kind": "trace", "prompt": "Use the calculator tool for 58 - 7. Return a compact calculator trace followed by the final answer.", "response": "calc:58 - 7=51\n51"}
+{"kind": "trace", "prompt": "Use the calculator tool for 58 - 9. Return a compact calculator trace followed by the final answer.", "response": "calc:58 - 9=49\n49"}
+{"kind": "trace", "prompt": "Use the calculator tool for 73 - 3. Return a compact calculator trace followed by the final answer.", "response": "calc:73 - 3=70\n70"}
+{"kind": "trace", "prompt": "Use the calculator tool for 73 - 7. Return a compact calculator trace followed by the final answer.", "response": "calc:73 - 7=66\n66"}
+{"kind": "trace", "prompt": "Use the calculator tool for 73 - 9. Return a compact calculator trace followed by the final answer.", "response": "calc:73 - 9=64\n64"}
+{"kind": "trace", "prompt": "Use the calculator tool for 6 * 3. Return a compact calculator trace followed by the final answer.", "response": "calc:6 * 3=18\n18"}
+{"kind": "trace", "prompt": "Use the calculator tool for 6 * 4. Return a compact calculator trace followed by the final answer.", "response": "calc:6 * 4=24\n24"}
+{"kind": "trace", "prompt": "Use the calculator tool for 6 * 5. Return a compact calculator trace followed by the final answer.", "response": "calc:6 * 5=30\n30"}
+{"kind": "trace", "prompt": "Use the calculator tool for 7 * 3. Return a compact calculator trace followed by the final answer.", "response": "calc:7 * 3=21\n21"}
+{"kind": "trace", "prompt": "Use the calculator tool for 7 * 4. Return a compact calculator trace followed by the final answer.", "response": "calc:7 * 4=28\n28"}
+{"kind": "trace", "prompt": "Use the calculator tool for 7 * 5. Return a compact calculator trace followed by the final answer.", "response": "calc:7 * 5=35\n35"}
+{"kind": "trace", "prompt": "Use the calculator tool for 8 * 3. Return a compact calculator trace followed by the final answer.", "response": "calc:8 * 3=24\n24"}
+{"kind": "trace", "prompt": "Use the calculator tool for 8 * 4. Return a compact calculator trace followed by the final answer.", "response": "calc:8 * 4=32\n32"}
+{"kind": "trace", "prompt": "Use the calculator tool for 8 * 5. Return a compact calculator trace followed by the final answer.", "response": "calc:8 * 5=40\n40"}
+{"kind": "trace", "prompt": "Use the calculator tool for 9 * 3. Return a compact calculator trace followed by the final answer.", "response": "calc:9 * 3=27\n27"}
+{"kind": "trace", "prompt": "Use the calculator tool for 9 * 4. Return a compact calculator trace followed by the final answer.", "response": "calc:9 * 4=36\n36"}
+{"kind": "trace", "prompt": "Use the calculator tool for 9 * 5. Return a compact calculator trace followed by the final answer.", "response": "calc:9 * 5=45\n45"}
+{"kind": "trace", "prompt": "Use the calculator tool for 11 * 3. Return a compact calculator trace followed by the final answer.", "response": "calc:11 * 3=33\n33"}
+{"kind": "trace", "prompt": "Use the calculator tool for 11 * 4. Return a compact calculator trace followed by the final answer.", "response": "calc:11 * 4=44\n44"}
+{"kind": "trace", "prompt": "Use the calculator tool for 11 * 5. Return a compact calculator trace followed by the final answer.", "response": "calc:11 * 5=55\n55"}
+{"kind": "trace", "prompt": "Use the calculator tool for 12 * 3. Return a compact calculator trace followed by the final answer.", "response": "calc:12 * 3=36\n36"}
+{"kind": "trace", "prompt": "Use the calculator tool for 12 * 4. Return a compact calculator trace followed by the final answer.", "response": "calc:12 * 4=48\n48"}
+{"kind": "trace", "prompt": "Use the calculator tool for 12 * 5. Return a compact calculator trace followed by the final answer.", "response": "calc:12 * 5=60\n60"}
+{"kind": "trace", "prompt": "Use the calculator tool for 14 * 3. Return a compact calculator trace followed by the final answer.", "response": "calc:14 * 3=42\n42"}
+{"kind": "trace", "prompt": "Use the calculator tool for 14 * 4. Return a compact calculator trace followed by the final answer.", "response": "calc:14 * 4=56\n56"}
+{"kind": "trace", "prompt": "Use the calculator tool for 14 * 5. Return a compact calculator trace followed by the final answer.", "response": "calc:14 * 5=70\n70"}
+{"kind": "trace", "prompt": "Use the calculator tool for 6 / 3. Return a compact calculator trace followed by the final answer.", "response": "calc:6 / 3=2\n2"}
+{"kind": "trace", "prompt": "Use the calculator tool for 9 / 3. Return a compact calculator trace followed by the final answer.", "response": "calc:9 / 3=3\n3"}
+{"kind": "trace", "prompt": "Use the calculator tool for 12 / 3. Return a compact calculator trace followed by the final answer.", "response": "calc:12 / 3=4\n4"}
+{"kind": "trace", "prompt": "Use the calculator tool for 8 / 4. Return a compact calculator trace followed by the final answer.", "response": "calc:8 / 4=2\n2"}
+{"kind": "trace", "prompt": "Use the calculator tool for 12 / 4. Return a compact calculator trace followed by the final answer.", "response": "calc:12 / 4=3\n3"}
+{"kind": "trace", "prompt": "Use the calculator tool for 16 / 4. Return a compact calculator trace followed by the final answer.", "response": "calc:16 / 4=4\n4"}
+{"kind": "trace", "prompt": "Use the calculator tool for 10 / 5. Return a compact calculator trace followed by the final answer.", "response": "calc:10 / 5=2\n2"}
+{"kind": "trace", "prompt": "Use the calculator tool for 15 / 5. Return a compact calculator trace followed by the final answer.", "response": "calc:15 / 5=3\n3"}
+{"kind": "trace", "prompt": "Use the calculator tool for 20 / 5. Return a compact calculator trace followed by the final answer.", "response": "calc:20 / 5=4\n4"}
+{"kind": "trace", "prompt": "Use the calculator tool for 12 / 6. Return a compact calculator trace followed by the final answer.", "response": "calc:12 / 6=2\n2"}
+{"kind": "trace", "prompt": "Use the calculator tool for 18 / 6. Return a compact calculator trace followed by the final answer.", "response": "calc:18 / 6=3\n3"}
+{"kind": "trace", "prompt": "Use the calculator tool for 24 / 6. Return a compact calculator trace followed by the final answer.", "response": "calc:24 / 6=4\n4"}
+{"kind": "trace", "prompt": "Use the calculator tool for 14 / 7. Return a compact calculator trace followed by the final answer.", "response": "calc:14 / 7=2\n2"}
+{"kind": "trace", "prompt": "Use the calculator tool for 21 / 7. Return a compact calculator trace followed by the final answer.", "response": "calc:21 / 7=3\n3"}
+{"kind": "trace", "prompt": "Use the calculator tool for 28 / 7. Return a compact calculator trace followed by the final answer.", "response": "calc:28 / 7=4\n4"}
+{"kind": "trace", "prompt": "Use the calculator tool for 16 / 8. Return a compact calculator trace followed by the final answer.", "response": "calc:16 / 8=2\n2"}
+{"kind": "trace", "prompt": "Use the calculator tool for 24 / 8. Return a compact calculator trace followed by the final answer.", "response": "calc:24 / 8=3\n3"}
+{"kind": "trace", "prompt": "Use the calculator tool for 32 / 8. Return a compact calculator trace followed by the final answer.", "response": "calc:32 / 8=4\n4"}
+{"kind": "trace", "prompt": "Use the calculator tool for 18 / 9. Return a compact calculator trace followed by the final answer.", "response": "calc:18 / 9=2\n2"}
+{"kind": "trace", "prompt": "Use the calculator tool for 27 / 9. Return a compact calculator trace followed by the final answer.", "response": "calc:27 / 9=3\n3"}
+{"kind": "trace", "prompt": "Use the calculator tool for 36 / 9. Return a compact calculator trace followed by the final answer.", "response": "calc:36 / 9=4\n4"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(16). Return a compact calculator trace followed by the final answer.", "response": "calc:sqrt(16)=4\n4"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(25). Return a compact calculator trace followed by the final answer.", "response": "calc:sqrt(25)=5\n5"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(36). Return a compact calculator trace followed by the final answer.", "response": "calc:sqrt(36)=6\n6"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(49). Return a compact calculator trace followed by the final answer.", "response": "calc:sqrt(49)=7\n7"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(64). Return a compact calculator trace followed by the final answer.", "response": "calc:sqrt(64)=8\n8"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "calc:sqrt(81)=9\n9"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(100). Return a compact calculator trace followed by the final answer.", "response": "calc:sqrt(100)=10\n10"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(121). Return a compact calculator trace followed by the final answer.", "response": "calc:sqrt(121)=11\n11"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(144). Return a compact calculator trace followed by the final answer.", "response": "calc:sqrt(144)=12\n12"}
+{"kind": "trace", "prompt": "Use the calculator tool for pow(2, 2). Return a compact calculator trace followed by the final answer.", "response": "calc:pow(2, 2)=4\n4"}
+{"kind": "trace", "prompt": "Use the calculator tool for pow(2, 3). Return a compact calculator trace followed by the final answer.", "response": "calc:pow(2, 3)=8\n8"}
+{"kind": "trace", "prompt": "Use the calculator tool for pow(3, 2). Return a compact calculator trace followed by the final answer.", "response": "calc:pow(3, 2)=9\n9"}
+{"kind": "trace", "prompt": "Use the calculator tool for pow(3, 3). Return a compact calculator trace followed by the final answer.", "response": "calc:pow(3, 3)=27\n27"}
+{"kind": "trace", "prompt": "Use the calculator tool for pow(4, 2). Return a compact calculator trace followed by the final answer.", "response": "calc:pow(4, 2)=16\n16"}
+{"kind": "trace", "prompt": "Use the calculator tool for pow(4, 3). Return a compact calculator trace followed by the final answer.", "response": "calc:pow(4, 3)=64\n64"}
+{"kind": "trace", "prompt": "Use the calculator tool for pow(5, 2). Return a compact calculator trace followed by the final answer.", "response": "calc:pow(5, 2)=25\n25"}
+{"kind": "trace", "prompt": "Use the calculator tool for pow(5, 3). Return a compact calculator trace followed by the final answer.", "response": "calc:pow(5, 3)=125\n125"}
+{"kind": "trace", "prompt": "Use the calculator tool for abs(-3). Return a compact calculator trace followed by the final answer.", "response": "calc:abs(-3)=3\n3"}
+{"kind": "trace", "prompt": "Use the calculator tool for abs(-5). Return a compact calculator trace followed by the final answer.", "response": "calc:abs(-5)=5\n5"}
+{"kind": "trace", "prompt": "Use the calculator tool for abs(-8). Return a compact calculator trace followed by the final answer.", "response": "calc:abs(-8)=8\n8"}
+{"kind": "trace", "prompt": "Use the calculator tool for abs(-11). Return a compact calculator trace followed by the final answer.", "response": "calc:abs(-11)=11\n11"}
+{"kind": "trace", "prompt": "Use the calculator tool for abs(-13). Return a compact calculator trace followed by the final answer.", "response": "calc:abs(-13)=13\n13"}
+{"kind": "trace", "prompt": "Use the calculator tool for abs(-21). Return a compact calculator trace followed by the final answer.", "response": "calc:abs(-21)=21\n21"}
+{"kind": "trace", "prompt": "Use the calculator tool for factorial(3). Return a compact calculator trace followed by the final answer.", "response": "calc:factorial(3)=6\n6"}
+{"kind": "trace", "prompt": "Use the calculator tool for factorial(4). Return a compact calculator trace followed by the final answer.", "response": "calc:factorial(4)=24\n24"}
+{"kind": "trace", "prompt": "Use the calculator tool for factorial(5). Return a compact calculator trace followed by the final answer.", "response": "calc:factorial(5)=120\n120"}
+{"kind": "trace", "prompt": "Use the calculator tool for factorial(6). Return a compact calculator trace followed by the final answer.", "response": "calc:factorial(6)=720\n720"}
+{"kind": "trace", "prompt": "Use the calculator tool for (3 + 2) * 2. Return a compact calculator trace followed by the final answer.", "response": "calc:(3 + 2) * 2=10\n10"}
+{"kind": "trace", "prompt": "Use the calculator tool for (3 + 4) * 2. Return a compact calculator trace followed by the final answer.", "response": "calc:(3 + 4) * 2=14\n14"}
+{"kind": "trace", "prompt": "Use the calculator tool for (5 + 2) * 2. Return a compact calculator trace followed by the final answer.", "response": "calc:(5 + 2) * 2=14\n14"}
+{"kind": "trace", "prompt": "Use the calculator tool for (5 + 4) * 2. Return a compact calculator trace followed by the final answer.", "response": "calc:(5 + 4) * 2=18\n18"}
+{"kind": "trace", "prompt": "Use the calculator tool for (7 + 2) * 2. Return a compact calculator trace followed by the final answer.", "response": "calc:(7 + 2) * 2=18\n18"}
+{"kind": "trace", "prompt": "Use the calculator tool for (7 + 4) * 2. Return a compact calculator trace followed by the final answer.", "response": "calc:(7 + 4) * 2=22\n22"}
+{"kind": "trace", "prompt": "Use the calculator tool for (9 + 2) * 2. Return a compact calculator trace followed by the final answer.", "response": "calc:(9 + 2) * 2=22\n22"}
+{"kind": "trace", "prompt": "Use the calculator tool for (9 + 4) * 2. Return a compact calculator trace followed by the final answer.", "response": "calc:(9 + 4) * 2=26\n26"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 11 + 5.", "response": "16"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 11 + 8.", "response": "19"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 11 + 12.", "response": "23"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 14 + 5.", "response": "19"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 14 + 8.", "response": "22"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 14 + 12.", "response": "26"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 17 + 5.", "response": "22"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 17 + 8.", "response": "25"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 17 + 12.", "response": "29"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 23 + 5.", "response": "28"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 23 + 8.", "response": "31"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 23 + 12.", "response": "35"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 29 + 5.", "response": "34"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 29 + 8.", "response": "37"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 29 + 12.", "response": "41"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 34 + 5.", "response": "39"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 34 + 8.", "response": "42"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 34 + 12.", "response": "46"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 41 + 5.", "response": "46"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 41 + 8.", "response": "49"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 41 + 12.", "response": "53"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 56 + 5.", "response": "61"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 56 + 8.", "response": "64"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 56 + 12.", "response": "68"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 21 - 3.", "response": "18"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 21 - 7.", "response": "14"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 21 - 9.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 25 - 3.", "response": "22"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 25 - 7.", "response": "18"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 25 - 9.", "response": "16"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "Solve for x: 3x + 9 = 24. Do not use the calculator tool. Reply with only the answer.", "response": "5"}
+{"kind": "no_tool", "prompt": "Solve for x: 5x = 35. Do not use the calculator tool. Reply with only the answer.", "response": "7"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "no_tool", "prompt": "What planet is known as the Red Planet? Do not use the calculator tool. Reply with only the answer.", "response": "Mars"}
+{"kind": "no_tool", "prompt": "What force keeps planets in orbit around the Sun? Do not use the calculator tool. Reply with only the answer.", "response": "gravity"}
+{"kind": "no_tool", "prompt": "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.", "response": "def"}
+{"kind": "no_tool", "prompt": "In Python, what keyword starts a loop over items? Do not use the calculator tool. Reply with only the answer.", "response": "for"}
+{"kind": "no_tool", "prompt": "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.", "response": "No"}
+{"kind": "no_tool", "prompt": "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.", "response": "No"}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to send an email to my boss.", "response": "The calculator cannot help with sending email."}
+{"kind": "boundary", "prompt": "Use the calculator tool to hack my bank account.", "response": "The calculator cannot help with hacking accounts."}
+{"kind": "boundary", "prompt": "Use the calculator tool to browse the internet for me.", "response": "The calculator cannot help with browsing the internet."}
+{"kind": "boundary", "prompt": "Use the calculator tool to write Python code for my app.", "response": "The calculator cannot help with writing software."}
+{"kind": "boundary", "prompt": "Use the calculator tool to open a website.", "response": "The calculator cannot help with opening websites."}

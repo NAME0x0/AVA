@@ -1,0 +1,17 @@
+...F......                                                               [100%]
+================================== FAILURES ===================================
+______________ test_supervised_split_shuffles_deterministically _______________
+
+    def test_supervised_split_shuffles_deterministically() -> None:
+        samples = [{"input_ids": [index], "target_ids": [index]} for index in range(10)]
+        train_samples, val_samples = _split_supervised_samples(samples)
+        assert len(train_samples) == 8
+        assert len(val_samples) == 2
+        combined = train_samples + val_samples
+        assert {item["input_ids"][0] for item in combined} == set(range(10))
+>       assert val_samples != samples[-2:]
+E       AssertionError: assert [{'input_ids': [8], 'target_ids': [8]}, {'input_ids': [9], 'target_ids': [9]}] != [{'input_ids': [8], 'target_ids': [8]}, {'input_ids': [9], 'target_ids': [9]}]
+
+tests\test_train.py:51: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_train.py::test_supervised_split_shuffles_deterministically

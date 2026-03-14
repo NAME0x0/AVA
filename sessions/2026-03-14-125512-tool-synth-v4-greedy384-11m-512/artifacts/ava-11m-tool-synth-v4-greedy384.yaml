@@ -1,0 +1,35 @@
+name: ava-11m-tool-synth-v4-greedy384
+tokenizer:
+  kind: greedy_bytes
+  vocab_size: 384
+  path: tokenizers/tool_synth_v1-greedy384.json
+
+model:
+  block_size: 256
+  n_layer: 6
+  n_head: 6
+  n_embd: 384
+  dropout: 0.0
+  bias: false
+
+training:
+  device: cuda
+  dtype: float32
+  micro_batch_size: 8
+  gradient_accumulation_steps: 2
+  learning_rate: 0.00015
+  weight_decay: 0.01
+  max_steps: 512
+  warmup_steps: 12
+  grad_clip: 1.0
+  loss_mode: supervised
+
+memory:
+  enabled: true
+  max_items: 256
+  write_surprise_threshold: 0.45
+  top_k: 4
+
+tools:
+  calculator: true
+  prompt_protocol: compact_tags

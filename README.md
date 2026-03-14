@@ -1,140 +1,141 @@
 # AVA
 
-AVA is the product.
+AVA is a compact AI model project built under hard constraints: one 4 GB VRAM GPU, limited data, and no large-cluster research budget.
 
-This repository is the research and engineering stack used to build AVA into a compact assistant that fits on a 4 GB VRAM GPU and improves through data quality, tool use, and careful evaluation. Near-term training remains text-first, but the scaffold now targets a broader useful model: language, math, science, coding, multilingual transfer, agentic planning, and later multimodal reasoning.
+This repository is the engineering and experimentation stack behind AVA. It is where the model, training loop, datasets, evaluation harnesses, and session logs live. The goal is not to imitate frontier labs with brute force. The goal is to find a small-model path that wins through better data, tighter experiments, stronger tool use, and a more transparent training process.
 
-## Product Goal
+## What This Repository Is
 
-AVA is being rebuilt as a compact general-purpose model for:
+AVA is the product. This codebase is the machinery used to build it.
 
-- everyday language tasks
-- math reasoning
-- science reasoning
-- practical coding assistance
-- reliable calculator-style tool use
-- strong instruction following, refusal quality, and tool-boundary compliance
-- multilingual transfer evaluation
-- long-horizon planning and skill use
-- future multimodal reasoning evaluation
-- long-horizon interaction through external memory
+Today the stack is text-first and focused on:
+- language
+- math
+- science
+- coding
+- tool use
+- compliance and instruction following
+- planning and memory scaffolding
+- multilingual and multimodal evaluation scaffolding
 
-The ambition is still to build a model family that scales well, but the repo is explicit about current constraints: a 4 GB local-first training line cannot honestly target frontier-everything performance today. The right move is to set the scaffolding now so later scale-ups are measured on the correct benchmark mix.
+The long-term ambition is broader, but the repo is explicit about current reality: AVA has to earn capability through measured iteration, not marketing claims.
 
-## Repo Role
+## Why AVA Exists
 
-The repo is the research program behind AVA:
+Most small-model projects fail in one of two ways: they either stay toy-sized and never become useful, or they copy large-model research directions that do not fit local hardware.
 
-- minimal GPT-2 style training code
-- paper-backed experiment sessions
-- append-only activity ledger for commands, snapshots, and wrapped test runs
-- tool-use, memory, planning, compliance, and activation-trace inspection
-- benchmark registry for text, science, coding, multilingual, multimodal, and agentic evaluation
-- 4 GB VRAM budget checks
-- fast tests for each new idea
+AVA takes a different route:
+- keep the stack simple enough to inspect end to end
+- run short, well-documented experiment cycles
+- bias toward methods that improve quality per token, per parameter, and per unit of compute
+- treat tool use, evaluation, and transparency as first-class parts of the model
 
-## Design Rules
+## Current Approach
 
-- `4 GB VRAM first`: every baseline must fit the RTX A2000 Laptop GPU budget.
-- `Text-first, multimodal-ready`: near-term training stays text-centric, but benchmark and session scaffolding must support later vision-language work.
-- `Versatility is earned in stages`: language, math, science, and coding should all appear in the benchmark and data plans before scale claims are made.
-- `Tool use over raw params`: calculator and structured tool traces are core training targets.
-- `Planning claims require benchmarks`: DeepPlanning-class tasks belong in the registry before AVA markets agentic planning.
-- `Compliance must be measured`: formatting obedience, safe refusals, and tool-policy behavior must show up in session artifacts.
-- `Benchmark scaffolding must stay ahead of model scale`: the registry should already include multilingual, multimodal, science, coding, and planning targets before the model can run them all well.
-- `Session logs are the source of truth`: every sweep, decision, and inspection trace lives in `sessions/`.
-- `Infinite context is not literal`: AVA uses an external memory path, not a magic unbounded Transformer context window.
-- `Reasoning should exist, but be cheap`: compact scratchpads, verifiable rewards, and selective test-time scaling matter more than verbose chain-of-thought everywhere.
-- `Sparse MoE is a branch, not the mainline`: use it later for ablations or deployment experiments, not as the primary answer to the 4 GB product constraint.
+The active research line is a compact GPT-2 style decoder with:
+- tight 4 GB VRAM budget checks
+- supervised and synthetic training curricula
+- compact calculator-style tool protocols
+- compliance and tool-boundary evaluation
+- session-based experiment logging
+- checkpoint inspection with activation traces
+- an append-only activity ledger for AVA-managed commands
 
-## Current Repo Contents
+Recent work in this repo has focused on improving tool-use behavior, tokenizer experiments, warm-start curriculum stages, and making every experiment easier to audit.
 
-- `src/ava/`
-  GPT-2 style model code, tokenizer, benchmark registry, tool and memory modules, session orchestration, and training utilities.
-- `configs/`
-  Baseline and sweep configs sized for a 4 GB workflow.
-- `docs/`
-  Architecture, benchmark strategy, experiment workflow, and data strategy notes.
-- `sessions/`
-  Generated on demand when session commands run; contains experiment packets, notes, next actions, and the `activity/` audit ledger.
-- `tests/`
-  Fast validation for the current research core.
+## Repository Layout
 
+- `src/ava/` — model code, tokenizers, training loop, evaluation, sessions, tools, memory, and inspection
+- `configs/` — baseline and experiment configs sized for local hardware
+- `corpora/` — tracked training and synthetic experiment corpora
+- `docs/` — architecture, data, benchmark, experiment, and roadmap notes
+- `sessions/` — generated experiment packets, metrics, notes, and activity logs
+- `tests/` — fast validation for the research core
 
 ## Quick Start
 
+Install the package and dev tools:
+
 ```bash
 python -m pip install -e .[dev]
-ava session bootstrap karpathy-reset
-ava session sota arxiv-march-2026
-ava session hf-research hf-march-2026
-ava session moe-feasibility moe-march-2026
+```
+
+Add training dependencies when needed:
+
+```bash
+python -m pip install -e .[train]
+```
+
+Inspect the benchmark scaffold:
+
+```bash
 ava benchmark registry --modality code
 ava benchmark registry --stage agentic
+```
+
+Run a dry-run budget check:
+
+```bash
 ava train dry-run configs/base.yaml
+```
+
+Start a tracked training session:
+
+```bash
 ava session train tool-sft-smoke configs/experiments/ava-11m-tool-sft.yaml corpora/tool_sft --max-steps 128
-ava inspect checkpoint path/to/checkpoint.pt --prompt "Question: Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.\nAnswer: "
-ava activity snapshot --label before-change
+```
+
+Run the test suite with archived command output:
+
+```bash
 ava activity run -- python -m pytest -q
 ```
 
-The session commands write paper-backed experiment packets. `ava benchmark registry` prints the external benchmark scaffold that AVA should eventually target. Every `ava` command also appends an event to `sessions/activity/YYYY-MM-DD.jsonl`. Use `ava activity snapshot` to capture repo-change state and `ava activity run -- ...` to log external test or eval commands with stdout and stderr artifacts.
+## How Experiments Work
 
-## Evaluation Stack
+AVA is session-first. Meaningful research work is recorded under `sessions/` with:
+- config snapshots
+- corpus manifests
+- environment metadata
+- training curves and evaluation outputs
+- checkpoint artifacts
+- written notes and next-step decisions
 
-AVA now has four evaluation layers plus an inspection path:
+The intent is simple: no silent fallbacks, no hidden training state, and no black-box project history.
 
-1. Internal smoke benchmarks for fast iteration.
-2. Tool-behavior benchmarks for trace generation, no-tool abstention, and boundary refusals.
-3. Compliance benchmarks for format obedience, refusal quality, and tool-boundary behavior.
-4. External benchmark registry for future text, science, coding, multilingual, multimodal, and agentic evaluation.
+## Evaluation Philosophy
 
-For inspection, AVA can also emit per-step traces with top logits, attention summaries, and top MLP neuron activations for a concrete prompt and checkpoint.
+AVA uses multiple evaluation layers on purpose.
 
-See `docs/BENCHMARKS.md` and `docs/EXPERIMENTS.md`.
+- Smoke evals catch broken training and prompt plumbing quickly.
+- Tool evals measure trace generation, abstention, and boundary behavior.
+- Compliance evals measure formatting obedience, refusal quality, and policy adherence.
+- The benchmark registry tracks the larger target surface for science, coding, multilingual, multimodal, and agentic work.
 
-## Activity Ledger
+This repo treats benchmark scaffolding as part of model design. If AVA is supposed to grow into a broader product, the evaluation surface has to be explicit before the scale-up happens.
 
-AVA now keeps an append-only activity ledger under `sessions/activity/`:
+## Transparency
 
-- `YYYY-MM-DD.jsonl` records every `ava` CLI invocation and session lifecycle event.
-- `snapshots/` stores explicit repo-state snapshots taken with `ava activity snapshot`.
-- `commands/` stores wrapped external command artifacts such as `stdout.txt`, `stderr.txt`, and `result.json` from `ava activity run -- ...`.
-- Future proof-of-concept: terminal-first evidence capture with `asciinema`, with optional `ffmpeg` rendering for shareable video exports.
+Transparency is a design constraint, not a nice-to-have.
 
-This does not magically intercept arbitrary shell edits made outside AVA, so repo-change transparency still relies on git state plus explicit snapshots when needed.
+Every serious experiment should leave behind enough evidence for someone else to answer:
+- what changed
+- why it changed
+- what was run
+- what improved
+- what failed
+- what should happen next
 
-## First Practical Plan
+For command-level provenance, AVA also keeps an activity ledger under `sessions/activity/` for CLI invocations, snapshots, and wrapped external commands.
 
-1. Stabilize the dense text-first baseline on language, math, science, and coding.
-2. Improve tool-use and compliance behavior with compact supervised data.
-3. Build a stronger compact tool curriculum before any tool RL branch.
-4. Add explicit planning and skill evaluation before any agentic product claims.
-5. Replace the byte tokenizer with a compact BPE or SentencePiece branch.
-6. Add multilingual transfer eval before claiming language generalization.
-7. Add stronger science and coding eval before scaling architecture claims.
-8. Add multimodal benchmark scaffolding before building a vision encoder path.
-9. Explore compression, tool RL, and tiny MoE branches only after the dense teacher is stable.
+## Further Reading
 
-## Source-Backed Direction
+- [Architecture](docs/ARCHITECTURE.md)
+- [Benchmarks](docs/BENCHMARKS.md)
+- [Data Strategy](docs/DATA.md)
+- [Experiment Workflow](docs/EXPERIMENTS.md)
+- [Research Roadmap](docs/RESEARCH_ROADMAP.md)
 
-The current direction is anchored in:
+## Status
 
-- GPT-2 and Karpathy-style minimal training loops for clean small-model iteration.
-- LIMO and Phi/Textbooks-style evidence that data quality can matter more than brute-force scale.
-- DeepSeek-R1 and DAPO-style evidence that verifiable RL can improve reasoning.
-- Toolformer and ToolACE-R-style evidence that small numbers of tool demonstrations plus iterative refinement can materially improve tool use.
-- ICRL, ToRL, and ReTool-style evidence that tool RL is promising after compact tool supervision already works.
-- DeepPlanning and SkillNet-style evidence that planning and skill claims should be benchmarked explicitly.
-- Penguin-VL and InternVL-U as future multimodal references, with compact VLM design favored for AVA's first vision branch.
-- s1-style evidence that selective test-time scaling can help if it is tightly budgeted.
-- Titans-style external memory for long-horizon product behavior.
-- Common modern evaluation sets such as MMLU-Pro, GPQA, HumanEval+, BFCL, DeepPlanning, MMMU, MathVista, M-IFEval, and FLORES-class transfer checks.
-
-See `docs/ARCHITECTURE.md`, `docs/BENCHMARKS.md`, `docs/RESEARCH_ROADMAP.md`, and `docs/EXPERIMENTS.md`.
-
-
-
-
-
-
+AVA is still in active experimentation. The stack is intentionally compact, the claims are intentionally conservative, and the repo is designed so that each iteration leaves behind a usable research trail.

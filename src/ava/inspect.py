@@ -6,7 +6,7 @@ from typing import Any
 
 from ava.config import ExperimentConfig
 from ava.model import TORCH_AVAILABLE, F, build_model, torch
-from ava.tokenizer import ByteTokenizer
+from ava.tokenizer import load_tokenizer
 
 
 def _resolve_device(requested_device: str) -> tuple[str, list[str]]:
@@ -17,7 +17,7 @@ def _resolve_device(requested_device: str) -> tuple[str, list[str]]:
     return requested_device, warnings
 
 
-def _single_token_text(tokenizer: ByteTokenizer, token_id: int) -> str:
+def _single_token_text(tokenizer: Any, token_id: int) -> str:
     return tokenizer.decode([token_id]).replace("\n", "\\n")
 
 
@@ -34,7 +34,7 @@ def _topk_entries(vector: Any, k: int) -> list[dict[str, float | int]]:
     ]
 
 
-def _topk_logits(logits: Any, tokenizer: ByteTokenizer, k: int) -> list[dict[str, object]]:
+def _topk_logits(logits: Any, tokenizer: Any, k: int) -> list[dict[str, object]]:
     entries = _topk_entries(logits, k)
     for item in entries:
         item["token_id"] = item.pop("index")
@@ -45,7 +45,7 @@ def _topk_logits(logits: Any, tokenizer: ByteTokenizer, k: int) -> list[dict[str
 def _attention_summary(
     weights: Any,
     token_ids: list[int],
-    tokenizer: ByteTokenizer,
+    tokenizer: Any,
     *,
     top_k_attention: int,
 ) -> list[dict[str, object]]:
@@ -87,7 +87,7 @@ def _layer_trace(
     mlp_hidden: Any,
     mlp_output: Any,
     token_ids: list[int],
-    tokenizer: ByteTokenizer,
+    tokenizer: Any,
     top_k_neurons: int,
     top_k_attention: int,
 ) -> dict[str, object]:
@@ -115,7 +115,7 @@ def _layer_trace(
 def _forward_with_trace(
     model: Any,
     idx: Any,
-    tokenizer: ByteTokenizer,
+    tokenizer: Any,
     *,
     top_k_neurons: int,
     top_k_logits_count: int,
@@ -191,7 +191,7 @@ def _forward_with_trace(
 @torch.no_grad()
 def trace_generation(
     model: Any,
-    tokenizer: ByteTokenizer,
+    tokenizer: Any,
     prompt: str,
     *,
     requested_device: str = "cuda",
@@ -265,7 +265,7 @@ def trace_checkpoint(
 
     checkpoint = torch.load(Path(checkpoint_path), map_location="cpu")
     config = ExperimentConfig.from_dict(checkpoint["config"])
-    tokenizer = ByteTokenizer()
+    tokenizer = load_tokenizer(config.tokenizer)
     model = build_model(config.model, tokenizer.vocab_size)
     model.load_state_dict(checkpoint["model"])
     payload = trace_generation(

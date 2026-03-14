@@ -1,0 +1,10 @@
+{
+  "name": "tool-synth-v2-block256-11m-512",
+  "slug": "tool-synth-v2-block256-11m-512",
+  "kind": "training",
+  "created_at_utc": "2026-03-14T12:30:44.402301+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-tool-synth-v2-block256.yaml",
+    "corpora\\tool_synth_v1"
+  ]
+}

@@ -1,0 +1,194 @@
+{
+  "name": "ava-11m-compliance-patch-v1",
+  "dataset_kind": "supervised",
+  "steps": 64,
+  "optimizer_steps": 32,
+  "final_loss": 0.4372,
+  "min_loss": 0.3052,
+  "train_eval_loss": 0.1872,
+  "val_loss": 0.268,
+  "runtime_seconds": 5.115,
+  "tokens_per_optimizer_step": 4096,
+  "tokens_seen": 131072,
+  "corpus_tokens": 1514,
+  "supervised_stats": {
+    "total_examples": 16,
+    "kept_examples": 16,
+    "truncated_examples": 0,
+    "skipped_no_target_examples": 0,
+    "max_full_tokens": 150,
+    "avg_full_tokens": 94.62
+  },
+  "tokenizer_kind": "byte",
+  "tokenizer_path": null,
+  "tokenizer_vocab_size": 260,
+  "init_checkpoint": "sessions/2026-03-14-130538-tool-stage2-v1-11m-256/checkpoints/ava-11m-tool-stage2-v1.pt",
+  "device_requested": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "checkpoint": "sessions\\2026-03-14-130736-compliance-patch-v1-11m-64\\checkpoints\\ava-11m-compliance-patch-v1.pt",
+  "loss_history": [
+    {
+      "step": 2,
+      "loss": 3.7549,
+      "lr": 1e-05
+    },
+    {
+      "step": 4,
+      "loss": 4.5075,
+      "lr": 2e-05
+    },
+    {
+      "step": 6,
+      "loss": 4.0682,
+      "lr": 2e-05
+    },
+    {
+      "step": 8,
+      "loss": 2.9005,
+      "lr": 2e-05
+    },
+    {
+      "step": 10,
+      "loss": 3.1214,
+      "lr": 2e-05
+    },
+    {
+      "step": 12,
+      "loss": 1.4914,
+      "lr": 2e-05
+    },
+    {
+      "step": 14,
+      "loss": 3.3129,
+      "lr": 2e-05
+    },
+    {
+      "step": 16,
+      "loss": 2.1001,
+      "lr": 2e-05
+    },
+    {
+      "step": 18,
+      "loss": 1.6475,
+      "lr": 2e-05
+    },
+    {
+      "step": 20,
+      "loss": 2.6648,
+      "lr": 2e-05
+    },
+    {
+      "step": 22,
+      "loss": 2.1456,
+      "lr": 2e-05
+    },
+    {
+      "step": 24,
+      "loss": 2.3598,
+      "lr": 2e-05
+    },
+    {
+      "step": 26,
+      "loss": 1.2571,
+      "lr": 2e-05
+    },
+    {
+      "step": 28,
+      "loss": 2.1248,
+      "lr": 2e-05
+    },
+    {
+      "step": 30,
+      "loss": 1.6281,
+      "lr": 2e-05
+    },
+    {
+      "step": 32,
+      "loss": 1.3841,
+      "lr": 2e-05
+    },
+    {
+      "step": 34,
+      "loss": 1.4613,
+      "lr": 2e-05
+    },
+    {
+      "step": 36,
+      "loss": 0.8062,
+      "lr": 2e-05
+    },
+    {
+      "step": 38,
+      "loss": 1.2002,
+      "lr": 2e-05
+    },
+    {
+      "step": 40,
+      "loss": 1.094,
+      "lr": 2e-05
+    },
+    {
+      "step": 42,
+      "loss": 0.9379,
+      "lr": 2e-05
+    },
+    {
+      "step": 44,
+      "loss": 1.0354,
+      "lr": 2e-05
+    },
+    {
+      "step": 46,
+      "loss": 0.6465,
+      "lr": 2e-05
+    },
+    {
+      "step": 48,
+      "loss": 0.3884,
+      "lr": 2e-05
+    },
+    {
+      "step": 50,
+      "loss": 0.8213,
+      "lr": 2e-05
+    },
+    {
+      "step": 52,
+      "loss": 0.5394,
+      "lr": 2e-05
+    },
+    {
+      "step": 54,
+      "loss": 0.4869,
+      "lr": 2e-05
+    },
+    {
+      "step": 56,
+      "loss": 0.3243,
+      "lr": 2e-05
+    },
+    {
+      "step": 58,
+      "loss": 0.6526,
+      "lr": 2e-05
+    },
+    {
+      "step": 60,
+      "loss": 0.3052,
+      "lr": 2e-05
+    },
+    {
+      "step": 62,
+      "loss": 0.6188,
+      "lr": 2e-05
+    },
+    {
+      "step": 64,
+      "loss": 0.4372,
+      "lr": 2e-05
+    }
+  ],
+  "checkpoint_sha256": "1ebd437f92f29d83ead9c853f244b9f4ac5997c62c8270f84fed83168a4de190",
+  "checkpoint_size_bytes": 43321807
+}

@@ -1,0 +1,10 @@
+{
+  "name": "tool-synth-v3-line256-11m-512",
+  "slug": "tool-synth-v3-line256-11m-512",
+  "kind": "training",
+  "created_at_utc": "2026-03-14T12:34:18.371055+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-tool-synth-v3-line256.yaml",
+    "corpora\\tool_synth_line_v1"
+  ]
+}

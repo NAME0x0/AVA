@@ -7,7 +7,7 @@ from typing import Any
 
 from ava.config import ExperimentConfig
 from ava.model import TORCH_AVAILABLE, build_model, torch
-from ava.tokenizer import ByteTokenizer
+from ava.tokenizer import load_tokenizer
 
 
 @dataclass(frozen=True, slots=True)
@@ -289,7 +289,7 @@ def evaluate_model(
     requested_device: str,
     max_new_tokens: int = 48,
 ) -> dict[str, object]:
-    tokenizer = ByteTokenizer()
+    tokenizer = load_tokenizer(config.tokenizer)
     device, warnings = _resolve_device(requested_device)
     model = model.to(device)
     model.eval()
@@ -340,7 +340,7 @@ def evaluate_model_compliance(
     requested_device: str,
     max_new_tokens: int = 48,
 ) -> dict[str, object]:
-    tokenizer = ByteTokenizer()
+    tokenizer = load_tokenizer(config.tokenizer)
     device, warnings = _resolve_device(requested_device)
     model = model.to(device)
     model.eval()
@@ -391,7 +391,7 @@ def evaluate_model_tool_use(
     requested_device: str,
     max_new_tokens: int = 48,
 ) -> dict[str, object]:
-    tokenizer = ByteTokenizer()
+    tokenizer = load_tokenizer(config.tokenizer)
     device, warnings = _resolve_device(requested_device)
     model = model.to(device)
     model.eval()
@@ -446,7 +446,7 @@ def evaluate_checkpoint(
 
     checkpoint = torch.load(Path(checkpoint_path), map_location="cpu")
     config = ExperimentConfig.from_dict(checkpoint["config"])
-    tokenizer = ByteTokenizer()
+    tokenizer = load_tokenizer(config.tokenizer)
     model = build_model(config.model, tokenizer.vocab_size)
     model.load_state_dict(checkpoint["model"])
     payload = evaluate_model(
@@ -471,7 +471,7 @@ def evaluate_compliance_checkpoint(
 
     checkpoint = torch.load(Path(checkpoint_path), map_location="cpu")
     config = ExperimentConfig.from_dict(checkpoint["config"])
-    tokenizer = ByteTokenizer()
+    tokenizer = load_tokenizer(config.tokenizer)
     model = build_model(config.model, tokenizer.vocab_size)
     model.load_state_dict(checkpoint["model"])
     payload = evaluate_model_compliance(
@@ -496,7 +496,7 @@ def evaluate_tool_use_checkpoint(
 
     checkpoint = torch.load(Path(checkpoint_path), map_location="cpu")
     config = ExperimentConfig.from_dict(checkpoint["config"])
-    tokenizer = ByteTokenizer()
+    tokenizer = load_tokenizer(config.tokenizer)
     model = build_model(config.model, tokenizer.vocab_size)
     model.load_state_dict(checkpoint["model"])
     payload = evaluate_model_tool_use(

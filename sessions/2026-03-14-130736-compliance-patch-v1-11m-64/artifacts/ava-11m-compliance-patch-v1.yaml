@@ -1,0 +1,35 @@
+name: ava-11m-compliance-patch-v1
+tokenizer:
+  kind: byte
+  vocab_size: 260
+
+model:
+  block_size: 256
+  n_layer: 6
+  n_head: 6
+  n_embd: 384
+  dropout: 0.0
+  bias: false
+
+training:
+  device: cuda
+  dtype: float32
+  micro_batch_size: 8
+  gradient_accumulation_steps: 2
+  learning_rate: 0.00002
+  weight_decay: 0.01
+  max_steps: 64
+  warmup_steps: 4
+  grad_clip: 1.0
+  loss_mode: supervised
+  init_checkpoint: sessions/2026-03-14-130538-tool-stage2-v1-11m-256/checkpoints/ava-11m-tool-stage2-v1.pt
+
+memory:
+  enabled: true
+  max_items: 256
+  write_surprise_threshold: 0.45
+  top_k: 4
+
+tools:
+  calculator: true
+  prompt_protocol: compact_tags

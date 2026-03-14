@@ -1,0 +1,1 @@
+ava session train tool-synth-v4-greedy384-11m-512 configs/experiments/ava-11m-tool-synth-v4-greedy384.yaml corpora/tool_synth_v1 --max-steps 512

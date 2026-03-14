@@ -31,6 +31,7 @@ class ToolProtocol:
 
 PROTOCOLS = (
     ToolProtocol("compact_tags", "[calc]{expression}=>{result}[/calc]"),
+    ToolProtocol("compact_line", "calc:{expression}={result}"),
     ToolProtocol("compact_json", '{{"tool":"calculator","input":"{expression}","result":"{result}"}}'),
     ToolProtocol(
         "compact_xml",

@@ -3,14 +3,14 @@ from __future__ import annotations
 import time
 from contextlib import nullcontext
 from pathlib import Path
-from random import randint, seed
+from random import Random, randint, seed
 from typing import Any
 
 from ava.config import ExperimentConfig, load_experiment_config
 from ava.data import discover_corpus_files, encode_corpus, load_supervised_examples, load_text_corpus
 from ava.experiments import estimate_budget
 from ava.model import TORCH_AVAILABLE, build_model, torch
-from ava.tokenizer import ByteTokenizer
+from ava.tokenizer import load_tokenizer
 
 
 def dry_run_summary(config: ExperimentConfig) -> dict[str, object]:
@@ -25,12 +25,12 @@ def dry_run_summary(config: ExperimentConfig) -> dict[str, object]:
     }
 
 
-def summarize_corpus(corpus_root: str | Path) -> dict[str, object]:
+def summarize_corpus(corpus_root: str | Path, tokenizer_config: object | None = None) -> dict[str, object]:
     corpus_path = Path(corpus_root)
     files = discover_corpus_files(corpus_path)
     texts = load_text_corpus(corpus_path)
     supervised_examples = load_supervised_examples(corpus_path)
-    tokenizer = ByteTokenizer()
+    tokenizer = load_tokenizer(tokenizer_config)
     token_count = sum(tokenizer.count_tokens(text, add_bos=True, add_eos=True) for text in texts)
     total_characters = sum(len(text) for text in texts)
     return {
@@ -44,11 +44,10 @@ def summarize_corpus(corpus_root: str | Path) -> dict[str, object]:
     }
 
 
-def _load_training_buffer(corpus_root: str | Path) -> list[int]:
+def _load_training_buffer(corpus_root: str | Path, tokenizer: Any) -> list[int]:
     texts = load_text_corpus(corpus_root)
     if not texts:
         raise RuntimeError(f"no training texts found under {corpus_root}")
-    tokenizer = ByteTokenizer()
     return encode_corpus(texts, tokenizer)
 
 
@@ -56,11 +55,10 @@ def _render_supervised_prompt(prompt: str) -> str:
     return f"Question: {prompt}\nAnswer: "
 
 
-def _load_supervised_dataset(corpus_root: str | Path, block_size: int) -> tuple[list[dict[str, list[int]]], int]:
+def _load_supervised_dataset(corpus_root: str | Path, block_size: int, tokenizer: Any) -> tuple[list[dict[str, list[int]]], int]:
     examples = load_supervised_examples(corpus_root)
     if not examples:
         raise RuntimeError(f"no supervised prompt/response pairs found under {corpus_root}")
-    tokenizer = ByteTokenizer()
     pad_id = tokenizer.token_to_id["<pad>"]
     samples: list[dict[str, list[int]]] = []
     total_tokens = 0
@@ -85,6 +83,51 @@ def _load_supervised_dataset(corpus_root: str | Path, block_size: int) -> tuple[
         samples.append({"input_ids": input_ids, "target_ids": target_ids})
         total_tokens += len(full_ids)
     return samples, total_tokens
+
+
+def summarize_supervised_dataset(corpus_root: str | Path, block_size: int, tokenizer: Any) -> dict[str, int | float]:
+    examples = load_supervised_examples(corpus_root)
+    if not examples:
+        return {
+            "total_examples": 0,
+            "kept_examples": 0,
+            "truncated_examples": 0,
+            "skipped_no_target_examples": 0,
+            "max_full_tokens": 0,
+            "avg_full_tokens": 0.0,
+        }
+    total_examples = len(examples)
+    truncated_examples = 0
+    skipped_no_target_examples = 0
+    full_lengths: list[int] = []
+    kept_examples = 0
+    for example in examples:
+        prompt_ids = tokenizer.encode(_render_supervised_prompt(example["prompt"]), add_bos=True)
+        response_ids = tokenizer.encode(example["response"], add_eos=True)
+        full_ids = prompt_ids + response_ids
+        full_lengths.append(len(full_ids))
+        if len(full_ids) < 2:
+            skipped_no_target_examples += 1
+            continue
+        input_ids = full_ids[:-1]
+        next_token_ids = full_ids[1:]
+        prompt_prefix = max(min(len(prompt_ids) - 1, len(next_token_ids)), 0)
+        target_ids = ([-100] * prompt_prefix) + next_token_ids[prompt_prefix:]
+        if len(input_ids) > block_size or len(target_ids) > block_size:
+            truncated_examples += 1
+        target_ids = target_ids[:block_size]
+        if not any(token_id != -100 for token_id in target_ids):
+            skipped_no_target_examples += 1
+            continue
+        kept_examples += 1
+    return {
+        "total_examples": total_examples,
+        "kept_examples": kept_examples,
+        "truncated_examples": truncated_examples,
+        "skipped_no_target_examples": skipped_no_target_examples,
+        "max_full_tokens": max(full_lengths),
+        "avg_full_tokens": round(sum(full_lengths) / len(full_lengths), 2),
+    }
 
 
 def _sample_batch(buffer: list[int], block_size: int, batch_size: int, device: str) -> tuple[Any, Any]:
@@ -143,8 +186,10 @@ def _split_supervised_samples(samples: list[dict[str, list[int]]]) -> tuple[list
     if len(samples) < 4:
         return samples, []
     val_count = max(1, len(samples) // 5)
-    train_samples = samples[:-val_count]
-    val_samples = samples[-val_count:]
+    shuffled = list(samples)
+    Random(1337).shuffle(shuffled)
+    train_samples = shuffled[:-val_count]
+    val_samples = shuffled[-val_count:]
     if not train_samples or not val_samples:
         return samples, []
     return train_samples, val_samples
@@ -217,24 +262,34 @@ def run_training(
     torch.manual_seed(1337)
 
     config = load_experiment_config(config_path)
-    tokenizer = ByteTokenizer()
+    tokenizer = load_tokenizer(config.tokenizer)
     requested_device = config.training.device
     device, warnings = _resolve_device(requested_device)
 
     dataset_kind = config.training.loss_mode
     if dataset_kind == "supervised":
-        samples, corpus_tokens = _load_supervised_dataset(corpus_root, config.model.block_size)
+        supervised_stats = summarize_supervised_dataset(corpus_root, config.model.block_size, tokenizer)
+        samples, corpus_tokens = _load_supervised_dataset(corpus_root, config.model.block_size, tokenizer)
         train_samples, val_samples = _split_supervised_samples(samples)
         train_buffer: list[int] = []
         val_buffer: list[int] = []
+        if supervised_stats["truncated_examples"]:
+            warnings.append(
+                f"{supervised_stats['truncated_examples']} supervised examples exceeded block_size={config.model.block_size} and were truncated."
+            )
     else:
-        buffer = _load_training_buffer(corpus_root)
+        buffer = _load_training_buffer(corpus_root, tokenizer)
         train_buffer, val_buffer = _split_train_val_buffer(buffer, config.model.block_size)
         train_samples = []
         val_samples = []
         corpus_tokens = len(buffer)
+        supervised_stats = None
 
     model = build_model(config.model, tokenizer.vocab_size).to(device)
+    if config.training.init_checkpoint:
+        init_checkpoint_path = Path(config.training.init_checkpoint)
+        init_payload = torch.load(init_checkpoint_path, map_location="cpu")
+        model.load_state_dict(init_payload["model"])
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=config.training.learning_rate,
@@ -338,6 +393,11 @@ def run_training(
         "tokens_per_optimizer_step": tokens_per_optimizer_step,
         "tokens_seen": optimizer_steps * tokens_per_optimizer_step,
         "corpus_tokens": corpus_tokens,
+        "supervised_stats": supervised_stats,
+        "tokenizer_kind": config.tokenizer.kind,
+        "tokenizer_path": config.tokenizer.path,
+        "tokenizer_vocab_size": tokenizer.vocab_size,
+        "init_checkpoint": config.training.init_checkpoint,
         "device_requested": requested_device,
         "device_used": device,
         "warnings": warnings,

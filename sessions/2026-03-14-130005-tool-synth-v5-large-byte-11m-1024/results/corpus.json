@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\tool_synth_v2_large",
+  "file_count": 3,
+  "text_count": 990,
+  "character_count": 112790,
+  "token_count": 114770,
+  "supervised_example_count": 989,
+  "files": [
+    {
+      "path": "corpora\\tool_synth_v2_large\\examples.jsonl",
+      "size_bytes": 161593,
+      "sha256": "5a1530aefc385eb54bba96d9812963504a775acceaf525503e160129a84cd839",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\tool_synth_v2_large\\manifest.json",
+      "size_bytes": 254,
+      "sha256": "bbbb45330f9fd22774dd38b1e936fa8dfacd09f8b8b60c984bcc4fcb8194c18b",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\tool_synth_v2_large\\README.md",
+      "size_bytes": 481,
+      "sha256": "c9922156d71ce7f1d86fcb84419447fdafa972e5d555bc08912e9937f4c4ed02",
+      "relative_path": "README.md"
+    }
+  ]
+}

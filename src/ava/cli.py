@@ -11,6 +11,7 @@ from ava.activity import record_activity, render_command, run_logged_command, sn
 from ava.benchmarks import serialize_benchmark_registry
 from ava.config import load_experiment_config
 from ava.inspect import trace_checkpoint
+from ava.tokenizer_artifacts import build_greedy_byte_piece_artifact
 from ava.sessions import (
     bootstrap_session,
     create_session,
@@ -78,6 +79,16 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("config")
     run.add_argument("corpus_root")
     run.add_argument("--max-steps", type=int, default=1000)
+
+    tokenizer_parser = subparsers.add_parser("tokenizer")
+    tokenizer_subparsers = tokenizer_parser.add_subparsers(dest="tokenizer_command", required=True)
+
+    tokenizer_build = tokenizer_subparsers.add_parser("build")
+    tokenizer_build.add_argument("corpus_root")
+    tokenizer_build.add_argument("output")
+    tokenizer_build.add_argument("--target-vocab-size", type=int, default=512)
+    tokenizer_build.add_argument("--max-piece-length", type=int, default=12)
+    tokenizer_build.add_argument("--min-frequency", type=int, default=2)
 
     inspect_parser = subparsers.add_parser("inspect")
     inspect_subparsers = inspect_parser.add_subparsers(dest="inspect_command", required=True)
@@ -244,6 +255,22 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
             "inspect_command": "checkpoint",
             "checkpoint": args.checkpoint,
             "device": args.device,
+        }
+
+    if args.command == "tokenizer" and args.tokenizer_command == "build":
+        payload = build_greedy_byte_piece_artifact(
+            args.corpus_root,
+            args.output,
+            target_vocab_size=args.target_vocab_size,
+            max_piece_length=args.max_piece_length,
+            min_frequency=args.min_frequency,
+        )
+        print(json.dumps(payload, indent=2))
+        return 0, {
+            "tokenizer_command": "build",
+            "corpus_root": args.corpus_root,
+            "output": args.output,
+            "vocab_size": payload.get("vocab_size"),
         }
 
     if args.command == "benchmark" and args.benchmark_command == "registry":

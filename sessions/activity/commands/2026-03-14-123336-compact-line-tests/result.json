@@ -1,0 +1,16 @@
+{
+  "label": "compact-line-tests",
+  "command": "python -m pytest tests/test_tools.py tests/test_synthetic.py tests/test_train.py -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_tools.py",
+    "tests/test_synthetic.py",
+    "tests/test_train.py",
+    "-q"
+  ],
+  "returncode": 2,
+  "cwd": "C:\\Users\\CodexSandboxOffline\\.codex\\.sandbox\\cwd\\98cfa6001b797942",
+  "duration_ms": 3363
+}

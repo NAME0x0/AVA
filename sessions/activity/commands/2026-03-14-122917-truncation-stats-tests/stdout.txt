@@ -1,0 +1,27 @@
+....F.......                                                             [100%]
+================================== FAILURES ===================================
+____________ test_summarize_supervised_dataset_reports_truncation _____________
+
+    def test_summarize_supervised_dataset_reports_truncation() -> None:
+        corpus_root = Path("sessions") / "test-supervised-summary"
+        if corpus_root.exists():
+            shutil.rmtree(corpus_root)
+        corpus_root.mkdir(parents=True, exist_ok=True)
+        (corpus_root / "examples.jsonl").write_text(
+            "\n".join(
+                [
+                    '{"prompt":"Use the calculator tool for factorial(5). Return a compact calculator trace followed by the final answer.","response":"[calc]factorial(5)=>120[/calc]\\n120"}',
+                    '{"prompt":"Short prompt","response":"good"}',
+                ]
+            ),
+            encoding="utf-8",
+        )
+        stats = summarize_supervised_dataset(corpus_root, block_size=40)
+        assert stats["total_examples"] == 2
+        assert stats["truncated_examples"] == 1
+>       assert stats["kept_examples"] == 2
+E       assert 1 == 2
+
+tests\test_train.py:73: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_train.py::test_summarize_supervised_dataset_reports_truncation

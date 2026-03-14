@@ -12,4 +12,5 @@ def test_calculate_safe_function() -> None:
 def test_protocol_rendering() -> None:
     protocols = list_protocol_names()
     assert "compact_tags" in protocols
+    assert "compact_line" in protocols
     assert "493" in render_tool_trace("compact_tags", "17*29", "493")

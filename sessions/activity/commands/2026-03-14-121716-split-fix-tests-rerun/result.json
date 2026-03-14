@@ -1,0 +1,15 @@
+{
+  "label": "split-fix-tests-rerun",
+  "command": "python -m pytest tests/test_train.py tests/test_sessions.py -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_train.py",
+    "tests/test_sessions.py",
+    "-q"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 7541
+}

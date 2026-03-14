@@ -1,0 +1,10 @@
+{
+  "name": "tool-synth-v5-large-byte-11m-1024",
+  "slug": "tool-synth-v5-large-byte-11m-1024",
+  "kind": "training",
+  "created_at_utc": "2026-03-14T13:00:05.936062+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-tool-synth-v5-large-byte.yaml",
+    "corpora\\tool_synth_v2_large"
+  ]
+}

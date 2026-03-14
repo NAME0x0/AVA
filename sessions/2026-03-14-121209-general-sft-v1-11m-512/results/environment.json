@@ -1,0 +1,39 @@
+{
+  "python_version": "3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "torch_available": true,
+  "torch_version": "2.9.1+cu130",
+  "torch_cuda_version": "13.0",
+  "cuda_available": true,
+  "cudnn_available": true,
+  "device_requested": "cuda",
+  "device_count": 1,
+  "gpu_devices": [
+    {
+      "index": 0,
+      "name": "NVIDIA RTX A2000 Laptop GPU",
+      "total_memory_bytes": 4294508544,
+      "multi_processor_count": 20
+    }
+  ],
+  "nvidia_smi": [
+    {
+      "name": "NVIDIA RTX A2000 Laptop GPU",
+      "driver_version": "581.95",
+      "memory_total": "4096 MiB"
+    }
+  ],
+  "repo": {
+    "head": "d377dd1dcfc867cbff40fe81ea5cc09684a067e1",
+    "dirty": true,
+    "dirty_paths": [
+      "M sessions/activity/2026-03-14.jsonl",
+      "?? configs/experiments/ava-11m-general-sft-v1.yaml",
+      "?? corpora/general_sft/README.md",
+      "?? corpora/general_sft/examples.jsonl",
+      "?? sessions/2026-03-14-121209-general-sft-v1-11m-512/artifacts/ava-11m-general-sft-v1.yaml",
+      "?? sessions/2026-03-14-121209-general-sft-v1-11m-512/artifacts/command.txt",
+      "?? sessions/2026-03-14-121209-general-sft-v1-11m-512/session.json"
+    ]
+  }
+}

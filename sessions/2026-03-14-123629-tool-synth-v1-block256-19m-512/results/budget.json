@@ -1,0 +1,8 @@
+{
+  "name": "ava-19m-tool-synth-v1-block256",
+  "parameters": 19179520,
+  "train_vram_gb": 1.372,
+  "infer_vram_gb": 0.862,
+  "tokens_per_optimizer_step": 4096,
+  "fits_4gb": true
+}

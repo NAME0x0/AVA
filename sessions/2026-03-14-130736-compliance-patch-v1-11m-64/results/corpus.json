@@ -1,0 +1,22 @@
+{
+  "corpus_root": "corpora\\compliance_patch_v1",
+  "file_count": 2,
+  "text_count": 17,
+  "character_count": 1466,
+  "token_count": 1500,
+  "supervised_example_count": 16,
+  "files": [
+    {
+      "path": "corpora\\compliance_patch_v1\\examples.jsonl",
+      "size_bytes": 1629,
+      "sha256": "329b36114f89acef99484b1bed290a12342eb0a32fd2efe8bca060cf70dd577c",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\compliance_patch_v1\\README.md",
+      "size_bytes": 273,
+      "sha256": "3ea794fec8c491cdcc08c75ae17204c6e48fd2c58886dd6e0fb5220528a5247d",
+      "relative_path": "README.md"
+    }
+  ]
+}

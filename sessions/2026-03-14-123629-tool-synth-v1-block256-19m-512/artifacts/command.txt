@@ -1,0 +1,1 @@
+ava session train tool-synth-v1-block256-19m-512 configs/experiments/ava-19m-tool-synth-v1-block256.yaml corpora/tool_synth_v1 --max-steps 512

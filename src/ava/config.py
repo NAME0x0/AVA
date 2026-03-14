@@ -11,13 +11,16 @@ import yaml
 class TokenizerConfig:
     kind: str = "byte"
     vocab_size: int = 260
+    path: str | None = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> "TokenizerConfig":
         data = data or {}
+        path = data.get("path")
         return cls(
             kind=str(data.get("kind", "byte")),
             vocab_size=int(data.get("vocab_size", 260)),
+            path=str(path) if path else None,
         )
 
 
@@ -62,6 +65,7 @@ class TrainingConfig:
     warmup_steps: int = 500
     grad_clip: float = 1.0
     loss_mode: str = "raw_lm"
+    init_checkpoint: str | None = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> "TrainingConfig":
@@ -77,6 +81,7 @@ class TrainingConfig:
             warmup_steps=int(data.get("warmup_steps", 500)),
             grad_clip=float(data.get("grad_clip", 1.0)),
             loss_mode=str(data.get("loss_mode", "raw_lm")),
+            init_checkpoint=str(data["init_checkpoint"]) if data.get("init_checkpoint") else None,
         )
 
 

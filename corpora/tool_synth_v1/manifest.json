@@ -1,0 +1,11 @@
+{
+  "protocol": "compact_tags",
+  "total_examples": 165,
+  "by_kind": {
+    "trace": 119,
+    "tool_direct": 30,
+    "no_tool": 10,
+    "boundary": 6
+  },
+  "examples_path": "corpora\\tool_synth_v1\\examples.jsonl"
+}

@@ -1,0 +1,110 @@
+{
+  "requested_device": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "max_new_tokens": 48,
+  "correct": 2,
+  "total": 10,
+  "accuracy": 0.2,
+  "by_category": {
+    "math": {
+      "correct": 0,
+      "total": 2,
+      "accuracy": 0.0
+    },
+    "coding": {
+      "correct": 0,
+      "total": 2,
+      "accuracy": 0.0
+    },
+    "science": {
+      "correct": 0,
+      "total": 2,
+      "accuracy": 0.0
+    },
+    "tool": {
+      "correct": 0,
+      "total": 2,
+      "accuracy": 0.0
+    },
+    "english": {
+      "correct": 2,
+      "total": 2,
+      "accuracy": 1.0
+    }
+  },
+  "results": [
+    {
+      "category": "english",
+      "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+      "expected": "The plan is not finished yet.",
+      "completion": "The plan is not finished yet.",
+      "matched": true
+    },
+    {
+      "category": "english",
+      "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+      "expected": "The cat slept on the warm sill.",
+      "completion": "The cat slept on the warm sill.",
+      "matched": true
+    },
+    {
+      "category": "math",
+      "prompt": "What is 17 * 29?",
+      "expected": "493",
+      "completion": "19",
+      "matched": false
+    },
+    {
+      "category": "math",
+      "prompt": "Solve for x: 2x + 6 = 14.",
+      "expected": "4",
+      "completion": "1",
+      "matched": false
+    },
+    {
+      "category": "science",
+      "prompt": "What planet is known as the Red Planet?",
+      "expected": "Mars",
+      "completion": "2",
+      "matched": false
+    },
+    {
+      "category": "science",
+      "prompt": "What force keeps planets in orbit around the Sun?",
+      "expected": "gravity",
+      "completion": "g [calculator cannot help with hacking TTThemain",
+      "matched": false
+    },
+    {
+      "category": "coding",
+      "prompt": "In Python, which keyword defines a function?",
+      "expected": "def",
+      "completion": "wile silcalculator cannot s def",
+      "matched": false
+    },
+    {
+      "category": "coding",
+      "prompt": "What does len('ava') return in Python?",
+      "expected": "3",
+      "completion": "12",
+      "matched": false
+    },
+    {
+      "category": "tool",
+      "prompt": "Use the calculator tool for 144 / 12.",
+      "expected": "12",
+      "completion": "1",
+      "matched": false
+    },
+    {
+      "category": "tool",
+      "prompt": "Use the calculator tool for sqrt(81).",
+      "expected": "9",
+      "completion": "1",
+      "matched": false
+    }
+  ],
+  "checkpoint": "sessions\\2026-03-14-130538-tool-stage2-v1-11m-256\\checkpoints\\ava-11m-tool-stage2-v1.pt",
+  "config_name": "ava-11m-tool-stage2-v1"
+}

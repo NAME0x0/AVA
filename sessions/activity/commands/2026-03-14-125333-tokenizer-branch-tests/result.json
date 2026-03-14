@@ -1,0 +1,19 @@
+{
+  "label": "tokenizer-branch-tests",
+  "command": "python -m pytest tests/test_tokenizer.py tests/test_train.py tests/test_tools.py tests/test_eval.py tests/test_sessions.py tests/test_inspect.py -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_tokenizer.py",
+    "tests/test_train.py",
+    "tests/test_tools.py",
+    "tests/test_eval.py",
+    "tests/test_sessions.py",
+    "tests/test_inspect.py",
+    "-q"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 8343
+}
