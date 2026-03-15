@@ -1,0 +1,1 @@
+python -m ava.cli benchmark external gsm8k sessions/2026-03-15-034612-arc-label-calibration-v1/checkpoints/ava-11m-arc-label-calibration-v1.pt --device cuda --limit 50 --output sessions/activity/gsm8k-label-calibration-v1-50.json

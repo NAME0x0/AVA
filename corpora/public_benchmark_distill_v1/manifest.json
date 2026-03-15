@@ -1,0 +1,25 @@
+{
+  "protocol": "compact_tags",
+  "curriculum": "public_benchmark_distill",
+  "arc_limit": null,
+  "gsm8k_limit": null,
+  "arc_rotations": 3,
+  "anchor_repeats": 12,
+  "arc_examples": 4476,
+  "gsm8k_examples": 7473,
+  "anchor_examples": 480,
+  "total_examples": 12429,
+  "by_kind": {
+    "arc_mc": 1119,
+    "arc_mc_aug": 3357,
+    "gsm8k_train": 7473,
+    "trace": 48,
+    "tool_direct": 48,
+    "no_tool": 120,
+    "boundary": 72,
+    "refusal": 48,
+    "format": 48,
+    "general": 96
+  },
+  "examples_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl"
+}

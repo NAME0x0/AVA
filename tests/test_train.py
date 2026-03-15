@@ -1,12 +1,15 @@
 import shutil
 from pathlib import Path
 
-from ava.config import load_experiment_config
+from ava.config import ModelConfig, load_experiment_config
+from ava.model import build_model
 from ava.tokenizer import ByteBPETokenizer, load_tokenizer
 from ava.train import (
     _load_supervised_dataset,
     _split_supervised_samples,
+    _configure_trainable_parameters,
     _expand_state_dict_for_tokenizer,
+    _resize_state_dict_for_block_size,
     dry_run_summary,
     summarize_corpus,
     summarize_supervised_dataset,
@@ -95,3 +98,23 @@ def test_expand_state_dict_for_byte_bpe_initializes_new_tokens_from_bytes() -> N
     assert expanded["wte.weight"].shape[0] == tokenizer.vocab_size
     assert __import__("torch").allclose(new_row, expected)
     assert __import__("torch").allclose(expanded["lm_head.weight"][260], expected)
+
+
+def test_resize_state_dict_for_block_size_interpolates_endpoints() -> None:
+    torch = __import__("torch")
+    positional = torch.arange(4 * 2, dtype=torch.float32).view(4, 2)
+    state = {"wpe.weight": positional}
+    resized = _resize_state_dict_for_block_size(state, block_size=8)
+    assert resized["wpe.weight"].shape == (8, 2)
+    assert torch.allclose(resized["wpe.weight"][0], positional[0])
+    assert torch.allclose(resized["wpe.weight"][-1], positional[-1])
+
+
+def test_configure_trainable_parameters_filters_by_pattern() -> None:
+    model = build_model(ModelConfig(block_size=32, n_layer=1, n_head=2, n_embd=8, dropout=0.0, bias=False), 260)
+    parameters, names, count = _configure_trainable_parameters(model, ("wpe.weight", "ln_f"))
+    assert set(names) == {"wpe.weight", "ln_f.weight", "ln_f.bias"}
+    assert count == sum(parameter.numel() for parameter in parameters)
+    assert model.wpe.weight.requires_grad is True
+    assert model.wte.weight.requires_grad is False
+

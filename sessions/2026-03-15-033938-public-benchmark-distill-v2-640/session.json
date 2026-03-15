@@ -1,0 +1,10 @@
+{
+  "name": "public-benchmark-distill-v2-640",
+  "slug": "public-benchmark-distill-v2-640",
+  "kind": "training",
+  "created_at_utc": "2026-03-15T03:39:38.551143+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-public-benchmark-distill-v2-640.yaml",
+    "corpora\\public_benchmark_distill_v1"
+  ]
+}

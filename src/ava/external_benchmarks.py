@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import re
+from collections import Counter
+from math import log
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -14,6 +16,7 @@ from ava.memory_transfer import _generate_completion
 from ava.model import TORCH_AVAILABLE, build_model, torch
 from ava.retrieval import (
     SupportExample,
+    _canonical_lookup_text,
     load_support_examples,
     lookup_support_answer,
     lookup_support_answer_nearest,
@@ -109,6 +112,105 @@ def _match_exact(task: ExternalBenchmarkTask, completion: str) -> bool:
     if task.benchmark == "gsm8k":
         return extract_gsm8k_answer(completion) == extract_gsm8k_answer(task.expected)
     return _normalize_text(completion) == _normalize_text(task.expected)
+
+
+def _support_lookup_tokens(text: str) -> list[str]:
+    return [token for token in _canonical_lookup_text(text).split() if token]
+
+
+def _build_sparse_support_rows(examples: list[SupportExample]) -> tuple[list[dict[str, object]], dict[str, float]]:
+    document_frequency: Counter[str] = Counter()
+    rows: list[dict[str, object]] = []
+    for example in examples:
+        tokens = _support_lookup_tokens(example.prompt)
+        rows.append({
+            "tokens": tokens,
+            "response": example.response,
+            "reference": {
+                "prompt": example.prompt,
+                "response": example.response,
+                "category": example.category,
+                "kind": example.kind,
+                "source_path": example.source_path,
+            },
+        })
+        for token in set(tokens):
+            document_frequency[token] += 1
+    total_documents = len(rows)
+    idf = {
+        token: log((total_documents + 1) / (count + 1)) + 1.0
+        for token, count in document_frequency.items()
+    }
+    return rows, idf
+
+
+def _sparse_support_score(query_tokens: list[str], support_tokens: list[str], idf: dict[str, float]) -> float:
+    query_counts = Counter(query_tokens)
+    support_counts = Counter(support_tokens)
+    shared = set(query_counts) & set(support_counts)
+    if not shared:
+        return 0.0
+    numerator = sum(min(query_counts[token], support_counts[token]) * idf.get(token, 1.0) for token in shared)
+    denominator = sum(query_counts[token] * idf.get(token, 1.0) for token in query_counts)
+    return numerator / max(denominator, 1e-9)
+
+
+def _support_response_choice_score(response: str, choice_text: str) -> float:
+    response_tokens = set(_support_lookup_tokens(response))
+    choice_tokens = set(_support_lookup_tokens(choice_text))
+    if not response_tokens or not choice_tokens:
+        return 0.0
+    return len(response_tokens & choice_tokens) / len(response_tokens | choice_tokens)
+
+
+def _predict_multiple_choice_from_support(
+    *,
+    prompt: str,
+    choices: tuple[tuple[str, str], ...],
+    support_examples: list[SupportExample] | None,
+    category_hint: str | None,
+    category_gated: bool,
+    top_k: int = 8,
+) -> tuple[str, dict[str, object]] | None:
+    examples = list(support_examples or [])
+    if category_gated and category_hint:
+        filtered = [item for item in examples if item.category == category_hint]
+        if filtered:
+            examples = filtered
+    if not examples:
+        return None
+
+    rows, idf = _build_sparse_support_rows(examples)
+    query_tokens = _support_lookup_tokens(prompt)
+    scored = sorted(
+        ((
+            _sparse_support_score(query_tokens, row["tokens"], idf),
+            row,
+        ) for row in rows),
+        key=lambda item: item[0],
+        reverse=True,
+    )[:top_k]
+    choice_scores: Counter[str] = Counter({label: 0.0 for label, _choice_text in choices})
+    support_details: list[dict[str, object]] = []
+    for score, row in scored:
+        support_details.append({"score": round(score, 6), **row["reference"]})
+        response = str(row["response"]).strip()
+        direct_label = next((label for label, _choice_text in choices if label.upper() == response.upper()), None)
+        if direct_label is not None:
+            choice_scores[direct_label] += score
+            continue
+        for label, choice_text in choices:
+            choice_scores[label] += score * _support_response_choice_score(response, choice_text)
+
+    if not choice_scores:
+        return None
+    best_label = max(choice_scores.items(), key=lambda item: item[1])[0]
+    return best_label, {
+        "mode": "support_mc",
+        "scores": {label: round(float(choice_scores[label]), 6) for label, _choice_text in choices},
+        "selected": best_label,
+        "supports": support_details,
+    }
 
 
 def _load_cached_rows(parts: tuple[str, ...], filename: str, limit: int | None) -> list[dict[str, object]] | None:
@@ -397,29 +499,61 @@ def evaluate_external_benchmark(
     for task in tasks:
         scoring: dict[str, object] | None = None
         if task.metric == "multiple_choice":
-            direct_completion, retrieval = _prepare_retrieval_prompt_for_task(
-                model,
-                tokenizer,
-                prompt=task.prompt,
-                support_examples=support_examples,
-                retrieval_mode=retrieval_mode,
-                category_hint=task.category,
-                category_gated=category_gated,
-                nearest_threshold=nearest_threshold,
-                nearest_margin=nearest_margin,
-            )
-            if direct_completion is not None:
-                completion = direct_completion
-                scoring = {"mode": "retrieval", "selected": completion}
+            if retrieval_mode == "support_mc":
+                support_prediction = _predict_multiple_choice_from_support(
+                    prompt=task.prompt,
+                    choices=task.choices,
+                    support_examples=support_examples,
+                    category_hint=task.category,
+                    category_gated=category_gated,
+                )
+                if support_prediction is not None:
+                    completion, scoring = support_prediction
+                    retrieval = {
+                        "enabled": True,
+                        "mode": "support_mc",
+                        "references": list(scoring.get("supports", [])),
+                        "category_hint": task.category,
+                    }
+                else:
+                    retrieval = {
+                        "enabled": False,
+                        "mode": "support_mc",
+                        "references": [],
+                        "category_hint": task.category,
+                    }
+                    completion, label_scores = _predict_multiple_choice_label(
+                        model,
+                        tokenizer,
+                        device,
+                        prompt=task.prompt,
+                        choices=task.choices,
+                    )
+                    scoring = {"mode": "label_logprob", "scores": label_scores, "selected": completion}
             else:
-                completion, label_scores = _predict_multiple_choice_label(
+                direct_completion, retrieval = _prepare_retrieval_prompt_for_task(
                     model,
                     tokenizer,
-                    device,
-                    prompt=str(retrieval["prompt"]),
-                    choices=task.choices,
+                    prompt=task.prompt,
+                    support_examples=support_examples,
+                    retrieval_mode=retrieval_mode,
+                    category_hint=task.category,
+                    category_gated=category_gated,
+                    nearest_threshold=nearest_threshold,
+                    nearest_margin=nearest_margin,
                 )
-                scoring = {"mode": "label_logprob", "scores": label_scores, "selected": completion}
+                if direct_completion is not None:
+                    completion = direct_completion
+                    scoring = {"mode": "retrieval", "selected": completion}
+                else:
+                    completion, label_scores = _predict_multiple_choice_label(
+                        model,
+                        tokenizer,
+                        device,
+                        prompt=str(retrieval["prompt"]),
+                        choices=task.choices,
+                    )
+                    scoring = {"mode": "label_logprob", "scores": label_scores, "selected": completion}
         else:
             completion, retrieval = _generate_completion(
                 model,

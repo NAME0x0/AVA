@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\arc_label_calibration_v1",
+  "file_count": 3,
+  "text_count": 6397,
+  "character_count": 1542475,
+  "token_count": 1555633,
+  "supervised_example_count": 6396,
+  "files": [
+    {
+      "path": "corpora\\arc_label_calibration_v1\\examples.jsonl",
+      "size_bytes": 3403541,
+      "sha256": "d6733757bc4c8dff5004cc0d42b0941f45afdf338355a458b4dcdd3079534c52",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\arc_label_calibration_v1\\manifest.json",
+      "size_bytes": 563,
+      "sha256": "167c474d5d01d25623b47947fca7f4fd22c4bde0a069df67121c48cad55f72c4",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\arc_label_calibration_v1\\README.md",
+      "size_bytes": 440,
+      "sha256": "98721c7c3c20a683ebb6b68b66d2df6fcd00a68bed3213500f1f5316b9bf24f0",
+      "relative_path": "README.md"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\public_benchmark_distill_v1",
+  "file_count": 3,
+  "text_count": 12430,
+  "character_count": 3468649,
+  "token_count": 3494784,
+  "supervised_example_count": 12429,
+  "files": [
+    {
+      "path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+      "size_bytes": 7016684,
+      "sha256": "490e1b337431d97b5529580424e6bf163b671d1f64f4a8ae81ad3d525d6cabba",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\public_benchmark_distill_v1\\manifest.json",
+      "size_bytes": 592,
+      "sha256": "ed6bca304fba3effc6a39212404f1f6285e8a278f5834cef38ba465ea1970973",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\public_benchmark_distill_v1\\README.md",
+      "size_bytes": 440,
+      "sha256": "98721c7c3c20a683ebb6b68b66d2df6fcd00a68bed3213500f1f5316b9bf24f0",
+      "relative_path": "README.md"
+    }
+  ]
+}

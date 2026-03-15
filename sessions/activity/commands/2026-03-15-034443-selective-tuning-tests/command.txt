@@ -1,0 +1,1 @@
+python -m pytest tests/test_train.py tests/test_synthetic.py tests/test_external_benchmarks.py -q

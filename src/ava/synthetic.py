@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from ava.external_benchmarks import load_arc_challenge_tasks, load_gsm8k_tasks
 from ava.tools import calculate, render_tool_trace
 
 
@@ -746,3 +747,198 @@ def materialize_teacher_distill_corpus(
             "This packet uses the public-reasoning repair mix, but adds teacher metadata and explicit format contracts so multiple teacher families can be compared cleanly.",
         ],
     )
+
+
+def _mc_question_from_prompt(prompt: str) -> str:
+    return prompt.split("\n\nOptions:\n", 1)[0].strip()
+
+
+
+def _rotate_multiple_choice_task(
+    prompt: str,
+    choices: tuple[tuple[str, str], ...],
+    expected_label: str,
+    rotation: int,
+) -> tuple[str, str]:
+    labels = tuple(label for label, _ in choices)
+    texts = [text for _label, text in choices]
+    if expected_label not in labels:
+        raise ValueError(f"expected label {expected_label} not present in choices")
+    rotation = rotation % len(texts)
+    rotated_texts = texts[rotation:] + texts[:rotation]
+    answer_index = labels.index(expected_label)
+    rotated_answer_index = (answer_index - rotation) % len(texts)
+    rotated_choices = tuple(zip(labels, rotated_texts, strict=True))
+    return _multiple_choice_prompt(_mc_question_from_prompt(prompt), rotated_choices), labels[rotated_answer_index]
+
+
+def _arc_train_examples(*, limit: int | None = None, rotations: int = 3) -> list[dict[str, object]]:
+    tasks = load_arc_challenge_tasks(split="train", limit=limit)
+    examples: list[dict[str, object]] = []
+    for index, task in enumerate(tasks):
+        examples.append(
+            {
+                "kind": "arc_mc",
+                "prompt": task.prompt,
+                "response": task.expected,
+                "benchmark": task.benchmark,
+                "source_type": "hf_train_split",
+                "category": task.category,
+                "difficulty": "train",
+                "format_contract": "label_only",
+                "verifier_status": "ground_truth",
+                "tags": ["arc", "science", "label_only"],
+            }
+        )
+        for offset in range(1, max(rotations, 0) + 1):
+            rotation = offset % len(task.choices) or 1
+            rotated_prompt, rotated_answer = _rotate_multiple_choice_task(
+                task.prompt,
+                task.choices,
+                task.expected,
+                rotation,
+            )
+            examples.append(
+                {
+                    "kind": "arc_mc_aug",
+                    "prompt": rotated_prompt,
+                    "response": rotated_answer,
+                    "benchmark": task.benchmark,
+                    "source_type": "hf_train_split_augmented",
+                    "category": task.category,
+                    "difficulty": "train",
+                    "format_contract": "label_only",
+                    "verifier_status": "ground_truth",
+                    "tags": ["arc", "science", "label_only", "rotated_choices"],
+                }
+            )
+    return examples
+
+
+def _gsm8k_train_examples(*, limit: int | None = None) -> list[dict[str, object]]:
+    tasks = load_gsm8k_tasks(split="train", limit=limit)
+    return [
+        {
+            "kind": "gsm8k_train",
+            "prompt": task.prompt,
+            "response": task.expected,
+            "benchmark": task.benchmark,
+            "source_type": "hf_train_split",
+            "category": task.category,
+            "difficulty": "train",
+            "format_contract": "final_answer_only",
+            "verifier_status": "ground_truth",
+            "tags": ["gsm8k", "math", "final_answer_only"],
+        }
+        for task in tasks
+    ]
+
+
+def _public_benchmark_anchor_examples(protocol_name: str) -> list[dict[str, object]]:
+    examples: list[dict[str, object]] = []
+    for expression in ("144 / 12", "sqrt(81)", "17 * 29", "25 + 17"):
+        trace = _trace_example(expression, protocol_name)
+        direct = _direct_tool_example(expression)
+        trace.update(
+            {
+                "benchmark": "internal_anchor",
+                "source_type": "anchor",
+                "category": "tool",
+                "difficulty": "anchor",
+                "format_contract": "tool_trace_then_answer",
+                "verifier_status": "ground_truth",
+                "tags": ["tool", "trace_anchor"],
+            }
+        )
+        direct.update(
+            {
+                "benchmark": "internal_anchor",
+                "source_type": "anchor",
+                "category": "tool",
+                "difficulty": "anchor",
+                "format_contract": "direct_tool_answer",
+                "verifier_status": "ground_truth",
+                "tags": ["tool", "direct_answer_anchor"],
+            }
+        )
+        examples.extend((trace, direct))
+    metadata_by_kind = {
+        "no_tool": ("tool", "final_answer_only", ["tool", "no_tool_anchor"]),
+        "boundary": ("compliance", "refusal_short", ["compliance", "boundary_anchor"]),
+        "refusal": ("compliance", "refusal_short", ["compliance", "refusal_anchor"]),
+        "format": ("compliance", "format_exact", ["compliance", "format_anchor"]),
+        "general": ("language", "final_answer_only", ["language", "general_anchor"]),
+    }
+    for row in _no_tool_examples() + _boundary_examples() + _refusal_examples() + _format_examples() + _general_anchor_examples():
+        category, contract, tags = metadata_by_kind[row["kind"]]
+        examples.append(
+            {
+                **row,
+                "benchmark": "internal_anchor",
+                "source_type": "anchor",
+                "category": category,
+                "difficulty": "anchor",
+                "format_contract": contract,
+                "verifier_status": "ground_truth",
+                "tags": list(tags),
+            }
+        )
+    return _dedupe_examples(examples)
+
+
+def generate_public_benchmark_distill_examples(
+    protocol_name: str = "compact_tags",
+    *,
+    arc_limit: int | None = None,
+    gsm8k_limit: int | None = None,
+    arc_rotations: int = 3,
+    anchor_repeats: int = 12,
+) -> list[dict[str, object]]:
+    examples: list[dict[str, object]] = []
+    examples.extend(_arc_train_examples(limit=arc_limit, rotations=arc_rotations))
+    examples.extend(_gsm8k_train_examples(limit=gsm8k_limit))
+    anchors = _public_benchmark_anchor_examples(protocol_name)
+    for _ in range(max(anchor_repeats, 0)):
+        examples.extend(dict(item) for item in anchors)
+    return examples
+
+
+def materialize_public_benchmark_distill_corpus(
+    root: str | Path,
+    protocol_name: str = "compact_tags",
+    *,
+    arc_limit: int | None = None,
+    gsm8k_limit: int | None = None,
+    arc_rotations: int = 3,
+    anchor_repeats: int = 12,
+) -> dict[str, object]:
+    examples = generate_public_benchmark_distill_examples(
+        protocol_name,
+        arc_limit=arc_limit,
+        gsm8k_limit=gsm8k_limit,
+        arc_rotations=arc_rotations,
+        anchor_repeats=anchor_repeats,
+    )
+    return _write_examples_corpus(
+        Path(root),
+        examples,
+        metadata={
+            "protocol": protocol_name,
+            "curriculum": "public_benchmark_distill",
+            "arc_limit": arc_limit,
+            "gsm8k_limit": gsm8k_limit,
+            "arc_rotations": arc_rotations,
+            "anchor_repeats": anchor_repeats,
+            "arc_examples": len([item for item in examples if item["kind"] in {"arc_mc", "arc_mc_aug"}]),
+            "gsm8k_examples": len([item for item in examples if item["kind"] == "gsm8k_train"]),
+            "anchor_examples": len([item for item in examples if item["source_type"] == "anchor"]),
+        },
+        readme_lines=[
+            "# Public Benchmark Distill Corpus",
+            "",
+            "A real train-split calibration packet built from ARC-Challenge train and GSM8K train.",
+            "",
+            "It attacks the current public failure modes directly: rotated ARC choice layouts break the model's C-label prior, GSM8K train rows teach answer-only arithmetic word problems, and repeated tool/compliance anchors are kept in the mix so AVA does not forget the internal wins while adapting to public distributions.",
+        ],
+    )
+

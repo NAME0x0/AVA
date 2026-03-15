@@ -1,9 +1,11 @@
 from ava.external_benchmarks import (
     ExternalBenchmarkTask,
     _match_multiple_choice,
+    _predict_multiple_choice_from_support,
     extract_gsm8k_answer,
     format_arc_prompt,
 )
+from ava.retrieval import SupportExample
 
 
 def test_extract_gsm8k_answer_prefers_delimiter() -> None:
@@ -37,3 +39,24 @@ def test_match_multiple_choice_accepts_label_and_option_text() -> None:
     assert _match_multiple_choice(task, "D")
     assert _match_multiple_choice(task, "Record the details of the investigation.")
     assert not _match_multiple_choice(task, "A")
+
+
+def test_predict_multiple_choice_from_support_maps_answer_text_to_label() -> None:
+    label, scoring = _predict_multiple_choice_from_support(
+        prompt="Which gas do plants take in for photosynthesis?",
+        choices=(("A", "oxygen"), ("B", "carbon dioxide"), ("C", "helium")),
+        support_examples=[
+            SupportExample(
+                prompt="What gas do plants take in from the air for photosynthesis?",
+                response="carbon dioxide",
+                category="science",
+            )
+        ],
+        category_hint="science",
+        category_gated=True,
+        top_k=1,
+    )
+    assert label == "B"
+    assert scoring["mode"] == "support_mc"
+    assert scoring["selected"] == "B"
+

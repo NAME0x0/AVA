@@ -1,0 +1,24 @@
+{
+  "protocol": "compact_tags",
+  "curriculum": "public_benchmark_distill",
+  "arc_limit": null,
+  "gsm8k_limit": 0,
+  "arc_rotations": 3,
+  "anchor_repeats": 48,
+  "arc_examples": 4476,
+  "gsm8k_examples": 0,
+  "anchor_examples": 1920,
+  "total_examples": 6396,
+  "by_kind": {
+    "arc_mc": 1119,
+    "arc_mc_aug": 3357,
+    "trace": 192,
+    "tool_direct": 192,
+    "no_tool": 480,
+    "boundary": 288,
+    "refusal": 192,
+    "format": 192,
+    "general": 384
+  },
+  "examples_path": "corpora\\arc_label_calibration_v1\\examples.jsonl"
+}

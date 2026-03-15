@@ -1,0 +1,10 @@
+{
+  "name": "arc-label-calibration-v1",
+  "slug": "arc-label-calibration-v1",
+  "kind": "training",
+  "created_at_utc": "2026-03-15T03:46:12.969659+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-arc-label-calibration-v1.yaml",
+    "corpora\\arc_label_calibration_v1"
+  ]
+}

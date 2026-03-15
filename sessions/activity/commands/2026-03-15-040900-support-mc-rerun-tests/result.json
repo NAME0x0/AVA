@@ -1,0 +1,14 @@
+{
+  "label": "support-mc-rerun-tests",
+  "command": "python -m pytest tests/test_external_benchmarks.py -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_external_benchmarks.py",
+    "-q"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 5112
+}

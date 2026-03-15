@@ -1,0 +1,22 @@
+{
+  "label": "gsm8k-public-distill-v2-50",
+  "command": "python -m ava.cli benchmark external gsm8k sessions/2026-03-15-033938-public-benchmark-distill-v2-640/checkpoints/ava-11m-public-benchmark-distill-v2-640.pt --device cuda --limit 50 --output sessions/activity/gsm8k-public-distill-v2-50.json",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "benchmark",
+    "external",
+    "gsm8k",
+    "sessions/2026-03-15-033938-public-benchmark-distill-v2-640/checkpoints/ava-11m-public-benchmark-distill-v2-640.pt",
+    "--device",
+    "cuda",
+    "--limit",
+    "50",
+    "--output",
+    "sessions/activity/gsm8k-public-distill-v2-50.json"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 6796
+}

@@ -148,7 +148,7 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark_external.add_argument("--limit", type=int, default=50)
     benchmark_external.add_argument("--device", default="cuda")
     benchmark_external.add_argument("--support-corpus")
-    benchmark_external.add_argument("--retrieval-mode", choices=("baseline", "direct", "nearest"), default="baseline")
+    benchmark_external.add_argument("--retrieval-mode", choices=("baseline", "direct", "nearest", "support_mc"), default="baseline")
     benchmark_external.add_argument("--nearest-threshold", type=float, default=0.45)
     benchmark_external.add_argument("--nearest-margin", type=float, default=0.0)
     benchmark_external.add_argument("--no-category-gating", action="store_true")

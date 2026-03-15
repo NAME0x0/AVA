@@ -1,0 +1,1 @@
+python -m ava.cli benchmark external gsm8k sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --device cuda --limit 50 --support-corpus corpora/gsm8k_train_support_v1 --retrieval-mode nearest --nearest-threshold 0.35 --nearest-margin 0.0 --output sessions/activity/gsm8k-support-nearest-50.json

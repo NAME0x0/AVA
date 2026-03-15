@@ -170,6 +170,21 @@ def _resolve_device(requested_device: str) -> tuple[str, list[str]]:
     return requested_device, warnings
 
 
+def _configure_trainable_parameters(model: Any, patterns: tuple[str, ...]) -> tuple[list[Any], list[str], int]:
+    trainable_names: list[str] = []
+    for name, parameter in model.named_parameters():
+        parameter.requires_grad = True
+        if patterns:
+            parameter.requires_grad = any(pattern in name for pattern in patterns)
+        if parameter.requires_grad:
+            trainable_names.append(name)
+    if patterns and not trainable_names:
+        raise RuntimeError(f"no trainable parameters matched patterns: {patterns}")
+    trainable_parameters = [parameter for parameter in model.parameters() if parameter.requires_grad]
+    trainable_parameter_count = sum(parameter.numel() for parameter in trainable_parameters)
+    return trainable_parameters, trainable_names, trainable_parameter_count
+
+
 def _expand_state_dict_for_tokenizer(state_dict: dict[str, Any], tokenizer: Any) -> dict[str, Any]:
     embedding = state_dict["wte.weight"]
     current_vocab, hidden_size = embedding.shape
@@ -194,11 +209,24 @@ def _expand_state_dict_for_tokenizer(state_dict: dict[str, Any], tokenizer: Any)
     return updated
 
 
+def _resize_state_dict_for_block_size(state_dict: dict[str, Any], block_size: int) -> dict[str, Any]:
+    positional = state_dict.get("wpe.weight")
+    if positional is None or positional.shape[0] == block_size:
+        return state_dict
+    source = positional.transpose(0, 1).unsqueeze(0)
+    resized = torch.nn.functional.interpolate(source, size=block_size, mode="linear", align_corners=True)
+    updated = dict(state_dict)
+    updated["wpe.weight"] = resized.squeeze(0).transpose(0, 1).contiguous()
+    return updated
+
+
 def _load_init_checkpoint(model: Any, tokenizer: Any, init_checkpoint_path: Path) -> str | None:
     init_payload = torch.load(init_checkpoint_path, map_location="cpu")
     init_state = init_payload["model"]
     if model.wte.weight.shape != init_state["wte.weight"].shape:
         init_state = _expand_state_dict_for_tokenizer(init_state, tokenizer)
+    if "wpe.weight" in init_state and model.wpe.weight.shape != init_state["wpe.weight"].shape:
+        init_state = _resize_state_dict_for_block_size(init_state, model.config.block_size)
     model.load_state_dict(init_state)
     init_config = init_payload.get("config", {})
     tokenizer_config = init_config.get("tokenizer", {}) if isinstance(init_config, dict) else {}
@@ -325,8 +353,12 @@ def run_training(
     if config.training.init_checkpoint:
         init_checkpoint_path = Path(config.training.init_checkpoint)
         init_tokenizer_kind = _load_init_checkpoint(model, tokenizer, init_checkpoint_path)
+    trainable_parameters, trainable_parameter_names, trainable_parameter_count = _configure_trainable_parameters(
+        model,
+        config.training.trainable_patterns,
+    )
     optimizer = torch.optim.AdamW(
-        model.parameters(),
+        trainable_parameters,
         lr=config.training.learning_rate,
         weight_decay=config.training.weight_decay,
     )
@@ -432,6 +464,9 @@ def run_training(
         "tokenizer_kind": config.tokenizer.kind,
         "tokenizer_path": config.tokenizer.path,
         "tokenizer_vocab_size": tokenizer.vocab_size,
+        "trainable_patterns": list(config.training.trainable_patterns),
+        "trainable_parameter_names": trainable_parameter_names,
+        "trainable_parameter_count": trainable_parameter_count,
         "init_tokenizer_kind": init_tokenizer_kind,
         "init_checkpoint": config.training.init_checkpoint,
         "device_requested": requested_device,

@@ -66,10 +66,12 @@ class TrainingConfig:
     grad_clip: float = 1.0
     loss_mode: str = "raw_lm"
     init_checkpoint: str | None = None
+    trainable_patterns: tuple[str, ...] = ()
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> "TrainingConfig":
         data = data or {}
+        patterns = data.get("trainable_patterns") or []
         return cls(
             device=str(data.get("device", "cuda")),
             dtype=str(data.get("dtype", "bfloat16")),
@@ -82,6 +84,7 @@ class TrainingConfig:
             grad_clip=float(data.get("grad_clip", 1.0)),
             loss_mode=str(data.get("loss_mode", "raw_lm")),
             init_checkpoint=str(data["init_checkpoint"]) if data.get("init_checkpoint") else None,
+            trainable_patterns=tuple(str(item) for item in patterns),
         )
 
 

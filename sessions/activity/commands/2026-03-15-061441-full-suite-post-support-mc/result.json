@@ -1,0 +1,13 @@
+{
+  "label": "full-suite-post-support-mc",
+  "command": "python -m pytest -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 13512
+}

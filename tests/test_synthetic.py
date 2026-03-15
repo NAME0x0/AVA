@@ -75,3 +75,19 @@ def test_generate_teacher_distill_examples_adds_sop_metadata() -> None:
     assert sample["format_contract"]
     assert sample["verifier_status"] == "pass"
     assert isinstance(sample["tags"], list)
+
+
+def test_generate_public_benchmark_distill_examples_uses_train_splits_and_anchors() -> None:
+    from ava.synthetic import generate_public_benchmark_distill_examples
+
+    examples = generate_public_benchmark_distill_examples(arc_limit=3, gsm8k_limit=4, arc_rotations=1, anchor_repeats=2)
+    arc_rows = [item for item in examples if item["kind"] in {"arc_mc", "arc_mc_aug"}]
+    gsm_rows = [item for item in examples if item["kind"] == "gsm8k_train"]
+    anchor_rows = [item for item in examples if item["source_type"] == "anchor"]
+    assert len(arc_rows) == 6
+    assert len(gsm_rows) == 4
+    assert len(anchor_rows) > 10
+    assert {item["response"] for item in arc_rows}.issubset({"A", "B", "C", "D"})
+    assert len({item["prompt"] for item in arc_rows}) == len(arc_rows)
+    assert all(item["prompt"].endswith("Reply with only the final answer.") for item in gsm_rows)
+
