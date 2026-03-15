@@ -1,0 +1,24 @@
+{
+  "label": "arc-baseline-50",
+  "command": "python -m ava.cli benchmark external arc-challenge sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --limit 50 --device cuda --retrieval-mode baseline --output sessions/activity/arc-baseline-50.json",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "benchmark",
+    "external",
+    "arc-challenge",
+    "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+    "--limit",
+    "50",
+    "--device",
+    "cuda",
+    "--retrieval-mode",
+    "baseline",
+    "--output",
+    "sessions/activity/arc-baseline-50.json"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 9520
+}

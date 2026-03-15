@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\public_reasoning_patch_v1",
+  "file_count": 3,
+  "text_count": 104,
+  "character_count": 11974,
+  "token_count": 12182,
+  "supervised_example_count": 103,
+  "files": [
+    {
+      "path": "corpora\\public_reasoning_patch_v1\\examples.jsonl",
+      "size_bytes": 17356,
+      "sha256": "53966ebfe9650420a9aef341b0d07cb70308471582e664d4192b8ac26c9bdaf0",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\public_reasoning_patch_v1\\manifest.json",
+      "size_bytes": 517,
+      "sha256": "8a6f0a054e4549218394f282405c37a90cede0c1522b57eb00700743af8b020f",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\public_reasoning_patch_v1\\README.md",
+      "size_bytes": 303,
+      "sha256": "195ec4955168bfb45ff4ce50a0e667c95d01acb32b742bd2cadc29ba7add7c5d",
+      "relative_path": "README.md"
+    }
+  ]
+}

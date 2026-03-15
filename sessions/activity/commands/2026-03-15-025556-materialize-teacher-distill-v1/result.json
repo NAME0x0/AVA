@@ -1,0 +1,12 @@
+{
+  "label": "materialize-teacher-distill-v1",
+  "command": "python -c \"from ava.synthetic import materialize_teacher_distill_corpus; import json; print(json.dumps(materialize_teacher_distill_corpus('corpora/teacher_distill_v1', teacher_model='codex'), indent=2))\"",
+  "argv": [
+    "python",
+    "-c",
+    "from ava.synthetic import materialize_teacher_distill_corpus; import json; print(json.dumps(materialize_teacher_distill_corpus('corpora/teacher_distill_v1', teacher_model='codex'), indent=2))"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 78
+}

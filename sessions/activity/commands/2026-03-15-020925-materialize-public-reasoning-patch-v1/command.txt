@@ -1,0 +1,1 @@
+python -c "from ava.synthetic import materialize_public_reasoning_patch_corpus; import json; print(json.dumps(materialize_public_reasoning_patch_corpus('corpora/public_reasoning_patch_v1'), indent=2))"

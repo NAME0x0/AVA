@@ -526,3 +526,223 @@ def materialize_tool_canonical_patch_corpus(
             "This branch exists to test whether prompt-surface purity beats broader prompt variation under the current small-model regime.",
         ],
     )
+
+def _multiple_choice_prompt(question: str, choices: tuple[tuple[str, str], ...]) -> str:
+    lines = [question.strip(), "", "Options:"]
+    for label, choice in choices:
+        lines.append(f"{label}. {choice}")
+    lines.extend(["", "Reply with only the correct option label."])
+    return "\n".join(lines)
+
+
+def _rotated_choice_set(correct: str, distractors: tuple[str, str, str], index: int) -> tuple[tuple[tuple[str, str], ...], str]:
+    labels = ("A", "B", "C", "D")
+    answer_index = index % len(labels)
+    offset = index % len(distractors)
+    rotated_distractors = list(distractors[offset:]) + list(distractors[:offset])
+    options = list(rotated_distractors)
+    options.insert(answer_index, correct)
+    return tuple(zip(labels, options, strict=True)), labels[answer_index]
+
+
+def _science_multiple_choice_examples() -> list[dict[str, str]]:
+    rows = [
+        ("Which planet is known as the Red Planet?", "Mars", ("Venus", "Jupiter", "Saturn")),
+        ("What force keeps planets in orbit around the Sun?", "gravity", ("friction", "magnetism", "sound")),
+        ("What gas do plants take in from the air for photosynthesis?", "carbon dioxide", ("oxygen", "nitrogen", "helium")),
+        ("What part of a plant absorbs water from the soil?", "roots", ("flowers", "leaves", "seeds")),
+        ("What change of state happens when liquid water becomes water vapor?", "evaporation", ("freezing", "melting", "condensation")),
+        ("Which organ pumps blood through the human body?", "heart", ("lung", "liver", "brain")),
+        ("Which star is closest to Earth?", "the Sun", ("Polaris", "Sirius", "Betelgeuse")),
+        ("What instrument is used to measure temperature?", "thermometer", ("barometer", "ruler", "microscope")),
+        ("Which material is attracted to a magnet?", "iron", ("plastic", "glass", "rubber")),
+        ("What should a student keep the same when testing which paper towel absorbs the most water?", "the amount of water used each time", ("the brand of cereal nearby", "the color of the table", "the day of the week")),
+        ("Which process turns food into energy inside living things?", "cellular respiration", ("erosion", "reflection", "evaporation")),
+        ("What do bees help many plants do?", "pollinate", ("freeze", "evaporate", "erode")),
+        ("Which layer of Earth do people live on?", "the crust", ("the core", "the mantle", "the inner core")),
+        ("What is needed for a circuit to light a bulb?", "a complete loop", ("a broken wire only", "a paper clip only", "an empty battery")),
+        ("Which phase of the Moon appears fully lit from Earth?", "full moon", ("new moon", "crescent moon", "quarter moon")),
+        ("What property describes how much space an object takes up?", "volume", ("speed", "mass only", "temperature")),
+    ]
+    examples: list[dict[str, str]] = []
+    for index, (question, correct, distractors) in enumerate(rows):
+        choices, answer_key = _rotated_choice_set(correct, distractors, index)
+        examples.append({
+            "kind": "science_mc",
+            "prompt": _multiple_choice_prompt(question, choices),
+            "response": answer_key,
+        })
+    return examples
+
+
+def _commonsense_multiple_choice_examples() -> list[dict[str, str]]:
+    rows = [
+        ("Which item would you use to cut paper?", "scissors", ("pillow", "blanket", "toothbrush")),
+        ("Where would you usually store frozen food?", "freezer", ("oven", "desk drawer", "mailbox")),
+        ("What should you wear in heavy rain?", "a raincoat", ("sandals only", "swim goggles", "headphones")),
+        ("Which room is best for taking a shower?", "bathroom", ("garage", "attic", "porch")),
+        ("What do you use to unlock a door?", "a key", ("a spoon", "a pillow", "a plate")),
+        ("Where do books usually belong in a library?", "on shelves", ("in a sink", "under a car", "inside a shoe")),
+        ("Which tool is best for writing on paper?", "a pencil", ("a fork", "a mug", "a towel")),
+        ("What should you do before crossing a busy street?", "look both ways", ("close your eyes", "run backward", "drop your shoes")),
+    ]
+    examples: list[dict[str, str]] = []
+    for index, (question, correct, distractors) in enumerate(rows):
+        choices, answer_key = _rotated_choice_set(correct, distractors, index + 1)
+        examples.append({
+            "kind": "commonsense_mc",
+            "prompt": _multiple_choice_prompt(question, choices),
+            "response": answer_key,
+        })
+    return examples
+
+
+def _word_problem_examples() -> list[dict[str, str]]:
+    examples: list[dict[str, str]] = []
+    for start in range(12, 52, 4):
+        spent = (start // 4) % 5 + 2
+        bought = (start // 6) % 4 + 1
+        answer = start - spent + bought
+        prompt = (
+            f"Ava had {start} stickers. She gave {spent} to her friend and then bought {bought} more. "
+            "How many stickers does she have now?\n\nReply with only the final answer."
+        )
+        examples.append({"kind": "math_word", "prompt": prompt, "response": str(answer)})
+    for boxes in range(3, 15):
+        per_box = boxes % 5 + 4
+        answer = boxes * per_box
+        prompt = (
+            f"A store has {boxes} boxes with {per_box} pencils in each box. "
+            "How many pencils are there in all?\n\nReply with only the final answer."
+        )
+        examples.append({"kind": "math_word", "prompt": prompt, "response": str(answer)})
+    for total in range(24, 88, 8):
+        group = total // 8 + 2
+        remainder = total % group
+        if remainder != 0:
+            continue
+        answer = total // group
+        prompt = (
+            f"A teacher divides {total} notebooks equally among {group} students. "
+            "How many notebooks does each student get?\n\nReply with only the final answer."
+        )
+        examples.append({"kind": "math_word", "prompt": prompt, "response": str(answer)})
+    for price in range(3, 11):
+        count = price + 2
+        extra = count // 2
+        answer = (price * count) + extra
+        prompt = (
+            f"Each notebook costs {price} dollars. Mia buys {count} notebooks and then pays {extra} extra dollars for a pen. "
+            "How many dollars does she spend in total?\n\nReply with only the final answer."
+        )
+        examples.append({"kind": "math_word", "prompt": prompt, "response": str(answer)})
+    return examples
+
+
+def generate_public_reasoning_patch_examples(protocol_name: str = "compact_tags") -> list[dict[str, str]]:
+    examples: list[dict[str, str]] = []
+    examples.extend(_science_multiple_choice_examples())
+    examples.extend(_commonsense_multiple_choice_examples())
+    examples.extend(_word_problem_examples())
+    for expression in ("144 / 12", "sqrt(81)", "17 * 29", "25 + 17"):
+        examples.append(_trace_example(expression, protocol_name))
+        examples.append(_direct_tool_example(expression))
+        examples.extend(_direct_variant_examples(expression)[:2])
+    examples.extend(_general_anchor_examples())
+    examples.extend(_no_tool_examples())
+    examples.extend(_boundary_examples())
+    examples.extend(_refusal_examples())
+    examples.extend(_format_examples())
+    return _dedupe_examples(examples)
+
+
+def materialize_public_reasoning_patch_corpus(
+    root: str | Path,
+    protocol_name: str = "compact_tags",
+) -> dict[str, object]:
+    examples = generate_public_reasoning_patch_examples(protocol_name)
+    return _write_examples_corpus(
+        Path(root),
+        examples,
+        metadata={
+            "protocol": protocol_name,
+            "curriculum": "public_reasoning_patch",
+            "science_examples": len([item for item in examples if item["kind"] == "science_mc"]),
+            "commonsense_examples": len([item for item in examples if item["kind"] == "commonsense_mc"]),
+            "math_examples": len([item for item in examples if item["kind"] == "math_word"]),
+        },
+        readme_lines=[
+            "# Public Reasoning Patch Corpus",
+            "",
+            "A deterministic patch packet aimed at the first public-benchmark failures.",
+            "",
+            "It balances A/B/C/D multiple-choice supervision, adds answer-only arithmetic word problems, and preserves a compact tool/compliance anchor set so AVA does not forget the earlier tool wins.",
+        ],
+    )
+
+
+def _teacher_packet_contract(kind: str) -> tuple[str, str]:
+    mapping = {
+        "science_mc": ("science", "label_only"),
+        "commonsense_mc": ("language", "label_only"),
+        "math_word": ("math", "final_answer_only"),
+        "trace": ("tool", "tool_trace_then_answer"),
+        "tool_direct": ("tool", "direct_tool_answer"),
+        "tool_direct_variant": ("tool", "direct_tool_answer"),
+        "no_tool": ("tool", "final_answer_only"),
+        "boundary": ("compliance", "refusal_short"),
+        "refusal": ("compliance", "refusal_short"),
+        "format": ("compliance", "format_exact"),
+        "general": ("language", "final_answer_only"),
+    }
+    return mapping.get(kind, ("language", "final_answer_only"))
+
+
+
+def generate_teacher_distill_examples(
+    teacher_model: str = "codex",
+    protocol_name: str = "compact_tags",
+) -> list[dict[str, object]]:
+    examples: list[dict[str, object]] = []
+    for item in generate_public_reasoning_patch_examples(protocol_name):
+        category, format_contract = _teacher_packet_contract(str(item["kind"]))
+        tags = [str(item["kind"]), category, format_contract]
+        examples.append(
+            {
+                **item,
+                "teacher_model": teacher_model,
+                "source_type": "synthetic_teacher",
+                "category": category,
+                "difficulty": "easy",
+                "format_contract": format_contract,
+                "verifier_status": "pass",
+                "tags": tags,
+            }
+        )
+    return examples
+
+
+
+def materialize_teacher_distill_corpus(
+    root: str | Path,
+    teacher_model: str = "codex",
+    protocol_name: str = "compact_tags",
+) -> dict[str, object]:
+    examples = generate_teacher_distill_examples(teacher_model=teacher_model, protocol_name=protocol_name)
+    return _write_examples_corpus(
+        Path(root),
+        examples,
+        metadata={
+            "protocol": protocol_name,
+            "curriculum": "teacher_distill",
+            "teacher_model": teacher_model,
+            "total_examples": len(examples),
+        },
+        readme_lines=[
+            "# Teacher Distill Corpus",
+            "",
+            "First SOP-shaped teacher packet for AVA.",
+            "",
+            "This packet uses the public-reasoning repair mix, but adds teacher metadata and explicit format contracts so multiple teacher families can be compared cleanly.",
+        ],
+    )

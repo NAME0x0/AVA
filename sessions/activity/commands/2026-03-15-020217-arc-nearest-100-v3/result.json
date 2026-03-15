@@ -1,0 +1,30 @@
+{
+  "label": "arc-nearest-100-v3",
+  "command": "python -m ava.cli benchmark external arc-challenge sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --limit 100 --device cuda --retrieval-mode nearest --support-corpus corpora/tool_memory_minimal_v3 --nearest-threshold 0.45 --nearest-margin 0.0 --output sessions/activity/arc-nearest-100-v3.json",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "benchmark",
+    "external",
+    "arc-challenge",
+    "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+    "--limit",
+    "100",
+    "--device",
+    "cuda",
+    "--retrieval-mode",
+    "nearest",
+    "--support-corpus",
+    "corpora/tool_memory_minimal_v3",
+    "--nearest-threshold",
+    "0.45",
+    "--nearest-margin",
+    "0.0",
+    "--output",
+    "sessions/activity/arc-nearest-100-v3.json"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 6840
+}

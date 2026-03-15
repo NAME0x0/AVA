@@ -10,7 +10,7 @@ from ava.config import ExperimentConfig, load_experiment_config
 from ava.data import discover_corpus_files, encode_corpus, load_supervised_examples, load_text_corpus
 from ava.experiments import estimate_budget
 from ava.model import TORCH_AVAILABLE, build_model, torch
-from ava.tokenizer import load_tokenizer
+from ava.tokenizer import ByteBPETokenizer, SPECIAL_TOKEN_OFFSET, load_tokenizer, token_piece_bytes
 
 
 def dry_run_summary(config: ExperimentConfig) -> dict[str, object]:
@@ -170,6 +170,41 @@ def _resolve_device(requested_device: str) -> tuple[str, list[str]]:
     return requested_device, warnings
 
 
+def _expand_state_dict_for_tokenizer(state_dict: dict[str, Any], tokenizer: Any) -> dict[str, Any]:
+    embedding = state_dict["wte.weight"]
+    current_vocab, hidden_size = embedding.shape
+    if tokenizer.vocab_size <= current_vocab:
+        return state_dict
+    if not isinstance(tokenizer, ByteBPETokenizer) or current_vocab < SPECIAL_TOKEN_OFFSET + 256:
+        raise RuntimeError("init checkpoint vocab does not match current tokenizer and cannot be expanded safely")
+    expanded = embedding.new_zeros((tokenizer.vocab_size, hidden_size))
+    expanded[:current_vocab] = embedding
+    fallback = embedding[:current_vocab].mean(dim=0)
+    for token_id in range(current_vocab, tokenizer.vocab_size):
+        piece = token_piece_bytes(tokenizer, token_id)
+        if piece:
+            byte_ids = [SPECIAL_TOKEN_OFFSET + value for value in piece]
+            expanded[token_id] = embedding[byte_ids].mean(dim=0)
+        else:
+            expanded[token_id] = fallback
+    updated = dict(state_dict)
+    updated["wte.weight"] = expanded
+    if "lm_head.weight" in updated:
+        updated["lm_head.weight"] = expanded.clone()
+    return updated
+
+
+def _load_init_checkpoint(model: Any, tokenizer: Any, init_checkpoint_path: Path) -> str | None:
+    init_payload = torch.load(init_checkpoint_path, map_location="cpu")
+    init_state = init_payload["model"]
+    if model.wte.weight.shape != init_state["wte.weight"].shape:
+        init_state = _expand_state_dict_for_tokenizer(init_state, tokenizer)
+    model.load_state_dict(init_state)
+    init_config = init_payload.get("config", {})
+    tokenizer_config = init_config.get("tokenizer", {}) if isinstance(init_config, dict) else {}
+    return str(tokenizer_config.get("kind", "byte"))
+
+
 def _split_train_val_buffer(buffer: list[int], block_size: int) -> tuple[list[int], list[int]]:
     min_tokens_for_val = max((block_size + 2) * 4, 512)
     if len(buffer) < min_tokens_for_val:
@@ -286,10 +321,10 @@ def run_training(
         supervised_stats = None
 
     model = build_model(config.model, tokenizer.vocab_size).to(device)
+    init_tokenizer_kind: str | None = None
     if config.training.init_checkpoint:
         init_checkpoint_path = Path(config.training.init_checkpoint)
-        init_payload = torch.load(init_checkpoint_path, map_location="cpu")
-        model.load_state_dict(init_payload["model"])
+        init_tokenizer_kind = _load_init_checkpoint(model, tokenizer, init_checkpoint_path)
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=config.training.learning_rate,
@@ -397,6 +432,7 @@ def run_training(
         "tokenizer_kind": config.tokenizer.kind,
         "tokenizer_path": config.tokenizer.path,
         "tokenizer_vocab_size": tokenizer.vocab_size,
+        "init_tokenizer_kind": init_tokenizer_kind,
         "init_checkpoint": config.training.init_checkpoint,
         "device_requested": requested_device,
         "device_used": device,

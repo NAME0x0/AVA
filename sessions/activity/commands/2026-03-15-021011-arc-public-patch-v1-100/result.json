@@ -1,0 +1,24 @@
+{
+  "label": "arc-public-patch-v1-100",
+  "command": "python -m ava.cli benchmark external arc-challenge sessions/2026-03-15-020934-public-reasoning-patch-v1/checkpoints/ava-11m-public-reasoning-patch-v1.pt --limit 100 --device cuda --retrieval-mode baseline --output sessions/activity/arc-public-patch-v1-100.json",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "benchmark",
+    "external",
+    "arc-challenge",
+    "sessions/2026-03-15-020934-public-reasoning-patch-v1/checkpoints/ava-11m-public-reasoning-patch-v1.pt",
+    "--limit",
+    "100",
+    "--device",
+    "cuda",
+    "--retrieval-mode",
+    "baseline",
+    "--output",
+    "sessions/activity/arc-public-patch-v1-100.json"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 5715
+}

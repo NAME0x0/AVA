@@ -1,8 +1,8 @@
 import shutil
 from pathlib import Path
 
-from ava.tokenizer import ByteTokenizer, load_greedy_byte_piece_tokenizer, load_tokenizer
-from ava.tokenizer_artifacts import build_greedy_byte_piece_artifact
+from ava.tokenizer import ByteTokenizer, load_byte_bpe_tokenizer, load_greedy_byte_piece_tokenizer, load_tokenizer
+from ava.tokenizer_artifacts import build_byte_bpe_artifact, build_greedy_byte_piece_artifact
 
 
 def test_roundtrip() -> None:
@@ -45,4 +45,33 @@ def test_greedy_byte_piece_tokenizer_artifact_roundtrip() -> None:
     config_like = {"kind": "greedy_bytes", "path": str(artifact_path)}
     loaded = load_tokenizer(config_like)
     assert loaded.decode(loaded.encode("The calculator cannot help with deleting files.")) == "The calculator cannot help with deleting files."
+    shutil.rmtree(root)
+
+
+def test_byte_bpe_tokenizer_artifact_roundtrip_and_compression() -> None:
+    root = Path("sessions") / "test-byte-bpe-artifact"
+    artifact_path = root / "byte_bpe.json"
+    if root.exists():
+        shutil.rmtree(root)
+    root.mkdir(parents=True, exist_ok=True)
+    (root / "examples.jsonl").write_text(
+        "\n".join(
+            [
+                '{"prompt":"What planet is known as the Red Planet?","response":"Mars"}',
+                '{"prompt":"What planet is known as the Red Planet?","response":"Mars"}',
+                '{"prompt":"Reply with only the correct option label.","response":"A"}',
+                '{"prompt":"Reply with only the correct option label.","response":"B"}',
+            ]
+        ),
+        encoding="utf-8",
+    )
+    artifact = build_byte_bpe_artifact(root, artifact_path, target_vocab_size=300, min_pair_frequency=2)
+    tokenizer = load_byte_bpe_tokenizer(artifact_path)
+    text = "What planet is known as the Red Planet?"
+    byte_tokenizer = ByteTokenizer()
+    assert artifact["merge_count"] > 0
+    assert tokenizer.decode(tokenizer.encode(text, add_bos=True, add_eos=True)) == text
+    assert tokenizer.count_tokens(text) <= byte_tokenizer.count_tokens(text)
+    loaded = load_tokenizer({"kind": "byte_bpe", "path": str(artifact_path)})
+    assert loaded.decode(loaded.encode("Mars")) == "Mars"
     shutil.rmtree(root)

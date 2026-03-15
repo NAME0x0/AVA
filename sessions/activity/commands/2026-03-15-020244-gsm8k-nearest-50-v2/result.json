@@ -1,0 +1,30 @@
+{
+  "label": "gsm8k-nearest-50-v2",
+  "command": "python -m ava.cli benchmark external gsm8k sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --limit 50 --device cuda --retrieval-mode nearest --support-corpus corpora/tool_memory_minimal_v3 --nearest-threshold 0.45 --nearest-margin 0.0 --output sessions/activity/gsm8k-nearest-50-v2.json",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "benchmark",
+    "external",
+    "gsm8k",
+    "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+    "--limit",
+    "50",
+    "--device",
+    "cuda",
+    "--retrieval-mode",
+    "nearest",
+    "--support-corpus",
+    "corpora/tool_memory_minimal_v3",
+    "--nearest-threshold",
+    "0.45",
+    "--nearest-margin",
+    "0.0",
+    "--output",
+    "sessions/activity/gsm8k-nearest-50-v2.json"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 15053
+}

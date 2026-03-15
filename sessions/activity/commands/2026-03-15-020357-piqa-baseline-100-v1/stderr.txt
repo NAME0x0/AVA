@@ -1,0 +1,41 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\AVA\src\ava\cli.py", line 484, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "D:\AVA\src\ava\cli.py", line 456, in main
+    exit_code, metadata = _dispatch(args)
+                          ~~~~~~~~~^^^^^^
+  File "D:\AVA\src\ava\cli.py", line 380, in _dispatch
+    payload = evaluate_external_benchmark(
+        args.checkpoint,
+    ...<8 lines>...
+        nearest_margin=args.nearest_margin,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\torch\utils\_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "D:\AVA\src\ava\external_benchmarks.py", line 393, in evaluate_external_benchmark
+    tasks = load_external_benchmark_tasks(benchmark, split=split, limit=limit)
+  File "D:\AVA\src\ava\external_benchmarks.py", line 215, in load_external_benchmark_tasks
+    return load_piqa_tasks(split=split or "validation", limit=limit)
+  File "D:\AVA\src\ava\external_benchmarks.py", line 182, in load_piqa_tasks
+    dataset = load_dataset("piqa", split=_slice_split(split, limit))
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\datasets\load.py", line 1485, in load_dataset
+    builder_instance = load_dataset_builder(
+        path=path,
+    ...<10 lines>...
+        **config_kwargs,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\datasets\load.py", line 1130, in load_dataset_builder
+    dataset_module = dataset_module_factory(
+        path,
+    ...<5 lines>...
+        cache_dir=cache_dir,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\datasets\load.py", line 1029, in dataset_module_factory
+    raise e1 from None
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\datasets\load.py", line 989, in dataset_module_factory
+    raise RuntimeError(f"Dataset scripts are no longer supported, but found {filename}")
+RuntimeError: Dataset scripts are no longer supported, but found piqa.py

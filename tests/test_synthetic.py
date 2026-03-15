@@ -50,3 +50,28 @@ def test_generate_tool_canonical_patch_examples_is_canonical_and_targeted() -> N
     assert "Use the calculator tool for 144 / 12." in prompts
     assert "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer." in prompts
     assert "Calculate 144 / 12 with the calculator tool. Reply with only the answer." not in prompts
+
+
+def test_generate_public_reasoning_patch_examples_balances_labels_and_preserves_tool_anchors() -> None:
+    from ava.synthetic import generate_public_reasoning_patch_examples
+
+    examples = generate_public_reasoning_patch_examples()
+    choices = [item["response"] for item in examples if item["kind"] in {"science_mc", "commonsense_mc"}]
+    assert set(choices) == {"A", "B", "C", "D"}
+    math_rows = [item for item in examples if item["kind"] == "math_word"]
+    assert len(math_rows) >= 20
+    assert all(item["prompt"].endswith("Reply with only the final answer.") for item in math_rows)
+    prompts = {item["prompt"] for item in examples}
+    assert "Use the calculator tool for 144 / 12." in prompts
+
+
+def test_generate_teacher_distill_examples_adds_sop_metadata() -> None:
+    from ava.synthetic import generate_teacher_distill_examples
+
+    examples = generate_teacher_distill_examples(teacher_model="codex")
+    sample = examples[0]
+    assert sample["teacher_model"] == "codex"
+    assert sample["source_type"] == "synthetic_teacher"
+    assert sample["format_contract"]
+    assert sample["verifier_status"] == "pass"
+    assert isinstance(sample["tags"], list)

@@ -1,0 +1,22 @@
+{
+  "protocol": "compact_tags",
+  "curriculum": "public_reasoning_patch",
+  "science_examples": 16,
+  "commonsense_examples": 8,
+  "math_examples": 31,
+  "total_examples": 103,
+  "by_kind": {
+    "science_mc": 16,
+    "commonsense_mc": 8,
+    "math_word": 31,
+    "trace": 4,
+    "tool_direct": 4,
+    "tool_direct_variant": 8,
+    "general": 8,
+    "no_tool": 10,
+    "boundary": 6,
+    "refusal": 4,
+    "format": 4
+  },
+  "examples_path": "corpora\\public_reasoning_patch_v1\\examples.jsonl"
+}

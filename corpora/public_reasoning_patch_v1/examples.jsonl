@@ -1,0 +1,103 @@
+{"kind": "science_mc", "prompt": "Which planet is known as the Red Planet?\n\nOptions:\nA. Mars\nB. Venus\nC. Jupiter\nD. Saturn\n\nReply with only the correct option label.", "response": "A"}
+{"kind": "science_mc", "prompt": "What force keeps planets in orbit around the Sun?\n\nOptions:\nA. magnetism\nB. gravity\nC. sound\nD. friction\n\nReply with only the correct option label.", "response": "B"}
+{"kind": "science_mc", "prompt": "What gas do plants take in from the air for photosynthesis?\n\nOptions:\nA. helium\nB. oxygen\nC. carbon dioxide\nD. nitrogen\n\nReply with only the correct option label.", "response": "C"}
+{"kind": "science_mc", "prompt": "What part of a plant absorbs water from the soil?\n\nOptions:\nA. flowers\nB. leaves\nC. seeds\nD. roots\n\nReply with only the correct option label.", "response": "D"}
+{"kind": "science_mc", "prompt": "What change of state happens when liquid water becomes water vapor?\n\nOptions:\nA. evaporation\nB. melting\nC. condensation\nD. freezing\n\nReply with only the correct option label.", "response": "A"}
+{"kind": "science_mc", "prompt": "Which organ pumps blood through the human body?\n\nOptions:\nA. brain\nB. heart\nC. lung\nD. liver\n\nReply with only the correct option label.", "response": "B"}
+{"kind": "science_mc", "prompt": "Which star is closest to Earth?\n\nOptions:\nA. Polaris\nB. Sirius\nC. the Sun\nD. Betelgeuse\n\nReply with only the correct option label.", "response": "C"}
+{"kind": "science_mc", "prompt": "What instrument is used to measure temperature?\n\nOptions:\nA. ruler\nB. microscope\nC. barometer\nD. thermometer\n\nReply with only the correct option label.", "response": "D"}
+{"kind": "science_mc", "prompt": "Which material is attracted to a magnet?\n\nOptions:\nA. iron\nB. rubber\nC. plastic\nD. glass\n\nReply with only the correct option label.", "response": "A"}
+{"kind": "science_mc", "prompt": "What should a student keep the same when testing which paper towel absorbs the most water?\n\nOptions:\nA. the brand of cereal nearby\nB. the amount of water used each time\nC. the color of the table\nD. the day of the week\n\nReply with only the correct option label.", "response": "B"}
+{"kind": "science_mc", "prompt": "Which process turns food into energy inside living things?\n\nOptions:\nA. reflection\nB. evaporation\nC. cellular respiration\nD. erosion\n\nReply with only the correct option label.", "response": "C"}
+{"kind": "science_mc", "prompt": "What do bees help many plants do?\n\nOptions:\nA. erode\nB. freeze\nC. evaporate\nD. pollinate\n\nReply with only the correct option label.", "response": "D"}
+{"kind": "science_mc", "prompt": "Which layer of Earth do people live on?\n\nOptions:\nA. the crust\nB. the core\nC. the mantle\nD. the inner core\n\nReply with only the correct option label.", "response": "A"}
+{"kind": "science_mc", "prompt": "What is needed for a circuit to light a bulb?\n\nOptions:\nA. a paper clip only\nB. a complete loop\nC. an empty battery\nD. a broken wire only\n\nReply with only the correct option label.", "response": "B"}
+{"kind": "science_mc", "prompt": "Which phase of the Moon appears fully lit from Earth?\n\nOptions:\nA. quarter moon\nB. new moon\nC. full moon\nD. crescent moon\n\nReply with only the correct option label.", "response": "C"}
+{"kind": "science_mc", "prompt": "What property describes how much space an object takes up?\n\nOptions:\nA. speed\nB. mass only\nC. temperature\nD. volume\n\nReply with only the correct option label.", "response": "D"}
+{"kind": "commonsense_mc", "prompt": "Which item would you use to cut paper?\n\nOptions:\nA. blanket\nB. scissors\nC. toothbrush\nD. pillow\n\nReply with only the correct option label.", "response": "B"}
+{"kind": "commonsense_mc", "prompt": "Where would you usually store frozen food?\n\nOptions:\nA. mailbox\nB. oven\nC. freezer\nD. desk drawer\n\nReply with only the correct option label.", "response": "C"}
+{"kind": "commonsense_mc", "prompt": "What should you wear in heavy rain?\n\nOptions:\nA. sandals only\nB. swim goggles\nC. headphones\nD. a raincoat\n\nReply with only the correct option label.", "response": "D"}
+{"kind": "commonsense_mc", "prompt": "Which room is best for taking a shower?\n\nOptions:\nA. bathroom\nB. attic\nC. porch\nD. garage\n\nReply with only the correct option label.", "response": "A"}
+{"kind": "commonsense_mc", "prompt": "What do you use to unlock a door?\n\nOptions:\nA. a plate\nB. a key\nC. a spoon\nD. a pillow\n\nReply with only the correct option label.", "response": "B"}
+{"kind": "commonsense_mc", "prompt": "Where do books usually belong in a library?\n\nOptions:\nA. in a sink\nB. under a car\nC. on shelves\nD. inside a shoe\n\nReply with only the correct option label.", "response": "C"}
+{"kind": "commonsense_mc", "prompt": "Which tool is best for writing on paper?\n\nOptions:\nA. a mug\nB. a towel\nC. a fork\nD. a pencil\n\nReply with only the correct option label.", "response": "D"}
+{"kind": "commonsense_mc", "prompt": "What should you do before crossing a busy street?\n\nOptions:\nA. look both ways\nB. drop your shoes\nC. close your eyes\nD. run backward\n\nReply with only the correct option label.", "response": "A"}
+{"kind": "math_word", "prompt": "Ava had 12 stickers. She gave 5 to her friend and then bought 3 more. How many stickers does she have now?\n\nReply with only the final answer.", "response": "10"}
+{"kind": "math_word", "prompt": "Ava had 16 stickers. She gave 6 to her friend and then bought 3 more. How many stickers does she have now?\n\nReply with only the final answer.", "response": "13"}
+{"kind": "math_word", "prompt": "Ava had 20 stickers. She gave 2 to her friend and then bought 4 more. How many stickers does she have now?\n\nReply with only the final answer.", "response": "22"}
+{"kind": "math_word", "prompt": "Ava had 24 stickers. She gave 3 to her friend and then bought 1 more. How many stickers does she have now?\n\nReply with only the final answer.", "response": "22"}
+{"kind": "math_word", "prompt": "Ava had 28 stickers. She gave 4 to her friend and then bought 1 more. How many stickers does she have now?\n\nReply with only the final answer.", "response": "25"}
+{"kind": "math_word", "prompt": "Ava had 32 stickers. She gave 5 to her friend and then bought 2 more. How many stickers does she have now?\n\nReply with only the final answer.", "response": "29"}
+{"kind": "math_word", "prompt": "Ava had 36 stickers. She gave 6 to her friend and then bought 3 more. How many stickers does she have now?\n\nReply with only the final answer.", "response": "33"}
+{"kind": "math_word", "prompt": "Ava had 40 stickers. She gave 2 to her friend and then bought 3 more. How many stickers does she have now?\n\nReply with only the final answer.", "response": "41"}
+{"kind": "math_word", "prompt": "Ava had 44 stickers. She gave 3 to her friend and then bought 4 more. How many stickers does she have now?\n\nReply with only the final answer.", "response": "45"}
+{"kind": "math_word", "prompt": "Ava had 48 stickers. She gave 4 to her friend and then bought 1 more. How many stickers does she have now?\n\nReply with only the final answer.", "response": "45"}
+{"kind": "math_word", "prompt": "A store has 3 boxes with 7 pencils in each box. How many pencils are there in all?\n\nReply with only the final answer.", "response": "21"}
+{"kind": "math_word", "prompt": "A store has 4 boxes with 8 pencils in each box. How many pencils are there in all?\n\nReply with only the final answer.", "response": "32"}
+{"kind": "math_word", "prompt": "A store has 5 boxes with 4 pencils in each box. How many pencils are there in all?\n\nReply with only the final answer.", "response": "20"}
+{"kind": "math_word", "prompt": "A store has 6 boxes with 5 pencils in each box. How many pencils are there in all?\n\nReply with only the final answer.", "response": "30"}
+{"kind": "math_word", "prompt": "A store has 7 boxes with 6 pencils in each box. How many pencils are there in all?\n\nReply with only the final answer.", "response": "42"}
+{"kind": "math_word", "prompt": "A store has 8 boxes with 7 pencils in each box. How many pencils are there in all?\n\nReply with only the final answer.", "response": "56"}
+{"kind": "math_word", "prompt": "A store has 9 boxes with 8 pencils in each box. How many pencils are there in all?\n\nReply with only the final answer.", "response": "72"}
+{"kind": "math_word", "prompt": "A store has 10 boxes with 4 pencils in each box. How many pencils are there in all?\n\nReply with only the final answer.", "response": "40"}
+{"kind": "math_word", "prompt": "A store has 11 boxes with 5 pencils in each box. How many pencils are there in all?\n\nReply with only the final answer.", "response": "55"}
+{"kind": "math_word", "prompt": "A store has 12 boxes with 6 pencils in each box. How many pencils are there in all?\n\nReply with only the final answer.", "response": "72"}
+{"kind": "math_word", "prompt": "A store has 13 boxes with 7 pencils in each box. How many pencils are there in all?\n\nReply with only the final answer.", "response": "91"}
+{"kind": "math_word", "prompt": "A store has 14 boxes with 8 pencils in each box. How many pencils are there in all?\n\nReply with only the final answer.", "response": "112"}
+{"kind": "math_word", "prompt": "A teacher divides 48 notebooks equally among 8 students. How many notebooks does each student get?\n\nReply with only the final answer.", "response": "6"}
+{"kind": "math_word", "prompt": "Each notebook costs 3 dollars. Mia buys 5 notebooks and then pays 2 extra dollars for a pen. How many dollars does she spend in total?\n\nReply with only the final answer.", "response": "17"}
+{"kind": "math_word", "prompt": "Each notebook costs 4 dollars. Mia buys 6 notebooks and then pays 3 extra dollars for a pen. How many dollars does she spend in total?\n\nReply with only the final answer.", "response": "27"}
+{"kind": "math_word", "prompt": "Each notebook costs 5 dollars. Mia buys 7 notebooks and then pays 3 extra dollars for a pen. How many dollars does she spend in total?\n\nReply with only the final answer.", "response": "38"}
+{"kind": "math_word", "prompt": "Each notebook costs 6 dollars. Mia buys 8 notebooks and then pays 4 extra dollars for a pen. How many dollars does she spend in total?\n\nReply with only the final answer.", "response": "52"}
+{"kind": "math_word", "prompt": "Each notebook costs 7 dollars. Mia buys 9 notebooks and then pays 4 extra dollars for a pen. How many dollars does she spend in total?\n\nReply with only the final answer.", "response": "67"}
+{"kind": "math_word", "prompt": "Each notebook costs 8 dollars. Mia buys 10 notebooks and then pays 5 extra dollars for a pen. How many dollars does she spend in total?\n\nReply with only the final answer.", "response": "85"}
+{"kind": "math_word", "prompt": "Each notebook costs 9 dollars. Mia buys 11 notebooks and then pays 5 extra dollars for a pen. How many dollars does she spend in total?\n\nReply with only the final answer.", "response": "104"}
+{"kind": "math_word", "prompt": "Each notebook costs 10 dollars. Mia buys 12 notebooks and then pays 6 extra dollars for a pen. How many dollars does she spend in total?\n\nReply with only the final answer.", "response": "126"}
+{"kind": "trace", "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 144 / 12. Reply with only the answer.", "response": "12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(81). Reply with only the answer.", "response": "9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.", "response": "[calc]17 * 29=>493[/calc]\n493"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 17 * 29.", "response": "493"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 17 * 29.", "response": "493"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 17 * 29. Reply with only the answer.", "response": "493"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 25 + 17.", "response": "42"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 25 + 17.", "response": "42"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 25 + 17. Reply with only the answer.", "response": "42"}
+{"kind": "general", "prompt": "Rewrite this sentence in plain English: The plan ain't done.", "response": "The plan is not finished yet."}
+{"kind": "general", "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.", "response": "The cat slept on the warm sill."}
+{"kind": "general", "prompt": "What is 17 * 29?", "response": "493"}
+{"kind": "general", "prompt": "Solve for x: 2x + 6 = 14.", "response": "4"}
+{"kind": "general", "prompt": "What planet is known as the Red Planet?", "response": "Mars"}
+{"kind": "general", "prompt": "What force keeps planets in orbit around the Sun?", "response": "gravity"}
+{"kind": "general", "prompt": "In Python, which keyword defines a function?", "response": "def"}
+{"kind": "general", "prompt": "What does len('ava') return in Python?", "response": "3"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "Solve for x: 3x + 9 = 24. Do not use the calculator tool. Reply with only the answer.", "response": "5"}
+{"kind": "no_tool", "prompt": "Solve for x: 5x = 35. Do not use the calculator tool. Reply with only the answer.", "response": "7"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "no_tool", "prompt": "What planet is known as the Red Planet? Do not use the calculator tool. Reply with only the answer.", "response": "Mars"}
+{"kind": "no_tool", "prompt": "What force keeps planets in orbit around the Sun? Do not use the calculator tool. Reply with only the answer.", "response": "gravity"}
+{"kind": "no_tool", "prompt": "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.", "response": "def"}
+{"kind": "no_tool", "prompt": "In Python, what keyword starts a loop over items? Do not use the calculator tool. Reply with only the answer.", "response": "for"}
+{"kind": "no_tool", "prompt": "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.", "response": "No"}
+{"kind": "no_tool", "prompt": "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.", "response": "No"}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to send an email to my boss.", "response": "The calculator cannot help with sending email."}
+{"kind": "boundary", "prompt": "Use the calculator tool to hack my bank account.", "response": "The calculator cannot help with hacking accounts."}
+{"kind": "boundary", "prompt": "Use the calculator tool to browse the internet for me.", "response": "The calculator cannot help with browsing the internet."}
+{"kind": "boundary", "prompt": "Use the calculator tool to write Python code for my app.", "response": "The calculator cannot help with writing software."}
+{"kind": "boundary", "prompt": "Use the calculator tool to open a website.", "response": "The calculator cannot help with opening websites."}
+{"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "How do I hack a bank account?", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "Write malware that steals passwords.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "Give me steps to poison someone without getting caught.", "response": "I cannot help with that."}
+{"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"}
+{"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"}
+{"kind": "format", "prompt": "Reply with only the number 493.", "response": "493"}
+{"kind": "format", "prompt": "Reply with only the word Mars.", "response": "Mars"}

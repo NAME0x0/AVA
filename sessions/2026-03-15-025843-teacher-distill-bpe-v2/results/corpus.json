@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\teacher_distill_v1",
+  "file_count": 3,
+  "text_count": 104,
+  "character_count": 11904,
+  "token_count": 7252,
+  "supervised_example_count": 103,
+  "files": [
+    {
+      "path": "corpora\\teacher_distill_v1\\examples.jsonl",
+      "size_bytes": 40391,
+      "sha256": "21b485cb298f3981a8ff8c36c4c8d13adaf8ee5ca82fc522797dbb9b1bd0d7b8",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\teacher_distill_v1\\manifest.json",
+      "size_bytes": 451,
+      "sha256": "1a15450d10bbf55ad634883d96c29d51c3ce1014663b35a9dc619d9fd0a03182",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\teacher_distill_v1\\README.md",
+      "size_bytes": 233,
+      "sha256": "8819ee04d240799d5f3f6f2758067954720ebabd78b79eb43a6780444d29084b",
+      "relative_path": "README.md"
+    }
+  ]
+}

@@ -16,7 +16,7 @@ def corpus_texts_for_tokenizer(corpus_root: str | Path) -> list[str]:
     root_path = Path(corpus_root)
     texts = load_text_corpus(root_path)
     for example in load_supervised_examples(root_path):
-        texts.append(_render_supervised_example(example["prompt"], example["response"]))
+        texts.append(_render_supervised_example(str(example["prompt"]), str(example["response"])))
     return texts
 
 
@@ -86,6 +86,117 @@ def build_greedy_byte_piece_artifact(
         "target_vocab_size": target_vocab_size,
         "max_piece_length": max_piece_length,
         "min_frequency": min_frequency,
+        "text_count": len(texts),
+        "character_count": sum(len(text) for text in texts),
+    }
+
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(artifact, indent=2), encoding="utf-8")
+    return artifact
+
+
+def _initial_bpe_sequences(texts: list[str]) -> list[list[bytes]]:
+    sequences: list[list[bytes]] = []
+    for text in texts:
+        payload = text.encode("utf-8")
+        if not payload:
+            continue
+        sequences.append([bytes([value]) for value in payload])
+    return sequences
+
+
+def _pair_counts(sequences: list[list[bytes]]) -> Counter[tuple[bytes, bytes]]:
+    counts: Counter[tuple[bytes, bytes]] = Counter()
+    for sequence in sequences:
+        for index in range(len(sequence) - 1):
+            counts[(sequence[index], sequence[index + 1])] += 1
+    return counts
+
+
+def _merge_pair_in_sequences(sequences: list[list[bytes]], pair: tuple[bytes, bytes]) -> list[list[bytes]]:
+    merged_piece = pair[0] + pair[1]
+    updated: list[list[bytes]] = []
+    for sequence in sequences:
+        rebuilt: list[bytes] = []
+        index = 0
+        while index < len(sequence):
+            if index < len(sequence) - 1 and sequence[index] == pair[0] and sequence[index + 1] == pair[1]:
+                rebuilt.append(merged_piece)
+                index += 2
+                continue
+            rebuilt.append(sequence[index])
+            index += 1
+        updated.append(rebuilt)
+    return updated
+
+
+def build_byte_bpe_artifact(
+    corpus_root: str | Path,
+    output_path: str | Path,
+    *,
+    target_vocab_size: int = 512,
+    min_pair_frequency: int = 2,
+    max_piece_length: int = 12,
+) -> dict[str, object]:
+    merge_budget = target_vocab_size - len(SPECIAL_TOKENS) - 256
+    if merge_budget <= 0:
+        raise ValueError("target_vocab_size must exceed special tokens plus 256 base byte tokens")
+
+    texts = corpus_texts_for_tokenizer(corpus_root)
+    if not texts:
+        raise RuntimeError(f"no texts available to build tokenizer under {corpus_root}")
+
+    sequences = _initial_bpe_sequences(texts)
+    merges: list[dict[str, object]] = []
+    while len(merges) < merge_budget:
+        counts = _pair_counts(sequences)
+        candidates = [(pair, count) for pair, count in counts.items() if count >= min_pair_frequency]
+        if not candidates:
+            break
+        candidates.sort(
+            key=lambda item: (
+                item[1],
+                len(item[0][0]) + len(item[0][1]),
+                item[0][0],
+                item[0][1],
+            ),
+            reverse=True,
+        )
+        best_pair: tuple[bytes, bytes] | None = None
+        best_count = 0
+        merged = b""
+        for candidate_pair, candidate_count in candidates:
+            candidate_merged = candidate_pair[0] + candidate_pair[1]
+            if len(candidate_merged) > max_piece_length:
+                continue
+            best_pair = candidate_pair
+            best_count = candidate_count
+            merged = candidate_merged
+            break
+        if best_pair is None:
+            break
+        merges.append(
+            {
+                "left": best_pair[0].hex(),
+                "right": best_pair[1].hex(),
+                "merged": merged.hex(),
+                "count": best_count,
+            }
+        )
+        sequences = _merge_pair_in_sequences(sequences, best_pair)
+
+    artifact = {
+        "kind": "byte_bpe",
+        "merges": merges,
+        "vocab_size": len(SPECIAL_TOKENS) + 256 + len(merges),
+        "merge_count": len(merges),
+        "special_tokens": list(SPECIAL_TOKENS),
+        "base_bytes": 256,
+        "corpus_root": str(Path(corpus_root)),
+        "target_vocab_size": target_vocab_size,
+        "min_pair_frequency": min_pair_frequency,
+        "max_piece_length": max_piece_length,
         "text_count": len(texts),
         "character_count": sum(len(text) for text in texts),
     }

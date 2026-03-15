@@ -1,0 +1,22 @@
+{
+  "label": "build-byte-bpe-teacher-distill-v1",
+  "command": "python -m ava.cli tokenizer build corpora/teacher_distill_v1 artifacts/tokenizers/teacher_distill_v1_byte_bpe_384.json --kind byte_bpe --target-vocab-size 384 --min-pair-frequency 2",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "tokenizer",
+    "build",
+    "corpora/teacher_distill_v1",
+    "artifacts/tokenizers/teacher_distill_v1_byte_bpe_384.json",
+    "--kind",
+    "byte_bpe",
+    "--target-vocab-size",
+    "384",
+    "--min-pair-frequency",
+    "2"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 4465
+}

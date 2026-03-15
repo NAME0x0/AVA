@@ -1,0 +1,10 @@
+{
+  "name": "teacher-distill-bpe-v1",
+  "slug": "teacher-distill-bpe-v1",
+  "kind": "training",
+  "created_at_utc": "2026-03-15T02:56:49.006568+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-teacher-distill-bpe-v1.yaml",
+    "corpora\\teacher_distill_v1"
+  ]
+}

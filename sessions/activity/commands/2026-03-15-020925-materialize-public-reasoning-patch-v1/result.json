@@ -1,0 +1,12 @@
+{
+  "label": "materialize-public-reasoning-patch-v1",
+  "command": "python -c \"from ava.synthetic import materialize_public_reasoning_patch_corpus; import json; print(json.dumps(materialize_public_reasoning_patch_corpus('corpora/public_reasoning_patch_v1'), indent=2))\"",
+  "argv": [
+    "python",
+    "-c",
+    "from ava.synthetic import materialize_public_reasoning_patch_corpus; import json; print(json.dumps(materialize_public_reasoning_patch_corpus('corpora/public_reasoning_patch_v1'), indent=2))"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 102
+}

@@ -2,10 +2,11 @@ import shutil
 from pathlib import Path
 
 from ava.config import load_experiment_config
-from ava.tokenizer import load_tokenizer
+from ava.tokenizer import ByteBPETokenizer, load_tokenizer
 from ava.train import (
     _load_supervised_dataset,
     _split_supervised_samples,
+    _expand_state_dict_for_tokenizer,
     dry_run_summary,
     summarize_corpus,
     summarize_supervised_dataset,
@@ -82,3 +83,15 @@ def test_summarize_supervised_dataset_reports_truncation() -> None:
     assert stats["kept_examples"] == 1
     assert stats["skipped_no_target_examples"] == 1
     shutil.rmtree(corpus_root)
+
+
+def test_expand_state_dict_for_byte_bpe_initializes_new_tokens_from_bytes() -> None:
+    tokenizer = ByteBPETokenizer([{"left": "61", "right": "62", "merged": "6162"}])
+    embedding = __import__("torch").arange(260 * 2, dtype=__import__("torch").float32).view(260, 2)
+    state = {"wte.weight": embedding, "lm_head.weight": embedding.clone()}
+    expanded = _expand_state_dict_for_tokenizer(state, tokenizer)
+    new_row = expanded["wte.weight"][260]
+    expected = (embedding[101] + embedding[102]) / 2
+    assert expanded["wte.weight"].shape[0] == tokenizer.vocab_size
+    assert __import__("torch").allclose(new_row, expected)
+    assert __import__("torch").allclose(expanded["lm_head.weight"][260], expected)

@@ -1,0 +1,10 @@
+{
+  "name": "public-reasoning-patch-v1",
+  "slug": "public-reasoning-patch-v1",
+  "kind": "training",
+  "created_at_utc": "2026-03-15T02:09:34.435558+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-public-reasoning-patch-v1.yaml",
+    "corpora\\public_reasoning_patch_v1"
+  ]
+}

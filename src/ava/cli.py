@@ -10,8 +10,9 @@ from time import monotonic
 from ava.activity import record_activity, render_command, run_logged_command, snapshot_repo_state
 from ava.benchmarks import serialize_benchmark_registry
 from ava.config import load_experiment_config
+from ava.external_benchmarks import evaluate_external_benchmark, summarize_external_benchmark
 from ava.inspect import trace_checkpoint
-from ava.tokenizer_artifacts import build_greedy_byte_piece_artifact
+from ava.tokenizer_artifacts import build_byte_bpe_artifact, build_greedy_byte_piece_artifact
 from ava.sessions import (
     bootstrap_session,
     create_session,
@@ -111,9 +112,11 @@ def build_parser() -> argparse.ArgumentParser:
     tokenizer_build = tokenizer_subparsers.add_parser("build")
     tokenizer_build.add_argument("corpus_root")
     tokenizer_build.add_argument("output")
+    tokenizer_build.add_argument("--kind", choices=("greedy_bytes", "byte_bpe"), default="greedy_bytes")
     tokenizer_build.add_argument("--target-vocab-size", type=int, default=512)
     tokenizer_build.add_argument("--max-piece-length", type=int, default=12)
     tokenizer_build.add_argument("--min-frequency", type=int, default=2)
+    tokenizer_build.add_argument("--min-pair-frequency", type=int, default=2)
 
     inspect_parser = subparsers.add_parser("inspect")
     inspect_subparsers = inspect_parser.add_subparsers(dest="inspect_command", required=True)
@@ -137,6 +140,19 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark_registry = benchmark_subparsers.add_parser("registry")
     benchmark_registry.add_argument("--modality", default="all")
     benchmark_registry.add_argument("--stage", default="all")
+
+    benchmark_external = benchmark_subparsers.add_parser("external")
+    benchmark_external.add_argument("benchmark", choices=("gsm8k", "arc-challenge", "piqa"))
+    benchmark_external.add_argument("checkpoint")
+    benchmark_external.add_argument("--split")
+    benchmark_external.add_argument("--limit", type=int, default=50)
+    benchmark_external.add_argument("--device", default="cuda")
+    benchmark_external.add_argument("--support-corpus")
+    benchmark_external.add_argument("--retrieval-mode", choices=("baseline", "direct", "nearest"), default="baseline")
+    benchmark_external.add_argument("--nearest-threshold", type=float, default=0.45)
+    benchmark_external.add_argument("--nearest-margin", type=float, default=0.0)
+    benchmark_external.add_argument("--no-category-gating", action="store_true")
+    benchmark_external.add_argument("--output")
 
     activity_parser = subparsers.add_parser("activity")
     activity_subparsers = activity_parser.add_subparsers(dest="activity_command", required=True)
@@ -337,16 +353,26 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
         }
 
     if args.command == "tokenizer" and args.tokenizer_command == "build":
-        payload = build_greedy_byte_piece_artifact(
-            args.corpus_root,
-            args.output,
-            target_vocab_size=args.target_vocab_size,
-            max_piece_length=args.max_piece_length,
-            min_frequency=args.min_frequency,
-        )
+        if args.kind == "byte_bpe":
+            payload = build_byte_bpe_artifact(
+                args.corpus_root,
+                args.output,
+                target_vocab_size=args.target_vocab_size,
+                min_pair_frequency=args.min_pair_frequency,
+                max_piece_length=args.max_piece_length,
+            )
+        else:
+            payload = build_greedy_byte_piece_artifact(
+                args.corpus_root,
+                args.output,
+                target_vocab_size=args.target_vocab_size,
+                max_piece_length=args.max_piece_length,
+                min_frequency=args.min_frequency,
+            )
         print(json.dumps(payload, indent=2))
         return 0, {
             "tokenizer_command": "build",
+            "tokenizer_kind": args.kind,
             "corpus_root": args.corpus_root,
             "output": args.output,
             "vocab_size": payload.get("vocab_size"),
@@ -360,6 +386,34 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
             "modality": args.modality,
             "stage": args.stage,
             "rows": len(payload),
+        }
+
+    if args.command == "benchmark" and args.benchmark_command == "external":
+        payload = evaluate_external_benchmark(
+            args.checkpoint,
+            benchmark=args.benchmark,
+            split=args.split,
+            limit=args.limit,
+            requested_device=args.device,
+            support_corpus=args.support_corpus,
+            retrieval_mode=args.retrieval_mode,
+            category_gated=not args.no_category_gating,
+            nearest_threshold=args.nearest_threshold,
+            nearest_margin=args.nearest_margin,
+        )
+        if args.output:
+            Path(args.output).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        print(summarize_external_benchmark(payload))
+        return 0, {
+            "benchmark_command": "external",
+            "benchmark": args.benchmark,
+            "checkpoint": args.checkpoint,
+            "support_corpus": args.support_corpus,
+            "retrieval_mode": args.retrieval_mode,
+            "accuracy": payload["accuracy"],
+            "correct": payload["correct"],
+            "total": payload["total"],
+            "output": args.output,
         }
 
     if args.command == "activity" and args.activity_command == "snapshot":
@@ -440,3 +494,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

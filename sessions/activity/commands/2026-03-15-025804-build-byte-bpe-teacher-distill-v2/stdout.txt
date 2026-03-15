@@ -1,0 +1,380 @@
+{
+  "kind": "byte_bpe",
+  "merges": [
+    {
+      "left": "65",
+      "right": "20",
+      "merged": "6520",
+      "count": 627
+    },
+    {
+      "left": "74",
+      "right": "68",
+      "merged": "7468",
+      "count": 573
+    },
+    {
+      "left": "6f",
+      "right": "6e",
+      "merged": "6f6e",
+      "count": 425
+    },
+    {
+      "left": "79",
+      "right": "20",
+      "merged": "7920",
+      "count": 394
+    },
+    {
+      "left": "65",
+      "right": "72",
+      "merged": "6572",
+      "count": 377
+    },
+    {
+      "left": "73",
+      "right": "20",
+      "merged": "7320",
+      "count": 357
+    },
+    {
+      "left": "2e",
+      "right": "20",
+      "merged": "2e20",
+      "count": 328
+    },
+    {
+      "left": "6f",
+      "right": "72",
+      "merged": "6f72",
+      "count": 307
+    },
+    {
+      "left": "6c",
+      "right": "7920",
+      "merged": "6c7920",
+      "count": 300
+    },
+    {
+      "left": "61",
+      "right": "6e",
+      "merged": "616e",
+      "count": 281
+    },
+    {
+      "left": "7468",
+      "right": "6520",
+      "merged": "74686520",
+      "count": 277
+    },
+    {
+      "left": "74",
+      "right": "69",
+      "merged": "7469",
+      "count": 277
+    },
+    {
+      "left": "61",
+      "right": "6c",
+      "merged": "616c",
+      "count": 228
+    },
+    {
+      "left": "74",
+      "right": "20",
+      "merged": "7420",
+      "count": 226
+    },
+    {
+      "left": "3a",
+      "right": "20",
+      "merged": "3a20",
+      "count": 218
+    },
+    {
+      "left": "7469",
+      "right": "6f6e",
+      "merged": "74696f6e",
+      "count": 215
+    },
+    {
+      "left": "69",
+      "right": "6e",
+      "merged": "696e",
+      "count": 213
+    },
+    {
+      "left": "77",
+      "right": "6572",
+      "merged": "776572",
+      "count": 211
+    },
+    {
+      "left": "73",
+      "right": "776572",
+      "merged": "73776572",
+      "count": 203
+    },
+    {
+      "left": "6c",
+      "right": "61",
+      "merged": "6c61",
+      "count": 198
+    },
+    {
+      "left": "77",
+      "right": "69",
+      "merged": "7769",
+      "count": 196
+    },
+    {
+      "left": "2e",
+      "right": "0a",
+      "merged": "2e0a",
+      "count": 196
+    },
+    {
+      "left": "7468",
+      "right": "20",
+      "merged": "746820",
+      "count": 194
+    },
+    {
+      "left": "65",
+      "right": "6e",
+      "merged": "656e",
+      "count": 192
+    },
+    {
+      "left": "7769",
+      "right": "746820",
+      "merged": "7769746820",
+      "count": 190
+    },
+    {
+      "left": "52",
+      "right": "65",
+      "merged": "5265",
+      "count": 164
+    },
+    {
+      "left": "64",
+      "right": "20",
+      "merged": "6420",
+      "count": 163
+    },
+    {
+      "left": "0a",
+      "right": "0a",
+      "merged": "0a0a",
+      "count": 159
+    },
+    {
+      "left": "6f72",
+      "right": "20",
+      "merged": "6f7220",
+      "count": 155
+    },
+    {
+      "left": "74",
+      "right": "6f",
+      "merged": "746f",
+      "count": 148
+    },
+    {
+      "left": "6c7920",
+      "right": "7769746820",
+      "merged": "6c79207769746820",
+      "count": 146
+    },
+    {
+      "left": "6c7920",
+      "right": "74686520",
+      "merged": "6c792074686520",
+      "count": 146
+    },
+    {
+      "left": "5265",
+      "right": "70",
+      "merged": "526570",
+      "count": 146
+    },
+    {
+      "left": "65",
+      "right": "73",
+      "merged": "6573",
+      "count": 143
+    },
+    {
+      "left": "61",
+      "right": "20",
+      "merged": "6120",
+      "count": 139
+    },
+    {
+      "left": "6f",
+      "right": "6c",
+      "merged": "6f6c",
+      "count": 136
+    },
+    {
+      "left": "68",
+      "right": "61",
+      "merged": "6861",
+      "count": 117
+    },
+    {
+      "left": "62",
+      "right": "6f",
+      "merged": "626f",
+      "count": 116
+    },
+    {
+      "left": "6f",
+      "right": "77",
+      "merged": "6f77",
+      "count": 114
+    },
+    {
+      "left": "0a0a",
+      "right": "526570",
+      "merged": "0a0a526570",
+      "count": 110
+    },
+    {
+      "left": "20",
+      "right": "6d",
+      "merged": "206d",
+      "count": 107
+    },
+    {
+      "left": "74696f6e",
+      "right": "3a20",
+      "merged": "74696f6e3a20",
+      "count": 103
+    },
+    {
+      "left": "6573",
+      "right": "74696f6e3a20",
+      "merged": "657374696f6e3a20",
+      "count": 103
+    },
+    {
+      "left": "73776572",
+      "right": "3a20",
+      "merged": "737765723a20",
+      "count": 103
+    },
+    {
+      "left": "6e",
+      "right": "737765723a20",
+      "merged": "6e737765723a20",
+      "count": 103
+    },
+    {
+      "left": "41",
+      "right": "6e737765723a20",
+      "merged": "416e737765723a20",
+      "count": 103
+    },
+    {
+      "left": "51",
+      "right": "75",
+      "merged": "5175",
+      "count": 103
+    },
+    {
+      "left": "616e",
+      "right": "73776572",
+      "merged": "616e73776572",
+      "count": 100
+    },
+    {
+      "left": "63",
+      "right": "616c",
+      "merged": "63616c",
+      "count": 100
+    },
+    {
+      "left": "63616c",
+      "right": "63",
+      "merged": "63616c63",
+      "count": 100
+    },
+    {
+      "left": "616e73776572",
+      "right": "2e0a",
+      "merged": "616e737765722e0a",
+      "count": 98
+    },
+    {
+      "left": "70",
+      "right": "74696f6e",
+      "merged": "7074696f6e",
+      "count": 96
+    },
+    {
+      "left": "65",
+      "right": "6c",
+      "merged": "656c",
+      "count": 92
+    },
+    {
+      "left": "696e",
+      "right": "20",
+      "merged": "696e20",
+      "count": 90
+    },
+    {
+      "left": "70",
+      "right": "656e",
+      "merged": "70656e",
+      "count": 88
+    },
+    {
+      "left": "61",
+      "right": "72",
+      "merged": "6172",
+      "count": 87
+    },
+    {
+      "left": "75",
+      "right": "6c61",
+      "merged": "756c61",
+      "count": 86
+    },
+    {
+      "left": "63616c63",
+      "right": "756c61",
+      "merged": "63616c63756c61",
+      "count": 84
+    },
+    {
+      "left": "63616c63756c61",
+      "right": "74",
+      "merged": "63616c63756c6174",
+      "count": 84
+    },
+    {
+      "left": "63",
+      "right": "68",
+      "merged": "6368",
+      "count": 82
+    }
+  ],
+  "vocab_size": 320,
+  "merge_count": 60,
+  "special_tokens": [
+    "<pad>",
+    "<bos>",
+    "<eos>",
+    "<sep>"
+  ],
+  "base_bytes": 256,
+  "corpus_root": "corpora\\teacher_distill_v1",
+  "target_vocab_size": 320,
+  "min_pair_frequency": 2,
+  "max_piece_length": 8,
+  "text_count": 207,
+  "character_count": 25434
+}

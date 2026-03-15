@@ -157,7 +157,10 @@ For command-level provenance, AVA also keeps an activity ledger under `sessions/
 - [Data Strategy](docs/DATA.md)
 - [Experiment Workflow](docs/EXPERIMENTS.md)
 - [Research Roadmap](docs/RESEARCH_ROADMAP.md)
+- [Teacher Distillation SOP](docs/TEACHER_DISTILLATION_SOP.md)
 
 ## Status
 
 AVA is still in active experimentation. The stack is intentionally compact, the claims are intentionally conservative, and the repo is designed so that each iteration leaves behind a usable research trail.
+
+
