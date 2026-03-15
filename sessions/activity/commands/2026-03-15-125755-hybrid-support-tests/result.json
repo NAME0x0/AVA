@@ -1,0 +1,16 @@
+{
+  "label": "hybrid-support-tests",
+  "command": "python -m pytest tests/test_external_benchmarks.py tests/test_sessions.py tests/test_eval.py -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_external_benchmarks.py",
+    "tests/test_sessions.py",
+    "tests/test_eval.py",
+    "-q"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 21760
+}

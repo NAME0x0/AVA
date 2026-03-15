@@ -62,6 +62,25 @@ def test_load_support_examples_and_prepare_prompt() -> None:
     shutil.rmtree(workspace)
 
 
+def test_load_support_examples_preserves_explicit_category() -> None:
+    workspace = Path("sessions") / "test-retrieval-explicit-category"
+    if workspace.exists():
+        shutil.rmtree(workspace)
+    workspace.mkdir(parents=True, exist_ok=True)
+    corpus_path = workspace / "examples.jsonl"
+    rows = [
+        {"kind": "arc_mc", "category": "science", "prompt": "Which planet is known as the Red Planet?", "response": "A"},
+        {"kind": "gsm8k_train", "category": "math", "prompt": "What is 9 + 3?", "response": "12"},
+    ]
+    corpus_path.write_text("\n".join(json.dumps(row) for row in rows) + "\n", encoding="utf-8")
+
+    examples = load_support_examples(corpus_path)
+    assert [item.category for item in examples] == ["science", "math"]
+    assert [item.kind for item in examples] == ["arc_mc", "gsm8k_train"]
+
+    shutil.rmtree(workspace)
+
+
 
 def test_lookup_support_answer_nearest_matches_paraphrase() -> None:
     examples = [

@@ -1,0 +1,28 @@
+{
+  "label": "gsm8k-nearest-public-distill-th095-v1",
+  "command": "python -m ava.cli benchmark external gsm8k sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --limit 50 --device cuda --retrieval-mode nearest --nearest-threshold 0.95 --nearest-margin 0.01 --support-corpus corpora/public_benchmark_distill_v1",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "benchmark",
+    "external",
+    "gsm8k",
+    "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+    "--limit",
+    "50",
+    "--device",
+    "cuda",
+    "--retrieval-mode",
+    "nearest",
+    "--nearest-threshold",
+    "0.95",
+    "--nearest-margin",
+    "0.01",
+    "--support-corpus",
+    "corpora/public_benchmark_distill_v1"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 385958
+}

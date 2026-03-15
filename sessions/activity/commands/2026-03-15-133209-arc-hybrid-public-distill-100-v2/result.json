@@ -1,0 +1,25 @@
+{
+  "label": "arc-hybrid-public-distill-100-v2",
+  "command": "python -m ava.cli benchmark external arc-challenge --limit 100 --device cuda --checkpoint sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --retrieval-mode hybrid_support_mc --support-corpus corpora/public_benchmark_distill_v1",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "benchmark",
+    "external",
+    "arc-challenge",
+    "--limit",
+    "100",
+    "--device",
+    "cuda",
+    "--checkpoint",
+    "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+    "--retrieval-mode",
+    "hybrid_support_mc",
+    "--support-corpus",
+    "corpora/public_benchmark_distill_v1"
+  ],
+  "returncode": 2,
+  "cwd": "D:\\AVA",
+  "duration_ms": 3334
+}

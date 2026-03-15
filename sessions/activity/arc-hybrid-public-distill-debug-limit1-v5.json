@@ -1,0 +1,566 @@
+{
+  "benchmark": "arc-challenge",
+  "split": null,
+  "limit": 1,
+  "checkpoint": "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+  "config_name": "ava-11m-failure-patch-v2",
+  "requested_device": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "support_corpus": "corpora/public_benchmark_distill_v1",
+  "support_index_rows": 12429,
+  "retrieval_mode": "hybrid_support_mc",
+  "category_gated": true,
+  "nearest_threshold": 0.45,
+  "nearest_margin": 0.0,
+  "correct": 1,
+  "total": 1,
+  "accuracy": 1.0,
+  "by_category": {
+    "science": {
+      "correct": 1,
+      "total": 1,
+      "accuracy": 1.0
+    }
+  },
+  "results": [
+    {
+      "benchmark": "arc-challenge",
+      "task_id": "Mercury_SC_407695",
+      "category": "science",
+      "prompt": "Juan and LaKeisha roll a few objects down a ramp. They want to see which object rolls the farthest. What should they do so they can repeat their investigation?\n\nOptions:\nA. Put the objects in groups.\nB. Change the height of the ramp.\nC. Choose different objects to roll.\nD. Record the details of the investigation.\n\nReply with only the correct option label.",
+      "expected": "D",
+      "completion": "D",
+      "matched": true,
+      "retrieval": {
+        "enabled": true,
+        "mode": "hybrid_support_mc",
+        "references": [
+          {
+            "score": 0.756628,
+            "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. perform the investigation in a different way\nB. change the hypothesis to match the results\nC. choose a different investigation\nD. repeat the investigation\n\nReply with only the correct option label.",
+            "response": "D",
+            "normalized_response": "repeat the investigation",
+            "category": "science",
+            "kind": "arc_mc",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.756628,
+            "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. change the hypothesis to match the results\nB. choose a different investigation\nC. repeat the investigation\nD. perform the investigation in a different way\n\nReply with only the correct option label.",
+            "response": "C",
+            "normalized_response": "repeat the investigation",
+            "category": "science",
+            "kind": "arc_mc_aug",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.756628,
+            "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. choose a different investigation\nB. repeat the investigation\nC. perform the investigation in a different way\nD. change the hypothesis to match the results\n\nReply with only the correct option label.",
+            "response": "B",
+            "normalized_response": "repeat the investigation",
+            "category": "science",
+            "kind": "arc_mc_aug",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.756628,
+            "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. repeat the investigation\nB. perform the investigation in a different way\nC. change the hypothesis to match the results\nD. choose a different investigation\n\nReply with only the correct option label.",
+            "response": "A",
+            "normalized_response": "repeat the investigation",
+            "category": "science",
+            "kind": "arc_mc_aug",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.683222,
+            "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both examine the history of life on Earth.\nB. They both make discoveries using optical devices.\nC. They both study how organisms change over time.\nD. They both search for evidence about the origins of the universe.\n\nReply with only the correct option label.",
+            "response": "B",
+            "normalized_response": "They both make discoveries using optical devices.",
+            "category": "science",
+            "kind": "arc_mc",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.683222,
+            "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both make discoveries using optical devices.\nB. They both study how organisms change over time.\nC. They both search for evidence about the origins of the universe.\nD. They both examine the history of life on Earth.\n\nReply with only the correct option label.",
+            "response": "A",
+            "normalized_response": "They both make discoveries using optical devices.",
+            "category": "science",
+            "kind": "arc_mc_aug",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.683222,
+            "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both study how organisms change over time.\nB. They both search for evidence about the origins of the universe.\nC. They both examine the history of life on Earth.\nD. They both make discoveries using optical devices.\n\nReply with only the correct option label.",
+            "response": "D",
+            "normalized_response": "They both make discoveries using optical devices.",
+            "category": "science",
+            "kind": "arc_mc_aug",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.683222,
+            "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both search for evidence about the origins of the universe.\nB. They both examine the history of life on Earth.\nC. They both make discoveries using optical devices.\nD. They both study how organisms change over time.\n\nReply with only the correct option label.",
+            "response": "C",
+            "normalized_response": "They both make discoveries using optical devices.",
+            "category": "science",
+            "kind": "arc_mc_aug",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          }
+        ],
+        "category_hint": "science"
+      },
+      "expected_text": "Record the details of the investigation.",
+      "choices": [
+        [
+          "A",
+          "Put the objects in groups."
+        ],
+        [
+          "B",
+          "Change the height of the ramp."
+        ],
+        [
+          "C",
+          "Choose different objects to roll."
+        ],
+        [
+          "D",
+          "Record the details of the investigation."
+        ]
+      ],
+      "scoring": {
+        "mode": "hybrid_support_mc",
+        "scores": {
+          "A": 1.789884,
+          "B": 1.792405,
+          "C": 1.697122,
+          "D": 1.880754
+        },
+        "selected": "D",
+        "supports": [
+          {
+            "score": 0.756628,
+            "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. perform the investigation in a different way\nB. change the hypothesis to match the results\nC. choose a different investigation\nD. repeat the investigation\n\nReply with only the correct option label.",
+            "response": "D",
+            "normalized_response": "repeat the investigation",
+            "category": "science",
+            "kind": "arc_mc",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.756628,
+            "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. change the hypothesis to match the results\nB. choose a different investigation\nC. repeat the investigation\nD. perform the investigation in a different way\n\nReply with only the correct option label.",
+            "response": "C",
+            "normalized_response": "repeat the investigation",
+            "category": "science",
+            "kind": "arc_mc_aug",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.756628,
+            "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. choose a different investigation\nB. repeat the investigation\nC. perform the investigation in a different way\nD. change the hypothesis to match the results\n\nReply with only the correct option label.",
+            "response": "B",
+            "normalized_response": "repeat the investigation",
+            "category": "science",
+            "kind": "arc_mc_aug",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.756628,
+            "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. repeat the investigation\nB. perform the investigation in a different way\nC. change the hypothesis to match the results\nD. choose a different investigation\n\nReply with only the correct option label.",
+            "response": "A",
+            "normalized_response": "repeat the investigation",
+            "category": "science",
+            "kind": "arc_mc_aug",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.683222,
+            "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both examine the history of life on Earth.\nB. They both make discoveries using optical devices.\nC. They both study how organisms change over time.\nD. They both search for evidence about the origins of the universe.\n\nReply with only the correct option label.",
+            "response": "B",
+            "normalized_response": "They both make discoveries using optical devices.",
+            "category": "science",
+            "kind": "arc_mc",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.683222,
+            "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both make discoveries using optical devices.\nB. They both study how organisms change over time.\nC. They both search for evidence about the origins of the universe.\nD. They both examine the history of life on Earth.\n\nReply with only the correct option label.",
+            "response": "A",
+            "normalized_response": "They both make discoveries using optical devices.",
+            "category": "science",
+            "kind": "arc_mc_aug",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.683222,
+            "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both study how organisms change over time.\nB. They both search for evidence about the origins of the universe.\nC. They both examine the history of life on Earth.\nD. They both make discoveries using optical devices.\n\nReply with only the correct option label.",
+            "response": "D",
+            "normalized_response": "They both make discoveries using optical devices.",
+            "category": "science",
+            "kind": "arc_mc_aug",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.683222,
+            "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both search for evidence about the origins of the universe.\nB. They both examine the history of life on Earth.\nC. They both make discoveries using optical devices.\nD. They both study how organisms change over time.\n\nReply with only the correct option label.",
+            "response": "C",
+            "normalized_response": "They both make discoveries using optical devices.",
+            "category": "science",
+            "kind": "arc_mc_aug",
+            "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+            "reference_count": 1
+          }
+        ],
+        "choice_supports": {
+          "A": [
+            {
+              "score": 0.224127,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. perform the investigation in a different way\nB. change the hypothesis to match the results\nC. choose a different investigation\nD. repeat the investigation\n\nReply with only the correct option label.",
+              "response": "D",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.224127,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. change the hypothesis to match the results\nB. choose a different investigation\nC. repeat the investigation\nD. perform the investigation in a different way\n\nReply with only the correct option label.",
+              "response": "C",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.224127,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. choose a different investigation\nB. repeat the investigation\nC. perform the investigation in a different way\nD. change the hypothesis to match the results\n\nReply with only the correct option label.",
+              "response": "B",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.224127,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. repeat the investigation\nB. perform the investigation in a different way\nC. change the hypothesis to match the results\nD. choose a different investigation\n\nReply with only the correct option label.",
+              "response": "A",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.223344,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both increase.\nB. The kinetic energy and the potential energy both decrease.\nC. The kinetic energy increases and the potential energy decreases.\nD. The kinetic energy decreases and the potential energy increases.\n\nReply with only the correct option label.",
+              "response": "C",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.223344,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both decrease.\nB. The kinetic energy increases and the potential energy decreases.\nC. The kinetic energy decreases and the potential energy increases.\nD. The kinetic energy and the potential energy both increase.\n\nReply with only the correct option label.",
+              "response": "B",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.223344,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy increases and the potential energy decreases.\nB. The kinetic energy decreases and the potential energy increases.\nC. The kinetic energy and the potential energy both increase.\nD. The kinetic energy and the potential energy both decrease.\n\nReply with only the correct option label.",
+              "response": "A",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.223344,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy decreases and the potential energy increases.\nB. The kinetic energy and the potential energy both increase.\nC. The kinetic energy and the potential energy both decrease.\nD. The kinetic energy increases and the potential energy decreases.\n\nReply with only the correct option label.",
+              "response": "D",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            }
+          ],
+          "B": [
+            {
+              "score": 0.224061,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. perform the investigation in a different way\nB. change the hypothesis to match the results\nC. choose a different investigation\nD. repeat the investigation\n\nReply with only the correct option label.",
+              "response": "D",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.224061,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. change the hypothesis to match the results\nB. choose a different investigation\nC. repeat the investigation\nD. perform the investigation in a different way\n\nReply with only the correct option label.",
+              "response": "C",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.224061,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. choose a different investigation\nB. repeat the investigation\nC. perform the investigation in a different way\nD. change the hypothesis to match the results\n\nReply with only the correct option label.",
+              "response": "B",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.224061,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. repeat the investigation\nB. perform the investigation in a different way\nC. change the hypothesis to match the results\nD. choose a different investigation\n\nReply with only the correct option label.",
+              "response": "A",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.22404,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both increase.\nB. The kinetic energy and the potential energy both decrease.\nC. The kinetic energy increases and the potential energy decreases.\nD. The kinetic energy decreases and the potential energy increases.\n\nReply with only the correct option label.",
+              "response": "C",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.22404,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both decrease.\nB. The kinetic energy increases and the potential energy decreases.\nC. The kinetic energy decreases and the potential energy increases.\nD. The kinetic energy and the potential energy both increase.\n\nReply with only the correct option label.",
+              "response": "B",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.22404,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy increases and the potential energy decreases.\nB. The kinetic energy decreases and the potential energy increases.\nC. The kinetic energy and the potential energy both increase.\nD. The kinetic energy and the potential energy both decrease.\n\nReply with only the correct option label.",
+              "response": "A",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.22404,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy decreases and the potential energy increases.\nB. The kinetic energy and the potential energy both increase.\nC. The kinetic energy and the potential energy both decrease.\nD. The kinetic energy increases and the potential energy decreases.\n\nReply with only the correct option label.",
+              "response": "D",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            }
+          ],
+          "C": [
+            {
+              "score": 0.212497,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both increase.\nB. The kinetic energy and the potential energy both decrease.\nC. The kinetic energy increases and the potential energy decreases.\nD. The kinetic energy decreases and the potential energy increases.\n\nReply with only the correct option label.",
+              "response": "C",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.212497,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both decrease.\nB. The kinetic energy increases and the potential energy decreases.\nC. The kinetic energy decreases and the potential energy increases.\nD. The kinetic energy and the potential energy both increase.\n\nReply with only the correct option label.",
+              "response": "B",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.212497,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy increases and the potential energy decreases.\nB. The kinetic energy decreases and the potential energy increases.\nC. The kinetic energy and the potential energy both increase.\nD. The kinetic energy and the potential energy both decrease.\n\nReply with only the correct option label.",
+              "response": "A",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.212497,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy decreases and the potential energy increases.\nB. The kinetic energy and the potential energy both increase.\nC. The kinetic energy and the potential energy both decrease.\nD. The kinetic energy increases and the potential energy decreases.\n\nReply with only the correct option label.",
+              "response": "D",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.211784,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. perform the investigation in a different way\nB. change the hypothesis to match the results\nC. choose a different investigation\nD. repeat the investigation\n\nReply with only the correct option label.",
+              "response": "D",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.211784,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. change the hypothesis to match the results\nB. choose a different investigation\nC. repeat the investigation\nD. perform the investigation in a different way\n\nReply with only the correct option label.",
+              "response": "C",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.211784,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. choose a different investigation\nB. repeat the investigation\nC. perform the investigation in a different way\nD. change the hypothesis to match the results\n\nReply with only the correct option label.",
+              "response": "B",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.211784,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. repeat the investigation\nB. perform the investigation in a different way\nC. change the hypothesis to match the results\nD. choose a different investigation\n\nReply with only the correct option label.",
+              "response": "A",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            }
+          ],
+          "D": [
+            {
+              "score": 0.246731,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. perform the investigation in a different way\nB. change the hypothesis to match the results\nC. choose a different investigation\nD. repeat the investigation\n\nReply with only the correct option label.",
+              "response": "D",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.246731,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. change the hypothesis to match the results\nB. choose a different investigation\nC. repeat the investigation\nD. perform the investigation in a different way\n\nReply with only the correct option label.",
+              "response": "C",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.246731,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. choose a different investigation\nB. repeat the investigation\nC. perform the investigation in a different way\nD. change the hypothesis to match the results\n\nReply with only the correct option label.",
+              "response": "B",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.246731,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. repeat the investigation\nB. perform the investigation in a different way\nC. change the hypothesis to match the results\nD. choose a different investigation\n\nReply with only the correct option label.",
+              "response": "A",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.223458,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both increase.\nB. The kinetic energy and the potential energy both decrease.\nC. The kinetic energy increases and the potential energy decreases.\nD. The kinetic energy decreases and the potential energy increases.\n\nReply with only the correct option label.",
+              "response": "C",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.223458,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both decrease.\nB. The kinetic energy increases and the potential energy decreases.\nC. The kinetic energy decreases and the potential energy increases.\nD. The kinetic energy and the potential energy both increase.\n\nReply with only the correct option label.",
+              "response": "B",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.223458,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy increases and the potential energy decreases.\nB. The kinetic energy decreases and the potential energy increases.\nC. The kinetic energy and the potential energy both increase.\nD. The kinetic energy and the potential energy both decrease.\n\nReply with only the correct option label.",
+              "response": "A",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.223458,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy decreases and the potential energy increases.\nB. The kinetic energy and the potential energy both increase.\nC. The kinetic energy and the potential energy both decrease.\nD. The kinetic energy increases and the potential energy decreases.\n\nReply with only the correct option label.",
+              "response": "D",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "arc_mc_aug",
+              "source_path": "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+              "reference_count": 1
+            }
+          ]
+        },
+        "candidate_count": 4476
+      }
+    }
+  ]
+}

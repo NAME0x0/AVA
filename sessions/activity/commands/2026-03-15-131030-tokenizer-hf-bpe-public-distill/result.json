@@ -1,0 +1,22 @@
+{
+  "label": "tokenizer-hf-bpe-public-distill",
+  "command": "python -m ava.cli tokenizer build corpora/public_benchmark_distill_v1 artifacts/tokenizers/public_distill_hf_bpe_384.json --kind hf_bpe --target-vocab-size 384 --min-frequency 2",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "tokenizer",
+    "build",
+    "corpora/public_benchmark_distill_v1",
+    "artifacts/tokenizers/public_distill_hf_bpe_384.json",
+    "--kind",
+    "hf_bpe",
+    "--target-vocab-size",
+    "384",
+    "--min-frequency",
+    "2"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 4891
+}

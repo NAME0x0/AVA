@@ -1,0 +1,87 @@
+{
+  "baseline": {
+    "arc_hybrid_train_support_100_old": {
+      "correct": 31,
+      "total": 100,
+      "accuracy": 0.31,
+      "source": "sessions/activity/arc-hybrid-support-mc-100.json"
+    },
+    "arc_hybrid_train_support_299_old": {
+      "correct": 87,
+      "total": 299,
+      "accuracy": 0.291,
+      "source": "sessions/activity/arc-hybrid-support-mc-299.json"
+    }
+  },
+  "this_round": {
+    "arc_hybrid_public_distill_100_v2": {
+      "correct": 24,
+      "total": 100,
+      "accuracy": 0.24
+    },
+    "arc_hybrid_public_distill_100_v4": {
+      "correct": 29,
+      "total": 100,
+      "accuracy": 0.29
+    },
+    "arc_hybrid_public_distill_100_v5": {
+      "correct": 30,
+      "total": 100,
+      "accuracy": 0.3
+    },
+    "arc_hybrid_public_distill_299_v4": {
+      "correct": 84,
+      "total": 299,
+      "accuracy": 0.281
+    },
+    "arc_hybrid_public_distill_299_v5": {
+      "correct": 86,
+      "total": 299,
+      "accuracy": 0.288
+    },
+    "arc_hybrid_public_plus_teacher_100_v1": {
+      "correct": 30,
+      "total": 100,
+      "accuracy": 0.3
+    },
+    "gsm8k_nearest_public_distill_th090_v1": {
+      "correct": 0,
+      "total": 50,
+      "accuracy": 0.0
+    },
+    "gsm8k_nearest_public_distill_th095_v1": {
+      "correct": 0,
+      "total": 50,
+      "accuracy": 0.0
+    },
+    "arc_ensemble_public_primary_100_v1": {
+      "correct": 31,
+      "total": 100,
+      "accuracy": 0.31
+    },
+    "arc_ensemble_public_primary_100_v2": {
+      "correct": 30,
+      "total": 100,
+      "accuracy": 0.3
+    },
+    "arc_ensemble_arc_primary_100_v1": {
+      "correct": 31,
+      "total": 100,
+      "accuracy": 0.31
+    },
+    "arc_ensemble_public_primary_299_v1": {
+      "correct": 88,
+      "total": 299,
+      "accuracy": 0.294
+    }
+  },
+  "findings": [
+    "Mixed support corpora were losing coarse domain labels because load_support_examples overwrote explicit category with kind.",
+    "Indexed hybrid retrieval made the broad public support bank usable again.",
+    "Signature-level support collapse was discarding rotated ARC support rows and hurting public benchmark performance.",
+    "A question/semantic-heavy hybrid scorer improved the broad public ARC bank from 84/299 to 86/299.",
+    "A margin-gated two-bank ensemble over the broad public bank and the dedicated ARC bank reached 88/299 on ARC-Challenge.",
+    "GSM8K remained at 0/50 even after clean math-only gating, so current retrieval improvements are MCQ-science-biased rather than free-form-math-capable.",
+    "Adding teacher science anchors on top of the public support bank did not improve ARC further."
+  ]
+}

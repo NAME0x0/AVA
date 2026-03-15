@@ -1,0 +1,15 @@
+{
+  "strategy": "margin_gate",
+  "primary_bank": "arc_text",
+  "margin_threshold": 0.001,
+  "banks": [
+    {
+      "name": "arc_text",
+      "path": "../arc_train_support_v1"
+    },
+    {
+      "name": "combined",
+      "path": "../arc_combined_support_v1"
+    }
+  ]
+}

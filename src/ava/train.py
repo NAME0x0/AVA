@@ -10,7 +10,7 @@ from ava.config import ExperimentConfig, load_experiment_config
 from ava.data import discover_corpus_files, encode_corpus, load_supervised_examples, load_text_corpus
 from ava.experiments import estimate_budget
 from ava.model import TORCH_AVAILABLE, build_model, torch
-from ava.tokenizer import ByteBPETokenizer, SPECIAL_TOKEN_OFFSET, load_tokenizer, token_piece_bytes
+from ava.tokenizer import SPECIAL_TOKENS, SPECIAL_TOKEN_OFFSET, load_tokenizer, token_piece_bytes
 
 
 def dry_run_summary(config: ExperimentConfig) -> dict[str, object]:
@@ -185,23 +185,46 @@ def _configure_trainable_parameters(model: Any, patterns: tuple[str, ...]) -> tu
     return trainable_parameters, trainable_names, trainable_parameter_count
 
 
-def _expand_state_dict_for_tokenizer(state_dict: dict[str, Any], tokenizer: Any) -> dict[str, Any]:
-    embedding = state_dict["wte.weight"]
+def _tokenizer_preserves_byte_prefix(tokenizer: Any) -> bool:
+    kind = getattr(tokenizer, "kind", None)
+    return kind is None or kind in {"byte", "greedy_bytes", "byte_bpe"}
+
+
+def _build_tokenizer_aligned_embedding(embedding: Any, tokenizer: Any) -> Any:
     current_vocab, hidden_size = embedding.shape
-    if tokenizer.vocab_size <= current_vocab:
-        return state_dict
-    if not isinstance(tokenizer, ByteBPETokenizer) or current_vocab < SPECIAL_TOKEN_OFFSET + 256:
-        raise RuntimeError("init checkpoint vocab does not match current tokenizer and cannot be expanded safely")
-    expanded = embedding.new_zeros((tokenizer.vocab_size, hidden_size))
-    expanded[:current_vocab] = embedding
-    fallback = embedding[:current_vocab].mean(dim=0)
-    for token_id in range(current_vocab, tokenizer.vocab_size):
+    if current_vocab < SPECIAL_TOKEN_OFFSET + 256:
+        raise RuntimeError("init checkpoint vocab does not match the byte-level AVA baseline and cannot be remapped safely")
+    expanded = embedding.new_empty((tokenizer.vocab_size, hidden_size))
+    fallback = embedding.mean(dim=0)
+    expanded[:] = fallback
+
+    if _tokenizer_preserves_byte_prefix(tokenizer):
+        copy_count = min(current_vocab, tokenizer.vocab_size)
+        expanded[:copy_count] = embedding[:copy_count]
+    else:
+        token_to_id = getattr(tokenizer, "token_to_id", {})
+        for token_name in SPECIAL_TOKENS:
+            new_id = token_to_id.get(token_name)
+            if new_id is not None:
+                expanded[new_id] = embedding[SPECIAL_TOKENS.index(token_name)]
+
+    for token_id in range(tokenizer.vocab_size):
+        if _tokenizer_preserves_byte_prefix(tokenizer) and token_id < min(current_vocab, tokenizer.vocab_size):
+            continue
         piece = token_piece_bytes(tokenizer, token_id)
         if piece:
             byte_ids = [SPECIAL_TOKEN_OFFSET + value for value in piece]
             expanded[token_id] = embedding[byte_ids].mean(dim=0)
-        else:
-            expanded[token_id] = fallback
+
+    return expanded
+
+
+def _expand_state_dict_for_tokenizer(state_dict: dict[str, Any], tokenizer: Any) -> dict[str, Any]:
+    embedding = state_dict["wte.weight"]
+    current_vocab, _hidden_size = embedding.shape
+    if tokenizer.vocab_size == current_vocab and _tokenizer_preserves_byte_prefix(tokenizer):
+        return state_dict
+    expanded = _build_tokenizer_aligned_embedding(embedding, tokenizer)
     updated = dict(state_dict)
     updated["wte.weight"] = expanded
     if "lm_head.weight" in updated:
@@ -223,14 +246,16 @@ def _resize_state_dict_for_block_size(state_dict: dict[str, Any], block_size: in
 def _load_init_checkpoint(model: Any, tokenizer: Any, init_checkpoint_path: Path) -> str | None:
     init_payload = torch.load(init_checkpoint_path, map_location="cpu")
     init_state = init_payload["model"]
-    if model.wte.weight.shape != init_state["wte.weight"].shape:
+    init_config = init_payload.get("config", {})
+    tokenizer_config = init_config.get("tokenizer", {}) if isinstance(init_config, dict) else {}
+    init_tokenizer_kind = str(tokenizer_config.get("kind", "byte"))
+    current_tokenizer_kind = getattr(tokenizer, "kind", "byte")
+    if model.wte.weight.shape != init_state["wte.weight"].shape or init_tokenizer_kind != current_tokenizer_kind:
         init_state = _expand_state_dict_for_tokenizer(init_state, tokenizer)
     if "wpe.weight" in init_state and model.wpe.weight.shape != init_state["wpe.weight"].shape:
         init_state = _resize_state_dict_for_block_size(init_state, model.config.block_size)
     model.load_state_dict(init_state)
-    init_config = init_payload.get("config", {})
-    tokenizer_config = init_config.get("tokenizer", {}) if isinstance(init_config, dict) else {}
-    return str(tokenizer_config.get("kind", "byte"))
+    return init_tokenizer_kind
 
 
 def _split_train_val_buffer(buffer: list[int], block_size: int) -> tuple[list[int], list[int]]:

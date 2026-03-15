@@ -1,0 +1,566 @@
+{
+  "benchmark": "arc-challenge",
+  "split": null,
+  "limit": 1,
+  "checkpoint": "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+  "config_name": "ava-11m-failure-patch-v2",
+  "requested_device": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "support_corpus": "corpora/arc_train_support_v1",
+  "support_index_rows": 1118,
+  "retrieval_mode": "hybrid_support_mc",
+  "category_gated": true,
+  "nearest_threshold": 0.45,
+  "nearest_margin": 0.0,
+  "correct": 1,
+  "total": 1,
+  "accuracy": 1.0,
+  "by_category": {
+    "science": {
+      "correct": 1,
+      "total": 1,
+      "accuracy": 1.0
+    }
+  },
+  "results": [
+    {
+      "benchmark": "arc-challenge",
+      "task_id": "Mercury_SC_407695",
+      "category": "science",
+      "prompt": "Juan and LaKeisha roll a few objects down a ramp. They want to see which object rolls the farthest. What should they do so they can repeat their investigation?\n\nOptions:\nA. Put the objects in groups.\nB. Change the height of the ramp.\nC. Choose different objects to roll.\nD. Record the details of the investigation.\n\nReply with only the correct option label.",
+      "expected": "D",
+      "completion": "D",
+      "matched": true,
+      "retrieval": {
+        "enabled": true,
+        "mode": "hybrid_support_mc",
+        "references": [
+          {
+            "score": 0.479812,
+            "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. perform the investigation in a different way\nB. change the hypothesis to match the results\nC. choose a different investigation\nD. repeat the investigation\n\nReply with only the correct option label.",
+            "response": "repeat the investigation",
+            "normalized_response": "repeat the investigation",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.421014,
+            "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both examine the history of life on Earth.\nB. They both make discoveries using optical devices.\nC. They both study how organisms change over time.\nD. They both search for evidence about the origins of the universe.\n\nReply with only the correct option label.",
+            "response": "They both make discoveries using optical devices.",
+            "normalized_response": "They both make discoveries using optical devices.",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.417311,
+            "prompt": "Two students are studying what makes ice melt fastest. They want to conduct an investigation. During which of these steps in their investigation will they measure the ice?\n\nOptions:\nA. showing some graphs\nB. making a conclusion\nC. developing a hypothesis\nD. collecting some data\n\nReply with only the correct option label.",
+            "response": "collecting some data",
+            "normalized_response": "collecting some data",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.411539,
+            "prompt": "What should be done when the results of an experiment do not support the hypothesis?\n\nOptions:\nA. repeat the experiment and check for errors\nB. change the observations to match the hypothesis\nC. redo the experiment until the expected results are obtained\nD. record and analyze the data after changing the hypothesis\n\nReply with only the correct option label.",
+            "response": "repeat the experiment and check for errors",
+            "normalized_response": "repeat the experiment and check for errors",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.394409,
+            "prompt": "A student is measuring the boiling point of a salt and water mixture. He takes one temperature measurement of 105\u00b0C. Which is the best way to ensure the results are valid?\n\nOptions:\nA. repeat the investigation\nB. change the volume of water\nC. add more salt to the mixture\nD. do the investigation without salt\n\nReply with only the correct option label.",
+            "response": "repeat the investigation",
+            "normalized_response": "repeat the investigation",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.392839,
+            "prompt": "In a lab investigation, students use Brand X batteries in a flashlight and Brand Y batteries in a radio. After two hours, the flashlight stops working, but the radio continues to work. As a result, the students conclude that Brand Y batteries last longer. Which statement about the conclusion of the investigation is most accurate?\n\nOptions:\nA. The conclusion is valid because they tested two different brands.\nB. The conclusion is invalid because the test had multiple variables.\nC. The conclusion is valid because they conducted the investigation in a lab.\nD. The conclusion is invalid because the real names of the batteries were hidden.\n\nReply with only the correct option label.",
+            "response": "The conclusion is invalid because the test had multiple variables.",
+            "normalized_response": "The conclusion is invalid because the test had multiple variables.",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.390949,
+            "prompt": "Students measure the effect of water on the growth of plants for a lab experiment. The students give different amounts of water to three different groups of plants. All plants receive the same amount of light and are planted in the same amount of soil. The students then measure the height of the plants over a period of four weeks. Which variables should be labeled on the axes to graph the data collected in this experiment?\n\nOptions:\nA. Amount of Water vs. Height of Plants\nB. Temperature vs. Amount of Sunlight\nC. Amount of Water vs. Amount of Soil\nD. Amount of Sunlight vs. Height of Plants\n\nReply with only the correct option label.",
+            "response": "Amount of Water vs. Height of Plants",
+            "normalized_response": "Amount of Water vs. Height of Plants",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.384618,
+            "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both increase.\nB. The kinetic energy and the potential energy both decrease.\nC. The kinetic energy increases and the potential energy decreases.\nD. The kinetic energy decreases and the potential energy increases.\n\nReply with only the correct option label.",
+            "response": "The kinetic energy increases and the potential energy decreases.",
+            "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          }
+        ],
+        "category_hint": "science"
+      },
+      "expected_text": "Record the details of the investigation.",
+      "choices": [
+        [
+          "A",
+          "Put the objects in groups."
+        ],
+        [
+          "B",
+          "Change the height of the ramp."
+        ],
+        [
+          "C",
+          "Choose different objects to roll."
+        ],
+        [
+          "D",
+          "Record the details of the investigation."
+        ]
+      ],
+      "scoring": {
+        "mode": "hybrid_support_mc",
+        "scores": {
+          "A": 1.989912,
+          "B": 2.027382,
+          "C": 1.924152,
+          "D": 2.082918
+        },
+        "selected": "D",
+        "supports": [
+          {
+            "score": 0.479812,
+            "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. perform the investigation in a different way\nB. change the hypothesis to match the results\nC. choose a different investigation\nD. repeat the investigation\n\nReply with only the correct option label.",
+            "response": "repeat the investigation",
+            "normalized_response": "repeat the investigation",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.421014,
+            "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both examine the history of life on Earth.\nB. They both make discoveries using optical devices.\nC. They both study how organisms change over time.\nD. They both search for evidence about the origins of the universe.\n\nReply with only the correct option label.",
+            "response": "They both make discoveries using optical devices.",
+            "normalized_response": "They both make discoveries using optical devices.",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.417311,
+            "prompt": "Two students are studying what makes ice melt fastest. They want to conduct an investigation. During which of these steps in their investigation will they measure the ice?\n\nOptions:\nA. showing some graphs\nB. making a conclusion\nC. developing a hypothesis\nD. collecting some data\n\nReply with only the correct option label.",
+            "response": "collecting some data",
+            "normalized_response": "collecting some data",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.411539,
+            "prompt": "What should be done when the results of an experiment do not support the hypothesis?\n\nOptions:\nA. repeat the experiment and check for errors\nB. change the observations to match the hypothesis\nC. redo the experiment until the expected results are obtained\nD. record and analyze the data after changing the hypothesis\n\nReply with only the correct option label.",
+            "response": "repeat the experiment and check for errors",
+            "normalized_response": "repeat the experiment and check for errors",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.394409,
+            "prompt": "A student is measuring the boiling point of a salt and water mixture. He takes one temperature measurement of 105\u00b0C. Which is the best way to ensure the results are valid?\n\nOptions:\nA. repeat the investigation\nB. change the volume of water\nC. add more salt to the mixture\nD. do the investigation without salt\n\nReply with only the correct option label.",
+            "response": "repeat the investigation",
+            "normalized_response": "repeat the investigation",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.392839,
+            "prompt": "In a lab investigation, students use Brand X batteries in a flashlight and Brand Y batteries in a radio. After two hours, the flashlight stops working, but the radio continues to work. As a result, the students conclude that Brand Y batteries last longer. Which statement about the conclusion of the investigation is most accurate?\n\nOptions:\nA. The conclusion is valid because they tested two different brands.\nB. The conclusion is invalid because the test had multiple variables.\nC. The conclusion is valid because they conducted the investigation in a lab.\nD. The conclusion is invalid because the real names of the batteries were hidden.\n\nReply with only the correct option label.",
+            "response": "The conclusion is invalid because the test had multiple variables.",
+            "normalized_response": "The conclusion is invalid because the test had multiple variables.",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.390949,
+            "prompt": "Students measure the effect of water on the growth of plants for a lab experiment. The students give different amounts of water to three different groups of plants. All plants receive the same amount of light and are planted in the same amount of soil. The students then measure the height of the plants over a period of four weeks. Which variables should be labeled on the axes to graph the data collected in this experiment?\n\nOptions:\nA. Amount of Water vs. Height of Plants\nB. Temperature vs. Amount of Sunlight\nC. Amount of Water vs. Amount of Soil\nD. Amount of Sunlight vs. Height of Plants\n\nReply with only the correct option label.",
+            "response": "Amount of Water vs. Height of Plants",
+            "normalized_response": "Amount of Water vs. Height of Plants",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          },
+          {
+            "score": 0.384618,
+            "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both increase.\nB. The kinetic energy and the potential energy both decrease.\nC. The kinetic energy increases and the potential energy decreases.\nD. The kinetic energy decreases and the potential energy increases.\n\nReply with only the correct option label.",
+            "response": "The kinetic energy increases and the potential energy decreases.",
+            "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+            "category": "science",
+            "kind": "science",
+            "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+            "reference_count": 1
+          }
+        ],
+        "choice_supports": {
+          "A": [
+            {
+              "score": 0.296386,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. perform the investigation in a different way\nB. change the hypothesis to match the results\nC. choose a different investigation\nD. repeat the investigation\n\nReply with only the correct option label.",
+              "response": "repeat the investigation",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.257631,
+              "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both examine the history of life on Earth.\nB. They both make discoveries using optical devices.\nC. They both study how organisms change over time.\nD. They both search for evidence about the origins of the universe.\n\nReply with only the correct option label.",
+              "response": "They both make discoveries using optical devices.",
+              "normalized_response": "They both make discoveries using optical devices.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.249602,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both increase.\nB. The kinetic energy and the potential energy both decrease.\nC. The kinetic energy increases and the potential energy decreases.\nD. The kinetic energy decreases and the potential energy increases.\n\nReply with only the correct option label.",
+              "response": "The kinetic energy increases and the potential energy decreases.",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.24826,
+              "prompt": "A student is measuring the boiling point of a salt and water mixture. He takes one temperature measurement of 105\u00b0C. Which is the best way to ensure the results are valid?\n\nOptions:\nA. repeat the investigation\nB. change the volume of water\nC. add more salt to the mixture\nD. do the investigation without salt\n\nReply with only the correct option label.",
+              "response": "repeat the investigation",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.235644,
+              "prompt": "A crop of corn plants is genetically modified so that the plants produce a natural pesticide. People are concerned that these corn plants might transfer modified genetic material to other plants. Which of the following is the best way to further modify the plants to prevent them from transferring their genetic materials to other plants?\n\nOptions:\nA. changing the plants so they do not make pollen\nB. changing the plants so they do not harm insects\nC. changing the plants so they cannot produce nutrients\nD. changing the plants so they cannot be easily identified\n\nReply with only the correct option label.",
+              "response": "changing the plants so they do not make pollen",
+              "normalized_response": "changing the plants so they do not make pollen",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.235162,
+              "prompt": "In a lab investigation, students use Brand X batteries in a flashlight and Brand Y batteries in a radio. After two hours, the flashlight stops working, but the radio continues to work. As a result, the students conclude that Brand Y batteries last longer. Which statement about the conclusion of the investigation is most accurate?\n\nOptions:\nA. The conclusion is valid because they tested two different brands.\nB. The conclusion is invalid because the test had multiple variables.\nC. The conclusion is valid because they conducted the investigation in a lab.\nD. The conclusion is invalid because the real names of the batteries were hidden.\n\nReply with only the correct option label.",
+              "response": "The conclusion is invalid because the test had multiple variables.",
+              "normalized_response": "The conclusion is invalid because the test had multiple variables.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.233627,
+              "prompt": "What should be done when the results of an experiment do not support the hypothesis?\n\nOptions:\nA. repeat the experiment and check for errors\nB. change the observations to match the hypothesis\nC. redo the experiment until the expected results are obtained\nD. record and analyze the data after changing the hypothesis\n\nReply with only the correct option label.",
+              "response": "repeat the experiment and check for errors",
+              "normalized_response": "repeat the experiment and check for errors",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.2336,
+              "prompt": "A scientist investigated the effect of workplace stress on heart disease in humans. Men of various ages were divided into two groups based on whether they described their work as very stressful or not very stressful. During the one year investigation the scientist monitored the heart health of each man. What was the bias in this investigation?\n\nOptions:\nA. The investigation only lasted one year.\nB. The only organ studied was the heart.\nC. The investigation tested only men.\nD. The age of the participants varied.\n\nReply with only the correct option label.",
+              "response": "The investigation tested only men.",
+              "normalized_response": "The investigation tested only men.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            }
+          ],
+          "B": [
+            {
+              "score": 0.29666,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. perform the investigation in a different way\nB. change the hypothesis to match the results\nC. choose a different investigation\nD. repeat the investigation\n\nReply with only the correct option label.",
+              "response": "repeat the investigation",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.261441,
+              "prompt": "Students measure the effect of water on the growth of plants for a lab experiment. The students give different amounts of water to three different groups of plants. All plants receive the same amount of light and are planted in the same amount of soil. The students then measure the height of the plants over a period of four weeks. Which variables should be labeled on the axes to graph the data collected in this experiment?\n\nOptions:\nA. Amount of Water vs. Height of Plants\nB. Temperature vs. Amount of Sunlight\nC. Amount of Water vs. Amount of Soil\nD. Amount of Sunlight vs. Height of Plants\n\nReply with only the correct option label.",
+              "response": "Amount of Water vs. Height of Plants",
+              "normalized_response": "Amount of Water vs. Height of Plants",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.257062,
+              "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both examine the history of life on Earth.\nB. They both make discoveries using optical devices.\nC. They both study how organisms change over time.\nD. They both search for evidence about the origins of the universe.\n\nReply with only the correct option label.",
+              "response": "They both make discoveries using optical devices.",
+              "normalized_response": "They both make discoveries using optical devices.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.252559,
+              "prompt": "A student is measuring the boiling point of a salt and water mixture. He takes one temperature measurement of 105\u00b0C. Which is the best way to ensure the results are valid?\n\nOptions:\nA. repeat the investigation\nB. change the volume of water\nC. add more salt to the mixture\nD. do the investigation without salt\n\nReply with only the correct option label.",
+              "response": "repeat the investigation",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.25162,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both increase.\nB. The kinetic energy and the potential energy both decrease.\nC. The kinetic energy increases and the potential energy decreases.\nD. The kinetic energy decreases and the potential energy increases.\n\nReply with only the correct option label.",
+              "response": "The kinetic energy increases and the potential energy decreases.",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.237647,
+              "prompt": "A crop of corn plants is genetically modified so that the plants produce a natural pesticide. People are concerned that these corn plants might transfer modified genetic material to other plants. Which of the following is the best way to further modify the plants to prevent them from transferring their genetic materials to other plants?\n\nOptions:\nA. changing the plants so they do not make pollen\nB. changing the plants so they do not harm insects\nC. changing the plants so they cannot produce nutrients\nD. changing the plants so they cannot be easily identified\n\nReply with only the correct option label.",
+              "response": "changing the plants so they do not make pollen",
+              "normalized_response": "changing the plants so they do not make pollen",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.235619,
+              "prompt": "What should be done when the results of an experiment do not support the hypothesis?\n\nOptions:\nA. repeat the experiment and check for errors\nB. change the observations to match the hypothesis\nC. redo the experiment until the expected results are obtained\nD. record and analyze the data after changing the hypothesis\n\nReply with only the correct option label.",
+              "response": "repeat the experiment and check for errors",
+              "normalized_response": "repeat the experiment and check for errors",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.234774,
+              "prompt": "A scientist investigated the effect of workplace stress on heart disease in humans. Men of various ages were divided into two groups based on whether they described their work as very stressful or not very stressful. During the one year investigation the scientist monitored the heart health of each man. What was the bias in this investigation?\n\nOptions:\nA. The investigation only lasted one year.\nB. The only organ studied was the heart.\nC. The investigation tested only men.\nD. The age of the participants varied.\n\nReply with only the correct option label.",
+              "response": "The investigation tested only men.",
+              "normalized_response": "The investigation tested only men.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            }
+          ],
+          "C": [
+            {
+              "score": 0.28639,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. perform the investigation in a different way\nB. change the hypothesis to match the results\nC. choose a different investigation\nD. repeat the investigation\n\nReply with only the correct option label.",
+              "response": "repeat the investigation",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.252695,
+              "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both examine the history of life on Earth.\nB. They both make discoveries using optical devices.\nC. They both study how organisms change over time.\nD. They both search for evidence about the origins of the universe.\n\nReply with only the correct option label.",
+              "response": "They both make discoveries using optical devices.",
+              "normalized_response": "They both make discoveries using optical devices.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.23701,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both increase.\nB. The kinetic energy and the potential energy both decrease.\nC. The kinetic energy increases and the potential energy decreases.\nD. The kinetic energy decreases and the potential energy increases.\n\nReply with only the correct option label.",
+              "response": "The kinetic energy increases and the potential energy decreases.",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.232752,
+              "prompt": "How do moose use a learned behavior to protect themselves?\n\nOptions:\nA. They have hollow hair to keep warm in the winter.\nB. They roll in a pool of muddy water to avoid fly bites.\nC. They have keen hearing to sense danger in the forest.\nD. They use their wide hooves to prevent sinking in deep snow.\n\nReply with only the correct option label.",
+              "response": "They roll in a pool of muddy water to avoid fly bites.",
+              "normalized_response": "They roll in a pool of muddy water to avoid fly bites.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.230549,
+              "prompt": "A student is measuring the boiling point of a salt and water mixture. He takes one temperature measurement of 105\u00b0C. Which is the best way to ensure the results are valid?\n\nOptions:\nA. repeat the investigation\nB. change the volume of water\nC. add more salt to the mixture\nD. do the investigation without salt\n\nReply with only the correct option label.",
+              "response": "repeat the investigation",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.228904,
+              "prompt": "Two students are studying what makes ice melt fastest. They want to conduct an investigation. During which of these steps in their investigation will they measure the ice?\n\nOptions:\nA. showing some graphs\nB. making a conclusion\nC. developing a hypothesis\nD. collecting some data\n\nReply with only the correct option label.",
+              "response": "collecting some data",
+              "normalized_response": "collecting some data",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.228444,
+              "prompt": "Students measure the effect of water on the growth of plants for a lab experiment. The students give different amounts of water to three different groups of plants. All plants receive the same amount of light and are planted in the same amount of soil. The students then measure the height of the plants over a period of four weeks. Which variables should be labeled on the axes to graph the data collected in this experiment?\n\nOptions:\nA. Amount of Water vs. Height of Plants\nB. Temperature vs. Amount of Sunlight\nC. Amount of Water vs. Amount of Soil\nD. Amount of Sunlight vs. Height of Plants\n\nReply with only the correct option label.",
+              "response": "Amount of Water vs. Height of Plants",
+              "normalized_response": "Amount of Water vs. Height of Plants",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.227409,
+              "prompt": "A crop of corn plants is genetically modified so that the plants produce a natural pesticide. People are concerned that these corn plants might transfer modified genetic material to other plants. Which of the following is the best way to further modify the plants to prevent them from transferring their genetic materials to other plants?\n\nOptions:\nA. changing the plants so they do not make pollen\nB. changing the plants so they do not harm insects\nC. changing the plants so they cannot produce nutrients\nD. changing the plants so they cannot be easily identified\n\nReply with only the correct option label.",
+              "response": "changing the plants so they do not make pollen",
+              "normalized_response": "changing the plants so they do not make pollen",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            }
+          ],
+          "D": [
+            {
+              "score": 0.323105,
+              "prompt": "Michelle performed an investigation but the results did not match her hypothesis. What should Michelle do next?\n\nOptions:\nA. perform the investigation in a different way\nB. change the hypothesis to match the results\nC. choose a different investigation\nD. repeat the investigation\n\nReply with only the correct option label.",
+              "response": "repeat the investigation",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.279141,
+              "prompt": "A student is measuring the boiling point of a salt and water mixture. He takes one temperature measurement of 105\u00b0C. Which is the best way to ensure the results are valid?\n\nOptions:\nA. repeat the investigation\nB. change the volume of water\nC. add more salt to the mixture\nD. do the investigation without salt\n\nReply with only the correct option label.",
+              "response": "repeat the investigation",
+              "normalized_response": "repeat the investigation",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.256258,
+              "prompt": "A scientist investigated the effect of workplace stress on heart disease in humans. Men of various ages were divided into two groups based on whether they described their work as very stressful or not very stressful. During the one year investigation the scientist monitored the heart health of each man. What was the bias in this investigation?\n\nOptions:\nA. The investigation only lasted one year.\nB. The only organ studied was the heart.\nC. The investigation tested only men.\nD. The age of the participants varied.\n\nReply with only the correct option label.",
+              "response": "The investigation tested only men.",
+              "normalized_response": "The investigation tested only men.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.256084,
+              "prompt": "Astronomers and biologists study different areas of science. Many astronomers observe far distant objects in the sky. Many biologists study extremely small objects. What do these astronomers and biologists have most in common?\n\nOptions:\nA. They both examine the history of life on Earth.\nB. They both make discoveries using optical devices.\nC. They both study how organisms change over time.\nD. They both search for evidence about the origins of the universe.\n\nReply with only the correct option label.",
+              "response": "They both make discoveries using optical devices.",
+              "normalized_response": "They both make discoveries using optical devices.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.250681,
+              "prompt": "Sam builds a ramp and lets a toy car roll down. Which describes the energy of the car as it rolls down the ramp?\n\nOptions:\nA. The kinetic energy and the potential energy both increase.\nB. The kinetic energy and the potential energy both decrease.\nC. The kinetic energy increases and the potential energy decreases.\nD. The kinetic energy decreases and the potential energy increases.\n\nReply with only the correct option label.",
+              "response": "The kinetic energy increases and the potential energy decreases.",
+              "normalized_response": "The kinetic energy increases and the potential energy decreases.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.24165,
+              "prompt": "In a lab investigation, students use Brand X batteries in a flashlight and Brand Y batteries in a radio. After two hours, the flashlight stops working, but the radio continues to work. As a result, the students conclude that Brand Y batteries last longer. Which statement about the conclusion of the investigation is most accurate?\n\nOptions:\nA. The conclusion is valid because they tested two different brands.\nB. The conclusion is invalid because the test had multiple variables.\nC. The conclusion is valid because they conducted the investigation in a lab.\nD. The conclusion is invalid because the real names of the batteries were hidden.\n\nReply with only the correct option label.",
+              "response": "The conclusion is invalid because the test had multiple variables.",
+              "normalized_response": "The conclusion is invalid because the test had multiple variables.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.23889,
+              "prompt": "Students measure the effect of water on the growth of plants for a lab experiment. The students give different amounts of water to three different groups of plants. All plants receive the same amount of light and are planted in the same amount of soil. The students then measure the height of the plants over a period of four weeks. Which variables should be labeled on the axes to graph the data collected in this experiment?\n\nOptions:\nA. Amount of Water vs. Height of Plants\nB. Temperature vs. Amount of Sunlight\nC. Amount of Water vs. Amount of Soil\nD. Amount of Sunlight vs. Height of Plants\n\nReply with only the correct option label.",
+              "response": "Amount of Water vs. Height of Plants",
+              "normalized_response": "Amount of Water vs. Height of Plants",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            },
+            {
+              "score": 0.23711,
+              "prompt": "A farmer wants to know if adding fertilizer to his field will make his crops healthier. Which activity should the farmer do first?\n\nOptions:\nA. Plant different crops in a nearby fertilized field.\nB. Water the crops in the field before adding fertilizers.\nC. Add many different fertilizers to the field at once.\nD. Record the appearance of the crops before fertilizing.\n\nReply with only the correct option label.",
+              "response": "Record the appearance of the crops before fertilizing.",
+              "normalized_response": "Record the appearance of the crops before fertilizing.",
+              "category": "science",
+              "kind": "science",
+              "source_path": "corpora\\arc_train_support_v1\\examples.jsonl",
+              "reference_count": 1
+            }
+          ]
+        },
+        "candidate_count": 1118
+      }
+    }
+  ]
+}

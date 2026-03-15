@@ -1,0 +1,24 @@
+{
+  "label": "arc-ensemble-public-primary-299-v1",
+  "command": "python -m ava.cli benchmark external arc-challenge sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --limit 299 --device cuda --retrieval-mode hybrid_support_ensemble --support-corpus configs/support/arc_ensemble_public_primary_v1.json",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "benchmark",
+    "external",
+    "arc-challenge",
+    "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+    "--limit",
+    "299",
+    "--device",
+    "cuda",
+    "--retrieval-mode",
+    "hybrid_support_ensemble",
+    "--support-corpus",
+    "configs/support/arc_ensemble_public_primary_v1.json"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 425375
+}

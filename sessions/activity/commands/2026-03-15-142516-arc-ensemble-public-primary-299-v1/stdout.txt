@@ -1,0 +1,10 @@
+{
+  "benchmark": "arc-challenge",
+  "split": null,
+  "limit": 299,
+  "retrieval_mode": "hybrid_support_ensemble",
+  "accuracy": 0.294,
+  "correct": 88,
+  "total": 299,
+  "support_corpus": "configs/support/arc_ensemble_public_primary_v1.json"
+}

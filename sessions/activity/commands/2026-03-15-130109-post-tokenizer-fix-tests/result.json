@@ -1,0 +1,15 @@
+{
+  "label": "post-tokenizer-fix-tests",
+  "command": "python -m pytest tests/test_external_benchmarks.py tests/test_tokenizer.py -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_external_benchmarks.py",
+    "tests/test_tokenizer.py",
+    "-q"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 4271
+}

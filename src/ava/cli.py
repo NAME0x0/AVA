@@ -12,7 +12,12 @@ from ava.benchmarks import serialize_benchmark_registry
 from ava.config import load_experiment_config
 from ava.external_benchmarks import evaluate_external_benchmark, summarize_external_benchmark
 from ava.inspect import trace_checkpoint
-from ava.tokenizer_artifacts import build_byte_bpe_artifact, build_greedy_byte_piece_artifact
+from ava.tokenizer_artifacts import (
+    build_byte_bpe_artifact,
+    build_greedy_byte_piece_artifact,
+    build_hf_bpe_artifact,
+    build_hf_unigram_artifact,
+)
 from ava.sessions import (
     bootstrap_session,
     create_session,
@@ -112,7 +117,7 @@ def build_parser() -> argparse.ArgumentParser:
     tokenizer_build = tokenizer_subparsers.add_parser("build")
     tokenizer_build.add_argument("corpus_root")
     tokenizer_build.add_argument("output")
-    tokenizer_build.add_argument("--kind", choices=("greedy_bytes", "byte_bpe"), default="greedy_bytes")
+    tokenizer_build.add_argument("--kind", choices=("greedy_bytes", "byte_bpe", "hf_bpe", "hf_unigram"), default="greedy_bytes")
     tokenizer_build.add_argument("--target-vocab-size", type=int, default=512)
     tokenizer_build.add_argument("--max-piece-length", type=int, default=12)
     tokenizer_build.add_argument("--min-frequency", type=int, default=2)
@@ -148,7 +153,7 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark_external.add_argument("--limit", type=int, default=50)
     benchmark_external.add_argument("--device", default="cuda")
     benchmark_external.add_argument("--support-corpus")
-    benchmark_external.add_argument("--retrieval-mode", choices=("baseline", "direct", "nearest", "support_mc"), default="baseline")
+    benchmark_external.add_argument("--retrieval-mode", choices=("baseline", "direct", "nearest", "support_mc", "hybrid_support_mc", "hybrid_support_ensemble"), default="baseline")
     benchmark_external.add_argument("--nearest-threshold", type=float, default=0.45)
     benchmark_external.add_argument("--nearest-margin", type=float, default=0.0)
     benchmark_external.add_argument("--no-category-gating", action="store_true")
@@ -360,6 +365,19 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
                 target_vocab_size=args.target_vocab_size,
                 min_pair_frequency=args.min_pair_frequency,
                 max_piece_length=args.max_piece_length,
+            )
+        elif args.kind == "hf_bpe":
+            payload = build_hf_bpe_artifact(
+                args.corpus_root,
+                args.output,
+                target_vocab_size=args.target_vocab_size,
+                min_frequency=args.min_frequency,
+            )
+        elif args.kind == "hf_unigram":
+            payload = build_hf_unigram_artifact(
+                args.corpus_root,
+                args.output,
+                target_vocab_size=args.target_vocab_size,
             )
         else:
             payload = build_greedy_byte_piece_artifact(

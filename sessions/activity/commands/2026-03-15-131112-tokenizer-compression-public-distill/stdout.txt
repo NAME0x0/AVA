@@ -1,0 +1,54 @@
+{
+  "byte": {
+    "corpus_root": "corpora\\public_benchmark_distill_v1",
+    "file_count": 3,
+    "text_count": 12430,
+    "character_count": 3468649,
+    "token_count": 3494784,
+    "supervised_example_count": 12429,
+    "files": [
+      "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+      "corpora\\public_benchmark_distill_v1\\manifest.json",
+      "corpora\\public_benchmark_distill_v1\\README.md"
+    ]
+  },
+  "byte_bpe": {
+    "corpus_root": "corpora\\public_benchmark_distill_v1",
+    "file_count": 3,
+    "text_count": 12430,
+    "character_count": 3468649,
+    "token_count": 1853567,
+    "supervised_example_count": 12429,
+    "files": [
+      "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+      "corpora\\public_benchmark_distill_v1\\manifest.json",
+      "corpora\\public_benchmark_distill_v1\\README.md"
+    ]
+  },
+  "hf_bpe": {
+    "corpus_root": "corpora\\public_benchmark_distill_v1",
+    "file_count": 3,
+    "text_count": 12430,
+    "character_count": 3468649,
+    "token_count": 1533886,
+    "supervised_example_count": 12429,
+    "files": [
+      "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+      "corpora\\public_benchmark_distill_v1\\manifest.json",
+      "corpora\\public_benchmark_distill_v1\\README.md"
+    ]
+  },
+  "hf_unigram": {
+    "corpus_root": "corpora\\public_benchmark_distill_v1",
+    "file_count": 3,
+    "text_count": 12430,
+    "character_count": 3468649,
+    "token_count": 1573510,
+    "supervised_example_count": 12429,
+    "files": [
+      "corpora\\public_benchmark_distill_v1\\examples.jsonl",
+      "corpora\\public_benchmark_distill_v1\\manifest.json",
+      "corpora\\public_benchmark_distill_v1\\README.md"
+    ]
+  }
+}

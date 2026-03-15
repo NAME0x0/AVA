@@ -1,0 +1,764 @@
+{
+  "kind": "byte_bpe",
+  "merges": [
+    {
+      "left": "65",
+      "right": "20",
+      "merged": "6520",
+      "count": 198930
+    },
+    {
+      "left": "74",
+      "right": "68",
+      "merged": "7468",
+      "count": 151165
+    },
+    {
+      "left": "73",
+      "right": "20",
+      "merged": "7320",
+      "count": 147296
+    },
+    {
+      "left": "6f",
+      "right": "6e",
+      "merged": "6f6e",
+      "count": 102554
+    },
+    {
+      "left": "65",
+      "right": "72",
+      "merged": "6572",
+      "count": 101021
+    },
+    {
+      "left": "79",
+      "right": "20",
+      "merged": "7920",
+      "count": 97151
+    },
+    {
+      "left": "61",
+      "right": "6e",
+      "merged": "616e",
+      "count": 89475
+    },
+    {
+      "left": "69",
+      "right": "6e",
+      "merged": "696e",
+      "count": 86958
+    },
+    {
+      "left": "2e",
+      "right": "20",
+      "merged": "2e20",
+      "count": 79882
+    },
+    {
+      "left": "7468",
+      "right": "6520",
+      "merged": "74686520",
+      "count": 79382
+    },
+    {
+      "left": "74",
+      "right": "20",
+      "merged": "7420",
+      "count": 75052
+    },
+    {
+      "left": "64",
+      "right": "20",
+      "merged": "6420",
+      "count": 66741
+    },
+    {
+      "left": "6c",
+      "right": "7920",
+      "merged": "6c7920",
+      "count": 55459
+    },
+    {
+      "left": "74",
+      "right": "69",
+      "merged": "7469",
+      "count": 54767
+    },
+    {
+      "left": "61",
+      "right": "6c",
+      "merged": "616c",
+      "count": 48780
+    },
+    {
+      "left": "6f",
+      "right": "72",
+      "merged": "6f72",
+      "count": 47829
+    },
+    {
+      "left": "66",
+      "right": "20",
+      "merged": "6620",
+      "count": 47558
+    },
+    {
+      "left": "61",
+      "right": "72",
+      "merged": "6172",
+      "count": 43503
+    },
+    {
+      "left": "72",
+      "right": "65",
+      "merged": "7265",
+      "count": 40793
+    },
+    {
+      "left": "7469",
+      "right": "6f6e",
+      "merged": "74696f6e",
+      "count": 40025
+    },
+    {
+      "left": "2e",
+      "right": "0a",
+      "merged": "2e0a",
+      "count": 39388
+    },
+    {
+      "left": "65",
+      "right": "6e",
+      "merged": "656e",
+      "count": 39006
+    },
+    {
+      "left": "6f",
+      "right": "6620",
+      "merged": "6f6620",
+      "count": 37436
+    },
+    {
+      "left": "77",
+      "right": "69",
+      "merged": "7769",
+      "count": 36556
+    },
+    {
+      "left": "74",
+      "right": "6f",
+      "merged": "746f",
+      "count": 35986
+    },
+    {
+      "left": "65",
+      "right": "73",
+      "merged": "6573",
+      "count": 35715
+    },
+    {
+      "left": "65",
+      "right": "7320",
+      "merged": "657320",
+      "count": 35512
+    },
+    {
+      "left": "63",
+      "right": "68",
+      "merged": "6368",
+      "count": 33256
+    },
+    {
+      "left": "7468",
+      "right": "20",
+      "merged": "746820",
+      "count": 32782
+    },
+    {
+      "left": "61",
+      "right": "20",
+      "merged": "6120",
+      "count": 32210
+    },
+    {
+      "left": "77",
+      "right": "6572",
+      "merged": "776572",
+      "count": 31816
+    },
+    {
+      "left": "6572",
+      "right": "20",
+      "merged": "657220",
+      "count": 29488
+    },
+    {
+      "left": "0a",
+      "right": "0a",
+      "merged": "0a0a",
+      "count": 28717
+    },
+    {
+      "left": "2c",
+      "right": "20",
+      "merged": "2c20",
+      "count": 28210
+    },
+    {
+      "left": "7769",
+      "right": "746820",
+      "merged": "7769746820",
+      "count": 28018
+    },
+    {
+      "left": "73",
+      "right": "776572",
+      "merged": "73776572",
+      "count": 27956
+    },
+    {
+      "left": "65",
+      "right": "70",
+      "merged": "6570",
+      "count": 27255
+    },
+    {
+      "left": "20",
+      "right": "6d",
+      "merged": "206d",
+      "count": 26616
+    },
+    {
+      "left": "6f",
+      "right": "75",
+      "merged": "6f75",
+      "count": 25873
+    },
+    {
+      "left": "6f6e",
+      "right": "6c7920",
+      "merged": "6f6e6c7920",
+      "count": 25371
+    },
+    {
+      "left": "3a",
+      "right": "20",
+      "merged": "3a20",
+      "count": 25263
+    },
+    {
+      "left": "696e",
+      "right": "67",
+      "merged": "696e67",
+      "count": 25141
+    },
+    {
+      "left": "6f6e6c7920",
+      "right": "74686520",
+      "merged": "6f6e6c792074686520",
+      "count": 24274
+    },
+    {
+      "left": "6c7920",
+      "right": "7769746820",
+      "merged": "6c79207769746820",
+      "count": 24254
+    },
+    {
+      "left": "52",
+      "right": "6570",
+      "merged": "526570",
+      "count": 24254
+    },
+    {
+      "left": "526570",
+      "right": "6c79207769746820",
+      "merged": "5265706c79207769746820",
+      "count": 24234
+    },
+    {
+      "left": "616c",
+      "right": "20",
+      "merged": "616c20",
+      "count": 23978
+    },
+    {
+      "left": "65",
+      "right": "6c",
+      "merged": "656c",
+      "count": 23926
+    },
+    {
+      "left": "69",
+      "right": "7320",
+      "merged": "697320",
+      "count": 23670
+    },
+    {
+      "left": "746f",
+      "right": "20",
+      "merged": "746f20",
+      "count": 23567
+    },
+    {
+      "left": "6f",
+      "right": "77",
+      "merged": "6f77",
+      "count": 23489
+    },
+    {
+      "left": "61",
+      "right": "74",
+      "merged": "6174",
+      "count": 23111
+    },
+    {
+      "left": "68",
+      "right": "6520",
+      "merged": "686520",
+      "count": 22554
+    },
+    {
+      "left": "616e",
+      "right": "6420",
+      "merged": "616e6420",
+      "count": 22164
+    },
+    {
+      "left": "3f",
+      "right": "0a0a",
+      "merged": "3f0a0a",
+      "count": 21910
+    },
+    {
+      "left": "68",
+      "right": "61",
+      "merged": "6861",
+      "count": 20370
+    },
+    {
+      "left": "65",
+      "right": "6420",
+      "merged": "656420",
+      "count": 19962
+    },
+    {
+      "left": "696e67",
+      "right": "20",
+      "merged": "696e6720",
+      "count": 19831
+    },
+    {
+      "left": "73",
+      "right": "74",
+      "merged": "7374",
+      "count": 19115
+    },
+    {
+      "left": "6c",
+      "right": "61",
+      "merged": "6c61",
+      "count": 19038
+    },
+    {
+      "left": "696e",
+      "right": "20",
+      "merged": "696e20",
+      "count": 18943
+    },
+    {
+      "left": "70",
+      "right": "74696f6e",
+      "merged": "7074696f6e",
+      "count": 18212
+    },
+    {
+      "left": "6368",
+      "right": "20",
+      "merged": "636820",
+      "count": 17161
+    },
+    {
+      "left": "66",
+      "right": "696e",
+      "merged": "66696e",
+      "count": 16598
+    },
+    {
+      "left": "72",
+      "right": "6f",
+      "merged": "726f",
+      "count": 16515
+    },
+    {
+      "left": "6f",
+      "right": "6c",
+      "merged": "6f6c",
+      "count": 15643
+    },
+    {
+      "left": "616e",
+      "right": "73776572",
+      "merged": "616e73776572",
+      "count": 15527
+    },
+    {
+      "left": "616e73776572",
+      "right": "2e0a",
+      "merged": "616e737765722e0a",
+      "count": 15282
+    },
+    {
+      "left": "66696e",
+      "right": "616c20",
+      "merged": "66696e616c20",
+      "count": 15224
+    },
+    {
+      "left": "66",
+      "right": "6f72",
+      "merged": "666f72",
+      "count": 14543
+    },
+    {
+      "left": "616e",
+      "right": "20",
+      "merged": "616e20",
+      "count": 14016
+    },
+    {
+      "left": "65",
+      "right": "61",
+      "merged": "6561",
+      "count": 13847
+    },
+    {
+      "left": "41",
+      "right": "6e",
+      "merged": "416e",
+      "count": 13803
+    },
+    {
+      "left": "75",
+      "right": "6573",
+      "merged": "756573",
+      "count": 13327
+    },
+    {
+      "left": "6c",
+      "right": "20",
+      "merged": "6c20",
+      "count": 13315
+    },
+    {
+      "left": "74",
+      "right": "7320",
+      "merged": "747320",
+      "count": 13193
+    },
+    {
+      "left": "756573",
+      "right": "74696f6e",
+      "merged": "75657374696f6e",
+      "count": 12707
+    },
+    {
+      "left": "30",
+      "right": "20",
+      "merged": "3020",
+      "count": 12514
+    },
+    {
+      "left": "75657374696f6e",
+      "right": "3a20",
+      "merged": "75657374696f6e3a20",
+      "count": 12437
+    },
+    {
+      "left": "65",
+      "right": "63",
+      "merged": "6563",
+      "count": 12434
+    },
+    {
+      "left": "51",
+      "right": "75657374696f6e3a20",
+      "merged": "5175657374696f6e3a20",
+      "count": 12429
+    },
+    {
+      "left": "73776572",
+      "right": "3a20",
+      "merged": "737765723a20",
+      "count": 12429
+    },
+    {
+      "left": "416e",
+      "right": "737765723a20",
+      "merged": "416e737765723a20",
+      "count": 12429
+    },
+    {
+      "left": "6f77",
+      "right": "206d",
+      "merged": "6f77206d",
+      "count": 12362
+    },
+    {
+      "left": "69",
+      "right": "6c",
+      "merged": "696c",
+      "count": 11809
+    },
+    {
+      "left": "64",
+      "right": "69",
+      "merged": "6469",
+      "count": 11722
+    },
+    {
+      "left": "6f6e",
+      "right": "20",
+      "merged": "6f6e20",
+      "count": 11652
+    },
+    {
+      "left": "6d",
+      "right": "20",
+      "merged": "6d20",
+      "count": 11545
+    },
+    {
+      "left": "7265",
+      "right": "63",
+      "merged": "726563",
+      "count": 11451
+    },
+    {
+      "left": "616e",
+      "right": "7920",
+      "merged": "616e7920",
+      "count": 11402
+    },
+    {
+      "left": "61",
+      "right": "7420",
+      "merged": "617420",
+      "count": 11192
+    },
+    {
+      "left": "69",
+      "right": "72",
+      "merged": "6972",
+      "count": 11166
+    },
+    {
+      "left": "72",
+      "right": "69",
+      "merged": "7269",
+      "count": 10854
+    },
+    {
+      "left": "63",
+      "right": "6f",
+      "merged": "636f",
+      "count": 10827
+    },
+    {
+      "left": "61",
+      "right": "7320",
+      "merged": "617320",
+      "count": 10772
+    },
+    {
+      "left": "666f72",
+      "right": "20",
+      "merged": "666f7220",
+      "count": 10504
+    },
+    {
+      "left": "63",
+      "right": "6f72",
+      "merged": "636f72",
+      "count": 10428
+    },
+    {
+      "left": "6c",
+      "right": "69",
+      "merged": "6c69",
+      "count": 10241
+    },
+    {
+      "left": "68",
+      "right": "69",
+      "merged": "6869",
+      "count": 10122
+    },
+    {
+      "left": "61",
+      "right": "6d",
+      "merged": "616d",
+      "count": 9462
+    },
+    {
+      "left": "2e20",
+      "right": "48",
+      "merged": "2e2048",
+      "count": 9458
+    },
+    {
+      "left": "62",
+      "right": "656c",
+      "merged": "62656c",
+      "count": 9431
+    },
+    {
+      "left": "7420",
+      "right": "6f",
+      "merged": "74206f",
+      "count": 9338
+    },
+    {
+      "left": "20",
+      "right": "6c61",
+      "merged": "206c61",
+      "count": 9242
+    },
+    {
+      "left": "61",
+      "right": "73",
+      "merged": "6173",
+      "count": 9240
+    },
+    {
+      "left": "61",
+      "right": "63",
+      "merged": "6163",
+      "count": 9224
+    },
+    {
+      "left": "636f72",
+      "right": "726563",
+      "merged": "636f72726563",
+      "count": 9214
+    },
+    {
+      "left": "76",
+      "right": "6520",
+      "merged": "766520",
+      "count": 9170
+    },
+    {
+      "left": "2e20",
+      "right": "54",
+      "merged": "2e2054",
+      "count": 9058
+    },
+    {
+      "left": "7074696f6e",
+      "right": "73",
+      "merged": "7074696f6e73",
+      "count": 8982
+    },
+    {
+      "left": "74206f",
+      "right": "7074696f6e",
+      "merged": "74206f7074696f6e",
+      "count": 8956
+    },
+    {
+      "left": "74206f7074696f6e",
+      "right": "206c61",
+      "merged": "74206f7074696f6e206c61",
+      "count": 8952
+    },
+    {
+      "left": "7074696f6e73",
+      "right": "3a",
+      "merged": "7074696f6e733a",
+      "count": 8952
+    },
+    {
+      "left": "7074696f6e733a",
+      "right": "0a",
+      "merged": "7074696f6e733a0a",
+      "count": 8952
+    },
+    {
+      "left": "4f",
+      "right": "7074696f6e733a0a",
+      "merged": "4f7074696f6e733a0a",
+      "count": 8952
+    },
+    {
+      "left": "62656c",
+      "right": "2e0a",
+      "merged": "62656c2e0a",
+      "count": 8952
+    },
+    {
+      "left": "6f6620",
+      "right": "74686520",
+      "merged": "6f662074686520",
+      "count": 8904
+    },
+    {
+      "left": "2e20",
+      "right": "20",
+      "merged": "2e2020",
+      "count": 8818
+    },
+    {
+      "left": "4f7074696f6e733a0a",
+      "right": "41",
+      "merged": "4f7074696f6e733a0a41",
+      "count": 8768
+    },
+    {
+      "left": "70",
+      "right": "6c",
+      "merged": "706c",
+      "count": 8760
+    },
+    {
+      "left": "6172",
+      "right": "6520",
+      "merged": "61726520",
+      "count": 8585
+    },
+    {
+      "left": "67",
+      "right": "68",
+      "merged": "6768",
+      "count": 8556
+    },
+    {
+      "left": "75",
+      "right": "72",
+      "merged": "7572",
+      "count": 8532
+    },
+    {
+      "left": "73",
+      "right": "7420",
+      "merged": "737420",
+      "count": 8514
+    }
+  ],
+  "vocab_size": 384,
+  "merge_count": 124,
+  "special_tokens": [
+    "<pad>",
+    "<bos>",
+    "<eos>",
+    "<sep>"
+  ],
+  "base_bytes": 256,
+  "corpus_root": "corpora\\public_benchmark_distill_v1",
+  "target_vocab_size": 384,
+  "min_pair_frequency": 2,
+  "max_piece_length": 12,
+  "text_count": 24859,
+  "character_count": 7160585
+}

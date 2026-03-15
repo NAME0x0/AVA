@@ -5,6 +5,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+try:
+    from tokenizers import Tokenizer as HFTokenizer
+
+    HF_TOKENIZERS_AVAILABLE = True
+except ImportError:
+    HFTokenizer = None
+    HF_TOKENIZERS_AVAILABLE = False
+
 
 SPECIAL_TOKENS = ("<pad>", "<bos>", "<eos>", "<sep>")
 SPECIAL_TOKEN_OFFSET = len(SPECIAL_TOKENS)
@@ -272,6 +280,66 @@ class ByteBPETokenizer:
         }
 
 
+@dataclass
+class HFSubwordTokenizer:
+    tokenizer_json: dict[str, object]
+    kind: str
+    metaspace_replacement: str = "▁"
+    token_to_id: dict[str, int] = field(init=False)
+    id_to_token: dict[int, str] = field(init=False)
+    vocab_size: int = field(init=False)
+    backend: Any = field(init=False)
+    special_tokens: tuple[str, ...] = field(init=False)
+
+    def __post_init__(self) -> None:
+        if not HF_TOKENIZERS_AVAILABLE:
+            raise RuntimeError("tokenizers is required for hf_bpe and hf_unigram tokenizers")
+        self.backend = HFTokenizer.from_str(json.dumps(self.tokenizer_json))
+        vocab = self.backend.get_vocab(with_added_tokens=True)
+        self.token_to_id = {str(token): int(token_id) for token, token_id in vocab.items()}
+        self.id_to_token = {int(token_id): str(token) for token, token_id in vocab.items()}
+        self.vocab_size = len(self.token_to_id)
+        self.special_tokens = tuple(token for token in self.token_to_id if token.startswith("<") and token.endswith(">"))
+        for token in SPECIAL_TOKENS:
+            if token not in self.token_to_id:
+                raise RuntimeError(f"{self.kind} tokenizer artifact is missing required special token {token}")
+
+    def encode(
+        self,
+        text: str,
+        *,
+        add_bos: bool = False,
+        add_eos: bool = False,
+    ) -> list[int]:
+        token_ids = list(self.backend.encode(text).ids)
+        if add_bos:
+            token_ids = [self.token_to_id["<bos>"], *token_ids]
+        if add_eos:
+            token_ids = [*token_ids, self.token_to_id["<eos>"]]
+        return token_ids
+
+    def decode(self, token_ids: list[int], *, skip_special_tokens: bool = True) -> str:
+        return str(self.backend.decode(token_ids, skip_special_tokens=skip_special_tokens))
+
+    def count_tokens(self, text: str, *, add_bos: bool = False, add_eos: bool = False) -> int:
+        return len(self.encode(text, add_bos=add_bos, add_eos=add_eos))
+
+    def token_piece_text(self, token_id: int) -> str | None:
+        token = self.id_to_token.get(token_id)
+        if token is None or token in self.special_tokens:
+            return None
+        return token.replace(self.metaspace_replacement, " ")
+
+    def to_artifact(self) -> dict[str, object]:
+        return {
+            "kind": self.kind,
+            "tokenizer_json": self.tokenizer_json,
+            "vocab_size": self.vocab_size,
+            "special_tokens": list(self.special_tokens),
+            "metaspace_replacement": self.metaspace_replacement,
+        }
+
+
 def load_greedy_byte_piece_tokenizer(path: str | Path) -> GreedyBytePieceTokenizer:
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
     if payload.get("kind") != "greedy_bytes":
@@ -286,6 +354,18 @@ def load_byte_bpe_tokenizer(path: str | Path) -> ByteBPETokenizer:
     return ByteBPETokenizer(list(payload.get("merges", [])))
 
 
+def load_hf_subword_tokenizer(path: str | Path) -> HFSubwordTokenizer:
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    kind = str(payload.get("kind"))
+    if kind not in {"hf_bpe", "hf_unigram"}:
+        raise ValueError(f"unsupported tokenizer artifact kind: {payload.get('kind')}")
+    return HFSubwordTokenizer(
+        tokenizer_json=dict(payload.get("tokenizer_json", {})),
+        kind=kind,
+        metaspace_replacement=str(payload.get("metaspace_replacement", "▁")),
+    )
+
+
 def token_piece_bytes(tokenizer: Any, token_id: int) -> bytes | None:
     if token_id < SPECIAL_TOKEN_OFFSET:
         return None
@@ -297,6 +377,11 @@ def token_piece_bytes(tokenizer: Any, token_id: int) -> bytes | None:
         return bytes([token_id - tokenizer.byte_token_offset])
     if isinstance(tokenizer, ByteBPETokenizer):
         return tokenizer.id_to_piece[token_id]
+    if isinstance(tokenizer, HFSubwordTokenizer):
+        piece = tokenizer.token_piece_text(token_id)
+        if piece is None:
+            return None
+        return piece.encode("utf-8")
     return None
 
 
@@ -308,7 +393,7 @@ def _config_value(config: object | None, key: str, default: Any = None) -> Any:
     return getattr(config, key, default)
 
 
-def load_tokenizer(config: object | None = None) -> ByteTokenizer | GreedyBytePieceTokenizer | ByteBPETokenizer:
+def load_tokenizer(config: object | None = None) -> ByteTokenizer | GreedyBytePieceTokenizer | ByteBPETokenizer | HFSubwordTokenizer:
     kind = str(_config_value(config, "kind", "byte"))
     if kind == "byte":
         return ByteTokenizer()
@@ -322,4 +407,9 @@ def load_tokenizer(config: object | None = None) -> ByteTokenizer | GreedyBytePi
         if not artifact_path:
             raise RuntimeError("tokenizer.kind=byte_bpe requires tokenizer.path")
         return load_byte_bpe_tokenizer(artifact_path)
+    if kind in {"hf_bpe", "hf_unigram"}:
+        artifact_path = _config_value(config, "path")
+        if not artifact_path:
+            raise RuntimeError(f"tokenizer.kind={kind} requires tokenizer.path")
+        return load_hf_subword_tokenizer(artifact_path)
     raise ValueError(f"unsupported tokenizer kind: {kind}")

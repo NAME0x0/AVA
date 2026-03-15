@@ -7,6 +7,30 @@ from pathlib import Path
 from ava.data import load_supervised_examples, load_text_corpus
 from ava.tokenizer import SPECIAL_TOKENS
 
+try:
+    from tokenizers import Tokenizer as HFTokenizer
+    from tokenizers.decoders import Metaspace as HFMetaspaceDecoder
+    from tokenizers.models import BPE as HFBPEModel
+    from tokenizers.models import Unigram as HFUnigramModel
+    from tokenizers.pre_tokenizers import Metaspace as HFMetaspace
+    from tokenizers.trainers import BpeTrainer as HFBpeTrainer
+    from tokenizers.trainers import UnigramTrainer as HFUnigramTrainer
+
+    HF_TOKENIZERS_AVAILABLE = True
+except ImportError:
+    HFTokenizer = None
+    HFMetaspaceDecoder = None
+    HFBPEModel = None
+    HFUnigramModel = None
+    HFMetaspace = None
+    HFBpeTrainer = None
+    HFUnigramTrainer = None
+    HF_TOKENIZERS_AVAILABLE = False
+
+
+HF_EXTRA_SPECIAL_TOKENS = ("<unk>",)
+HF_ALL_SPECIAL_TOKENS = list(SPECIAL_TOKENS) + list(HF_EXTRA_SPECIAL_TOKENS)
+
 
 def _render_supervised_example(prompt: str, response: str) -> str:
     return f"Question: {prompt}\nAnswer: {response}"
@@ -204,4 +228,87 @@ def build_byte_bpe_artifact(
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(artifact, indent=2), encoding="utf-8")
+    return artifact
+
+
+def _build_hf_tokenizer(kind: str, texts: list[str], target_vocab_size: int, min_frequency: int) -> dict[str, object]:
+    if not HF_TOKENIZERS_AVAILABLE:
+        raise RuntimeError("tokenizers is required to build hf_bpe or hf_unigram tokenizers")
+    if kind == "hf_bpe":
+        tokenizer = HFTokenizer(HFBPEModel(unk_token="<unk>"))
+        trainer = HFBpeTrainer(
+            vocab_size=target_vocab_size,
+            min_frequency=min_frequency,
+            special_tokens=HF_ALL_SPECIAL_TOKENS,
+        )
+    elif kind == "hf_unigram":
+        tokenizer = HFTokenizer(HFUnigramModel())
+        trainer = HFUnigramTrainer(
+            vocab_size=target_vocab_size,
+            special_tokens=HF_ALL_SPECIAL_TOKENS,
+            unk_token="<unk>",
+        )
+    else:
+        raise ValueError(f"unsupported HF tokenizer kind: {kind}")
+    tokenizer.pre_tokenizer = HFMetaspace(replacement="▁", prepend_scheme="always")
+    tokenizer.decoder = HFMetaspaceDecoder(replacement="▁", prepend_scheme="always")
+    tokenizer.train_from_iterator(texts, trainer=trainer)
+    tokenizer_json = json.loads(tokenizer.to_str())
+    vocab = tokenizer.get_vocab(with_added_tokens=True)
+    return {
+        "kind": kind,
+        "tokenizer_json": tokenizer_json,
+        "vocab_size": len(vocab),
+        "special_tokens": list(HF_ALL_SPECIAL_TOKENS),
+        "metaspace_replacement": "▁",
+    }
+
+
+def build_hf_bpe_artifact(
+    corpus_root: str | Path,
+    output_path: str | Path,
+    *,
+    target_vocab_size: int = 512,
+    min_frequency: int = 2,
+) -> dict[str, object]:
+    texts = corpus_texts_for_tokenizer(corpus_root)
+    if not texts:
+        raise RuntimeError(f"no texts available to build tokenizer under {corpus_root}")
+    artifact = _build_hf_tokenizer("hf_bpe", texts, target_vocab_size, min_frequency)
+    artifact.update(
+        {
+            "corpus_root": str(Path(corpus_root)),
+            "target_vocab_size": target_vocab_size,
+            "min_frequency": min_frequency,
+            "text_count": len(texts),
+            "character_count": sum(len(text) for text in texts),
+        }
+    )
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(artifact, indent=2, ensure_ascii=False), encoding="utf-8")
+    return artifact
+
+
+def build_hf_unigram_artifact(
+    corpus_root: str | Path,
+    output_path: str | Path,
+    *,
+    target_vocab_size: int = 512,
+) -> dict[str, object]:
+    texts = corpus_texts_for_tokenizer(corpus_root)
+    if not texts:
+        raise RuntimeError(f"no texts available to build tokenizer under {corpus_root}")
+    artifact = _build_hf_tokenizer("hf_unigram", texts, target_vocab_size, min_frequency=1)
+    artifact.update(
+        {
+            "corpus_root": str(Path(corpus_root)),
+            "target_vocab_size": target_vocab_size,
+            "text_count": len(texts),
+            "character_count": sum(len(text) for text in texts),
+        }
+    )
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(artifact, indent=2, ensure_ascii=False), encoding="utf-8")
     return artifact

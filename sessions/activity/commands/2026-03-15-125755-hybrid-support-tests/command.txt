@@ -1,0 +1,1 @@
+python -m pytest tests/test_external_benchmarks.py tests/test_sessions.py tests/test_eval.py -q

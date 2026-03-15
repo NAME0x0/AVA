@@ -1,0 +1,10 @@
+{
+  "name": "hf-bpe-migrate-v1",
+  "slug": "hf-bpe-migrate-v1",
+  "kind": "training",
+  "created_at_utc": "2026-03-15T13:08:46.470564+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-failure-patch-v2-hf-bpe.yaml",
+    "corpora\\failure_patch_v1"
+  ]
+}

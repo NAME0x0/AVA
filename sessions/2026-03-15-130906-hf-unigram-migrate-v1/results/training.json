@@ -1,0 +1,331 @@
+{
+  "name": "ava-11m-failure-patch-v2-hf-unigram",
+  "dataset_kind": "supervised",
+  "steps": 96,
+  "optimizer_steps": 48,
+  "final_loss": 2.6014,
+  "min_loss": 1.9811,
+  "train_eval_loss": 3.2279,
+  "val_loss": 5.8623,
+  "runtime_seconds": 6.98,
+  "tokens_per_optimizer_step": 4096,
+  "tokens_seen": 196608,
+  "corpus_tokens": 867,
+  "supervised_stats": {
+    "total_examples": 27,
+    "kept_examples": 27,
+    "truncated_examples": 0,
+    "skipped_no_target_examples": 0,
+    "max_full_tokens": 60,
+    "avg_full_tokens": 32.11
+  },
+  "tokenizer_kind": "hf_unigram",
+  "tokenizer_path": "configs/tokenizers/ava-corpora-hf-unigram-512.json",
+  "tokenizer_vocab_size": 512,
+  "trainable_patterns": [],
+  "trainable_parameter_names": [
+    "wte.weight",
+    "wpe.weight",
+    "blocks.0.ln_1.weight",
+    "blocks.0.ln_1.bias",
+    "blocks.0.attn.c_attn.weight",
+    "blocks.0.attn.c_proj.weight",
+    "blocks.0.ln_2.weight",
+    "blocks.0.ln_2.bias",
+    "blocks.0.mlp.c_fc.weight",
+    "blocks.0.mlp.c_proj.weight",
+    "blocks.1.ln_1.weight",
+    "blocks.1.ln_1.bias",
+    "blocks.1.attn.c_attn.weight",
+    "blocks.1.attn.c_proj.weight",
+    "blocks.1.ln_2.weight",
+    "blocks.1.ln_2.bias",
+    "blocks.1.mlp.c_fc.weight",
+    "blocks.1.mlp.c_proj.weight",
+    "blocks.2.ln_1.weight",
+    "blocks.2.ln_1.bias",
+    "blocks.2.attn.c_attn.weight",
+    "blocks.2.attn.c_proj.weight",
+    "blocks.2.ln_2.weight",
+    "blocks.2.ln_2.bias",
+    "blocks.2.mlp.c_fc.weight",
+    "blocks.2.mlp.c_proj.weight",
+    "blocks.3.ln_1.weight",
+    "blocks.3.ln_1.bias",
+    "blocks.3.attn.c_attn.weight",
+    "blocks.3.attn.c_proj.weight",
+    "blocks.3.ln_2.weight",
+    "blocks.3.ln_2.bias",
+    "blocks.3.mlp.c_fc.weight",
+    "blocks.3.mlp.c_proj.weight",
+    "blocks.4.ln_1.weight",
+    "blocks.4.ln_1.bias",
+    "blocks.4.attn.c_attn.weight",
+    "blocks.4.attn.c_proj.weight",
+    "blocks.4.ln_2.weight",
+    "blocks.4.ln_2.bias",
+    "blocks.4.mlp.c_fc.weight",
+    "blocks.4.mlp.c_proj.weight",
+    "blocks.5.ln_1.weight",
+    "blocks.5.ln_1.bias",
+    "blocks.5.attn.c_attn.weight",
+    "blocks.5.attn.c_proj.weight",
+    "blocks.5.ln_2.weight",
+    "blocks.5.ln_2.bias",
+    "blocks.5.mlp.c_fc.weight",
+    "blocks.5.mlp.c_proj.weight",
+    "ln_f.weight",
+    "ln_f.bias"
+  ],
+  "trainable_parameter_count": 10921728,
+  "init_tokenizer_kind": "byte",
+  "init_checkpoint": "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+  "device_requested": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "checkpoint": "sessions\\2026-03-15-130906-hf-unigram-migrate-v1\\checkpoints\\ava-11m-failure-patch-v2-hf-unigram.pt",
+  "loss_history": [
+    {
+      "step": 2,
+      "loss": 5.7901,
+      "lr": 1.25e-06
+    },
+    {
+      "step": 4,
+      "loss": 5.8468,
+      "lr": 2.5e-06
+    },
+    {
+      "step": 6,
+      "loss": 5.7596,
+      "lr": 3.75e-06
+    },
+    {
+      "step": 8,
+      "loss": 5.5419,
+      "lr": 5e-06
+    },
+    {
+      "step": 10,
+      "loss": 5.1821,
+      "lr": 5e-06
+    },
+    {
+      "step": 12,
+      "loss": 5.3575,
+      "lr": 5e-06
+    },
+    {
+      "step": 14,
+      "loss": 5.4226,
+      "lr": 5e-06
+    },
+    {
+      "step": 16,
+      "loss": 5.5695,
+      "lr": 5e-06
+    },
+    {
+      "step": 18,
+      "loss": 5.2674,
+      "lr": 5e-06
+    },
+    {
+      "step": 20,
+      "loss": 4.9586,
+      "lr": 5e-06
+    },
+    {
+      "step": 22,
+      "loss": 5.1373,
+      "lr": 5e-06
+    },
+    {
+      "step": 24,
+      "loss": 5.7577,
+      "lr": 5e-06
+    },
+    {
+      "step": 26,
+      "loss": 4.8425,
+      "lr": 5e-06
+    },
+    {
+      "step": 28,
+      "loss": 4.3881,
+      "lr": 5e-06
+    },
+    {
+      "step": 30,
+      "loss": 4.2991,
+      "lr": 5e-06
+    },
+    {
+      "step": 32,
+      "loss": 4.1193,
+      "lr": 5e-06
+    },
+    {
+      "step": 34,
+      "loss": 5.2872,
+      "lr": 5e-06
+    },
+    {
+      "step": 36,
+      "loss": 4.5279,
+      "lr": 5e-06
+    },
+    {
+      "step": 38,
+      "loss": 4.1575,
+      "lr": 5e-06
+    },
+    {
+      "step": 40,
+      "loss": 4.5742,
+      "lr": 5e-06
+    },
+    {
+      "step": 42,
+      "loss": 4.3209,
+      "lr": 5e-06
+    },
+    {
+      "step": 44,
+      "loss": 3.9342,
+      "lr": 5e-06
+    },
+    {
+      "step": 46,
+      "loss": 4.7455,
+      "lr": 5e-06
+    },
+    {
+      "step": 48,
+      "loss": 4.4572,
+      "lr": 5e-06
+    },
+    {
+      "step": 50,
+      "loss": 3.6356,
+      "lr": 5e-06
+    },
+    {
+      "step": 52,
+      "loss": 4.1314,
+      "lr": 5e-06
+    },
+    {
+      "step": 54,
+      "loss": 3.4439,
+      "lr": 5e-06
+    },
+    {
+      "step": 56,
+      "loss": 4.5306,
+      "lr": 5e-06
+    },
+    {
+      "step": 58,
+      "loss": 3.9151,
+      "lr": 5e-06
+    },
+    {
+      "step": 60,
+      "loss": 3.9415,
+      "lr": 5e-06
+    },
+    {
+      "step": 62,
+      "loss": 4.3662,
+      "lr": 5e-06
+    },
+    {
+      "step": 64,
+      "loss": 4.0575,
+      "lr": 5e-06
+    },
+    {
+      "step": 66,
+      "loss": 2.5392,
+      "lr": 5e-06
+    },
+    {
+      "step": 68,
+      "loss": 3.8643,
+      "lr": 5e-06
+    },
+    {
+      "step": 70,
+      "loss": 3.9998,
+      "lr": 5e-06
+    },
+    {
+      "step": 72,
+      "loss": 2.9422,
+      "lr": 5e-06
+    },
+    {
+      "step": 74,
+      "loss": 3.4828,
+      "lr": 5e-06
+    },
+    {
+      "step": 76,
+      "loss": 4.1397,
+      "lr": 5e-06
+    },
+    {
+      "step": 78,
+      "loss": 4.0032,
+      "lr": 5e-06
+    },
+    {
+      "step": 80,
+      "loss": 4.378,
+      "lr": 5e-06
+    },
+    {
+      "step": 82,
+      "loss": 3.2092,
+      "lr": 5e-06
+    },
+    {
+      "step": 84,
+      "loss": 3.1759,
+      "lr": 5e-06
+    },
+    {
+      "step": 86,
+      "loss": 2.9832,
+      "lr": 5e-06
+    },
+    {
+      "step": 88,
+      "loss": 2.7152,
+      "lr": 5e-06
+    },
+    {
+      "step": 90,
+      "loss": 4.1472,
+      "lr": 5e-06
+    },
+    {
+      "step": 92,
+      "loss": 3.6114,
+      "lr": 5e-06
+    },
+    {
+      "step": 94,
+      "loss": 1.9811,
+      "lr": 5e-06
+    },
+    {
+      "step": 96,
+      "loss": 2.6014,
+      "lr": 5e-06
+    }
+  ],
+  "checkpoint_sha256": "5896ddfdb7e37dba6703c1cde265c4c9d762043492efdc6cf13b1017253ef5df",
+  "checkpoint_size_bytes": 43709471
+}

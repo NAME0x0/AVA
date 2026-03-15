@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\failure_patch_v1",
+  "file_count": 3,
+  "text_count": 28,
+  "character_count": 1953,
+  "token_count": 849,
+  "supervised_example_count": 27,
+  "files": [
+    {
+      "path": "corpora\\failure_patch_v1\\examples.jsonl",
+      "size_bytes": 3151,
+      "sha256": "0c5768212dbd5699f953c035e83e1f6c97038511ab465466981f47536d2370f3",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\failure_patch_v1\\manifest.json",
+      "size_bytes": 280,
+      "sha256": "7ce4b6943eab95dd2629b40d59a22e35a19c2c646cb10fdc39dfe339558f8df7",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\failure_patch_v1\\README.md",
+      "size_bytes": 158,
+      "sha256": "b2c1da781d285ec2200cf314f8d145b78daf0f2098474d24e0fb0a2a5c566fea",
+      "relative_path": "README.md"
+    }
+  ]
+}

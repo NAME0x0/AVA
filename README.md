@@ -1,16 +1,17 @@
 # AVA
 
-AVA is a compact AI model project built under hard constraints: one 4 GB VRAM GPU, limited data, and no large-cluster research budget.
+AVA is a transparent small-model research stack for building a high-quality assistant under hard constraints: one 4 GB VRAM GPU, limited data, limited time, and no large-cluster budget.
 
-This repository is the engineering and experimentation stack behind AVA. It is where the model, training loop, tokenizers, corpora, evaluation harnesses, benchmark runners, and transparent session logs live. The goal is not to imitate frontier labs with brute force. The goal is to find a small-model path that wins through better data, tighter experiments, stronger tool use, and a more transparent training process.
+The repo contains the model code, training loop, tokenizers, corpora, benchmark runners, retrieval system, inspection tools, activity ledger, and session notes used to build AVA. The goal is not to mimic frontier labs with brute force. The goal is to find a compact path that wins through better data, better systems design, tighter evaluation, and disciplined experimentation.
 
-## Current Progress
+## Current Status
 
-As of March 15, 2026, AVA has three distinct live results:
+As of March 15, 2026, AVA has four live stories:
 
-- base `11M` checkpoint with strong internal behavior and clean tool/compliance control
-- memory-assisted transfer path that turns the same tiny checkpoint into a much stronger system on held-out internal suites
-- first real public-benchmark gain on `ARC-Challenge` through transparent sparse support retrieval
+- a compact `11M` checkpoint with strong internal tool/compliance behavior
+- a small-memory transfer path that turns that checkpoint into a much stronger hybrid system on held-out internal suites
+- a real public benchmark lift on `ARC-Challenge`
+- a new best public path through margin-gated support-bank ensembling
 
 ### Scoreboard
 
@@ -19,57 +20,80 @@ As of March 15, 2026, AVA has three distinct live results:
 | Base checkpoint internal benchmark | `9/10` | [failure-patch-v2 rerun](/D:/AVA/sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/notes.md) |
 | Base checkpoint tool eval | `6/6` | [failure-patch-v2 rerun](/D:/AVA/sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/notes.md) |
 | Base checkpoint compliance | `4/4` | [failure-patch-v2 rerun](/D:/AVA/sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/notes.md) |
-| Expanded transfer suite with `23`-example memory bank | `40/40` | [expanded-transfer-tool-repair-nano-v1](/D:/AVA/sessions/2026-03-14-202119-expanded-transfer-tool-repair-nano-v1/notes.md) |
+| Expanded internal transfer suite with `23`-example memory bank | `40/40` | [expanded-transfer-tool-repair-nano-v1](/D:/AVA/sessions/2026-03-14-202119-expanded-transfer-tool-repair-nano-v1/notes.md) |
 | Stress transfer suite with `21`-example memory bank | `87/87` | [stress-tool-minimal-v3-rerun](/D:/AVA/sessions/2026-03-14-202211-stress-tool-minimal-v3-rerun/notes.md) |
 | Same stress suite without memory | `17/87` | [stress-tool-minimal-v3-rerun](/D:/AVA/sessions/2026-03-14-202211-stress-tool-minimal-v3-rerun/notes.md) |
-| ARC-Challenge first `100` baseline | `19/100` | [arc-baseline-100-v3.json](/D:/AVA/sessions/activity/arc-baseline-100-v3.json) |
-| ARC-Challenge first `100` with `support_mc` | `30/100` | [arc-support-mc-100-kindscience.json](/D:/AVA/sessions/activity/arc-support-mc-100-kindscience.json) |
-| ARC-Challenge full `299` validation with `support_mc` | `84/299` | [arc-support-mc-299-kindscience.json](/D:/AVA/sessions/activity/arc-support-mc-299-kindscience.json) |
-| GSM8K first `50` baseline | `0/50` | [gsm8k-baseline-50-v2.json](/D:/AVA/sessions/activity/gsm8k-baseline-50-v2.json) |
-| GSM8K first `50` with retrieval branches | `0/50` | [gsm8k-support-nearest-th0-50.json](/D:/AVA/sessions/activity/gsm8k-support-nearest-th0-50.json) |
+| ARC-Challenge baseline, first `100` | `19/100` | [arc-baseline-100-v3.json](/D:/AVA/sessions/activity/arc-baseline-100-v3.json) |
+| ARC-Challenge with dedicated `support_mc`, first `100` | `30/100` | [arc-support-mc-100-kindscience.json](/D:/AVA/sessions/activity/arc-support-mc-100-kindscience.json) |
+| ARC-Challenge with dedicated `support_mc`, full `299` | `84/299` | [arc-support-mc-299-kindscience.json](/D:/AVA/sessions/activity/arc-support-mc-299-kindscience.json) |
+| ARC-Challenge with tuned public hybrid bank, first `100` | `30/100` | [summary.json](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/results/summary.json) |
+| ARC-Challenge with tuned public hybrid bank, full `299` | `86/299` | [summary.json](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/results/summary.json) |
+| ARC-Challenge with margin-gated two-bank ensemble, first `100` | `31/100` | [notes.md](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/notes.md) |
+| ARC-Challenge with margin-gated two-bank ensemble, full `299` | `88/299` | [notes.md](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/notes.md) |
+| GSM8K baseline, first `50` | `0/50` | [gsm8k-baseline-50-v2.json](/D:/AVA/sessions/activity/gsm8k-baseline-50-v2.json) |
+| GSM8K nearest retrieval on cleaned math support, first `50` | `0/50` | [notes.md](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/notes.md) |
 
-### Progress Figures
+### ARC Progress
 
 ```mermaid
-flowchart LR
-    A["Base 11M checkpoint<br/>Internal: 9/10<br/>Tool: 6/6<br/>Compliance: 4/4"] --> B["Nearest-memory transfer<br/>Expanded suite: 40/40<br/>Stress suite: 87/87"]
-    C["ARC baseline<br/>19/100 first 100"] --> D["ARC support_mc<br/>30/100 first 100<br/>84/299 full validation"]
-    E["GSM8K baseline<br/>0/50"] --> F["GSM8K support branches<br/>0/50"]
+xychart-beta
+    title "ARC-Challenge Progress (First 100)"
+    x-axis ["Baseline", "support_mc", "Public Hybrid", "Ensemble"]
+    y-axis "Correct" 0 --> 35
+    bar [19, 30, 30, 31]
 ```
 
 ```mermaid
-flowchart TD
-    G["What is working"] --> G1["Tiny checkpoint can follow tool boundaries and compact formats"]
-    G --> G2["Small external memory bank beats brute-force bank size"]
-    G --> G3["Transparent sparse support retrieval lifts public science MCQ performance"]
-    H["What is not solved"] --> H1["Public math reasoning on GSM8K"]
-    H --> H2["Direct public-benchmark weight patches without collapse"]
-    H --> H3["Tokenizer migration after the fact"]
+xychart-beta
+    title "ARC-Challenge Progress (Full 299)"
+    x-axis ["support_mc", "Public Hybrid", "Ensemble"]
+    y-axis "Correct" 0 --> 100
+    bar [84, 86, 88]
+```
+
+```mermaid
+flowchart LR
+    A["Base 11M checkpoint
+Internal 9/10
+Tool 6/6
+Compliance 4/4"] --> B["Nearest-memory transfer
+Expanded 40/40
+Stress 87/87"]
+    C["ARC baseline
+19/100"] --> D["Dedicated support bank
+30/100
+84/299"] --> E["Public hybrid bank
+30/100
+86/299"] --> F["Two-bank ensemble
+31/100
+88/299"]
 ```
 
 ## What Changed Most Recently
 
-The latest major branch added public-benchmark support infrastructure and ruled out two bad paths.
+The newest branch is captured in [notes.md](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/notes.md).
 
 What worked:
 
-- `support_mc` retrieval in [external_benchmarks.py](/D:/AVA/src/ava/external_benchmarks.py) produced the first real public-benchmark lift on `ARC-Challenge`
-- the support bank in [arc_train_support_v1](/D:/AVA/corpora/arc_train_support_v1) beat direct fine-tuning attempts on the current tiny checkpoint
-- checkpoint reuse infrastructure in [train.py](/D:/AVA/src/ava/train.py) now supports block-size interpolation and selective tuning experiments
+- explicit support-bank `category` preservation in [retrieval.py](/D:/AVA/src/ava/retrieval.py) fixed a real mixed-bank routing bug
+- reusable sparse support indexing in [external_benchmarks.py](/D:/AVA/src/ava/external_benchmarks.py) made larger public support banks usable again
+- keeping rotated ARC support rows materially improved the public bank
+- a question/semantic-heavy hybrid scorer improved the broad public ARC bank
+- a margin-gated two-bank ensemble over [public_benchmark_distill_v1](/D:/AVA/corpora/public_benchmark_distill_v1) and [arc_train_support_v1](/D:/AVA/corpora/arc_train_support_v1) produced the new best `88/299`
 
-What failed:
+What did not work:
 
-- [public-benchmark-distill-v2-640](/D:/AVA/sessions/2026-03-15-033938-public-benchmark-distill-v2-640/notes.md) collapsed internal behavior and did not improve public benchmarks
-- [arc-label-calibration-v1](/D:/AVA/sessions/2026-03-15-034612-arc-label-calibration-v1/notes.md) also collapsed generation and did not improve public benchmarks
-- `GSM8K` stayed flat across direct and nearest retrieval branches
+- GSM8K stayed at `0/50` under the retrieval variants tried so far
+- adding teacher science anchors on top of the public bank did not improve ARC
+- PIQA is currently blocked by the local `datasets` runtime path rather than model inference quality
 
-The current lesson is straightforward: transparent support retrieval is a real lever for public science MCQ right now, while naive public-benchmark distillation and late checkpoint surgery are not.
+The current lesson is simple: public science MCQ is moving through better retrieval systems faster than through naive weight surgery.
 
-## What This Repository Is
+## What AVA Is
 
 AVA is the product. This codebase is the machinery used to build it.
 
-Today the stack is text-first and focused on:
+The active stack is currently text-first and focused on:
 
 - language
 - math
@@ -80,49 +104,21 @@ Today the stack is text-first and focused on:
 - planning and memory scaffolding
 - multilingual and multimodal evaluation scaffolding
 
-The long-term ambition is broader, but the repo is explicit about current reality: AVA has to earn capability through measured iteration, not marketing claims.
-
-## Why AVA Exists
-
-Most small-model projects fail in one of two ways: they either stay toy-sized and never become useful, or they copy large-model research directions that do not fit local hardware.
-
-AVA takes a different route:
-
-- keep the stack simple enough to inspect end to end
-- run short, well-documented experiment cycles
-- bias toward methods that improve quality per token, per parameter, and per unit of compute
-- treat tool use, evaluation, and transparency as first-class parts of the model
-
-## Current Approach
-
-The active research line is a compact GPT-2 style decoder with:
-
-- tight 4 GB VRAM budget checks
-- supervised and synthetic training curricula
-- compact calculator-style tool protocols
-- compliance and tool-boundary evaluation
-- session-based experiment logging
-- checkpoint inspection with activation traces
-- append-only activity logging for AVA-managed commands
-- external memory and sparse support retrieval for transparent hybrid inference
-
-Recent work in this repo has focused on tool-use behavior, public benchmark adapters, tokenizer experiments, warm-start curriculum stages, and making every experiment easier to audit.
-
 ## Repository Layout
 
 - `src/ava/` - model code, tokenizers, training loop, evaluation, sessions, tools, memory, retrieval, inspection, and public benchmark runners
-- `configs/` - baseline and experiment configs sized for local hardware
-- `corpora/` - tracked training and synthetic experiment corpora
+- `configs/` - experiment configs, tokenizer configs, and support-bank manifests
+- `corpora/` - tracked corpora and support banks
 - `docs/` - architecture, data, benchmark, experiment, and roadmap notes
-- `sessions/` - generated experiment packets, metrics, notes, and activity logs
-- `tests/` - fast validation for the research core
+- `sessions/` - experiment packets, metrics, notes, and activity logs
+- `tests/` - regression and validation coverage for the research core
 
 ## Quick Start
 
-Install the package and dev tools:
+Install the package plus dev and benchmark extras:
 
 ```bash
-python -m pip install -e .[dev]
+python -m pip install -e .[dev,bench]
 ```
 
 Add training dependencies when needed:
@@ -131,73 +127,70 @@ Add training dependencies when needed:
 python -m pip install -e .[train]
 ```
 
-Inspect the benchmark scaffold:
-
-```bash
-ava benchmark registry --modality code
-ava benchmark registry --stage agentic
-```
-
-Run a dry-run budget check:
+Run the baseline budget check:
 
 ```bash
 ava train dry-run configs/base.yaml
 ```
 
-Start a tracked training session:
+Run the current benchmark registry smoke:
 
 ```bash
-ava session train tool-sft-smoke configs/experiments/ava-11m-tool-sft.yaml corpora/tool_sft --max-steps 128
+ava benchmark registry --stage foundation
+ava benchmark registry --modality vision
 ```
 
-Run the test suite with archived command output:
+Replay the current best public ARC path:
 
 ```bash
-ava activity run -- python -m pytest -q
+ava benchmark external arc-challenge sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --limit 299 --device cuda --retrieval-mode hybrid_support_ensemble --support-corpus configs/support/arc_ensemble_public_primary_v1.json
 ```
 
-Replay the current public benchmark improvement:
-
-```bash
-ava benchmark external arc-challenge --limit 100 --retrieval-mode support_mc --support-corpus corpora/arc_train_support_v1 --device cuda
-```
-
-Replay the current stress result on the best `11M` checkpoint:
+Replay the current best internal transfer path:
 
 ```bash
 ava session memory-transfer stress-tool-minimal-v3-rerun sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt corpora/tool_memory_minimal_v3 --device cuda --nearest-threshold 0.45 --nearest-margin 0.0 --suite stress
 ```
 
-## How Experiments Work
+Archive a test run in the activity ledger:
 
-AVA is session-first. Meaningful research work is recorded under `sessions/` with:
+```bash
+ava activity run -- python -m pytest -q
+```
+
+## Experiment Discipline
+
+AVA is session-first. Meaningful work is recorded under `sessions/` with:
 
 - config snapshots
 - corpus manifests
 - environment metadata
 - training curves and evaluation outputs
-- checkpoint artifacts
-- written notes and next-step decisions
+- checkpoint or support-bank artifacts
+- written notes and explicit next-step decisions
 
-The intent is simple: no silent fallbacks, no hidden training state, and no black-box project history.
+There should be no silent fallbacks, no hidden benchmark state, and no untraceable “magic improvement.”
 
-## Evaluation Philosophy
+## CI / CD
 
-AVA uses multiple evaluation layers on purpose.
+The repository now treats CI as part of the research contract.
 
-- Smoke evals catch broken training and prompt plumbing quickly.
-- Tool evals measure trace generation, abstention, and boundary behavior.
-- Compliance evals measure formatting obedience, refusal quality, and policy adherence.
-- Internal transfer suites measure whether small memory banks actually generalize.
-- External benchmark runners track the public target surface for science, coding, multilingual, multimodal, and agentic work.
+Current CI in [.github/workflows/ci.yml](/D:/AVA/.github/workflows/ci.yml) runs:
 
-This repo treats benchmark scaffolding as part of model design. If AVA is supposed to grow into a broader product, the evaluation surface has to be explicit before the scale-up happens.
+- Python matrix quality checks on `3.10` and `3.11`
+- `ruff check`
+- `ruff format --check`
+- `mypy src tests`
+- `pytest -q`
+- CLI smoke checks for `train dry-run` and benchmark registry commands
+
+That keeps the model stack, benchmark surface, and docs/install path from drifting silently.
 
 ## Transparency
 
 Transparency is a design constraint, not a nice-to-have.
 
-Every serious experiment should leave behind enough evidence for someone else to answer:
+Every serious experiment should leave behind enough evidence to answer:
 
 - what changed
 - why it changed
@@ -206,7 +199,7 @@ Every serious experiment should leave behind enough evidence for someone else to
 - what failed
 - what should happen next
 
-For command-level provenance, AVA also keeps an activity ledger under `sessions/activity/` for CLI invocations, snapshots, and wrapped external commands.
+For command-level provenance, AVA keeps an append-only activity ledger under `sessions/activity/`.
 
 ## Further Reading
 
@@ -219,4 +212,4 @@ For command-level provenance, AVA also keeps an activity ledger under `sessions/
 
 ## Status
 
-AVA is still in active experimentation. The current best story is not “tiny model beats everything.” The current best story is more useful and more honest: a transparent compact model plus well-shaped external support already shows strong internal control and the first real public-benchmark lift, and the repo now makes it easy to see exactly where that approach works and where it still fails.
+AVA is still in active experimentation. The current best honest story is not “tiny model beats everything.” The current best honest story is stronger than that: a transparent compact checkpoint plus well-shaped external support already produces strong internal control and a measured public benchmark lift, and the repo makes the wins, failures, and tradeoffs inspectable end to end.

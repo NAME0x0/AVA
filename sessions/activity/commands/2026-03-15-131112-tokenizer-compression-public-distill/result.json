@@ -1,0 +1,12 @@
+{
+  "label": "tokenizer-compression-public-distill",
+  "command": "python -c \"import json; from ava.train import summarize_corpus; corpus='corpora/public_benchmark_distill_v1'; configs={'byte':{'kind':'byte'},'byte_bpe':{'kind':'byte_bpe','path':'artifacts/tokenizers/public_distill_byte_bpe_384.json'},'hf_bpe':{'kind':'hf_bpe','path':'artifacts/tokenizers/public_distill_hf_bpe_384.json'},'hf_unigram':{'kind':'hf_unigram','path':'artifacts/tokenizers/public_distill_hf_unigram_384.json'}}; payload={name:summarize_corpus(corpus,cfg) for name,cfg in configs.items()}; print(json.dumps(payload, indent=2))\"",
+  "argv": [
+    "python",
+    "-c",
+    "import json; from ava.train import summarize_corpus; corpus='corpora/public_benchmark_distill_v1'; configs={'byte':{'kind':'byte'},'byte_bpe':{'kind':'byte_bpe','path':'artifacts/tokenizers/public_distill_byte_bpe_384.json'},'hf_bpe':{'kind':'hf_bpe','path':'artifacts/tokenizers/public_distill_hf_bpe_384.json'},'hf_unigram':{'kind':'hf_unigram','path':'artifacts/tokenizers/public_distill_hf_unigram_384.json'}}; payload={name:summarize_corpus(corpus,cfg) for name,cfg in configs.items()}; print(json.dumps(payload, indent=2))"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 44827
+}

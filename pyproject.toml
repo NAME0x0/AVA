@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ava"
 version = "0.1.0"
-description = "Session-first small-model lab for an English+math AVA on 4 GB VRAM"
+description = "Transparent small-model research stack for AVA on 4 GB VRAM"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
@@ -27,8 +27,13 @@ dev = [
 train = [
     "torch>=2.4,<3",
 ]
+bench = [
+    "datasets>=3.2,<5",
+    "pyarrow>=18,<22",
+    "tokenizers>=0.20,<1",
+]
 all = [
-    "ava[dev,train]",
+    "ava[dev,train,bench]",
 ]
 
 [project.scripts]

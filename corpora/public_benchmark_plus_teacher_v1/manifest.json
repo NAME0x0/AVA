@@ -1,0 +1,8 @@
+{
+  "curriculum": "public_benchmark_plus_teacher",
+  "sources": [
+    "corpora/public_benchmark_distill_v1/examples.jsonl",
+    "corpora/teacher_distill_v1/examples.jsonl"
+  ],
+  "total_examples": 12532
+}

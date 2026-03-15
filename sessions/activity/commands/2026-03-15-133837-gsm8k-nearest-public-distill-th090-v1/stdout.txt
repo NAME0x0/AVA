@@ -1,0 +1,10 @@
+{
+  "benchmark": "gsm8k",
+  "split": null,
+  "limit": 50,
+  "retrieval_mode": "nearest",
+  "accuracy": 0.0,
+  "correct": 0,
+  "total": 50,
+  "support_corpus": "corpora/public_benchmark_distill_v1"
+}

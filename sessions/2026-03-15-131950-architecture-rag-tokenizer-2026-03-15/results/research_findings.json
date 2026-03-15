@@ -1,0 +1,120 @@
+{
+  "goal": "Find stronger architecture, RAG, tokenizer, and encoder directions for AVA under a 4 GB single-GPU constraint and validate the cheapest concrete branches locally.",
+  "papers": [
+    {
+      "key": "mamba2",
+      "title": "Transformers are SSMs: Generalized Models and Efficient Algorithms Through Structured State Space Duality",
+      "url": "https://arxiv.org/abs/2405.21060",
+      "takeaway": "State-space / attention hybrids are credible small-model efficiency candidates when KV cache or long context becomes the bottleneck."
+    },
+    {
+      "key": "hymba",
+      "title": "Hymba: A Hybrid-head Architecture for Small Language Models",
+      "url": "https://arxiv.org/abs/2411.13676",
+      "takeaway": "For small models, mixing attention and SSM heads inside the same layer is a serious architecture candidate, not a curiosity."
+    },
+    {
+      "key": "lightrag",
+      "title": "LightRAG: Simple and Fast Retrieval-Augmented Generation",
+      "url": "https://arxiv.org/abs/2410.05779",
+      "takeaway": "Dual-level graph plus text retrieval is a better long-term memory design than flat nearest-neighbor lookup."
+    },
+    {
+      "key": "hipporag2",
+      "title": "From RAG to Memory: Non-Parametric Continual Learning for Large Language Models",
+      "url": "https://arxiv.org/abs/2502.14802",
+      "takeaway": "RAG should evolve into structured memory with associative retrieval, not remain prompt stuffing forever."
+    },
+    {
+      "key": "flashrag",
+      "title": "FlashRAG: A Modular Toolkit for Efficient Retrieval-Augmented Generation Research",
+      "url": "https://arxiv.org/abs/2405.13576",
+      "takeaway": "FlashRAG is the best external research/eval framework reference; it is useful for reproducing RAG baselines, not for AVA runtime itself."
+    },
+    {
+      "key": "focus",
+      "title": "FOCUS: Effective Embedding Initialization for Specializing Pretrained Multilingual Models on a Single Language",
+      "url": "https://arxiv.org/abs/2305.14481",
+      "takeaway": "Changing tokenization after pretraining needs smart embedding init; naive remapping is not enough."
+    },
+    {
+      "key": "bge-m3",
+      "title": "BGE M3-Embedding: Multi-Lingual, Multi-Functionality, Multi-Granularity Text Embeddings Through Self-Knowledge Distillation",
+      "url": "https://arxiv.org/abs/2402.03216",
+      "takeaway": "If AVA needs a multilingual retrieval encoder later, BGE-M3 is the strongest open reference, but it is heavy for 4 GB local-first use."
+    },
+    {
+      "key": "gte-modernbert-base",
+      "title": "gte-modernbert-base model card",
+      "url": "https://huggingface.co/Alibaba-NLP/gte-modernbert-base",
+      "takeaway": "For a local retrieval encoder, gte-modernbert-base is the pragmatic first candidate: 149M parameters, 8192 context, competitive retrieval metrics."
+    }
+  ],
+  "decisions": {
+    "architecture": "AVA-v2 should move away from pure GPT-2 defaults toward a modern dense stack first (RoPE, RMSNorm, SwiGLU, GQA), then test Hymba/Mamba-style hybrid layers after the dense baseline is rebuilt.",
+    "rag_runtime": "Adopt the existing hybrid_support_mc branch as the current best public-benchmark retriever. Long-term memory direction should borrow from LightRAG/HippoRAG2, not flat canonical lookup.",
+    "rag_framework": "Use FlashRAG as the reference framework for future RAG benchmark reproduction and ablations, not as the product runtime.",
+    "tokenizer": "hf_bpe_512 is the current best local tokenizer artifact by compression. However, post-hoc tokenizer migration still collapses the student, so tokenizer changes must happen earlier in training or use a stronger FOCUS-style migration recipe.",
+    "encoder": "No external encoder was downloaded yet. The first local candidate is Alibaba-NLP/gte-modernbert-base; the multilingual heavier candidate is BAAI/bge-m3."
+  },
+  "experiments": {
+    "tokenizer_compression": {
+      "corpora": {
+        "corpora": {
+          "byte": 11827907,
+          "hf_bpe_512": 4505401,
+          "hf_unigram_512": 4857842
+        },
+        "corpora/tool_sft": {
+          "byte": 8426,
+          "hf_bpe_512": 2792,
+          "hf_unigram_512": 2966
+        },
+        "corpora/public_benchmark_distill_v1": {
+          "byte": 7212853,
+          "hf_bpe_512": 2823770,
+          "hf_unigram_512": 3047019
+        }
+      },
+      "winner": "hf_bpe_512"
+    },
+    "tokenizer_migration": {
+      "hf_bpe_migrate_v1": {
+        "session": "sessions/2026-03-15-130846-hf-bpe-migrate-v1",
+        "benchmark": "2/10",
+        "tool_eval": "0/6",
+        "compliance": "0/4"
+      },
+      "hf_unigram_migrate_v1": {
+        "session": "sessions/2026-03-15-130906-hf-unigram-migrate-v1",
+        "benchmark": "2/10",
+        "tool_eval": "0/6",
+        "compliance": "0/4"
+      }
+    },
+    "arc_public_benchmark": {
+      "support_mc_100": {
+        "correct": 30,
+        "total": 100
+      },
+      "hybrid_support_mc_100": {
+        "correct": 31,
+        "total": 100
+      },
+      "support_mc_299": {
+        "correct": 84,
+        "total": 299
+      },
+      "hybrid_support_mc_299": {
+        "correct": 87,
+        "total": 299
+      }
+    },
+    "broad_support_bank_probe": {
+      "command": "python -m ava.cli benchmark external arc-challenge ... --support-corpus corpora/public_benchmark_distill_v1 --retrieval-mode hybrid_support_mc",
+      "result": "timed out at 300s",
+      "takeaway": "The broader support bank needs indexing or an encoder-backed retriever before it is practical."
+    }
+  },
+  "next_step": "Implement a modern dense AVA-v2 block family and a pluggable encoder-backed hybrid retriever. If a Hugging Face token is available, download gte-modernbert-base first and benchmark it against the current sparse hybrid ARC path."
+}

@@ -1,40 +1,53 @@
 # Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
+.python-version
 .venv/
 venv/
 
 # Tool caches
 .mypy_cache/
 .pytest_cache/
+.pytest-tmp/
 .ruff_cache/
+.coverage
+htmlcov/
 
-# Local corpora and checkpoints
-corpora/raw/
-corpora/processed/
+# Local experiment and tokenizer build artifacts
+artifacts/
+tokenizers/
 checkpoints/
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.onnx
+
+# Session-local heavyweight outputs
 sessions/*/checkpoints/
 sessions/*/logs/
-sessions/*/artifacts/*.bin
-sessions/*/artifacts/*.pt
-sessions/*/artifacts/*.pth
+sessions/test-*/
+sessions/*/__pycache__/
+
+# Generated corpora and raw data staging
+corpora/raw/
+corpora/processed/
 
 # Build artifacts
 build/
 dist/
 *.egg-info/
 
-# OS/editor
+# OS / editor
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
 
-# UI leftovers
+# Frontend leftovers
 ui/.next/
 ui/node_modules/
 ui/out/
 ui/src-tauri/target/
-
-.pytest-tmp/
-

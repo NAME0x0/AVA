@@ -87,7 +87,8 @@ def load_support_examples(path: str | Path) -> list[SupportExample]:
             prompt = str(payload["prompt"]).strip()
             response = str(payload["response"]).strip()
             kind = str(payload["kind"]).strip() if payload.get("kind") else None
-            category = infer_support_category(prompt, response, kind)
+            explicit_category = str(payload["category"]).strip() if payload.get("category") else None
+            category = explicit_category or infer_support_category(prompt, response, kind)
             examples.append(
                 SupportExample(
                     prompt=prompt,

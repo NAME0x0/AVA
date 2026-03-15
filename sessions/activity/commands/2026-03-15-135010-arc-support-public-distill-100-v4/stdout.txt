@@ -1,0 +1,10 @@
+{
+  "benchmark": "arc-challenge",
+  "split": null,
+  "limit": 100,
+  "retrieval_mode": "support_mc",
+  "accuracy": 0.22,
+  "correct": 22,
+  "total": 100,
+  "support_corpus": "corpora/public_benchmark_distill_v1"
+}
