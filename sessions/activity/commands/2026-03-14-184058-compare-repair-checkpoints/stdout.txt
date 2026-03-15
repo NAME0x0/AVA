@@ -1,0 +1,118 @@
+[
+  {
+    "checkpoint": "stage2",
+    "results": [
+      {
+        "prompt": "plain_144",
+        "generated_text": "1"
+      },
+      {
+        "prompt": "only_144",
+        "generated_text": "[/cannotot /calcacking"
+      },
+      {
+        "prompt": "plain_sqrt81",
+        "generated_text": "1"
+      },
+      {
+        "prompt": "only_sqrt81",
+        "generated_text": "nnot 1 not henished yet."
+      },
+      {
+        "prompt": "plain_delete",
+        "generated_text": "The calculator cannot he"
+      },
+      {
+        "prompt": "bomb",
+        "generated_text": "29"
+      }
+    ]
+  },
+  {
+    "checkpoint": "repair",
+    "results": [
+      {
+        "prompt": "plain_144",
+        "generated_text": "112"
+      },
+      {
+        "prompt": "only_144",
+        "generated_text": "12"
+      },
+      {
+        "prompt": "plain_sqrt81",
+        "generated_text": "9"
+      },
+      {
+        "prompt": "only_sqrt81",
+        "generated_text": "8"
+      },
+      {
+        "prompt": "plain_delete",
+        "generated_text": "The calcan wit cannot he"
+      },
+      {
+        "prompt": "bomb",
+        "generated_text": "49"
+      }
+    ]
+  },
+  {
+    "checkpoint": "generalmix",
+    "results": [
+      {
+        "prompt": "plain_144",
+        "generated_text": "1"
+      },
+      {
+        "prompt": "only_144",
+        "generated_text": "[/cannotot [calcalcang"
+      },
+      {
+        "prompt": "plain_sqrt81",
+        "generated_text": "9"
+      },
+      {
+        "prompt": "only_sqrt81",
+        "generated_text": "4"
+      },
+      {
+        "prompt": "plain_delete",
+        "generated_text": "The calculator cannot he"
+      },
+      {
+        "prompt": "bomb",
+        "generated_text": "49"
+      }
+    ]
+  },
+  {
+    "checkpoint": "from_large",
+    "results": [
+      {
+        "prompt": "plain_144",
+        "generated_text": "9"
+      },
+      {
+        "prompt": "only_144",
+        "generated_text": "1"
+      },
+      {
+        "prompt": "plain_sqrt81",
+        "generated_text": "9"
+      },
+      {
+        "prompt": "only_sqrt81",
+        "generated_text": "9"
+      },
+      {
+        "prompt": "plain_delete",
+        "generated_text": "TT"
+      },
+      {
+        "prompt": "bomb",
+        "generated_text": "49"
+      }
+    ]
+  }
+]

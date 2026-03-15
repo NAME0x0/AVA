@@ -1,0 +1,28 @@
+{
+  "corpus_root": "D:\\AVA\\corpora\\tool_canonical_patch_v1",
+  "file_count": 3,
+  "text_count": 54,
+  "character_count": 3652,
+  "token_count": 3760,
+  "supervised_example_count": 53,
+  "files": [
+    {
+      "path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl",
+      "size_bytes": 6164,
+      "sha256": "c51b40c0e6ee544eb2c78d1cd75ec4dbdaf095b69f51243a471a5e8be1945fdf",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\manifest.json",
+      "size_bytes": 373,
+      "sha256": "0dd81674d1182aa0c298198965d380b9107f938a7cf7199c13b7b9a2e29f84c2",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\README.md",
+      "size_bytes": 265,
+      "sha256": "731d88d83697dc36ba1d2058592f89aac30af5648cedb024d3a9c32f72e7c471",
+      "relative_path": "README.md"
+    }
+  ]
+}

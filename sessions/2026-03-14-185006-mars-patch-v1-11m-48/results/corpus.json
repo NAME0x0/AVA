@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\mars_patch_v1",
+  "file_count": 3,
+  "text_count": 16,
+  "character_count": 889,
+  "token_count": 921,
+  "supervised_example_count": 15,
+  "files": [
+    {
+      "path": "corpora\\mars_patch_v1\\examples.jsonl",
+      "size_bytes": 1561,
+      "sha256": "9b5562c4fd9a69037d30187a7963d3d682cdfaa3c8d9929892dedae1f8651c02",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\mars_patch_v1\\manifest.json",
+      "size_bytes": 255,
+      "sha256": "99d0ba3e041063de0c3fb44ab7a83ef64af6e398c342933bd5cf4456dfa7e152",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\mars_patch_v1\\README.md",
+      "size_bytes": 84,
+      "sha256": "847d8ace9f94aeadd7fca850ca525cc10cb79d30b83b1a9bdccc57dec70ac06e",
+      "relative_path": "README.md"
+    }
+  ]
+}

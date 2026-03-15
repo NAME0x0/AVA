@@ -1,0 +1,15 @@
+{
+  "label": "nano-transfer-tests",
+  "command": "python -m pytest tests/test_retrieval.py tests/test_memory_transfer.py -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_retrieval.py",
+    "tests/test_memory_transfer.py",
+    "-q"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 3243
+}

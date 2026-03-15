@@ -1,0 +1,10 @@
+[
+  {
+    "category": "no_tool",
+    "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "Paris",
+    "retrieval_completion": "calp t."
+  }
+]

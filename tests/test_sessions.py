@@ -9,7 +9,9 @@ from ava.sessions import (
     bootstrap_session,
     hf_research_session,
     inspection_session,
+    memory_transfer_session,
     moe_feasibility_session,
+    retrieval_session,
     sota_session,
     training_session,
 )
@@ -107,6 +109,16 @@ def _write_tiny_config(path: Path) -> None:
 def _write_tiny_corpus(root: Path) -> None:
     root.mkdir(parents=True, exist_ok=True)
     (root / "tiny.txt").write_text(TINY_CORPUS, encoding="utf-8")
+
+
+def _write_tiny_support_corpus(root: Path) -> None:
+    root.mkdir(parents=True, exist_ok=True)
+    rows = [
+        {"prompt": "What planet is known as the Red Planet?", "response": "Mars"},
+        {"prompt": "What force keeps planets in orbit around the Sun?", "response": "gravity"},
+        {"prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."},
+    ]
+    (root / "examples.jsonl").write_text("\n".join(json.dumps(row) for row in rows) + "\n", encoding="utf-8")
 
 
 def _write_tiny_checkpoint(path: Path) -> None:
@@ -268,6 +280,90 @@ def test_training_session_writes_transparent_artifacts() -> None:
         event["kind"] == "session"
         and event["status"] == "completed"
         and event["metadata"]["session_kind"] == "training"
+        for event in events
+    )
+    shutil.rmtree(root)
+    shutil.rmtree(workspace)
+
+
+def test_retrieval_session_writes_before_after_artifacts() -> None:
+    root = Path("sessions") / "test-retrieval"
+    workspace = Path("sessions") / "test-retrieval-workspace"
+    if root.exists():
+        shutil.rmtree(root)
+    if workspace.exists():
+        shutil.rmtree(workspace)
+    workspace.mkdir(parents=True, exist_ok=True)
+    checkpoint_path = workspace / "tiny.pt"
+    support_root = workspace / "support"
+    _write_tiny_checkpoint(checkpoint_path)
+    _write_tiny_support_corpus(support_root)
+
+    session_dir = retrieval_session(
+        root,
+        "retrieval-test",
+        checkpoint_path,
+        support_root,
+        requested_device="cpu",
+        max_new_tokens=2,
+        retrieval_top_k=1,
+        category_gated=True,
+    )
+    assert (session_dir / "notes.md").exists()
+    assert (session_dir / "results" / "support_corpus.json").exists()
+    assert (session_dir / "results" / "baseline_benchmark.json").exists()
+    assert (session_dir / "results" / "retrieval_benchmark.json").exists()
+    assert (session_dir / "results" / "changed_benchmark.json").exists()
+    assert (session_dir / "results" / "retrieval_tool_eval.json").exists()
+    assert (session_dir / "results" / "retrieval_compliance.json").exists()
+    events = read_activity_events(root)
+    assert any(
+        event["kind"] == "session"
+        and event["status"] == "completed"
+        and event["metadata"]["session_kind"] == "retrieval"
+        for event in events
+    )
+    shutil.rmtree(root)
+    shutil.rmtree(workspace)
+
+
+
+def test_memory_transfer_session_writes_mode_comparison_artifacts() -> None:
+    root = Path("sessions") / "test-memory-transfer"
+    workspace = Path("sessions") / "test-memory-transfer-session-workspace"
+    if root.exists():
+        shutil.rmtree(root)
+    if workspace.exists():
+        shutil.rmtree(workspace)
+    workspace.mkdir(parents=True, exist_ok=True)
+    checkpoint_path = workspace / "tiny.pt"
+    support_root = workspace / "support"
+    _write_tiny_checkpoint(checkpoint_path)
+    _write_tiny_support_corpus(support_root)
+
+    session_dir = memory_transfer_session(
+        root,
+        "memory-transfer-test",
+        checkpoint_path,
+        support_root,
+        requested_device="cpu",
+        max_new_tokens=2,
+        nearest_threshold=0.5,
+        nearest_margin=0.0,
+        category_gated=True,
+        suite="expanded",
+    )
+    assert (session_dir / "notes.md").exists()
+    assert (session_dir / "results" / "baseline_transfer.json").exists()
+    assert (session_dir / "results" / "direct_transfer.json").exists()
+    assert (session_dir / "results" / "nearest_transfer.json").exists()
+    assert (session_dir / "results" / "winner.json").exists()
+    assert "expanded" in (session_dir / "notes.md").read_text(encoding="utf-8")
+    events = read_activity_events(root)
+    assert any(
+        event["kind"] == "session"
+        and event["status"] == "completed"
+        and event["metadata"]["session_kind"] == "memory-transfer"
         for event in events
     )
     shutil.rmtree(root)

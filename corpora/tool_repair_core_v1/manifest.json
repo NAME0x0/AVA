@@ -1,0 +1,17 @@
+{
+  "source": "corpora/tool_repair_v1/examples.jsonl",
+  "curriculum": "repair_core_ablation",
+  "tool_prompt_count": 10,
+  "variant_free": true,
+  "total_examples": 42,
+  "by_kind": {
+    "trace": 5,
+    "tool_direct": 5,
+    "general": 8,
+    "no_tool": 10,
+    "boundary": 6,
+    "format": 4,
+    "refusal": 4
+  },
+  "examples_path": "corpora\\tool_repair_core_v1\\examples.jsonl"
+}

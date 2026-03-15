@@ -1,0 +1,1 @@
+python -c "import json; from ava.synthetic import materialize_tool_canonical_patch_corpus; payload=materialize_tool_canonical_patch_corpus(r'corpora/tool_canonical_patch_v1'); print(json.dumps(payload, indent=2))"

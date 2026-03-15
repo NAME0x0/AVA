@@ -1,0 +1,194 @@
+{
+  "name": "ava-11m-failure-patch-v1",
+  "dataset_kind": "supervised",
+  "steps": 64,
+  "optimizer_steps": 32,
+  "final_loss": 0.0055,
+  "min_loss": 0.0055,
+  "train_eval_loss": 0.0151,
+  "val_loss": 0.1199,
+  "runtime_seconds": 12.731,
+  "tokens_per_optimizer_step": 4096,
+  "tokens_seen": 131072,
+  "corpus_tokens": 2340,
+  "supervised_stats": {
+    "total_examples": 27,
+    "kept_examples": 27,
+    "truncated_examples": 0,
+    "skipped_no_target_examples": 0,
+    "max_full_tokens": 150,
+    "avg_full_tokens": 86.67
+  },
+  "tokenizer_kind": "byte",
+  "tokenizer_path": null,
+  "tokenizer_vocab_size": 260,
+  "init_checkpoint": "sessions/2026-03-14-184435-tool-multiview-guardrail-v2-11m-96/checkpoints/ava-11m-tool-multiview-guardrail-v2.pt",
+  "device_requested": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "checkpoint": "sessions\\2026-03-14-184801-failure-patch-v1-11m-64\\checkpoints\\ava-11m-failure-patch-v1.pt",
+  "loss_history": [
+    {
+      "step": 2,
+      "loss": 0.1097,
+      "lr": 2.5e-06
+    },
+    {
+      "step": 4,
+      "loss": 0.1105,
+      "lr": 5e-06
+    },
+    {
+      "step": 6,
+      "loss": 0.0976,
+      "lr": 7.5e-06
+    },
+    {
+      "step": 8,
+      "loss": 0.0582,
+      "lr": 1e-05
+    },
+    {
+      "step": 10,
+      "loss": 0.0621,
+      "lr": 1e-05
+    },
+    {
+      "step": 12,
+      "loss": 0.0927,
+      "lr": 1e-05
+    },
+    {
+      "step": 14,
+      "loss": 0.0405,
+      "lr": 1e-05
+    },
+    {
+      "step": 16,
+      "loss": 0.087,
+      "lr": 1e-05
+    },
+    {
+      "step": 18,
+      "loss": 0.0367,
+      "lr": 1e-05
+    },
+    {
+      "step": 20,
+      "loss": 0.0374,
+      "lr": 1e-05
+    },
+    {
+      "step": 22,
+      "loss": 0.033,
+      "lr": 1e-05
+    },
+    {
+      "step": 24,
+      "loss": 0.0323,
+      "lr": 1e-05
+    },
+    {
+      "step": 26,
+      "loss": 0.047,
+      "lr": 1e-05
+    },
+    {
+      "step": 28,
+      "loss": 0.0198,
+      "lr": 1e-05
+    },
+    {
+      "step": 30,
+      "loss": 0.0558,
+      "lr": 1e-05
+    },
+    {
+      "step": 32,
+      "loss": 0.0422,
+      "lr": 1e-05
+    },
+    {
+      "step": 34,
+      "loss": 0.0399,
+      "lr": 1e-05
+    },
+    {
+      "step": 36,
+      "loss": 0.0337,
+      "lr": 1e-05
+    },
+    {
+      "step": 38,
+      "loss": 0.0151,
+      "lr": 1e-05
+    },
+    {
+      "step": 40,
+      "loss": 0.025,
+      "lr": 1e-05
+    },
+    {
+      "step": 42,
+      "loss": 0.0196,
+      "lr": 1e-05
+    },
+    {
+      "step": 44,
+      "loss": 0.0152,
+      "lr": 1e-05
+    },
+    {
+      "step": 46,
+      "loss": 0.016,
+      "lr": 1e-05
+    },
+    {
+      "step": 48,
+      "loss": 0.0243,
+      "lr": 1e-05
+    },
+    {
+      "step": 50,
+      "loss": 0.0131,
+      "lr": 1e-05
+    },
+    {
+      "step": 52,
+      "loss": 0.0181,
+      "lr": 1e-05
+    },
+    {
+      "step": 54,
+      "loss": 0.0129,
+      "lr": 1e-05
+    },
+    {
+      "step": 56,
+      "loss": 0.0096,
+      "lr": 1e-05
+    },
+    {
+      "step": 58,
+      "loss": 0.0088,
+      "lr": 1e-05
+    },
+    {
+      "step": 60,
+      "loss": 0.0082,
+      "lr": 1e-05
+    },
+    {
+      "step": 62,
+      "loss": 0.0127,
+      "lr": 1e-05
+    },
+    {
+      "step": 64,
+      "loss": 0.0055,
+      "lr": 1e-05
+    }
+  ],
+  "checkpoint_sha256": "1bc5de88af0d226aed46256ac9685c2fe67861ce2986aeed156198d87b074020",
+  "checkpoint_size_bytes": 43321697
+}

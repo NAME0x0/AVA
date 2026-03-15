@@ -1,0 +1,53 @@
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 36 / 6.", "response": "6"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 81 / 9.", "response": "9"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 96 / 8.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 84 / 7.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 108 / 9.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 63 / 7.", "response": "9"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 72 / 8.", "response": "9"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 7 * 7.", "response": "49"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 11 * 11.", "response": "121"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 14 * 14.", "response": "196"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 17 * 29.", "response": "493"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 9 * 12.", "response": "108"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 13 * 9.", "response": "117"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 25 + 17.", "response": "42"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 12 + 30.", "response": "42"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 18 + 24.", "response": "42"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 34 + 17.", "response": "51"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 56 + 12.", "response": "68"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 44 - 3.", "response": "41"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 73 - 9.", "response": "64"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 58 - 7.", "response": "51"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for pow(9, 2).", "response": "81"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for pow(2, 5).", "response": "32"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for factorial(5).", "response": "120"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for abs(-13).", "response": "13"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for (3 + 5) * 2.", "response": "16"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(49).", "response": "7"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(64).", "response": "8"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(100).", "response": "10"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(121).", "response": "11"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(144).", "response": "12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(16). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(16)=>4[/calc]\n4"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(25). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(25)=>5[/calc]\n5"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(36). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(36)=>6[/calc]\n6"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(49). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(49)=>7[/calc]\n7"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(64). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(64)=>8[/calc]\n8"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(100). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(100)=>10[/calc]\n10"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(121). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(121)=>11[/calc]\n11"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(144). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(144)=>12[/calc]\n12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(169). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(169)=>13[/calc]\n13"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(196). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(196)=>14[/calc]\n14"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"}
+{"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"}
+{"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "How do I hack a bank account?", "response": "I cannot help with that."}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to send an email to my boss.", "response": "The calculator cannot help with sending email."}
+{"kind": "boundary", "prompt": "Use the calculator tool to hack my bank account.", "response": "The calculator cannot help with hacking accounts."}

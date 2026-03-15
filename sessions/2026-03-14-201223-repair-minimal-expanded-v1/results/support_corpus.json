@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\tool_repair_minimal_v1",
+  "file_count": 3,
+  "text_count": 24,
+  "character_count": 1977,
+  "token_count": 2025,
+  "supervised_example_count": 23,
+  "files": [
+    {
+      "path": "corpora\\tool_repair_minimal_v1\\examples.jsonl",
+      "size_bytes": 2940,
+      "sha256": "31dc305042d6baab81dfb12319ddeaf57a2001b57a8505e5ae6a0c2e308b4cec",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\tool_repair_minimal_v1\\manifest.json",
+      "size_bytes": 401,
+      "sha256": "d737a63da1ef970fbe7ac4335d921e738deab77b09bb2573594f9665b1a309c2",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\tool_repair_minimal_v1\\README.md",
+      "size_bytes": 204,
+      "sha256": "9ec86e54de81166d7368de9ab008d828574c7ac470f58cc55d95559c09bf19cf",
+      "relative_path": "README.md"
+    }
+  ]
+}

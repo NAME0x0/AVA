@@ -1,0 +1,1 @@
+{'total_examples': 15, 'by_kind': {'general': 10, 'tool_direct': 1, 'trace': 1, 'boundary': 1, 'refusal': 1, 'format': 1}}

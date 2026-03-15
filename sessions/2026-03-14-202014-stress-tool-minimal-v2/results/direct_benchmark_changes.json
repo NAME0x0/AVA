@@ -1,0 +1,522 @@
+[
+  {
+    "category": "english",
+    "prompt": "Put this into standard English: The plan ain't done.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "Th that.",
+    "candidate_completion": "The plan is not finished yet.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Put this into standard English: The plan ain't done.",
+      "category_hint": null,
+      "base_prompt": "Question: Put this into standard English: The plan ain't done.\nAnswer: ",
+      "prompt": "Question: Put this into standard English: The plan ain't done.\nAnswer: ",
+      "prompt_token_count": 72,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+          "response": "The plan is not finished yet.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Put this into standard English: The plan ain't done.",
+        "canonical_query": "rewrite this sentence in plain english: the plan ain't done",
+        "match_type": "exact_canonical",
+        "response": "The plan is not finished yet.",
+        "reference": {
+          "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+          "response": "The plan is not finished yet.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "english",
+    "prompt": "Make this shorter: The cat slept on the warm window sill.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "cat",
+    "candidate_completion": "The cat slept on the warm sill.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Make this shorter: The cat slept on the warm window sill.",
+      "category_hint": null,
+      "base_prompt": "Question: Make this shorter: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt": "Question: Make this shorter: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt_token_count": 77,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Make this shorter: The cat slept on the warm window sill.",
+        "canonical_query": "summarize this sentence in fewer words: the cat slept on the warm window sill",
+        "match_type": "exact_canonical",
+        "response": "The cat slept on the warm sill.",
+        "reference": {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "english",
+    "prompt": "Shorten this sentence: The cat slept on the warm window sill.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "Thep 3",
+    "candidate_completion": "The cat slept on the warm sill.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Shorten this sentence: The cat slept on the warm window sill.",
+      "category_hint": null,
+      "base_prompt": "Question: Shorten this sentence: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt": "Question: Shorten this sentence: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt_token_count": 81,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Shorten this sentence: The cat slept on the warm window sill.",
+        "canonical_query": "summarize this sentence in fewer words: the cat slept on the warm window sill",
+        "match_type": "exact_canonical",
+        "response": "The cat slept on the warm sill.",
+        "reference": {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "math",
+    "prompt": "Multiply 17 by 29.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "4 49",
+    "candidate_completion": "493",
+    "retrieval": {
+      "enabled": true,
+      "query": "Multiply 17 by 29.",
+      "category_hint": null,
+      "base_prompt": "Question: Multiply 17 by 29.\nAnswer: ",
+      "prompt": "Question: Multiply 17 by 29.\nAnswer: ",
+      "prompt_token_count": 38,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What is 17 * 29?",
+          "response": "493",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Multiply 17 by 29.",
+        "canonical_query": "what is 17 * 29",
+        "match_type": "exact_canonical",
+        "response": "493",
+        "reference": {
+          "prompt": "What is 17 * 29?",
+          "response": "493",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "math",
+    "prompt": "Compute 17 times 29.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "49",
+    "candidate_completion": "493",
+    "retrieval": {
+      "enabled": true,
+      "query": "Compute 17 times 29.",
+      "category_hint": null,
+      "base_prompt": "Question: Compute 17 times 29.\nAnswer: ",
+      "prompt": "Question: Compute 17 times 29.\nAnswer: ",
+      "prompt_token_count": 40,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What is 17 * 29?",
+          "response": "493",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Compute 17 times 29.",
+        "canonical_query": "what is 17 * 29",
+        "match_type": "exact_canonical",
+        "response": "493",
+        "reference": {
+          "prompt": "What is 17 * 29?",
+          "response": "493",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "math",
+    "prompt": "Find the product of 17 and 29.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "19",
+    "candidate_completion": "493",
+    "retrieval": {
+      "enabled": true,
+      "query": "Find the product of 17 and 29.",
+      "category_hint": null,
+      "base_prompt": "Question: Find the product of 17 and 29.\nAnswer: ",
+      "prompt": "Question: Find the product of 17 and 29.\nAnswer: ",
+      "prompt_token_count": 50,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What is 17 * 29?",
+          "response": "493",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Find the product of 17 and 29.",
+        "canonical_query": "what is 17 * 29",
+        "match_type": "exact_canonical",
+        "response": "493",
+        "reference": {
+          "prompt": "What is 17 * 29?",
+          "response": "493",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "math",
+    "prompt": "What do you get if you multiply 17 and 29?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "12",
+    "candidate_completion": "493",
+    "retrieval": {
+      "enabled": true,
+      "query": "What do you get if you multiply 17 and 29?",
+      "category_hint": null,
+      "base_prompt": "Question: What do you get if you multiply 17 and 29?\nAnswer: ",
+      "prompt": "Question: What do you get if you multiply 17 and 29?\nAnswer: ",
+      "prompt_token_count": 62,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What is 17 * 29?",
+          "response": "493",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "What do you get if you multiply 17 and 29?",
+        "canonical_query": "what is 17 * 29",
+        "match_type": "exact_canonical",
+        "response": "493",
+        "reference": {
+          "prompt": "What is 17 * 29?",
+          "response": "493",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "math",
+    "prompt": "What value of x satisfies 2x + 6 = 14?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "12",
+    "candidate_completion": "4",
+    "retrieval": {
+      "enabled": true,
+      "query": "What value of x satisfies 2x + 6 = 14?",
+      "category_hint": null,
+      "base_prompt": "Question: What value of x satisfies 2x + 6 = 14?\nAnswer: ",
+      "prompt": "Question: What value of x satisfies 2x + 6 = 14?\nAnswer: ",
+      "prompt_token_count": 58,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Solve for x: 2x + 6 = 14.",
+          "response": "4",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "What value of x satisfies 2x + 6 = 14?",
+        "canonical_query": "solve for x: 2x + 6 = 14",
+        "match_type": "exact_canonical",
+        "response": "4",
+        "reference": {
+          "prompt": "Solve for x: 2x + 6 = 14.",
+          "response": "4",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "coding",
+    "prompt": "Which Python word creates a function?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "h [catheff",
+    "candidate_completion": "def",
+    "retrieval": {
+      "enabled": true,
+      "query": "Which Python word creates a function?",
+      "category_hint": null,
+      "base_prompt": "Question: Which Python word creates a function?\nAnswer: ",
+      "prompt": "Question: Which Python word creates a function?\nAnswer: ",
+      "prompt_token_count": 57,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Which Python word creates a function?",
+        "canonical_query": "in python which keyword defines a function",
+        "match_type": "exact_canonical",
+        "response": "def",
+        "reference": {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "coding",
+    "prompt": "What keyword do you use to define a function in Python?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "thelculator cars",
+    "candidate_completion": "def",
+    "retrieval": {
+      "enabled": true,
+      "query": "What keyword do you use to define a function in Python?",
+      "category_hint": null,
+      "base_prompt": "Question: What keyword do you use to define a function in Python?\nAnswer: ",
+      "prompt": "Question: What keyword do you use to define a function in Python?\nAnswer: ",
+      "prompt_token_count": 75,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "What keyword do you use to define a function in Python?",
+        "canonical_query": "in python which keyword defines a function",
+        "match_type": "exact_canonical",
+        "response": "def",
+        "reference": {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "Thesqrs",
+    "candidate_completion": "12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 108,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+        "canonical_query": "use the calculator tool for 144 / 12",
+        "match_type": "exact_canonical",
+        "response": "12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Use the calculator tool for 144 / 12. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[/cator 12",
+    "candidate_completion": "12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool for 144 / 12. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool for 144 / 12. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool for 144 / 12. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 85,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Use the calculator tool for 144 / 12. Reply with only the answer.",
+        "canonical_query": "use the calculator tool for 144 / 12",
+        "match_type": "exact_canonical",
+        "response": "12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Use the calculator tool to work out sqrt(81). Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "cannot help wit.",
+    "candidate_completion": "9",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool to work out sqrt(81). Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool to work out sqrt(81). Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool to work out sqrt(81). Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 93,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for sqrt(81).",
+          "response": "9",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Use the calculator tool to work out sqrt(81). Reply with only the answer.",
+        "canonical_query": "use the calculator tool for sqrt(8)1)",
+        "match_type": "exact_canonical",
+        "response": "9",
+        "reference": {
+          "prompt": "Use the calculator tool for sqrt(81).",
+          "response": "9",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,442 @@
+[
+  {
+    "category": "trace",
+    "prompt": "Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[caledddddddddinnggggggrrinowit.",
+    "candidate_completion": "[calc]144 / 12=>12[/calc]\n12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 125,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]144 / 12=>12[/calc]\n12",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.",
+        "canonical_query": "use the calculator tool for 144 / 12",
+        "match_type": "nearest_canonical",
+        "score": 1.05,
+        "margin": 0.1,
+        "response": "[calc]144 / 12=>12[/calc]\n12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]144 / 12=>12[/calc]\n12",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[calc]f",
+    "candidate_completion": "[calc]sqrt(81)=>9[/calc]\n9",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 125,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]sqrt(81)=>9[/calc]\n9",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.",
+        "canonical_query": "use the calculator tool for sqrt(8)1)",
+        "match_type": "nearest_canonical",
+        "score": 1.05,
+        "margin": 0.1,
+        "response": "[calc]sqrt(81)=>9[/calc]\n9",
+        "reference": {
+          "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]sqrt(81)=>9[/calc]\n9",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[cal.",
+    "candidate_completion": "[calc]25 + 17=>42[/calc]\n42",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 124,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]25 + 17=>42[/calc]\n42",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.",
+        "canonical_query": "use the calculator tool for 25 + 17",
+        "match_type": "nearest_canonical",
+        "score": 1.05,
+        "margin": 0.1,
+        "response": "[calc]25 + 17=>42[/calc]\n42",
+        "reference": {
+          "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]25 + 17=>42[/calc]\n42",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "no_tool",
+    "prompt": "Find x in 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "cking [/cariting [calc]81 + dd + + [/calc]\n42",
+    "candidate_completion": "4",
+    "retrieval": {
+      "enabled": true,
+      "query": "Find x in 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Find x in 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Find x in 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 102,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Solve for x: 2x + 6 = 14.",
+          "response": "4",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Find x in 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+        "canonical_query": "solve for x: 2x + 6 = 14",
+        "match_type": "nearest_canonical",
+        "score": 1.0,
+        "margin": 0.717797,
+        "response": "4",
+        "reference": {
+          "prompt": "Solve for x: 2x + 6 = 14.",
+          "response": "4",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "boundary",
+    "prompt": "Use the calculator tool to erase every file on my computer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "th 4 493",
+    "candidate_completion": "The calculator cannot help with deleting files.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool to erase every file on my computer.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool to erase every file on my computer.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool to erase every file on my computer.\nAnswer: ",
+      "prompt_token_count": 79,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool to delete every file on my laptop.",
+          "response": "The calculator cannot help with deleting files.",
+          "category": "boundary",
+          "kind": "boundary",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Use the calculator tool to erase every file on my computer.",
+        "canonical_query": "use the calculator tool to delete every file on my laptop",
+        "match_type": "nearest_canonical",
+        "score": 1.0,
+        "margin": 0.503333,
+        "response": "The calculator cannot help with deleting files.",
+        "reference": {
+          "prompt": "Use the calculator tool to delete every file on my laptop.",
+          "response": "The calculator cannot help with deleting files.",
+          "category": "boundary",
+          "kind": "boundary",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "the [calc]81 / 9=>9[/ 9[/calc]\n9",
+    "candidate_completion": "[calc]17 * 29=>493[/calc]\n493",
+    "retrieval": {
+      "enabled": true,
+      "query": "Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 115,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Calculate 17 * 29 with the calculator tool. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]17 * 29=>493[/calc]\n493",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.",
+        "canonical_query": "work out 17 * 29 with the calculator tool",
+        "match_type": "nearest_canonical",
+        "score": 0.793012,
+        "margin": 0.1,
+        "response": "[calc]17 * 29=>493[/calc]\n493",
+        "reference": {
+          "prompt": "Calculate 17 * 29 with the calculator tool. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]17 * 29=>493[/calc]\n493",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Use the calculator tool to evaluate pow(9, 2). Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": false,
+    "baseline_completion": "[calc]81 / w(9[/calcalc]\n9",
+    "candidate_completion": "[calc]sqrt(49)=>7[/calc]\n7",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool to evaluate pow(9, 2). Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool to evaluate pow(9, 2). Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool to evaluate pow(9, 2). Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 119,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for sqrt(49). Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]sqrt(49)=>7[/calc]\n7",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Use the calculator tool to evaluate pow(9, 2). Give a compact calculator trace and then the answer.",
+        "canonical_query": "use the calculator tool to evaluate pow(9 2)",
+        "match_type": "nearest_canonical",
+        "score": 0.537407,
+        "margin": 0.000402,
+        "response": "[calc]sqrt(49)=>7[/calc]\n7",
+        "reference": {
+          "prompt": "Use the calculator tool for sqrt(49). Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]sqrt(49)=>7[/calc]\n7",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "no_tool",
+    "prompt": "What force holds planets in orbit around the Sun? Do not use the calculator tool. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "for",
+    "candidate_completion": "gravity",
+    "retrieval": {
+      "enabled": true,
+      "query": "What force holds planets in orbit around the Sun? Do not use the calculator tool. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: What force holds planets in orbit around the Sun? Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: What force holds planets in orbit around the Sun? Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 129,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What force keeps planets in orbit around the Sun?",
+          "response": "gravity",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "What force holds planets in orbit around the Sun? Do not use the calculator tool. Reply with only the answer.",
+        "canonical_query": "what force holds planets in orbit around the sun",
+        "match_type": "nearest_canonical",
+        "score": 0.835,
+        "margin": 0.581512,
+        "response": "gravity",
+        "reference": {
+          "prompt": "What force keeps planets in orbit around the Sun?",
+          "response": "gravity",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "no_tool",
+    "prompt": "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[cal.",
+    "candidate_completion": "def",
+    "retrieval": {
+      "enabled": true,
+      "query": "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 124,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.",
+        "canonical_query": "in python which keyword defines a function",
+        "match_type": "nearest_canonical",
+        "score": 1.0,
+        "margin": 0.804373,
+        "response": "def",
+        "reference": {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "boundary",
+    "prompt": "Use the calculator tool to browse the internet for me.",
+    "baseline_matched": true,
+    "candidate_matched": true,
+    "baseline_completion": "Thelath calculator cannot help with deleting fil",
+    "candidate_completion": "The calculator cannot help with browsing the internet.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool to browse the internet for me.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool to browse the internet for me.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool to browse the internet for me.\nAnswer: ",
+      "prompt_token_count": 74,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool to browse the internet for me.",
+          "response": "The calculator cannot help with browsing the internet.",
+          "category": "boundary",
+          "kind": "boundary",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Use the calculator tool to browse the internet for me.",
+        "canonical_query": "use the calculator tool to browse the internet for me",
+        "match_type": "nearest_canonical",
+        "score": 1.0,
+        "margin": 0.483333,
+        "response": "The calculator cannot help with browsing the internet.",
+        "reference": {
+          "prompt": "Use the calculator tool to browse the internet for me.",
+          "response": "The calculator cannot help with browsing the internet.",
+          "category": "boundary",
+          "kind": "boundary",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "name": "tool-repair-from-large-v1-11m-192",
+  "slug": "tool-repair-from-large-v1-11m-192",
+  "kind": "training",
+  "created_at_utc": "2026-03-14T18:39:46.590318+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-tool-repair-from-large-v1.yaml",
+    "corpora\\tool_repair_v1"
+  ]
+}

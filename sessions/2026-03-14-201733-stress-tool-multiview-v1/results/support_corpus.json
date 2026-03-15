@@ -1,0 +1,28 @@
+{
+  "corpus_root": "D:\\AVA\\corpora\\tool_multiview_v1",
+  "file_count": 3,
+  "text_count": 98,
+  "character_count": 8065,
+  "token_count": 8261,
+  "supervised_example_count": 97,
+  "files": [
+    {
+      "path": "D:\\AVA\\corpora\\tool_multiview_v1\\examples.jsonl",
+      "size_bytes": 13444,
+      "sha256": "198463b963141a387915962fb80c400f4e48ad57f3705cb577891319a67b5588",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "D:\\AVA\\corpora\\tool_multiview_v1\\manifest.json",
+      "size_bytes": 556,
+      "sha256": "88ff4163c9ff1e3db1b5471730fc557243093292f6063da998ce96078007f71d",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "D:\\AVA\\corpora\\tool_multiview_v1\\README.md",
+      "size_bytes": 258,
+      "sha256": "cc14da8d1e5854f013946657e9b15cc4b52043a37a84acbec5f2e309ffc54ee7",
+      "relative_path": "README.md"
+    }
+  ]
+}

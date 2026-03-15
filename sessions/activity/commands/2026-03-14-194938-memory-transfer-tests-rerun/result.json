@@ -1,0 +1,17 @@
+{
+  "label": "memory-transfer-tests-rerun",
+  "command": "python -m pytest tests/test_retrieval.py tests/test_memory_transfer.py tests/test_sessions.py tests/test_eval.py -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_retrieval.py",
+    "tests/test_memory_transfer.py",
+    "tests/test_sessions.py",
+    "tests/test_eval.py",
+    "-q"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 8890
+}

@@ -17,7 +17,9 @@ from ava.sessions import (
     create_session,
     hf_research_session,
     inspection_session,
+    memory_transfer_session,
     moe_feasibility_session,
+    retrieval_session,
     sota_session,
     training_session,
 )
@@ -69,6 +71,29 @@ def build_parser() -> argparse.ArgumentParser:
     session_inspect.add_argument("--top-k-logits", type=int, default=8)
     session_inspect.add_argument("--top-k-attention", type=int, default=4)
 
+    session_retrieval = session_subparsers.add_parser("retrieval")
+    session_retrieval.add_argument("name")
+    session_retrieval.add_argument("checkpoint")
+    session_retrieval.add_argument("support_corpus")
+    session_retrieval.add_argument("--root", default="sessions")
+    session_retrieval.add_argument("--device", default="cuda")
+    session_retrieval.add_argument("--max-new-tokens", type=int, default=48)
+    session_retrieval.add_argument("--retrieval-top-k", type=int, default=1)
+    session_retrieval.add_argument("--mode", choices=("prompt", "direct"), default="prompt")
+    session_retrieval.add_argument("--no-category-gating", action="store_true")
+
+    session_memory_transfer = session_subparsers.add_parser("memory-transfer")
+    session_memory_transfer.add_argument("name")
+    session_memory_transfer.add_argument("checkpoint")
+    session_memory_transfer.add_argument("support_corpus")
+    session_memory_transfer.add_argument("--root", default="sessions")
+    session_memory_transfer.add_argument("--device", default="cuda")
+    session_memory_transfer.add_argument("--max-new-tokens", type=int, default=48)
+    session_memory_transfer.add_argument("--nearest-threshold", type=float, default=0.58)
+    session_memory_transfer.add_argument("--nearest-margin", type=float, default=0.03)
+    session_memory_transfer.add_argument("--suite", choices=("small", "expanded", "stress"), default="small")
+    session_memory_transfer.add_argument("--no-category-gating", action="store_true")
+
     train_parser = subparsers.add_parser("train")
     train_subparsers = train_parser.add_subparsers(dest="train_command", required=True)
 
@@ -101,6 +126,10 @@ def build_parser() -> argparse.ArgumentParser:
     inspect_checkpoint.add_argument("--top-k-neurons", type=int, default=8)
     inspect_checkpoint.add_argument("--top-k-logits", type=int, default=8)
     inspect_checkpoint.add_argument("--top-k-attention", type=int, default=4)
+    inspect_checkpoint.add_argument("--support-corpus")
+    inspect_checkpoint.add_argument("--retrieval-top-k", type=int, default=0)
+    inspect_checkpoint.add_argument("--category-hint")
+    inspect_checkpoint.add_argument("--no-category-gating", action="store_true")
 
     benchmark_parser = subparsers.add_parser("benchmark")
     benchmark_subparsers = benchmark_parser.add_subparsers(dest="benchmark_command", required=True)
@@ -225,6 +254,52 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
             "checkpoint": args.checkpoint,
         }
 
+    if args.command == "session" and args.session_command == "retrieval":
+        session_dir = retrieval_session(
+            Path(args.root),
+            args.name,
+            args.checkpoint,
+            args.support_corpus,
+            requested_device=args.device,
+            max_new_tokens=args.max_new_tokens,
+            retrieval_top_k=args.retrieval_top_k,
+            category_gated=not args.no_category_gating,
+            retrieval_mode=args.mode,
+        )
+        print(f"Retrieval session: {session_dir}")
+        print(f"Notes: {session_dir / 'notes.md'}")
+        return 0, {
+            "session_dir": str(session_dir),
+            "session_kind": "retrieval",
+            "session_name": args.name,
+            "checkpoint": args.checkpoint,
+            "support_corpus": args.support_corpus,
+        }
+
+    if args.command == "session" and args.session_command == "memory-transfer":
+        session_dir = memory_transfer_session(
+            Path(args.root),
+            args.name,
+            args.checkpoint,
+            args.support_corpus,
+            requested_device=args.device,
+            max_new_tokens=args.max_new_tokens,
+            nearest_threshold=args.nearest_threshold,
+            nearest_margin=args.nearest_margin,
+            category_gated=not args.no_category_gating,
+            suite=args.suite,
+        )
+        print(f"Memory transfer session: {session_dir}")
+        print(f"Notes: {session_dir / 'notes.md'}")
+        return 0, {
+            "session_dir": str(session_dir),
+            "session_kind": "memory-transfer",
+            "session_name": args.name,
+            "checkpoint": args.checkpoint,
+            "support_corpus": args.support_corpus,
+            "suite": args.suite,
+        }
+
     if args.command == "train" and args.train_command == "dry-run":
         payload = dry_run_summary(load_experiment_config(args.config))
         print(json.dumps(payload, indent=2))
@@ -249,6 +324,10 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
             top_k_neurons=args.top_k_neurons,
             top_k_logits=args.top_k_logits,
             top_k_attention=args.top_k_attention,
+            support_corpus=args.support_corpus,
+            retrieval_top_k=args.retrieval_top_k,
+            category_hint=args.category_hint,
+            category_gated=not args.no_category_gating,
         )
         print(json.dumps(payload, indent=2))
         return 0, {

@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\what_prefix_patch_v1",
+  "file_count": 3,
+  "text_count": 25,
+  "character_count": 1464,
+  "token_count": 1514,
+  "supervised_example_count": 24,
+  "files": [
+    {
+      "path": "corpora\\what_prefix_patch_v1\\examples.jsonl",
+      "size_bytes": 2479,
+      "sha256": "8dff455766ddad2ee8874601a9291294a2d9cf52f5fc8c304f8df6edbecdeec9",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\what_prefix_patch_v1\\manifest.json",
+      "size_bytes": 288,
+      "sha256": "34b7ba107a21aa4560ce6a032a25e625c3f50b362a8260f8b7c8c569753183c7",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\what_prefix_patch_v1\\README.md",
+      "size_bytes": 195,
+      "sha256": "d8509ff1d6b2b12bed567d23b048f419f96ff89afb4e1171d95c4326747643b0",
+      "relative_path": "README.md"
+    }
+  ]
+}

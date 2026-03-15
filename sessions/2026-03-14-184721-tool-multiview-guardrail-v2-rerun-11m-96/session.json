@@ -1,0 +1,10 @@
+{
+  "name": "tool-multiview-guardrail-v2-rerun-11m-96",
+  "slug": "tool-multiview-guardrail-v2-rerun-11m-96",
+  "kind": "training",
+  "created_at_utc": "2026-03-14T18:47:21.687029+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-tool-multiview-guardrail-v2.yaml",
+    "corpora\\multiview_guardrail_v1"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "retrieval-tool-multiview-direct-top1",
+  "slug": "retrieval-tool-multiview-direct-top1",
+  "kind": "retrieval",
+  "created_at_utc": "2026-03-14T19:31:05.295539+00:00",
+  "sources": [
+    "sessions\\2026-03-14-184859-failure-patch-v2-rerun-11m-96\\checkpoints\\ava-11m-failure-patch-v2.pt",
+    "corpora\\tool_multiview_v1"
+  ]
+}

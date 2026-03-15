@@ -1,0 +1,16 @@
+{
+  "label": "stress-canonicalization-tests-rerun-2",
+  "command": "python -m pytest tests/test_retrieval.py tests/test_memory_transfer.py tests/test_sessions.py -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_retrieval.py",
+    "tests/test_memory_transfer.py",
+    "tests/test_sessions.py",
+    "-q"
+  ],
+  "returncode": 1,
+  "cwd": "D:\\AVA",
+  "duration_ms": 10579
+}

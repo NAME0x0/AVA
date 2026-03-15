@@ -1,0 +1,16 @@
+{
+  "source_corpus": "corpora/tool_repair_ultra_v1",
+  "selection": "greedy_support_search",
+  "start_count": 29,
+  "final_count": 23,
+  "final_total": 40,
+  "by_kind": {
+    "general": 5,
+    "trace_variant": 5,
+    "tool_direct_variant": 4,
+    "no_tool": 5,
+    "boundary": 1,
+    "format": 3
+  },
+  "examples_path": "corpora\\tool_repair_nano_v1\\examples.jsonl"
+}

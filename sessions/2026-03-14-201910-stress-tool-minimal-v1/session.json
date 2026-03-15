@@ -1,0 +1,10 @@
+{
+  "name": "stress-tool-minimal-v1",
+  "slug": "stress-tool-minimal-v1",
+  "kind": "memory-transfer",
+  "created_at_utc": "2026-03-14T20:19:10.269079+00:00",
+  "sources": [
+    "D:\\AVA\\sessions\\2026-03-14-184859-failure-patch-v2-rerun-11m-96\\checkpoints\\ava-11m-failure-patch-v2.pt",
+    "D:\\AVA\\corpora\\tool_memory_minimal_v1"
+  ]
+}

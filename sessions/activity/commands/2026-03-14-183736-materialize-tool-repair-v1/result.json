@@ -1,0 +1,12 @@
+{
+  "label": "materialize-tool-repair-v1",
+  "command": "python -c \"import json; from ava.synthetic import materialize_tool_repair_corpus; payload=materialize_tool_repair_corpus(r'corpora/tool_repair_v1'); print(json.dumps(payload, indent=2))\"",
+  "argv": [
+    "python",
+    "-c",
+    "import json; from ava.synthetic import materialize_tool_repair_corpus; payload=materialize_tool_repair_corpus(r'corpora/tool_repair_v1'); print(json.dumps(payload, indent=2))"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 78
+}

@@ -1,0 +1,17 @@
+{
+  "protocol": "compact_tags",
+  "recipe": "tool_combo",
+  "total_examples": 201,
+  "by_kind": {
+    "trace": 20,
+    "tool_direct": 20,
+    "trace_variant": 42,
+    "tool_direct_variant": 87,
+    "general": 8,
+    "no_tool": 10,
+    "boundary": 6,
+    "format": 4,
+    "refusal": 4
+  },
+  "examples_path": "corpora\\tool_combo_v1\\examples.jsonl"
+}

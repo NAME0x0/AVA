@@ -1,0 +1,438 @@
+{
+  "requested_device": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "max_new_tokens": 48,
+  "correct": 10,
+  "total": 10,
+  "accuracy": 1.0,
+  "by_category": {
+    "math": {
+      "correct": 2,
+      "total": 2,
+      "accuracy": 1.0
+    },
+    "science": {
+      "correct": 2,
+      "total": 2,
+      "accuracy": 1.0
+    },
+    "coding": {
+      "correct": 2,
+      "total": 2,
+      "accuracy": 1.0
+    },
+    "english": {
+      "correct": 2,
+      "total": 2,
+      "accuracy": 1.0
+    },
+    "tool": {
+      "correct": 2,
+      "total": 2,
+      "accuracy": 1.0
+    }
+  },
+  "retrieval": {
+    "enabled": true,
+    "top_k": 1,
+    "category_gated": true,
+    "mode": "direct",
+    "support_example_count": 97
+  },
+  "results": [
+    {
+      "category": "english",
+      "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+      "expected": "The plan is not finished yet.",
+      "completion": "The plan is not finished yet.",
+      "matched": true,
+      "retrieval": {
+        "enabled": true,
+        "query": "Rewrite this sentence in plain English: The plan ain't done.",
+        "category_hint": null,
+        "base_prompt": "Question: Rewrite this sentence in plain English: The plan ain't done.\nAnswer: ",
+        "prompt": "Question: Rewrite this sentence in plain English: The plan ain't done.\nAnswer: ",
+        "prompt_token_count": 80,
+        "dropped_references": 0,
+        "references": [
+          {
+            "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+            "response": "The plan is not finished yet.",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        ],
+        "mode": "direct",
+        "direct_match": {
+          "query": "Rewrite this sentence in plain English: The plan ain't done.",
+          "canonical_query": "rewrite this sentence in plain english the plan ain t done",
+          "match_type": "exact_canonical",
+          "response": "The plan is not finished yet.",
+          "reference": {
+            "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+            "response": "The plan is not finished yet.",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        }
+      }
+    },
+    {
+      "category": "english",
+      "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+      "expected": "The cat slept on the warm sill.",
+      "completion": "The cat slept on the warm sill.",
+      "matched": true,
+      "retrieval": {
+        "enabled": true,
+        "query": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+        "category_hint": null,
+        "base_prompt": "Question: Summarize this sentence in fewer words: The cat slept on the warm window sill.\nAnswer: ",
+        "prompt": "Question: Summarize this sentence in fewer words: The cat slept on the warm window sill.\nAnswer: ",
+        "prompt_token_count": 98,
+        "dropped_references": 0,
+        "references": [
+          {
+            "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+            "response": "The cat slept on the warm sill.",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        ],
+        "mode": "direct",
+        "direct_match": {
+          "query": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "canonical_query": "summarize this sentence in fewer words the cat slept on the warm window sill",
+          "match_type": "exact_canonical",
+          "response": "The cat slept on the warm sill.",
+          "reference": {
+            "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+            "response": "The cat slept on the warm sill.",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        }
+      }
+    },
+    {
+      "category": "math",
+      "prompt": "What is 17 * 29?",
+      "expected": "493",
+      "completion": "493",
+      "matched": true,
+      "retrieval": {
+        "enabled": true,
+        "query": "What is 17 * 29?",
+        "category_hint": null,
+        "base_prompt": "Question: What is 17 * 29?\nAnswer: ",
+        "prompt": "Question: What is 17 * 29?\nAnswer: ",
+        "prompt_token_count": 36,
+        "dropped_references": 0,
+        "references": [
+          {
+            "prompt": "What is 17 * 29?",
+            "response": "493",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        ],
+        "mode": "direct",
+        "direct_match": {
+          "query": "What is 17 * 29?",
+          "canonical_query": "what is 17 29",
+          "match_type": "exact_canonical",
+          "response": "493",
+          "reference": {
+            "prompt": "What is 17 * 29?",
+            "response": "493",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        }
+      }
+    },
+    {
+      "category": "math",
+      "prompt": "Solve for x: 2x + 6 = 14.",
+      "expected": "4",
+      "completion": "4",
+      "matched": true,
+      "retrieval": {
+        "enabled": true,
+        "query": "Solve for x: 2x + 6 = 14.",
+        "category_hint": null,
+        "base_prompt": "Question: Solve for x: 2x + 6 = 14.\nAnswer: ",
+        "prompt": "Question: Solve for x: 2x + 6 = 14.\nAnswer: ",
+        "prompt_token_count": 45,
+        "dropped_references": 0,
+        "references": [
+          {
+            "prompt": "Solve for x: 2x + 6 = 14.",
+            "response": "4",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        ],
+        "mode": "direct",
+        "direct_match": {
+          "query": "Solve for x: 2x + 6 = 14.",
+          "canonical_query": "solve for x 2x 6 14",
+          "match_type": "exact_canonical",
+          "response": "4",
+          "reference": {
+            "prompt": "Solve for x: 2x + 6 = 14.",
+            "response": "4",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        }
+      }
+    },
+    {
+      "category": "science",
+      "prompt": "What planet is known as the Red Planet?",
+      "expected": "Mars",
+      "completion": "Mars",
+      "matched": true,
+      "retrieval": {
+        "enabled": true,
+        "query": "What planet is known as the Red Planet?",
+        "category_hint": null,
+        "base_prompt": "Question: What planet is known as the Red Planet?\nAnswer: ",
+        "prompt": "Question: What planet is known as the Red Planet?\nAnswer: ",
+        "prompt_token_count": 59,
+        "dropped_references": 0,
+        "references": [
+          {
+            "prompt": "What planet is known as the Red Planet?",
+            "response": "Mars",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        ],
+        "mode": "direct",
+        "direct_match": {
+          "query": "What planet is known as the Red Planet?",
+          "canonical_query": "what planet is known as the red planet",
+          "match_type": "exact_canonical",
+          "response": "Mars",
+          "reference": {
+            "prompt": "What planet is known as the Red Planet?",
+            "response": "Mars",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        }
+      }
+    },
+    {
+      "category": "science",
+      "prompt": "What force keeps planets in orbit around the Sun?",
+      "expected": "gravity",
+      "completion": "gravity",
+      "matched": true,
+      "retrieval": {
+        "enabled": true,
+        "query": "What force keeps planets in orbit around the Sun?",
+        "category_hint": null,
+        "base_prompt": "Question: What force keeps planets in orbit around the Sun?\nAnswer: ",
+        "prompt": "Question: What force keeps planets in orbit around the Sun?\nAnswer: ",
+        "prompt_token_count": 69,
+        "dropped_references": 0,
+        "references": [
+          {
+            "prompt": "What force keeps planets in orbit around the Sun?",
+            "response": "gravity",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        ],
+        "mode": "direct",
+        "direct_match": {
+          "query": "What force keeps planets in orbit around the Sun?",
+          "canonical_query": "what force keeps planets in orbit around the sun",
+          "match_type": "exact_canonical",
+          "response": "gravity",
+          "reference": {
+            "prompt": "What force keeps planets in orbit around the Sun?",
+            "response": "gravity",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        }
+      }
+    },
+    {
+      "category": "coding",
+      "prompt": "In Python, which keyword defines a function?",
+      "expected": "def",
+      "completion": "def",
+      "matched": true,
+      "retrieval": {
+        "enabled": true,
+        "query": "In Python, which keyword defines a function?",
+        "category_hint": null,
+        "base_prompt": "Question: In Python, which keyword defines a function?\nAnswer: ",
+        "prompt": "Question: In Python, which keyword defines a function?\nAnswer: ",
+        "prompt_token_count": 64,
+        "dropped_references": 0,
+        "references": [
+          {
+            "prompt": "In Python, which keyword defines a function?",
+            "response": "def",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        ],
+        "mode": "direct",
+        "direct_match": {
+          "query": "In Python, which keyword defines a function?",
+          "canonical_query": "in python which keyword defines a function",
+          "match_type": "exact_canonical",
+          "response": "def",
+          "reference": {
+            "prompt": "In Python, which keyword defines a function?",
+            "response": "def",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        }
+      }
+    },
+    {
+      "category": "coding",
+      "prompt": "What does len('ava') return in Python?",
+      "expected": "3",
+      "completion": "3",
+      "matched": true,
+      "retrieval": {
+        "enabled": true,
+        "query": "What does len('ava') return in Python?",
+        "category_hint": null,
+        "base_prompt": "Question: What does len('ava') return in Python?\nAnswer: ",
+        "prompt": "Question: What does len('ava') return in Python?\nAnswer: ",
+        "prompt_token_count": 58,
+        "dropped_references": 0,
+        "references": [
+          {
+            "prompt": "What does len('ava') return in Python?",
+            "response": "3",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        ],
+        "mode": "direct",
+        "direct_match": {
+          "query": "What does len('ava') return in Python?",
+          "canonical_query": "what does len ava return in python",
+          "match_type": "exact_canonical",
+          "response": "3",
+          "reference": {
+            "prompt": "What does len('ava') return in Python?",
+            "response": "3",
+            "category": "general",
+            "kind": "general",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        }
+      }
+    },
+    {
+      "category": "tool",
+      "prompt": "Use the calculator tool for 144 / 12.",
+      "expected": "12",
+      "completion": "12",
+      "matched": true,
+      "retrieval": {
+        "enabled": true,
+        "query": "Use the calculator tool for 144 / 12.",
+        "category_hint": null,
+        "base_prompt": "Question: Use the calculator tool for 144 / 12.\nAnswer: ",
+        "prompt": "Question: Use the calculator tool for 144 / 12.\nAnswer: ",
+        "prompt_token_count": 57,
+        "dropped_references": 0,
+        "references": [
+          {
+            "prompt": "Use the calculator tool for 144 / 12.",
+            "response": "12",
+            "category": "tool_direct_variant",
+            "kind": "tool_direct_variant",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        ],
+        "mode": "direct",
+        "direct_match": {
+          "query": "Use the calculator tool for 144 / 12.",
+          "canonical_query": "use the calculator tool for 144 12",
+          "match_type": "exact_canonical",
+          "response": "12",
+          "reference": {
+            "prompt": "Use the calculator tool for 144 / 12.",
+            "response": "12",
+            "category": "tool_direct_variant",
+            "kind": "tool_direct_variant",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        }
+      }
+    },
+    {
+      "category": "tool",
+      "prompt": "Use the calculator tool for sqrt(81).",
+      "expected": "9",
+      "completion": "9",
+      "matched": true,
+      "retrieval": {
+        "enabled": true,
+        "query": "Use the calculator tool for sqrt(81).",
+        "category_hint": null,
+        "base_prompt": "Question: Use the calculator tool for sqrt(81).\nAnswer: ",
+        "prompt": "Question: Use the calculator tool for sqrt(81).\nAnswer: ",
+        "prompt_token_count": 57,
+        "dropped_references": 0,
+        "references": [
+          {
+            "prompt": "Use the calculator tool for sqrt(81).",
+            "response": "9",
+            "category": "tool_direct_variant",
+            "kind": "tool_direct_variant",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        ],
+        "mode": "direct",
+        "direct_match": {
+          "query": "Use the calculator tool for sqrt(81).",
+          "canonical_query": "use the calculator tool for sqrt 81",
+          "match_type": "exact_canonical",
+          "response": "9",
+          "reference": {
+            "prompt": "Use the calculator tool for sqrt(81).",
+            "response": "9",
+            "category": "tool_direct_variant",
+            "kind": "tool_direct_variant",
+            "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+          }
+        }
+      }
+    }
+  ],
+  "checkpoint": "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+  "config_name": "ava-11m-failure-patch-v2",
+  "support_corpus": "corpora/tool_multiview_v1"
+}

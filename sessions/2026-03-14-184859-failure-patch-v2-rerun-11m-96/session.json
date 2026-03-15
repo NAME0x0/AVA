@@ -1,0 +1,10 @@
+{
+  "name": "failure-patch-v2-rerun-11m-96",
+  "slug": "failure-patch-v2-rerun-11m-96",
+  "kind": "training",
+  "created_at_utc": "2026-03-14T18:48:59.619971+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-failure-patch-v2.yaml",
+    "corpora\\failure_patch_v1"
+  ]
+}

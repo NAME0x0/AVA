@@ -1,0 +1,29 @@
+{
+  "protocol": "compact_tags",
+  "curriculum": "multiview",
+  "expression_count": 12,
+  "expressions": [
+    "17 * 29",
+    "25 + 17",
+    "36 / 6",
+    "81 / 9",
+    "144 / 12",
+    "sqrt(49)",
+    "sqrt(64)",
+    "sqrt(81)",
+    "sqrt(100)",
+    "7 * 7",
+    "11 * 11",
+    "14 * 14"
+  ],
+  "total_examples": 97,
+  "by_kind": {
+    "trace_variant": 24,
+    "tool_direct_variant": 51,
+    "general": 8,
+    "boundary": 6,
+    "refusal": 4,
+    "format": 4
+  },
+  "examples_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+}

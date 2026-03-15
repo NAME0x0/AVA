@@ -7,6 +7,7 @@ from typing import Any
 
 from ava.config import ExperimentConfig
 from ava.model import TORCH_AVAILABLE, build_model, torch
+from ava.retrieval import SupportExample, load_support_examples, lookup_support_answer, prepare_retrieval_prompt
 from ava.tokenizer import load_tokenizer
 
 
@@ -24,6 +25,7 @@ class BenchmarkResult:
     expected: str
     completion: str
     matched: bool
+    retrieval: dict[str, object] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -43,6 +45,7 @@ class ComplianceResult:
     completion: str
     matched: bool
     failed_checks: tuple[str, ...]
+    retrieval: dict[str, object] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -62,6 +65,7 @@ class ToolUseResult:
     completion: str
     matched: bool
     failed_checks: tuple[str, ...]
+    retrieval: dict[str, object] | None = None
 
 
 def _refusal_markers() -> tuple[str, ...]:
@@ -182,10 +186,6 @@ def _resolve_device(requested_device: str) -> tuple[str, list[str]]:
     return requested_device, warnings
 
 
-def _render_prompt(prompt: str) -> str:
-    return f"Question: {prompt}\nAnswer: "
-
-
 def _contains_normalized_phrase(text: str, phrase: str) -> bool:
     normalized_text = _normalize_text(text)
     normalized_phrase = _normalize_text(phrase)
@@ -282,22 +282,49 @@ def _summarize_results(results: list[object]) -> tuple[int, int, dict[str, dict[
     return correct, total, by_category
 
 
-def evaluate_model(
-    model: Any,
-    config: ExperimentConfig,
-    *,
-    requested_device: str,
-    max_new_tokens: int = 48,
-) -> dict[str, object]:
-    tokenizer = load_tokenizer(config.tokenizer)
-    device, warnings = _resolve_device(requested_device)
-    model = model.to(device)
-    model.eval()
+def _category_hint_for_task(category: str) -> str:
+    mapping = {"tool_policy": "boundary"}
+    return mapping.get(category, category)
 
-    results: list[BenchmarkResult] = []
-    for task in default_benchmark():
-        prompt = _render_prompt(task.prompt)
-        prompt_ids = tokenizer.encode(prompt, add_bos=True)
+
+def _generate_completion(
+    model: Any,
+    tokenizer: Any,
+    device: str,
+    *,
+    prompt: str,
+    max_new_tokens: int,
+    retrieval_examples: list[SupportExample] | None,
+    retrieval_top_k: int,
+    category_hint: str | None,
+    category_gated: bool,
+    retrieval_mode: str,
+) -> tuple[str, dict[str, object]]:
+    if retrieval_mode == "direct":
+        direct = lookup_support_answer(
+            prompt,
+            support_examples=retrieval_examples,
+            category_hint=category_hint,
+            category_gated=category_gated,
+        )
+        base_prompt = prepare_retrieval_prompt(prompt, tokenizer=tokenizer, block_size=model.config.block_size)
+        if direct is not None:
+            retrieval = {
+                **base_prompt,
+                "enabled": True,
+                "mode": "direct",
+                "direct_match": direct,
+                "references": [direct["reference"]],
+            }
+            return str(direct["response"]), retrieval
+        retrieval = {
+            **base_prompt,
+            "enabled": False,
+            "mode": "direct",
+            "direct_match": None,
+            "references": [],
+        }
+        prompt_ids = tokenizer.encode(str(retrieval["prompt"]), add_bos=True)
         idx = torch.tensor([prompt_ids], dtype=torch.long, device=device)
         generated = _greedy_generate(
             model,
@@ -307,6 +334,61 @@ def evaluate_model(
         )
         generated_ids = generated[0].tolist()[len(prompt_ids) :]
         completion = tokenizer.decode(generated_ids).strip()
+        return completion, retrieval
+
+    retrieval = prepare_retrieval_prompt(
+        prompt,
+        tokenizer=tokenizer,
+        block_size=model.config.block_size,
+        support_examples=retrieval_examples,
+        top_k=retrieval_top_k,
+        category_hint=category_hint,
+        category_gated=category_gated,
+    )
+    retrieval["mode"] = retrieval_mode
+    prompt_ids = tokenizer.encode(str(retrieval["prompt"]), add_bos=True)
+    idx = torch.tensor([prompt_ids], dtype=torch.long, device=device)
+    generated = _greedy_generate(
+        model,
+        idx,
+        max_new_tokens=max_new_tokens,
+        eos_token_id=tokenizer.token_to_id["<eos>"],
+    )
+    generated_ids = generated[0].tolist()[len(prompt_ids) :]
+    completion = tokenizer.decode(generated_ids).strip()
+    return completion, retrieval
+
+
+def evaluate_model(
+    model: Any,
+    config: ExperimentConfig,
+    *,
+    requested_device: str,
+    max_new_tokens: int = 48,
+    retrieval_examples: list[SupportExample] | None = None,
+    retrieval_top_k: int = 0,
+    category_gated: bool = True,
+    retrieval_mode: str = "prompt",
+) -> dict[str, object]:
+    tokenizer = load_tokenizer(config.tokenizer)
+    device, warnings = _resolve_device(requested_device)
+    model = model.to(device)
+    model.eval()
+
+    results: list[BenchmarkResult] = []
+    for task in default_benchmark():
+        completion, retrieval = _generate_completion(
+            model,
+            tokenizer,
+            device,
+            prompt=task.prompt,
+            max_new_tokens=max_new_tokens,
+            retrieval_examples=retrieval_examples,
+            retrieval_top_k=retrieval_top_k,
+            category_hint=_category_hint_for_task(task.category),
+            category_gated=category_gated,
+            retrieval_mode=retrieval_mode,
+        )
         matched = _matches_expected(task.expected, completion)
         results.append(
             BenchmarkResult(
@@ -315,6 +397,7 @@ def evaluate_model(
                 expected=task.expected,
                 completion=completion,
                 matched=matched,
+                retrieval=retrieval,
             )
         )
 
@@ -329,6 +412,13 @@ def evaluate_model(
         "total": total,
         "accuracy": round(correct / max(total, 1), 3),
         "by_category": by_category,
+        "retrieval": {
+            "enabled": bool(retrieval_examples and retrieval_top_k > 0),
+            "top_k": retrieval_top_k,
+            "category_gated": category_gated,
+            "mode": retrieval_mode,
+            "support_example_count": len(retrieval_examples or []),
+        },
         "results": payload,
     }
 
@@ -339,6 +429,10 @@ def evaluate_model_compliance(
     *,
     requested_device: str,
     max_new_tokens: int = 48,
+    retrieval_examples: list[SupportExample] | None = None,
+    retrieval_top_k: int = 0,
+    category_gated: bool = True,
+    retrieval_mode: str = "prompt",
 ) -> dict[str, object]:
     tokenizer = load_tokenizer(config.tokenizer)
     device, warnings = _resolve_device(requested_device)
@@ -347,17 +441,18 @@ def evaluate_model_compliance(
 
     results: list[ComplianceResult] = []
     for task in default_compliance_benchmark():
-        prompt = _render_prompt(task.prompt)
-        prompt_ids = tokenizer.encode(prompt, add_bos=True)
-        idx = torch.tensor([prompt_ids], dtype=torch.long, device=device)
-        generated = _greedy_generate(
+        completion, retrieval = _generate_completion(
             model,
-            idx,
+            tokenizer,
+            device,
+            prompt=task.prompt,
             max_new_tokens=max_new_tokens,
-            eos_token_id=tokenizer.token_to_id["<eos>"],
+            retrieval_examples=retrieval_examples,
+            retrieval_top_k=retrieval_top_k,
+            category_hint=_category_hint_for_task(task.category),
+            category_gated=category_gated,
+            retrieval_mode=retrieval_mode,
         )
-        generated_ids = generated[0].tolist()[len(prompt_ids) :]
-        completion = tokenizer.decode(generated_ids).strip()
         matched, failed_checks = _matches_compliance(task, completion)
         results.append(
             ComplianceResult(
@@ -366,6 +461,7 @@ def evaluate_model_compliance(
                 completion=completion,
                 matched=matched,
                 failed_checks=failed_checks,
+                retrieval=retrieval,
             )
         )
 
@@ -380,6 +476,13 @@ def evaluate_model_compliance(
         "total": total,
         "accuracy": round(correct / max(total, 1), 3),
         "by_category": by_category,
+        "retrieval": {
+            "enabled": bool(retrieval_examples and retrieval_top_k > 0),
+            "top_k": retrieval_top_k,
+            "category_gated": category_gated,
+            "mode": retrieval_mode,
+            "support_example_count": len(retrieval_examples or []),
+        },
         "results": payload,
     }
 
@@ -390,6 +493,10 @@ def evaluate_model_tool_use(
     *,
     requested_device: str,
     max_new_tokens: int = 48,
+    retrieval_examples: list[SupportExample] | None = None,
+    retrieval_top_k: int = 0,
+    category_gated: bool = True,
+    retrieval_mode: str = "prompt",
 ) -> dict[str, object]:
     tokenizer = load_tokenizer(config.tokenizer)
     device, warnings = _resolve_device(requested_device)
@@ -398,17 +505,18 @@ def evaluate_model_tool_use(
 
     results: list[ToolUseResult] = []
     for task in default_tool_benchmark():
-        prompt = _render_prompt(task.prompt)
-        prompt_ids = tokenizer.encode(prompt, add_bos=True)
-        idx = torch.tensor([prompt_ids], dtype=torch.long, device=device)
-        generated = _greedy_generate(
+        completion, retrieval = _generate_completion(
             model,
-            idx,
+            tokenizer,
+            device,
+            prompt=task.prompt,
             max_new_tokens=max_new_tokens,
-            eos_token_id=tokenizer.token_to_id["<eos>"],
+            retrieval_examples=retrieval_examples,
+            retrieval_top_k=retrieval_top_k,
+            category_hint=_category_hint_for_task(task.category),
+            category_gated=category_gated,
+            retrieval_mode=retrieval_mode,
         )
-        generated_ids = generated[0].tolist()[len(prompt_ids) :]
-        completion = tokenizer.decode(generated_ids).strip()
         matched, failed_checks = _matches_tool_use(task, completion)
         results.append(
             ToolUseResult(
@@ -417,6 +525,7 @@ def evaluate_model_tool_use(
                 completion=completion,
                 matched=matched,
                 failed_checks=failed_checks,
+                retrieval=retrieval,
             )
         )
 
@@ -431,6 +540,13 @@ def evaluate_model_tool_use(
         "total": total,
         "accuracy": round(correct / max(total, 1), 3),
         "by_category": by_category,
+        "retrieval": {
+            "enabled": bool(retrieval_examples and retrieval_top_k > 0),
+            "top_k": retrieval_top_k,
+            "category_gated": category_gated,
+            "mode": retrieval_mode,
+            "support_example_count": len(retrieval_examples or []),
+        },
         "results": payload,
     }
 
@@ -440,6 +556,10 @@ def evaluate_checkpoint(
     *,
     requested_device: str = "cuda",
     max_new_tokens: int = 48,
+    support_corpus: str | Path | None = None,
+    retrieval_top_k: int = 0,
+    category_gated: bool = True,
+    retrieval_mode: str = "prompt",
 ) -> dict[str, object]:
     if not TORCH_AVAILABLE:
         raise RuntimeError("PyTorch is required for evaluation.")
@@ -449,14 +569,20 @@ def evaluate_checkpoint(
     tokenizer = load_tokenizer(config.tokenizer)
     model = build_model(config.model, tokenizer.vocab_size)
     model.load_state_dict(checkpoint["model"])
+    support_examples = load_support_examples(support_corpus) if support_corpus else None
     payload = evaluate_model(
         model,
         config,
         requested_device=requested_device,
         max_new_tokens=max_new_tokens,
+        retrieval_examples=support_examples,
+        retrieval_top_k=retrieval_top_k,
+        category_gated=category_gated,
+        retrieval_mode=retrieval_mode,
     )
     payload["checkpoint"] = str(checkpoint_path)
     payload["config_name"] = config.name
+    payload["support_corpus"] = str(support_corpus) if support_corpus else None
     return payload
 
 
@@ -465,6 +591,10 @@ def evaluate_compliance_checkpoint(
     *,
     requested_device: str = "cuda",
     max_new_tokens: int = 48,
+    support_corpus: str | Path | None = None,
+    retrieval_top_k: int = 0,
+    category_gated: bool = True,
+    retrieval_mode: str = "prompt",
 ) -> dict[str, object]:
     if not TORCH_AVAILABLE:
         raise RuntimeError("PyTorch is required for evaluation.")
@@ -474,14 +604,20 @@ def evaluate_compliance_checkpoint(
     tokenizer = load_tokenizer(config.tokenizer)
     model = build_model(config.model, tokenizer.vocab_size)
     model.load_state_dict(checkpoint["model"])
+    support_examples = load_support_examples(support_corpus) if support_corpus else None
     payload = evaluate_model_compliance(
         model,
         config,
         requested_device=requested_device,
         max_new_tokens=max_new_tokens,
+        retrieval_examples=support_examples,
+        retrieval_top_k=retrieval_top_k,
+        category_gated=category_gated,
+        retrieval_mode=retrieval_mode,
     )
     payload["checkpoint"] = str(checkpoint_path)
     payload["config_name"] = config.name
+    payload["support_corpus"] = str(support_corpus) if support_corpus else None
     return payload
 
 
@@ -490,6 +626,10 @@ def evaluate_tool_use_checkpoint(
     *,
     requested_device: str = "cuda",
     max_new_tokens: int = 48,
+    support_corpus: str | Path | None = None,
+    retrieval_top_k: int = 0,
+    category_gated: bool = True,
+    retrieval_mode: str = "prompt",
 ) -> dict[str, object]:
     if not TORCH_AVAILABLE:
         raise RuntimeError("PyTorch is required for evaluation.")
@@ -499,14 +639,20 @@ def evaluate_tool_use_checkpoint(
     tokenizer = load_tokenizer(config.tokenizer)
     model = build_model(config.model, tokenizer.vocab_size)
     model.load_state_dict(checkpoint["model"])
+    support_examples = load_support_examples(support_corpus) if support_corpus else None
     payload = evaluate_model_tool_use(
         model,
         config,
         requested_device=requested_device,
         max_new_tokens=max_new_tokens,
+        retrieval_examples=support_examples,
+        retrieval_top_k=retrieval_top_k,
+        category_gated=category_gated,
+        retrieval_mode=retrieval_mode,
     )
     payload["checkpoint"] = str(checkpoint_path)
     payload["config_name"] = config.name
+    payload["support_corpus"] = str(support_corpus) if support_corpus else None
     return payload
 
 

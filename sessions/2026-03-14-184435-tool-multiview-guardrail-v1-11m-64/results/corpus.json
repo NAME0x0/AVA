@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\multiview_guardrail_v1",
+  "file_count": 3,
+  "text_count": 27,
+  "character_count": 2079,
+  "token_count": 2133,
+  "supervised_example_count": 26,
+  "files": [
+    {
+      "path": "corpora\\multiview_guardrail_v1\\examples.jsonl",
+      "size_bytes": 3150,
+      "sha256": "575a0a278d956339f9717aec080185016b531f6f83bd5d5a3d46cedb4bd93b10",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\multiview_guardrail_v1\\manifest.json",
+      "size_bytes": 291,
+      "sha256": "aa9f8791935f383b18fa49d60d58dafe4fdc17164a3548167681328befc35bca",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\multiview_guardrail_v1\\README.md",
+      "size_bytes": 245,
+      "sha256": "c918d1e92235cd9abe3489e84f180c0bed9d628b533c99c0f81c59af0f60e30e",
+      "relative_path": "README.md"
+    }
+  ]
+}

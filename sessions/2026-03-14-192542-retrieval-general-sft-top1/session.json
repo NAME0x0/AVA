@@ -1,0 +1,10 @@
+{
+  "name": "retrieval-general-sft-top1",
+  "slug": "retrieval-general-sft-top1",
+  "kind": "retrieval",
+  "created_at_utc": "2026-03-14T19:25:42.023511+00:00",
+  "sources": [
+    "sessions\\2026-03-14-184859-failure-patch-v2-rerun-11m-96\\checkpoints\\ava-11m-failure-patch-v2.pt",
+    "corpora\\general_sft"
+  ]
+}

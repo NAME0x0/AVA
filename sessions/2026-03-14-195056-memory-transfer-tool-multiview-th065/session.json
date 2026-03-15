@@ -1,0 +1,10 @@
+{
+  "name": "memory-transfer-tool-multiview-th065",
+  "slug": "memory-transfer-tool-multiview-th065",
+  "kind": "memory-transfer",
+  "created_at_utc": "2026-03-14T19:50:56.892594+00:00",
+  "sources": [
+    "sessions\\2026-03-14-184859-failure-patch-v2-rerun-11m-96\\checkpoints\\ava-11m-failure-patch-v2.pt",
+    "corpora\\tool_multiview_v1"
+  ]
+}

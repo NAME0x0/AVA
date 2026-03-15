@@ -1,0 +1,14 @@
+{
+  "curriculum": "minimal_memory",
+  "total_examples": 21,
+  "by_kind": {
+    "general": 5,
+    "trace": 5,
+    "tool_direct": 2,
+    "no_tool": 5,
+    "boundary": 1,
+    "format": 2,
+    "refusal": 1
+  },
+  "examples_path": "corpora\\tool_memory_minimal_v3\\examples.jsonl"
+}

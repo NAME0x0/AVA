@@ -1,0 +1,10 @@
+[
+  {
+    "category": "science",
+    "prompt": "What planet is known as the Red Planet?",
+    "baseline_matched": false,
+    "retrieval_matched": true,
+    "baseline_completion": "[car 493",
+    "retrieval_completion": "Mars"
+  }
+]

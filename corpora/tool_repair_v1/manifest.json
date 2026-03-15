@@ -1,0 +1,41 @@
+{
+  "protocol": "compact_tags",
+  "curriculum": "repair",
+  "expression_count": 20,
+  "expressions": [
+    "144 / 12",
+    "sqrt(36)",
+    "sqrt(49)",
+    "sqrt(64)",
+    "sqrt(81)",
+    "sqrt(100)",
+    "sqrt(121)",
+    "sqrt(144)",
+    "sqrt(169)",
+    "sqrt(196)",
+    "7 * 7",
+    "11 * 11",
+    "17 * 29",
+    "25 + 17",
+    "36 / 6",
+    "81 / 9",
+    "pow(9, 2)",
+    "pow(2, 5)",
+    "factorial(5)",
+    "(3 + 5) * 2"
+  ],
+  "include_refusal": true,
+  "total_examples": 192,
+  "by_kind": {
+    "trace": 20,
+    "tool_direct": 20,
+    "trace_variant": 40,
+    "tool_direct_variant": 80,
+    "general": 8,
+    "no_tool": 10,
+    "boundary": 6,
+    "format": 4,
+    "refusal": 4
+  },
+  "examples_path": "corpora\\tool_repair_v1\\examples.jsonl"
+}

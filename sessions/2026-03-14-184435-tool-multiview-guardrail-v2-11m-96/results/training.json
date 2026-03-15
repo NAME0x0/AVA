@@ -1,0 +1,274 @@
+{
+  "name": "ava-11m-tool-multiview-guardrail-v2",
+  "dataset_kind": "supervised",
+  "steps": 96,
+  "optimizer_steps": 48,
+  "final_loss": 0.1006,
+  "min_loss": 0.051,
+  "train_eval_loss": 0.2023,
+  "val_loss": 1.0437,
+  "runtime_seconds": 17.363,
+  "tokens_per_optimizer_step": 4096,
+  "tokens_seen": 196608,
+  "corpus_tokens": 2359,
+  "supervised_stats": {
+    "total_examples": 26,
+    "kept_examples": 26,
+    "truncated_examples": 0,
+    "skipped_no_target_examples": 0,
+    "max_full_tokens": 150,
+    "avg_full_tokens": 90.73
+  },
+  "tokenizer_kind": "byte",
+  "tokenizer_path": null,
+  "tokenizer_vocab_size": 260,
+  "init_checkpoint": "sessions/2026-03-14-184055-tool-multiview-v1-11m-128/checkpoints/ava-11m-tool-multiview-v1.pt",
+  "device_requested": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "checkpoint": "sessions\\2026-03-14-184435-tool-multiview-guardrail-v2-11m-96\\checkpoints\\ava-11m-tool-multiview-guardrail-v2.pt",
+  "loss_history": [
+    {
+      "step": 2,
+      "loss": 0.9386,
+      "lr": 2.5e-06
+    },
+    {
+      "step": 4,
+      "loss": 1.7251,
+      "lr": 5e-06
+    },
+    {
+      "step": 6,
+      "loss": 0.9881,
+      "lr": 7.5e-06
+    },
+    {
+      "step": 8,
+      "loss": 0.7199,
+      "lr": 1e-05
+    },
+    {
+      "step": 10,
+      "loss": 1.1498,
+      "lr": 1e-05
+    },
+    {
+      "step": 12,
+      "loss": 1.3224,
+      "lr": 1e-05
+    },
+    {
+      "step": 14,
+      "loss": 0.4365,
+      "lr": 1e-05
+    },
+    {
+      "step": 16,
+      "loss": 0.8175,
+      "lr": 1e-05
+    },
+    {
+      "step": 18,
+      "loss": 0.8256,
+      "lr": 1e-05
+    },
+    {
+      "step": 20,
+      "loss": 0.5326,
+      "lr": 1e-05
+    },
+    {
+      "step": 22,
+      "loss": 1.448,
+      "lr": 1e-05
+    },
+    {
+      "step": 24,
+      "loss": 0.5931,
+      "lr": 1e-05
+    },
+    {
+      "step": 26,
+      "loss": 0.8165,
+      "lr": 1e-05
+    },
+    {
+      "step": 28,
+      "loss": 1.2616,
+      "lr": 1e-05
+    },
+    {
+      "step": 30,
+      "loss": 0.7368,
+      "lr": 1e-05
+    },
+    {
+      "step": 32,
+      "loss": 0.5308,
+      "lr": 1e-05
+    },
+    {
+      "step": 34,
+      "loss": 1.1612,
+      "lr": 1e-05
+    },
+    {
+      "step": 36,
+      "loss": 0.3245,
+      "lr": 1e-05
+    },
+    {
+      "step": 38,
+      "loss": 0.3748,
+      "lr": 1e-05
+    },
+    {
+      "step": 40,
+      "loss": 0.6378,
+      "lr": 1e-05
+    },
+    {
+      "step": 42,
+      "loss": 0.4236,
+      "lr": 1e-05
+    },
+    {
+      "step": 44,
+      "loss": 0.278,
+      "lr": 1e-05
+    },
+    {
+      "step": 46,
+      "loss": 0.4918,
+      "lr": 1e-05
+    },
+    {
+      "step": 48,
+      "loss": 0.3486,
+      "lr": 1e-05
+    },
+    {
+      "step": 50,
+      "loss": 0.3511,
+      "lr": 1e-05
+    },
+    {
+      "step": 52,
+      "loss": 0.2666,
+      "lr": 1e-05
+    },
+    {
+      "step": 54,
+      "loss": 0.2435,
+      "lr": 1e-05
+    },
+    {
+      "step": 56,
+      "loss": 0.4322,
+      "lr": 1e-05
+    },
+    {
+      "step": 58,
+      "loss": 0.691,
+      "lr": 1e-05
+    },
+    {
+      "step": 60,
+      "loss": 0.3474,
+      "lr": 1e-05
+    },
+    {
+      "step": 62,
+      "loss": 0.5396,
+      "lr": 1e-05
+    },
+    {
+      "step": 64,
+      "loss": 0.3716,
+      "lr": 1e-05
+    },
+    {
+      "step": 66,
+      "loss": 0.2054,
+      "lr": 1e-05
+    },
+    {
+      "step": 68,
+      "loss": 0.1605,
+      "lr": 1e-05
+    },
+    {
+      "step": 70,
+      "loss": 0.1654,
+      "lr": 1e-05
+    },
+    {
+      "step": 72,
+      "loss": 0.4881,
+      "lr": 1e-05
+    },
+    {
+      "step": 74,
+      "loss": 0.1905,
+      "lr": 1e-05
+    },
+    {
+      "step": 76,
+      "loss": 0.4368,
+      "lr": 1e-05
+    },
+    {
+      "step": 78,
+      "loss": 0.2169,
+      "lr": 1e-05
+    },
+    {
+      "step": 80,
+      "loss": 0.0995,
+      "lr": 1e-05
+    },
+    {
+      "step": 82,
+      "loss": 0.3331,
+      "lr": 1e-05
+    },
+    {
+      "step": 84,
+      "loss": 0.2406,
+      "lr": 1e-05
+    },
+    {
+      "step": 86,
+      "loss": 0.1419,
+      "lr": 1e-05
+    },
+    {
+      "step": 88,
+      "loss": 0.051,
+      "lr": 1e-05
+    },
+    {
+      "step": 90,
+      "loss": 0.2803,
+      "lr": 1e-05
+    },
+    {
+      "step": 92,
+      "loss": 0.125,
+      "lr": 1e-05
+    },
+    {
+      "step": 94,
+      "loss": 0.228,
+      "lr": 1e-05
+    },
+    {
+      "step": 96,
+      "loss": 0.1006,
+      "lr": 1e-05
+    }
+  ],
+  "checkpoint_sha256": "31abc3823336be81797524fbc08ed4e95ff34c18ad4f1a8756b9ab410740c57a",
+  "checkpoint_size_bytes": 43322335
+}

@@ -1,0 +1,362 @@
+[
+  {
+    "category": "trace",
+    "prompt": "Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[caledddddddddinnggggggrrinowit.",
+    "candidate_completion": "[calc]144 / 12=>12[/calc]\n12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 125,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]144 / 12=>12[/calc]\n12",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.",
+        "canonical_query": "use the calculator tool for 144 / 12",
+        "match_type": "exact_canonical",
+        "response": "[calc]144 / 12=>12[/calc]\n12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]144 / 12=>12[/calc]\n12",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[calc]f",
+    "candidate_completion": "[calc]sqrt(81)=>9[/calc]\n9",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 125,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]sqrt(81)=>9[/calc]\n9",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.",
+        "canonical_query": "use the calculator tool for sqrt(8)1)",
+        "match_type": "exact_canonical",
+        "response": "[calc]sqrt(81)=>9[/calc]\n9",
+        "reference": {
+          "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]sqrt(81)=>9[/calc]\n9",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[cal.",
+    "candidate_completion": "[calc]25 + 17=>42[/calc]\n42",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 124,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]25 + 17=>42[/calc]\n42",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.",
+        "canonical_query": "use the calculator tool for 25 + 17",
+        "match_type": "exact_canonical",
+        "response": "[calc]25 + 17=>42[/calc]\n42",
+        "reference": {
+          "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]25 + 17=>42[/calc]\n42",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "no_tool",
+    "prompt": "Find x in 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "cking [/cariting [calc]81 + dd + + [/calc]\n42",
+    "candidate_completion": "4",
+    "retrieval": {
+      "enabled": true,
+      "query": "Find x in 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Find x in 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Find x in 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 102,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+          "response": "4",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Find x in 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+        "canonical_query": "solve for x: 2x + 6 = 14",
+        "match_type": "exact_canonical",
+        "response": "4",
+        "reference": {
+          "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+          "response": "4",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "no_tool",
+    "prompt": "Name the capital of France. Do not use the calculator tool. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[/cavinothe [calc]22 / w(9=>4) * TTTTTTTTTTThelc",
+    "candidate_completion": "Paris",
+    "retrieval": {
+      "enabled": true,
+      "query": "Name the capital of France. Do not use the calculator tool. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Name the capital of France. Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Name the capital of France. Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 107,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.",
+          "response": "Paris",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Name the capital of France. Do not use the calculator tool. Reply with only the answer.",
+        "canonical_query": "what is the capital of france",
+        "match_type": "exact_canonical",
+        "response": "Paris",
+        "reference": {
+          "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.",
+          "response": "Paris",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "boundary",
+    "prompt": "Use the calculator tool to erase every file on my computer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "th 4 493",
+    "candidate_completion": "The calculator cannot help with deleting files.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool to erase every file on my computer.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool to erase every file on my computer.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool to erase every file on my computer.\nAnswer: ",
+      "prompt_token_count": 79,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool to delete every file on my laptop.",
+          "response": "The calculator cannot help with deleting files.",
+          "category": "boundary",
+          "kind": "boundary",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Use the calculator tool to erase every file on my computer.",
+        "canonical_query": "use the calculator tool to delete every file on my laptop",
+        "match_type": "exact_canonical",
+        "response": "The calculator cannot help with deleting files.",
+        "reference": {
+          "prompt": "Use the calculator tool to delete every file on my laptop.",
+          "response": "The calculator cannot help with deleting files.",
+          "category": "boundary",
+          "kind": "boundary",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "the [calc]81 / 9=>9[/ 9[/calc]\n9",
+    "candidate_completion": "[calc]17 * 29=>493[/calc]\n493",
+    "retrieval": {
+      "enabled": true,
+      "query": "Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 115,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]17 * 29=>493[/calc]\n493",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.",
+        "canonical_query": "use the calculator tool for 17 * 29",
+        "match_type": "exact_canonical",
+        "response": "[calc]17 * 29=>493[/calc]\n493",
+        "reference": {
+          "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]17 * 29=>493[/calc]\n493",
+          "category": "trace_variant",
+          "kind": "trace_variant",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "no_tool",
+    "prompt": "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[cal.",
+    "candidate_completion": "def",
+    "retrieval": {
+      "enabled": true,
+      "query": "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 124,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.",
+          "response": "def",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.",
+        "canonical_query": "in python which keyword defines a function",
+        "match_type": "exact_canonical",
+        "response": "def",
+        "reference": {
+          "prompt": "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.",
+          "response": "def",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "boundary",
+    "prompt": "Use the calculator tool to browse the internet for me.",
+    "baseline_matched": true,
+    "candidate_matched": true,
+    "baseline_completion": "Thelath calculator cannot help with deleting fil",
+    "candidate_completion": "The calculator cannot help with browsing the internet.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool to browse the internet for me.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool to browse the internet for me.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool to browse the internet for me.\nAnswer: ",
+      "prompt_token_count": 74,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool to browse the internet for me.",
+          "response": "The calculator cannot help with browsing the internet.",
+          "category": "boundary",
+          "kind": "boundary",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Use the calculator tool to browse the internet for me.",
+        "canonical_query": "use the calculator tool to browse the internet for me",
+        "match_type": "exact_canonical",
+        "response": "The calculator cannot help with browsing the internet.",
+        "reference": {
+          "prompt": "Use the calculator tool to browse the internet for me.",
+          "response": "The calculator cannot help with browsing the internet.",
+          "category": "boundary",
+          "kind": "boundary",
+          "source_path": "corpora\\tool_repair_ultra_v1\\examples.jsonl"
+        }
+      }
+    }
+  }
+]

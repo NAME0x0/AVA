@@ -1,0 +1,16 @@
+{
+  "label": "synthetic-surface-tests-rerun",
+  "command": "python -m pytest tests/test_synthetic.py tests/test_train.py tests/test_tokenizer.py -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_synthetic.py",
+    "tests/test_train.py",
+    "tests/test_tokenizer.py",
+    "-q"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 5638
+}

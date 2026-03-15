@@ -1,0 +1,46 @@
+[
+  {
+    "category": "science",
+    "prompt": "What keeps planets moving around the Sun?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "4",
+    "candidate_completion": "gravity",
+    "retrieval": {
+      "enabled": true,
+      "query": "What keeps planets moving around the Sun?",
+      "category_hint": null,
+      "base_prompt": "Question: What keeps planets moving around the Sun?\nAnswer: ",
+      "prompt": "Question: What keeps planets moving around the Sun?\nAnswer: ",
+      "prompt_token_count": 61,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What force keeps planets in orbit around the Sun?",
+          "response": "gravity",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "What keeps planets moving around the Sun?",
+        "canonical_query": "what keeps planets moving around the sun",
+        "match_type": "nearest_canonical",
+        "score": 0.665455,
+        "margin": 0.371865,
+        "response": "gravity",
+        "reference": {
+          "prompt": "What force keeps planets in orbit around the Sun?",
+          "response": "gravity",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.65,
+      "nearest_margin": 0.0
+    }
+  }
+]

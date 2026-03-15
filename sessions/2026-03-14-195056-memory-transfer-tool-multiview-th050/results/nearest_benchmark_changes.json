@@ -1,0 +1,266 @@
+[
+  {
+    "category": "english",
+    "prompt": "Put this into standard English: The plan ain't done.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "Th that.",
+    "candidate_completion": "The plan is not finished yet.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Put this into standard English: The plan ain't done.",
+      "category_hint": null,
+      "base_prompt": "Question: Put this into standard English: The plan ain't done.\nAnswer: ",
+      "prompt": "Question: Put this into standard English: The plan ain't done.\nAnswer: ",
+      "prompt_token_count": 72,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+          "response": "The plan is not finished yet.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Put this into standard English: The plan ain't done.",
+        "canonical_query": "put this into standard english the plan ain t done",
+        "match_type": "nearest_canonical",
+        "score": 0.572222,
+        "margin": 0.381746,
+        "response": "The plan is not finished yet.",
+        "reference": {
+          "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+          "response": "The plan is not finished yet.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.5,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "english",
+    "prompt": "Make this shorter: The cat slept on the warm window sill.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "cat",
+    "candidate_completion": "The cat slept on the warm sill.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Make this shorter: The cat slept on the warm window sill.",
+      "category_hint": null,
+      "base_prompt": "Question: Make this shorter: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt": "Question: Make this shorter: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt_token_count": 77,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Make this shorter: The cat slept on the warm window sill.",
+        "canonical_query": "make this shorter the cat slept on the warm window sill",
+        "match_type": "nearest_canonical",
+        "score": 0.602341,
+        "margin": 0.3894,
+        "response": "The cat slept on the warm sill.",
+        "reference": {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.5,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "science",
+    "prompt": "Which planet is called the Red Planet?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "cannot help with that.",
+    "candidate_completion": "Mars",
+    "retrieval": {
+      "enabled": true,
+      "query": "Which planet is called the Red Planet?",
+      "category_hint": null,
+      "base_prompt": "Question: Which planet is called the Red Planet?\nAnswer: ",
+      "prompt": "Question: Which planet is called the Red Planet?\nAnswer: ",
+      "prompt_token_count": 58,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What planet is known as the Red Planet?",
+          "response": "Mars",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Which planet is called the Red Planet?",
+        "canonical_query": "which planet is called the red planet",
+        "match_type": "nearest_canonical",
+        "score": 0.543111,
+        "margin": 0.344876,
+        "response": "Mars",
+        "reference": {
+          "prompt": "What planet is known as the Red Planet?",
+          "response": "Mars",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.5,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "science",
+    "prompt": "What keeps planets moving around the Sun?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "4",
+    "candidate_completion": "gravity",
+    "retrieval": {
+      "enabled": true,
+      "query": "What keeps planets moving around the Sun?",
+      "category_hint": null,
+      "base_prompt": "Question: What keeps planets moving around the Sun?\nAnswer: ",
+      "prompt": "Question: What keeps planets moving around the Sun?\nAnswer: ",
+      "prompt_token_count": 61,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What force keeps planets in orbit around the Sun?",
+          "response": "gravity",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "What keeps planets moving around the Sun?",
+        "canonical_query": "what keeps planets moving around the sun",
+        "match_type": "nearest_canonical",
+        "score": 0.665455,
+        "margin": 0.371865,
+        "response": "gravity",
+        "reference": {
+          "prompt": "What force keeps planets in orbit around the Sun?",
+          "response": "gravity",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.5,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "coding",
+    "prompt": "Which Python word creates a function?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "h [catheff",
+    "candidate_completion": "def",
+    "retrieval": {
+      "enabled": true,
+      "query": "Which Python word creates a function?",
+      "category_hint": null,
+      "base_prompt": "Question: Which Python word creates a function?\nAnswer: ",
+      "prompt": "Question: Which Python word creates a function?\nAnswer: ",
+      "prompt_token_count": 57,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Which Python word creates a function?",
+        "canonical_query": "which python word creates a function",
+        "match_type": "nearest_canonical",
+        "score": 0.526496,
+        "margin": 0.355662,
+        "response": "def",
+        "reference": {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.5,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "Thesqrs",
+    "candidate_completion": "12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 108,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool on 144 / 12. Reply with only the answer.",
+          "response": "12",
+          "category": "tool_direct_variant",
+          "kind": "tool_direct_variant",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+        "canonical_query": "please use the calculator tool to compute 144 divided by 12",
+        "match_type": "nearest_canonical",
+        "score": 0.558696,
+        "margin": 0.002244,
+        "response": "12",
+        "reference": {
+          "prompt": "Use the calculator tool on 144 / 12. Reply with only the answer.",
+          "response": "12",
+          "category": "tool_direct_variant",
+          "kind": "tool_direct_variant",
+          "source_path": "corpora\\tool_multiview_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.5,
+      "nearest_margin": 0.0
+    }
+  }
+]

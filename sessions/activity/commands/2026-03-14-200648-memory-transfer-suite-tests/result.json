@@ -1,0 +1,15 @@
+{
+  "label": "memory-transfer-suite-tests",
+  "command": "python -m pytest tests/test_memory_transfer.py tests/test_sessions.py -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_memory_transfer.py",
+    "tests/test_sessions.py",
+    "-q"
+  ],
+  "returncode": 1,
+  "cwd": "D:\\AVA",
+  "duration_ms": 13352
+}

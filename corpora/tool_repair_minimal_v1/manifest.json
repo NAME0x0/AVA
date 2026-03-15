@@ -1,0 +1,15 @@
+{
+  "source_corpus": "corpora/tool_repair_v1",
+  "selection": "tool_repair_minimal_v1",
+  "total_examples": 27,
+  "by_kind": {
+    "general": 8,
+    "trace_variant": 5,
+    "tool_direct_variant": 4,
+    "no_tool": 4,
+    "boundary": 2,
+    "format": 2,
+    "refusal": 2
+  },
+  "examples_path": "corpora\\tool_repair_minimal_v1\\examples.jsonl"
+}

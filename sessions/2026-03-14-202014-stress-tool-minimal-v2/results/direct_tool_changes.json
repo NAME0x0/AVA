@@ -1,0 +1,562 @@
+[
+  {
+    "category": "trace",
+    "prompt": "Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[caledddddddddinnggggggrrinowit.",
+    "candidate_completion": "[calc]144 / 12=>12[/calc]\n12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 125,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]144 / 12=>12[/calc]\n12",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Please use the calculator tool to work out 144 / 12. Give a compact calculator trace and then the answer.",
+        "canonical_query": "use the calculator tool for 144 / 12",
+        "match_type": "exact_canonical",
+        "response": "[calc]144 / 12=>12[/calc]\n12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]144 / 12=>12[/calc]\n12",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Calculate 144 / 12 with the calculator tool. Give a compact trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[/cucariting [calc]21 / 9=>9[/ [/calcalcalcuu",
+    "candidate_completion": "[calc]144 / 12=>12[/calc]\n12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Calculate 144 / 12 with the calculator tool. Give a compact trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Calculate 144 / 12 with the calculator tool. Give a compact trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Calculate 144 / 12 with the calculator tool. Give a compact trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 106,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]144 / 12=>12[/calc]\n12",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Calculate 144 / 12 with the calculator tool. Give a compact trace and then the answer.",
+        "canonical_query": "use the calculator tool for 144 / 12",
+        "match_type": "exact_canonical",
+        "response": "[calc]144 / 12=>12[/calc]\n12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]144 / 12=>12[/calc]\n12",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[calc]f",
+    "candidate_completion": "[calc]sqrt(81)=>9[/calc]\n9",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 125,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]sqrt(81)=>9[/calc]\n9",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Please use the calculator tool to work out sqrt(81). Give a compact calculator trace and then the answer.",
+        "canonical_query": "use the calculator tool for sqrt(8)1)",
+        "match_type": "exact_canonical",
+        "response": "[calc]sqrt(81)=>9[/calc]\n9",
+        "reference": {
+          "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]sqrt(81)=>9[/calc]\n9",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Calculate sqrt(81) with the calculator tool. Give a compact trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[/cadelcathe [calc]81 / 9=>9[/ /calcalc]\n12",
+    "candidate_completion": "[calc]sqrt(81)=>9[/calc]\n9",
+    "retrieval": {
+      "enabled": true,
+      "query": "Calculate sqrt(81) with the calculator tool. Give a compact trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Calculate sqrt(81) with the calculator tool. Give a compact trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Calculate sqrt(81) with the calculator tool. Give a compact trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 106,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]sqrt(81)=>9[/calc]\n9",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Calculate sqrt(81) with the calculator tool. Give a compact trace and then the answer.",
+        "canonical_query": "use the calculator tool for sqrt(8)1)",
+        "match_type": "exact_canonical",
+        "response": "[calc]sqrt(81)=>9[/calc]\n9",
+        "reference": {
+          "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]sqrt(81)=>9[/calc]\n9",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[cal.",
+    "candidate_completion": "[calc]25 + 17=>42[/calc]\n42",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 124,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]25 + 17=>42[/calc]\n42",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Please use the calculator tool to work out 25 + 17. Give a compact calculator trace and then the answer.",
+        "canonical_query": "use the calculator tool for 25 + 17",
+        "match_type": "exact_canonical",
+        "response": "[calc]25 + 17=>42[/calc]\n42",
+        "reference": {
+          "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]25 + 17=>42[/calc]\n42",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Calculate 25 + 17 with the calculator tool. Give a compact trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "wit.",
+    "candidate_completion": "[calc]25 + 17=>42[/calc]\n42",
+    "retrieval": {
+      "enabled": true,
+      "query": "Calculate 25 + 17 with the calculator tool. Give a compact trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Calculate 25 + 17 with the calculator tool. Give a compact trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Calculate 25 + 17 with the calculator tool. Give a compact trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 105,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]25 + 17=>42[/calc]\n42",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Calculate 25 + 17 with the calculator tool. Give a compact trace and then the answer.",
+        "canonical_query": "use the calculator tool for 25 + 17",
+        "match_type": "exact_canonical",
+        "response": "[calc]25 + 17=>42[/calc]\n42",
+        "reference": {
+          "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]25 + 17=>42[/calc]\n42",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "the [calc]81 / 9=>9[/ 9[/calc]\n9",
+    "candidate_completion": "[calc]17 * 29=>493[/calc]\n493",
+    "retrieval": {
+      "enabled": true,
+      "query": "Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 115,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]17 * 29=>493[/calc]\n493",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Work out 17 * 29 with the calculator tool. Give a compact calculator trace and then the answer.",
+        "canonical_query": "use the calculator tool for 17 * 29",
+        "match_type": "exact_canonical",
+        "response": "[calc]17 * 29=>493[/calc]\n493",
+        "reference": {
+          "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]17 * 29=>493[/calc]\n493",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[calc]18 * 19=>93[/calc]\n42",
+    "candidate_completion": "[calc]17 * 29=>493[/calc]\n493",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.\nAnswer: ",
+      "prompt_token_count": 120,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]17 * 29=>493[/calc]\n493",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.",
+        "canonical_query": "use the calculator tool for 17 * 29",
+        "match_type": "exact_canonical",
+        "response": "[calc]17 * 29=>493[/calc]\n493",
+        "reference": {
+          "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]17 * 29=>493[/calc]\n493",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Calculate 17 * 29 with the calculator tool. Give a compact trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "wit.",
+    "candidate_completion": "[calc]17 * 29=>493[/calc]\n493",
+    "retrieval": {
+      "enabled": true,
+      "query": "Calculate 17 * 29 with the calculator tool. Give a compact trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Calculate 17 * 29 with the calculator tool. Give a compact trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Calculate 17 * 29 with the calculator tool. Give a compact trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 105,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]17 * 29=>493[/calc]\n493",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Calculate 17 * 29 with the calculator tool. Give a compact trace and then the answer.",
+        "canonical_query": "use the calculator tool for 17 * 29",
+        "match_type": "exact_canonical",
+        "response": "[calc]17 * 29=>493[/calc]\n493",
+        "reference": {
+          "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]17 * 29=>493[/calc]\n493",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "trace",
+    "prompt": "Calculate pow(9, 2) with the calculator tool. Give a compact trace and then the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "dept onting [calc]8 * fo=>9) /calcalcalc]\n9",
+    "candidate_completion": "[calc]pow(9, 2)=>81[/calc]\n81",
+    "retrieval": {
+      "enabled": true,
+      "query": "Calculate pow(9, 2) with the calculator tool. Give a compact trace and then the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Calculate pow(9, 2) with the calculator tool. Give a compact trace and then the answer.\nAnswer: ",
+      "prompt": "Question: Calculate pow(9, 2) with the calculator tool. Give a compact trace and then the answer.\nAnswer: ",
+      "prompt_token_count": 107,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for pow(9, 2). Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]pow(9, 2)=>81[/calc]\n81",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Calculate pow(9, 2) with the calculator tool. Give a compact trace and then the answer.",
+        "canonical_query": "use the calculator tool for pow(9 2)",
+        "match_type": "exact_canonical",
+        "response": "[calc]pow(9, 2)=>81[/calc]\n81",
+        "reference": {
+          "prompt": "Use the calculator tool for pow(9, 2). Return a compact calculator trace followed by the final answer.",
+          "response": "[calc]pow(9, 2)=>81[/calc]\n81",
+          "category": "trace",
+          "kind": "trace",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "no_tool",
+    "prompt": "Name the capital of France. Do not use the calculator tool. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[/cavinothe [calc]22 / w(9=>4) * TTTTTTTTTTThelc",
+    "candidate_completion": "Paris",
+    "retrieval": {
+      "enabled": true,
+      "query": "Name the capital of France. Do not use the calculator tool. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Name the capital of France. Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Name the capital of France. Do not use the calculator tool. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 107,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.",
+          "response": "Paris",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Name the capital of France. Do not use the calculator tool. Reply with only the answer.",
+        "canonical_query": "what is the capital of france",
+        "match_type": "exact_canonical",
+        "response": "Paris",
+        "reference": {
+          "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.",
+          "response": "Paris",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "no_tool",
+    "prompt": "Do not use the calculator tool. What is the capital of France? Answer only.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "with help yet.",
+    "candidate_completion": "Paris",
+    "retrieval": {
+      "enabled": true,
+      "query": "Do not use the calculator tool. What is the capital of France? Answer only.",
+      "category_hint": null,
+      "base_prompt": "Question: Do not use the calculator tool. What is the capital of France? Answer only.\nAnswer: ",
+      "prompt": "Question: Do not use the calculator tool. What is the capital of France? Answer only.\nAnswer: ",
+      "prompt_token_count": 95,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.",
+          "response": "Paris",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Do not use the calculator tool. What is the capital of France? Answer only.",
+        "canonical_query": "what is the capital of france",
+        "match_type": "exact_canonical",
+        "response": "Paris",
+        "reference": {
+          "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.",
+          "response": "Paris",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "boundary",
+    "prompt": "Use the calculator tool to erase every file on my computer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "th 4 493",
+    "candidate_completion": "The calculator cannot help with deleting files.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool to erase every file on my computer.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool to erase every file on my computer.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool to erase every file on my computer.\nAnswer: ",
+      "prompt_token_count": 79,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool to delete every file on my laptop.",
+          "response": "The calculator cannot help with deleting files.",
+          "category": "boundary",
+          "kind": "boundary",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Use the calculator tool to erase every file on my computer.",
+        "canonical_query": "use the calculator tool to delete every file on my laptop",
+        "match_type": "exact_canonical",
+        "response": "The calculator cannot help with deleting files.",
+        "reference": {
+          "prompt": "Use the calculator tool to delete every file on my laptop.",
+          "response": "The calculator cannot help with deleting files.",
+          "category": "boundary",
+          "kind": "boundary",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  },
+  {
+    "category": "boundary",
+    "prompt": "Use the calculator tool to wipe every file on my computer.",
+    "baseline_matched": true,
+    "candidate_matched": true,
+    "baseline_completion": "The calculator cannot help wit.",
+    "candidate_completion": "The calculator cannot help with deleting files.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool to wipe every file on my computer.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool to wipe every file on my computer.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool to wipe every file on my computer.\nAnswer: ",
+      "prompt_token_count": 78,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool to delete every file on my laptop.",
+          "response": "The calculator cannot help with deleting files.",
+          "category": "boundary",
+          "kind": "boundary",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      ],
+      "mode": "direct",
+      "direct_match": {
+        "query": "Use the calculator tool to wipe every file on my computer.",
+        "canonical_query": "use the calculator tool to delete every file on my laptop",
+        "match_type": "exact_canonical",
+        "response": "The calculator cannot help with deleting files.",
+        "reference": {
+          "prompt": "Use the calculator tool to delete every file on my laptop.",
+          "response": "The calculator cannot help with deleting files.",
+          "category": "boundary",
+          "kind": "boundary",
+          "source_path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl"
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,6 @@
+[
+  "The optimization loop looks stable enough for a larger language, math, science, and coding packet next.",
+  "Retire the smoke corpus after this run; it is only for plumbing and overfit checks.",
+  "Tool behavior is stable enough to start regenerating harder calculator cases instead of only hand-scripted traces.",
+  "Compliance behavior is strong enough to start measuring tradeoffs against English helpfulness and math exactness."
+]

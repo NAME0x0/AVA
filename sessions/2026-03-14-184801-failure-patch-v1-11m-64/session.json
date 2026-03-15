@@ -1,0 +1,10 @@
+{
+  "name": "failure-patch-v1-11m-64",
+  "slug": "failure-patch-v1-11m-64",
+  "kind": "training",
+  "created_at_utc": "2026-03-14T18:48:01.674172+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-failure-patch-v1.yaml",
+    "corpora\\failure_patch_v1"
+  ]
+}

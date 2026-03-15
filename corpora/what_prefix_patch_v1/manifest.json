@@ -1,0 +1,14 @@
+{
+  "recipe": "what_prefix_patch",
+  "total_examples": 24,
+  "by_kind": {
+    "general": 15,
+    "tool_direct": 2,
+    "trace": 2,
+    "no_tool": 1,
+    "boundary": 1,
+    "refusal": 1,
+    "format": 2
+  },
+  "examples_path": "corpora\\what_prefix_patch_v1\\examples.jsonl"
+}

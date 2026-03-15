@@ -1,0 +1,39 @@
+....F.............                                                       [100%]
+================================== FAILURES ===================================
+_____________ test_tool_form_preference_chooses_direct_over_trace _____________
+
+    def test_tool_form_preference_chooses_direct_over_trace() -> None:
+        examples = [
+            SupportExample(
+                prompt='Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.',
+                response='[calc]144 / 12=>12[/calc]\n12',
+                category='trace',
+                kind='trace',
+            ),
+            SupportExample(
+                prompt='Use the calculator tool for 144 / 12.',
+                response='12',
+                category='tool',
+                kind='tool_direct',
+            ),
+        ]
+        exact = lookup_support_answer(
+            'Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.',
+            support_examples=examples,
+            category_hint='tool',
+            category_gated=False,
+        )
+        nearest = lookup_support_answer_nearest(
+            'Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.',
+            support_examples=examples,
+            category_hint='tool',
+            category_gated=False,
+            min_score=0.0,
+            min_margin=0.0,
+        )
+>       assert exact is not None
+E       assert None is not None
+
+tests\test_retrieval.py:124: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_retrieval.py::test_tool_form_preference_chooses_direct_over_trace

@@ -1,0 +1,52 @@
+[
+  {
+    "category": "english",
+    "prompt": "Put this into standard English: The plan ain't done.",
+    "expected": "The plan is not finished yet."
+  },
+  {
+    "category": "english",
+    "prompt": "Make this shorter: The cat slept on the warm window sill.",
+    "expected": "The cat slept on the warm sill."
+  },
+  {
+    "category": "math",
+    "prompt": "Multiply 17 by 29.",
+    "expected": "493"
+  },
+  {
+    "category": "math",
+    "prompt": "Find x in 2x + 6 = 14.",
+    "expected": "4"
+  },
+  {
+    "category": "science",
+    "prompt": "Which planet is called the Red Planet?",
+    "expected": "Mars"
+  },
+  {
+    "category": "science",
+    "prompt": "What keeps planets moving around the Sun?",
+    "expected": "gravity"
+  },
+  {
+    "category": "coding",
+    "prompt": "Which Python word creates a function?",
+    "expected": "def"
+  },
+  {
+    "category": "coding",
+    "prompt": "What does Python len('ava') give back?",
+    "expected": "3"
+  },
+  {
+    "category": "tool",
+    "prompt": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+    "expected": "12"
+  },
+  {
+    "category": "tool",
+    "prompt": "Please use the calculator tool to get the square root of 81. Reply with only the answer.",
+    "expected": "9"
+  }
+]

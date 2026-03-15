@@ -4,6 +4,22 @@ AVA is a compact AI model project built under hard constraints: one 4 GB VRAM GP
 
 This repository is the engineering and experimentation stack behind AVA. It is where the model, training loop, datasets, evaluation harnesses, and session logs live. The goal is not to imitate frontier labs with brute force. The goal is to find a small-model path that wins through better data, tighter experiments, stronger tool use, and a more transparent training process.
 
+## Current Verified State
+
+As of March 15, 2026, the strongest verified AVA result in this repo is a small-model plus explicit-memory system, not a raw-weight-only win.
+
+- Base checkpoint: `sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt`
+- Harder held-out stress suite: `87/87` with nearest-memory routing using the `21`-example bank in `corpora/tool_memory_minimal_v3`
+- Same stress suite baseline without memory: `17/87`
+- Harder held-out expanded suite: `40/40` with the `23`-example bank in `corpora/tool_repair_nano_v1`
+
+The important result is not just that AVA improves with retrieval. It is that bank quality matters more than bank size. In the current stack, a carefully shaped external memory bank is the main capability multiplier for the `11M` model.
+
+Representative tracked sessions:
+- `sessions/2026-03-14-202211-stress-tool-minimal-v3-rerun/`
+- `sessions/2026-03-14-202119-expanded-transfer-tool-repair-nano-v1/`
+- `sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/`
+
 ## What This Repository Is
 
 AVA is the product. This codebase is the machinery used to build it.
@@ -89,6 +105,12 @@ Run the test suite with archived command output:
 
 ```bash
 ava activity run -- python -m pytest -q
+```
+
+Replay the current stress result on the best 11M checkpoint:
+
+```bash
+ava session memory-transfer stress-tool-minimal-v3-rerun sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt corpora/tool_memory_minimal_v3 --device cuda --nearest-threshold 0.45 --nearest-margin 0.0 --suite stress
 ```
 
 ## How Experiments Work

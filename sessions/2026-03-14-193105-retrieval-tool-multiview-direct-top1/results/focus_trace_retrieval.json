@@ -1,0 +1,11 @@
+{
+  "mode": "direct",
+  "prompt": "What planet is known as the Red Planet?",
+  "generated_text": "Mars",
+  "steps": [],
+  "retrieval": {
+    "enabled": true,
+    "mode": "direct",
+    "category_hint": "science"
+  }
+}

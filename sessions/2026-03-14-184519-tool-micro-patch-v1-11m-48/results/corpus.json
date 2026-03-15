@@ -1,0 +1,22 @@
+{
+  "corpus_root": "corpora\\tool_micro_patch_v1",
+  "file_count": 2,
+  "text_count": 22,
+  "character_count": 2251,
+  "token_count": 2295,
+  "supervised_example_count": 21,
+  "files": [
+    {
+      "path": "corpora\\tool_micro_patch_v1\\examples.jsonl",
+      "size_bytes": 2928,
+      "sha256": "b8fab2ae87792cee61b6d299f3b1eb7171493997e2608d23404caa06f6d20291",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\tool_micro_patch_v1\\README.md",
+      "size_bytes": 253,
+      "sha256": "7f41cca2faf8f88df8f1e0f6f184eccf194f5fa6eef017487cec2cfa5060e957",
+      "relative_path": "README.md"
+    }
+  ]
+}

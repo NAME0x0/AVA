@@ -1,0 +1,154 @@
+{
+  "name": "ava-11m-tool-micro-patch-v1",
+  "dataset_kind": "supervised",
+  "steps": 48,
+  "optimizer_steps": 24,
+  "final_loss": 0.2567,
+  "min_loss": 0.1828,
+  "train_eval_loss": 0.5688,
+  "val_loss": 0.616,
+  "runtime_seconds": 3.769,
+  "tokens_per_optimizer_step": 4096,
+  "tokens_seen": 98304,
+  "corpus_tokens": 2419,
+  "supervised_stats": {
+    "total_examples": 21,
+    "kept_examples": 21,
+    "truncated_examples": 0,
+    "skipped_no_target_examples": 0,
+    "max_full_tokens": 152,
+    "avg_full_tokens": 115.19
+  },
+  "tokenizer_kind": "byte",
+  "tokenizer_path": null,
+  "tokenizer_vocab_size": 260,
+  "init_checkpoint": "sessions/2026-03-14-184359-tool-canonical-patch-from-repair-v1-11m-64/checkpoints/ava-11m-tool-canonical-patch-from-repair-v1.pt",
+  "device_requested": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "checkpoint": "sessions\\2026-03-14-184519-tool-micro-patch-v1-11m-48\\checkpoints\\ava-11m-tool-micro-patch-v1.pt",
+  "loss_history": [
+    {
+      "step": 2,
+      "loss": 0.3561,
+      "lr": 1.25e-06
+    },
+    {
+      "step": 4,
+      "loss": 0.3022,
+      "lr": 2.5e-06
+    },
+    {
+      "step": 6,
+      "loss": 0.8029,
+      "lr": 3.75e-06
+    },
+    {
+      "step": 8,
+      "loss": 0.6674,
+      "lr": 5e-06
+    },
+    {
+      "step": 10,
+      "loss": 0.2389,
+      "lr": 5e-06
+    },
+    {
+      "step": 12,
+      "loss": 0.2669,
+      "lr": 5e-06
+    },
+    {
+      "step": 14,
+      "loss": 0.6695,
+      "lr": 5e-06
+    },
+    {
+      "step": 16,
+      "loss": 0.7687,
+      "lr": 5e-06
+    },
+    {
+      "step": 18,
+      "loss": 0.2505,
+      "lr": 5e-06
+    },
+    {
+      "step": 20,
+      "loss": 0.6612,
+      "lr": 5e-06
+    },
+    {
+      "step": 22,
+      "loss": 0.7825,
+      "lr": 5e-06
+    },
+    {
+      "step": 24,
+      "loss": 0.1828,
+      "lr": 5e-06
+    },
+    {
+      "step": 26,
+      "loss": 1.1765,
+      "lr": 5e-06
+    },
+    {
+      "step": 28,
+      "loss": 0.5361,
+      "lr": 5e-06
+    },
+    {
+      "step": 30,
+      "loss": 0.2458,
+      "lr": 5e-06
+    },
+    {
+      "step": 32,
+      "loss": 0.2357,
+      "lr": 5e-06
+    },
+    {
+      "step": 34,
+      "loss": 0.575,
+      "lr": 5e-06
+    },
+    {
+      "step": 36,
+      "loss": 0.2612,
+      "lr": 5e-06
+    },
+    {
+      "step": 38,
+      "loss": 0.2754,
+      "lr": 5e-06
+    },
+    {
+      "step": 40,
+      "loss": 0.6718,
+      "lr": 5e-06
+    },
+    {
+      "step": 42,
+      "loss": 0.2112,
+      "lr": 5e-06
+    },
+    {
+      "step": 44,
+      "loss": 0.2294,
+      "lr": 5e-06
+    },
+    {
+      "step": 46,
+      "loss": 0.2049,
+      "lr": 5e-06
+    },
+    {
+      "step": 48,
+      "loss": 0.2567,
+      "lr": 5e-06
+    }
+  ],
+  "checkpoint_sha256": "519867102fa9b55534a937e9dedf47732b33e6945d6dfd07a3a806ece50e57d4",
+  "checkpoint_size_bytes": 43321871
+}

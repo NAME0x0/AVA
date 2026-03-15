@@ -1,0 +1,1 @@
+python -m pytest tests/test_retrieval.py tests/test_memory_transfer.py tests/test_sessions.py -q

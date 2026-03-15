@@ -1,0 +1,1278 @@
+[
+  {
+    "category": "english",
+    "prompt": "Put this into standard English: The plan ain't done.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "Th that.",
+    "candidate_completion": "The plan is not finished yet.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Put this into standard English: The plan ain't done.",
+      "category_hint": null,
+      "base_prompt": "Question: Put this into standard English: The plan ain't done.\nAnswer: ",
+      "prompt": "Question: Put this into standard English: The plan ain't done.\nAnswer: ",
+      "prompt_token_count": 72,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+          "response": "The plan is not finished yet.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Put this into standard English: The plan ain't done.",
+        "canonical_query": "rewrite this sentence in plain english: the plan ain't done",
+        "match_type": "nearest_canonical",
+        "score": 1.0,
+        "margin": 0.65101,
+        "response": "The plan is not finished yet.",
+        "reference": {
+          "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+          "response": "The plan is not finished yet.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "english",
+    "prompt": "Rewrite in plain English: The plan ain't done.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "calculcalculcanot dd / / / / /culp /ckingth delc",
+    "candidate_completion": "The plan is not finished yet.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Rewrite in plain English: The plan ain't done.",
+      "category_hint": null,
+      "base_prompt": "Question: Rewrite in plain English: The plan ain't done.\nAnswer: ",
+      "prompt": "Question: Rewrite in plain English: The plan ain't done.\nAnswer: ",
+      "prompt_token_count": 66,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+          "response": "The plan is not finished yet.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Rewrite in plain English: The plan ain't done.",
+        "canonical_query": "rewrite in plain english: the plan ain't done",
+        "match_type": "nearest_canonical",
+        "score": 0.819615,
+        "margin": 0.532876,
+        "response": "The plan is not finished yet.",
+        "reference": {
+          "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+          "response": "The plan is not finished yet.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "english",
+    "prompt": "Turn this into plain English: The plan ain't done.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "with that.",
+    "candidate_completion": "The plan is not finished yet.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Turn this into plain English: The plan ain't done.",
+      "category_hint": null,
+      "base_prompt": "Question: Turn this into plain English: The plan ain't done.\nAnswer: ",
+      "prompt": "Question: Turn this into plain English: The plan ain't done.\nAnswer: ",
+      "prompt_token_count": 70,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+          "response": "The plan is not finished yet.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Turn this into plain English: The plan ain't done.",
+        "canonical_query": "turn this into plain english: the plan ain't done",
+        "match_type": "nearest_canonical",
+        "score": 0.652778,
+        "margin": 0.439921,
+        "response": "The plan is not finished yet.",
+        "reference": {
+          "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+          "response": "The plan is not finished yet.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "english",
+    "prompt": "Say this in standard English: The plan ain't done.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "with that.",
+    "candidate_completion": "The plan is not finished yet.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Say this in standard English: The plan ain't done.",
+      "category_hint": null,
+      "base_prompt": "Question: Say this in standard English: The plan ain't done.\nAnswer: ",
+      "prompt": "Question: Say this in standard English: The plan ain't done.\nAnswer: ",
+      "prompt_token_count": 70,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+          "response": "The plan is not finished yet.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Say this in standard English: The plan ain't done.",
+        "canonical_query": "say this in standard english: the plan ain't done",
+        "match_type": "nearest_canonical",
+        "score": 0.630556,
+        "margin": 0.386696,
+        "response": "The plan is not finished yet.",
+        "reference": {
+          "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+          "response": "The plan is not finished yet.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "english",
+    "prompt": "Make this shorter: The cat slept on the warm window sill.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "cat",
+    "candidate_completion": "The cat slept on the warm sill.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Make this shorter: The cat slept on the warm window sill.",
+      "category_hint": null,
+      "base_prompt": "Question: Make this shorter: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt": "Question: Make this shorter: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt_token_count": 77,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Make this shorter: The cat slept on the warm window sill.",
+        "canonical_query": "summarize this sentence in fewer words: the cat slept on the warm window sill",
+        "match_type": "nearest_canonical",
+        "score": 1.0,
+        "margin": 0.69822,
+        "response": "The cat slept on the warm sill.",
+        "reference": {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "english",
+    "prompt": "Shorten this sentence: The cat slept on the warm window sill.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "Thep 3",
+    "candidate_completion": "The cat slept on the warm sill.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Shorten this sentence: The cat slept on the warm window sill.",
+      "category_hint": null,
+      "base_prompt": "Question: Shorten this sentence: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt": "Question: Shorten this sentence: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt_token_count": 81,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Shorten this sentence: The cat slept on the warm window sill.",
+        "canonical_query": "shorten this sentence: the cat slept on the warm window sill",
+        "match_type": "nearest_canonical",
+        "score": 0.618589,
+        "margin": 0.394593,
+        "response": "The cat slept on the warm sill.",
+        "reference": {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "english",
+    "prompt": "Summarize this briefly: The cat slept on the warm window sill.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "4 493",
+    "candidate_completion": "The cat slept on the warm sill.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Summarize this briefly: The cat slept on the warm window sill.",
+      "category_hint": null,
+      "base_prompt": "Question: Summarize this briefly: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt": "Question: Summarize this briefly: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt_token_count": 82,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Summarize this briefly: The cat slept on the warm window sill.",
+        "canonical_query": "summarize this briefly: the cat slept on the warm window sill",
+        "match_type": "nearest_canonical",
+        "score": 0.68913,
+        "margin": 0.47513,
+        "response": "The cat slept on the warm sill.",
+        "reference": {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "english",
+    "prompt": "Say this with fewer words: The cat slept on the warm window sill.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "4 Mator I withelp 4 493",
+    "candidate_completion": "The cat slept on the warm sill.",
+    "retrieval": {
+      "enabled": true,
+      "query": "Say this with fewer words: The cat slept on the warm window sill.",
+      "category_hint": null,
+      "base_prompt": "Question: Say this with fewer words: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt": "Question: Say this with fewer words: The cat slept on the warm window sill.\nAnswer: ",
+      "prompt_token_count": 85,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Say this with fewer words: The cat slept on the warm window sill.",
+        "canonical_query": "say this with fewer words: the cat slept on the warm window sill",
+        "match_type": "nearest_canonical",
+        "score": 0.721986,
+        "margin": 0.515567,
+        "response": "The cat slept on the warm sill.",
+        "reference": {
+          "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+          "response": "The cat slept on the warm sill.",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "math",
+    "prompt": "Multiply 17 by 29.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "4 49",
+    "candidate_completion": "493",
+    "retrieval": {
+      "enabled": true,
+      "query": "Multiply 17 by 29.",
+      "category_hint": null,
+      "base_prompt": "Question: Multiply 17 by 29.\nAnswer: ",
+      "prompt": "Question: Multiply 17 by 29.\nAnswer: ",
+      "prompt_token_count": 38,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What is 17 * 29?",
+          "response": "493",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Multiply 17 by 29.",
+        "canonical_query": "what is 17 * 29",
+        "match_type": "nearest_canonical",
+        "score": 1.0,
+        "margin": 0.643061,
+        "response": "493",
+        "reference": {
+          "prompt": "What is 17 * 29?",
+          "response": "493",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "math",
+    "prompt": "Solve 2x + 6 = 14 for x.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "49",
+    "candidate_completion": "4",
+    "retrieval": {
+      "enabled": true,
+      "query": "Solve 2x + 6 = 14 for x.",
+      "category_hint": null,
+      "base_prompt": "Question: Solve 2x + 6 = 14 for x.\nAnswer: ",
+      "prompt": "Question: Solve 2x + 6 = 14 for x.\nAnswer: ",
+      "prompt_token_count": 44,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Solve for x: 2x + 6 = 14.",
+          "response": "4",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Solve 2x + 6 = 14 for x.",
+        "canonical_query": "solve 2x + 6 = 14 for x",
+        "match_type": "nearest_canonical",
+        "score": 0.761466,
+        "margin": 0.0,
+        "response": "4",
+        "reference": {
+          "prompt": "Solve for x: 2x + 6 = 14.",
+          "response": "4",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "science",
+    "prompt": "Which planet is called the Red Planet?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "cannot help with that.",
+    "candidate_completion": "Mars",
+    "retrieval": {
+      "enabled": true,
+      "query": "Which planet is called the Red Planet?",
+      "category_hint": null,
+      "base_prompt": "Question: Which planet is called the Red Planet?\nAnswer: ",
+      "prompt": "Question: Which planet is called the Red Planet?\nAnswer: ",
+      "prompt_token_count": 58,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What planet is known as the Red Planet?",
+          "response": "Mars",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Which planet is called the Red Planet?",
+        "canonical_query": "which planet is known as the red planet",
+        "match_type": "nearest_canonical",
+        "score": 0.805519,
+        "margin": 0.0,
+        "response": "Mars",
+        "reference": {
+          "prompt": "What planet is known as the Red Planet?",
+          "response": "Mars",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "science",
+    "prompt": "Which world is known as the Red Planet?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[car wit(22ravity",
+    "candidate_completion": "Mars",
+    "retrieval": {
+      "enabled": true,
+      "query": "Which world is known as the Red Planet?",
+      "category_hint": null,
+      "base_prompt": "Question: Which world is known as the Red Planet?\nAnswer: ",
+      "prompt": "Question: Which world is known as the Red Planet?\nAnswer: ",
+      "prompt_token_count": 59,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What planet is known as the Red Planet?",
+          "response": "Mars",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Which world is known as the Red Planet?",
+        "canonical_query": "which world is known as the red planet",
+        "match_type": "nearest_canonical",
+        "score": 0.711404,
+        "margin": 0.0,
+        "response": "Mars",
+        "reference": {
+          "prompt": "What planet is known as the Red Planet?",
+          "response": "Mars",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "science",
+    "prompt": "Name the planet known as the Red Planet.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "12",
+    "candidate_completion": "Mars",
+    "retrieval": {
+      "enabled": true,
+      "query": "Name the planet known as the Red Planet.",
+      "category_hint": null,
+      "base_prompt": "Question: Name the planet known as the Red Planet.\nAnswer: ",
+      "prompt": "Question: Name the planet known as the Red Planet.\nAnswer: ",
+      "prompt_token_count": 60,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What planet is known as the Red Planet?",
+          "response": "Mars",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Name the planet known as the Red Planet.",
+        "canonical_query": "name the planet known as the red planet",
+        "match_type": "nearest_canonical",
+        "score": 0.694643,
+        "margin": 0.0,
+        "response": "Mars",
+        "reference": {
+          "prompt": "What planet is known as the Red Planet?",
+          "response": "Mars",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "science",
+    "prompt": "What planet gets called the Red Planet?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[carinoralculcalculcanot winot help with help wi",
+    "candidate_completion": "Mars",
+    "retrieval": {
+      "enabled": true,
+      "query": "What planet gets called the Red Planet?",
+      "category_hint": null,
+      "base_prompt": "Question: What planet gets called the Red Planet?\nAnswer: ",
+      "prompt": "Question: What planet gets called the Red Planet?\nAnswer: ",
+      "prompt_token_count": 59,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What planet is known as the Red Planet?",
+          "response": "Mars",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "What planet gets called the Red Planet?",
+        "canonical_query": "what planet gets known as the red planet",
+        "match_type": "nearest_canonical",
+        "score": 0.809615,
+        "margin": 0.0,
+        "response": "Mars",
+        "reference": {
+          "prompt": "What planet is known as the Red Planet?",
+          "response": "Mars",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "science",
+    "prompt": "What keeps planets moving around the Sun?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "4",
+    "candidate_completion": "gravity",
+    "retrieval": {
+      "enabled": true,
+      "query": "What keeps planets moving around the Sun?",
+      "category_hint": null,
+      "base_prompt": "Question: What keeps planets moving around the Sun?\nAnswer: ",
+      "prompt": "Question: What keeps planets moving around the Sun?\nAnswer: ",
+      "prompt_token_count": 61,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What force keeps planets in orbit around the Sun?",
+          "response": "gravity",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "What keeps planets moving around the Sun?",
+        "canonical_query": "what keeps planets in orbit around the sun",
+        "match_type": "nearest_canonical",
+        "score": 0.902222,
+        "margin": 0.0,
+        "response": "gravity",
+        "reference": {
+          "prompt": "What force keeps planets in orbit around the Sun?",
+          "response": "gravity",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "science",
+    "prompt": "Why do planets stay in orbit around the Sun?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "thelp with that.",
+    "candidate_completion": "gravity",
+    "retrieval": {
+      "enabled": true,
+      "query": "Why do planets stay in orbit around the Sun?",
+      "category_hint": null,
+      "base_prompt": "Question: Why do planets stay in orbit around the Sun?\nAnswer: ",
+      "prompt": "Question: Why do planets stay in orbit around the Sun?\nAnswer: ",
+      "prompt_token_count": 64,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What force keeps planets in orbit around the Sun?",
+          "response": "gravity",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Why do planets stay in orbit around the Sun?",
+        "canonical_query": "why do planets stay in orbit around the sun",
+        "match_type": "nearest_canonical",
+        "score": 0.587363,
+        "margin": 0.0,
+        "response": "gravity",
+        "reference": {
+          "prompt": "What force keeps planets in orbit around the Sun?",
+          "response": "gravity",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "science",
+    "prompt": "Which force holds planets in orbit around the Sun?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "with that.",
+    "candidate_completion": "gravity",
+    "retrieval": {
+      "enabled": true,
+      "query": "Which force holds planets in orbit around the Sun?",
+      "category_hint": null,
+      "base_prompt": "Question: Which force holds planets in orbit around the Sun?\nAnswer: ",
+      "prompt": "Question: Which force holds planets in orbit around the Sun?\nAnswer: ",
+      "prompt_token_count": 70,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What force keeps planets in orbit around the Sun?",
+          "response": "gravity",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Which force holds planets in orbit around the Sun?",
+        "canonical_query": "which force holds planets in orbit around the sun",
+        "match_type": "nearest_canonical",
+        "score": 0.705248,
+        "margin": 0.0,
+        "response": "gravity",
+        "reference": {
+          "prompt": "What force keeps planets in orbit around the Sun?",
+          "response": "gravity",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "coding",
+    "prompt": "Which Python word creates a function?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "h [catheff",
+    "candidate_completion": "def",
+    "retrieval": {
+      "enabled": true,
+      "query": "Which Python word creates a function?",
+      "category_hint": null,
+      "base_prompt": "Question: Which Python word creates a function?\nAnswer: ",
+      "prompt": "Question: Which Python word creates a function?\nAnswer: ",
+      "prompt_token_count": 57,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Which Python word creates a function?",
+        "canonical_query": "in python which keyword defines a function",
+        "match_type": "nearest_canonical",
+        "score": 1.0,
+        "margin": 0.0,
+        "response": "def",
+        "reference": {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "coding",
+    "prompt": "In Python, what keyword defines a function?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "I help with that.",
+    "candidate_completion": "def",
+    "retrieval": {
+      "enabled": true,
+      "query": "In Python, what keyword defines a function?",
+      "category_hint": null,
+      "base_prompt": "Question: In Python, what keyword defines a function?\nAnswer: ",
+      "prompt": "Question: In Python, what keyword defines a function?\nAnswer: ",
+      "prompt_token_count": 63,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "In Python, what keyword defines a function?",
+        "canonical_query": "in python what keyword defines a function",
+        "match_type": "nearest_canonical",
+        "score": 0.806928,
+        "margin": 0.0,
+        "response": "def",
+        "reference": {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "coding",
+    "prompt": "Which Python keyword starts a function definition?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "with that.",
+    "candidate_completion": "def",
+    "retrieval": {
+      "enabled": true,
+      "query": "Which Python keyword starts a function definition?",
+      "category_hint": null,
+      "base_prompt": "Question: Which Python keyword starts a function definition?\nAnswer: ",
+      "prompt": "Question: Which Python keyword starts a function definition?\nAnswer: ",
+      "prompt_token_count": 70,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Which Python keyword starts a function definition?",
+        "canonical_query": "which python keyword starts a function definition",
+        "match_type": "nearest_canonical",
+        "score": 0.580098,
+        "margin": 0.0,
+        "response": "def",
+        "reference": {
+          "prompt": "In Python, which keyword defines a function?",
+          "response": "def",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "coding",
+    "prompt": "In Python, what is len('ava')?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "t.",
+    "candidate_completion": "3",
+    "retrieval": {
+      "enabled": true,
+      "query": "In Python, what is len('ava')?",
+      "category_hint": null,
+      "base_prompt": "Question: In Python, what is len('ava')?\nAnswer: ",
+      "prompt": "Question: In Python, what is len('ava')?\nAnswer: ",
+      "prompt_token_count": 50,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What does len('ava') return in Python?",
+          "response": "3",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "In Python, what is len('ava')?",
+        "canonical_query": "in python what is len('ava')",
+        "match_type": "nearest_canonical",
+        "score": 0.556923,
+        "margin": 0.214014,
+        "response": "3",
+        "reference": {
+          "prompt": "What does len('ava') return in Python?",
+          "response": "3",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "coding",
+    "prompt": "What value does len('ava') produce?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "49",
+    "candidate_completion": "3",
+    "retrieval": {
+      "enabled": true,
+      "query": "What value does len('ava') produce?",
+      "category_hint": null,
+      "base_prompt": "Question: What value does len('ava') produce?\nAnswer: ",
+      "prompt": "Question: What value does len('ava') produce?\nAnswer: ",
+      "prompt_token_count": 55,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "What does len('ava') return in Python?",
+          "response": "3",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "What value does len('ava') produce?",
+        "canonical_query": "what value does len('ava') produce",
+        "match_type": "nearest_canonical",
+        "score": 0.456866,
+        "margin": 0.263057,
+        "response": "3",
+        "reference": {
+          "prompt": "What does len('ava') return in Python?",
+          "response": "3",
+          "category": "general",
+          "kind": "general",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "Thesqrs",
+    "candidate_completion": "12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 108,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+        "canonical_query": "use the calculator tool for 144 / 12",
+        "match_type": "nearest_canonical",
+        "score": 1.05,
+        "margin": 0.0,
+        "response": "12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Use the calculator tool for 144 / 12. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[/cator 12",
+    "candidate_completion": "12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool for 144 / 12. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool for 144 / 12. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool for 144 / 12. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 85,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Use the calculator tool for 144 / 12. Reply with only the answer.",
+        "canonical_query": "use the calculator tool for 144 / 12",
+        "match_type": "nearest_canonical",
+        "score": 1.05,
+        "margin": 0.0,
+        "response": "12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Please use the calculator tool for 144 / 12 and answer only.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "The 12",
+    "candidate_completion": "12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool for 144 / 12 and answer only.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool for 144 / 12 and answer only.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool for 144 / 12 and answer only.\nAnswer: ",
+      "prompt_token_count": 80,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Please use the calculator tool for 144 / 12 and answer only.",
+        "canonical_query": "use the calculator tool for 144 / 12 and answer only",
+        "match_type": "nearest_canonical",
+        "score": 0.804545,
+        "margin": 0.0,
+        "response": "12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "With the calculator tool, evaluate 144 / 12. Return only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "4",
+    "candidate_completion": "12",
+    "retrieval": {
+      "enabled": true,
+      "query": "With the calculator tool, evaluate 144 / 12. Return only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: With the calculator tool, evaluate 144 / 12. Return only the answer.\nAnswer: ",
+      "prompt": "Question: With the calculator tool, evaluate 144 / 12. Return only the answer.\nAnswer: ",
+      "prompt_token_count": 88,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Calculate 144 / 12 with the calculator tool. Reply with only the answer.",
+          "response": "12",
+          "category": "tool_direct_variant",
+          "kind": "tool_direct_variant",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "With the calculator tool, evaluate 144 / 12. Return only the answer.",
+        "canonical_query": "with the calculator tool evaluate 144 / 12 return only the answer",
+        "match_type": "nearest_canonical",
+        "score": 0.591667,
+        "margin": 0.03859,
+        "response": "12",
+        "reference": {
+          "prompt": "Calculate 144 / 12 with the calculator tool. Reply with only the answer.",
+          "response": "12",
+          "category": "tool_direct_variant",
+          "kind": "tool_direct_variant",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Please use the calculator tool to get the square root of 81. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "III onothe filcalc]sqrt(9, ddddisqrrs",
+    "candidate_completion": "9",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to get the square root of 81. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to get the square root of 81. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to get the square root of 81. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 108,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool on sqrt(81). Reply with only the answer.",
+          "response": "9",
+          "category": "tool_direct_variant",
+          "kind": "tool_direct_variant",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Please use the calculator tool to get the square root of 81. Reply with only the answer.",
+        "canonical_query": "use the calculator tool to sqrt(81)",
+        "match_type": "nearest_canonical",
+        "score": 0.687324,
+        "margin": 0.003991,
+        "response": "9",
+        "reference": {
+          "prompt": "Use the calculator tool on sqrt(81). Reply with only the answer.",
+          "response": "9",
+          "category": "tool_direct_variant",
+          "kind": "tool_direct_variant",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Use the calculator tool to work out sqrt(81). Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "cannot help wit.",
+    "candidate_completion": "9",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool to work out sqrt(81). Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool to work out sqrt(81). Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool to work out sqrt(81). Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 93,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for sqrt(81).",
+          "response": "9",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Use the calculator tool to work out sqrt(81). Reply with only the answer.",
+        "canonical_query": "use the calculator tool for sqrt(8)1)",
+        "match_type": "nearest_canonical",
+        "score": 1.05,
+        "margin": 0.0,
+        "response": "9",
+        "reference": {
+          "prompt": "Use the calculator tool for sqrt(81).",
+          "response": "9",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "With the calculator tool, calculate the square root of 81 and answer only.",
+    "baseline_matched": false,
+    "candidate_matched": false,
+    "baseline_completion": "w finished wit.",
+    "candidate_completion": "6",
+    "retrieval": {
+      "enabled": true,
+      "query": "With the calculator tool, calculate the square root of 81 and answer only.",
+      "category_hint": null,
+      "base_prompt": "Question: With the calculator tool, calculate the square root of 81 and answer only.\nAnswer: ",
+      "prompt": "Question: With the calculator tool, calculate the square root of 81 and answer only.\nAnswer: ",
+      "prompt_token_count": 94,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Calculate sqrt(36) with the calculator tool. Reply with only the answer.",
+          "response": "6",
+          "category": "tool_direct_variant",
+          "kind": "tool_direct_variant",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "With the calculator tool, calculate the square root of 81 and answer only.",
+        "canonical_query": "with the calculator tool calculate sqrt(81) and answer only",
+        "match_type": "nearest_canonical",
+        "score": 0.539806,
+        "margin": 0.0,
+        "response": "6",
+        "reference": {
+          "prompt": "Calculate sqrt(36) with the calculator tool. Reply with only the answer.",
+          "response": "6",
+          "category": "tool_direct_variant",
+          "kind": "tool_direct_variant",
+          "source_path": "D:\\AVA\\corpora\\tool_repair_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  }
+]

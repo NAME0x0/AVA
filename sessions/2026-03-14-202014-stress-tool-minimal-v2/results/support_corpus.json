@@ -1,0 +1,28 @@
+{
+  "corpus_root": "D:\\AVA\\corpora\\tool_memory_minimal_v2",
+  "file_count": 3,
+  "text_count": 22,
+  "character_count": 1668,
+  "token_count": 1712,
+  "supervised_example_count": 21,
+  "files": [
+    {
+      "path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\examples.jsonl",
+      "size_bytes": 2627,
+      "sha256": "aafe1b204a0b3bc4334011135eff927385c81ae6a03e5de90c24336bd4e8e41a",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\manifest.json",
+      "size_bytes": 290,
+      "sha256": "c1f11d1dae64505e294b4ae94b0de43f135ff67bc00a06fad531dfc87b512b5f",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "D:\\AVA\\corpora\\tool_memory_minimal_v2\\README.md",
+      "size_bytes": 96,
+      "sha256": "ccc7e7e173d2bf67344cd7f94b41cb859433aa01d477003207488dcbe0da6e20",
+      "relative_path": "README.md"
+    }
+  ]
+}

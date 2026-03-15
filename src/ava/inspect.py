@@ -6,6 +6,7 @@ from typing import Any
 
 from ava.config import ExperimentConfig
 from ava.model import TORCH_AVAILABLE, F, build_model, torch
+from ava.retrieval import load_support_examples, prepare_retrieval_prompt
 from ava.tokenizer import load_tokenizer
 
 
@@ -199,12 +200,26 @@ def trace_generation(
     top_k_neurons: int = 8,
     top_k_logits: int = 8,
     top_k_attention: int = 4,
+    support_examples: list[dict[str, object]] | None = None,
+    retrieval_top_k: int = 0,
+    category_hint: str | None = None,
+    category_gated: bool = True,
 ) -> dict[str, object]:
     device, warnings = _resolve_device(requested_device)
     model = model.to(device)
     model.eval()
 
-    prompt_ids = tokenizer.encode(prompt, add_bos=True)
+    retrieval = prepare_retrieval_prompt(
+        prompt,
+        tokenizer=tokenizer,
+        block_size=model.config.block_size,
+        support_examples=support_examples,
+        top_k=retrieval_top_k,
+        category_hint=category_hint,
+        category_gated=category_gated,
+    )
+
+    prompt_ids = tokenizer.encode(str(retrieval["prompt"]), add_bos=True)
     idx = torch.tensor([prompt_ids], dtype=torch.long, device=device)
     generated_token_ids: list[int] = []
     generated_tokens: list[str] = []
@@ -239,6 +254,7 @@ def trace_generation(
         "device_used": device,
         "warnings": warnings,
         "prompt": prompt,
+        "retrieval": retrieval,
         "prompt_token_ids": prompt_ids,
         "prompt_token_text": [_single_token_text(tokenizer, token_id) for token_id in prompt_ids],
         "max_new_tokens": max_new_tokens,
@@ -259,6 +275,10 @@ def trace_checkpoint(
     top_k_neurons: int = 8,
     top_k_logits: int = 8,
     top_k_attention: int = 4,
+    support_corpus: str | Path | None = None,
+    retrieval_top_k: int = 0,
+    category_hint: str | None = None,
+    category_gated: bool = True,
 ) -> dict[str, object]:
     if not TORCH_AVAILABLE:
         raise RuntimeError("PyTorch is required for inspection.")
@@ -268,6 +288,7 @@ def trace_checkpoint(
     tokenizer = load_tokenizer(config.tokenizer)
     model = build_model(config.model, tokenizer.vocab_size)
     model.load_state_dict(checkpoint["model"])
+    support_examples = load_support_examples(support_corpus) if support_corpus else None
     payload = trace_generation(
         model,
         tokenizer,
@@ -277,7 +298,12 @@ def trace_checkpoint(
         top_k_neurons=top_k_neurons,
         top_k_logits=top_k_logits,
         top_k_attention=top_k_attention,
+        support_examples=support_examples,
+        retrieval_top_k=retrieval_top_k,
+        category_hint=category_hint,
+        category_gated=category_gated,
     )
     payload["checkpoint"] = str(checkpoint_path)
     payload["config_name"] = config.name
+    payload["support_corpus"] = str(support_corpus) if support_corpus else None
     return payload

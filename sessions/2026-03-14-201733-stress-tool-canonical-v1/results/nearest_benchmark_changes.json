@@ -1,0 +1,398 @@
+[
+  {
+    "category": "math",
+    "prompt": "Solve 2x + 6 = 14 for x.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "49",
+    "candidate_completion": "4",
+    "retrieval": {
+      "enabled": true,
+      "query": "Solve 2x + 6 = 14 for x.",
+      "category_hint": null,
+      "base_prompt": "Question: Solve 2x + 6 = 14 for x.\nAnswer: ",
+      "prompt": "Question: Solve 2x + 6 = 14 for x.\nAnswer: ",
+      "prompt_token_count": 44,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+          "response": "4",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Solve 2x + 6 = 14 for x.",
+        "canonical_query": "solve 2x + 6 = 14 for x",
+        "match_type": "nearest_canonical",
+        "score": 0.761466,
+        "margin": 0.571015,
+        "response": "4",
+        "reference": {
+          "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+          "response": "4",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "math",
+    "prompt": "What value of x satisfies 2x + 6 = 14?",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "12",
+    "candidate_completion": "4",
+    "retrieval": {
+      "enabled": true,
+      "query": "What value of x satisfies 2x + 6 = 14?",
+      "category_hint": null,
+      "base_prompt": "Question: What value of x satisfies 2x + 6 = 14?\nAnswer: ",
+      "prompt": "Question: What value of x satisfies 2x + 6 = 14?\nAnswer: ",
+      "prompt_token_count": 58,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+          "response": "4",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "What value of x satisfies 2x + 6 = 14?",
+        "canonical_query": "solve for x: 2x + 6 = 14",
+        "match_type": "nearest_canonical",
+        "score": 1.0,
+        "margin": 0.767797,
+        "response": "4",
+        "reference": {
+          "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+          "response": "4",
+          "category": "no_tool",
+          "kind": "no_tool",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "Thesqrs",
+    "candidate_completion": "12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 108,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Please use the calculator tool to compute 144 divided by 12. Reply with only the answer.",
+        "canonical_query": "use the calculator tool for 144 / 12",
+        "match_type": "nearest_canonical",
+        "score": 1.05,
+        "margin": 0.305714,
+        "response": "12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Use the calculator tool for 144 / 12. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "[/cator 12",
+    "candidate_completion": "12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool for 144 / 12. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool for 144 / 12. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool for 144 / 12. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 85,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Use the calculator tool for 144 / 12. Reply with only the answer.",
+        "canonical_query": "use the calculator tool for 144 / 12",
+        "match_type": "nearest_canonical",
+        "score": 1.05,
+        "margin": 0.305714,
+        "response": "12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Please use the calculator tool for 144 / 12 and answer only.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "The 12",
+    "candidate_completion": "12",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool for 144 / 12 and answer only.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool for 144 / 12 and answer only.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool for 144 / 12 and answer only.\nAnswer: ",
+      "prompt_token_count": 80,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Please use the calculator tool for 144 / 12 and answer only.",
+        "canonical_query": "use the calculator tool for 144 / 12 and",
+        "match_type": "nearest_canonical",
+        "score": 0.956433,
+        "margin": 0.265155,
+        "response": "12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "With the calculator tool, evaluate 144 / 12. Return only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "4",
+    "candidate_completion": "12",
+    "retrieval": {
+      "enabled": true,
+      "query": "With the calculator tool, evaluate 144 / 12. Return only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: With the calculator tool, evaluate 144 / 12. Return only the answer.\nAnswer: ",
+      "prompt": "Question: With the calculator tool, evaluate 144 / 12. Return only the answer.\nAnswer: ",
+      "prompt_token_count": 88,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "With the calculator tool, evaluate 144 / 12. Return only the answer.",
+        "canonical_query": "use the calculator tool for 144 / 12 return only the answer",
+        "match_type": "nearest_canonical",
+        "score": 0.786459,
+        "margin": 0.206931,
+        "response": "12",
+        "reference": {
+          "prompt": "Use the calculator tool for 144 / 12.",
+          "response": "12",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Please use the calculator tool to get the square root of 81. Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "III onothe filcalc]sqrt(9, ddddisqrrs",
+    "candidate_completion": "9",
+    "retrieval": {
+      "enabled": true,
+      "query": "Please use the calculator tool to get the square root of 81. Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Please use the calculator tool to get the square root of 81. Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Please use the calculator tool to get the square root of 81. Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 108,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for sqrt(81).",
+          "response": "9",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Please use the calculator tool to get the square root of 81. Reply with only the answer.",
+        "canonical_query": "use the calculator tool to sqrt(81)",
+        "match_type": "nearest_canonical",
+        "score": 0.683333,
+        "margin": 0.0121,
+        "response": "9",
+        "reference": {
+          "prompt": "Use the calculator tool for sqrt(81).",
+          "response": "9",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "Use the calculator tool to work out sqrt(81). Reply with only the answer.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "cannot help wit.",
+    "candidate_completion": "9",
+    "retrieval": {
+      "enabled": true,
+      "query": "Use the calculator tool to work out sqrt(81). Reply with only the answer.",
+      "category_hint": null,
+      "base_prompt": "Question: Use the calculator tool to work out sqrt(81). Reply with only the answer.\nAnswer: ",
+      "prompt": "Question: Use the calculator tool to work out sqrt(81). Reply with only the answer.\nAnswer: ",
+      "prompt_token_count": 93,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for sqrt(81).",
+          "response": "9",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "Use the calculator tool to work out sqrt(81). Reply with only the answer.",
+        "canonical_query": "use the calculator tool for sqrt(8)1)",
+        "match_type": "nearest_canonical",
+        "score": 1.05,
+        "margin": 0.1,
+        "response": "9",
+        "reference": {
+          "prompt": "Use the calculator tool for sqrt(81).",
+          "response": "9",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  },
+  {
+    "category": "tool",
+    "prompt": "With the calculator tool, calculate the square root of 81 and answer only.",
+    "baseline_matched": false,
+    "candidate_matched": true,
+    "baseline_completion": "w finished wit.",
+    "candidate_completion": "9",
+    "retrieval": {
+      "enabled": true,
+      "query": "With the calculator tool, calculate the square root of 81 and answer only.",
+      "category_hint": null,
+      "base_prompt": "Question: With the calculator tool, calculate the square root of 81 and answer only.\nAnswer: ",
+      "prompt": "Question: With the calculator tool, calculate the square root of 81 and answer only.\nAnswer: ",
+      "prompt_token_count": 94,
+      "dropped_references": 0,
+      "references": [
+        {
+          "prompt": "Use the calculator tool for sqrt(81).",
+          "response": "9",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      ],
+      "mode": "nearest",
+      "nearest_match": {
+        "query": "With the calculator tool, calculate the square root of 81 and answer only.",
+        "canonical_query": "use the calculator tool for sqrt(81) and",
+        "match_type": "nearest_canonical",
+        "score": 0.768019,
+        "margin": 0.011289,
+        "response": "9",
+        "reference": {
+          "prompt": "Use the calculator tool for sqrt(81).",
+          "response": "9",
+          "category": "tool_direct",
+          "kind": "tool_direct",
+          "source_path": "D:\\AVA\\corpora\\tool_canonical_patch_v1\\examples.jsonl"
+        }
+      },
+      "nearest_threshold": 0.45,
+      "nearest_margin": 0.0
+    }
+  }
+]

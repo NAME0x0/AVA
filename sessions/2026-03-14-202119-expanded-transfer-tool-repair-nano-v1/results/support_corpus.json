@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\tool_repair_nano_v1",
+  "file_count": 3,
+  "text_count": 24,
+  "character_count": 2083,
+  "token_count": 2131,
+  "supervised_example_count": 23,
+  "files": [
+    {
+      "path": "corpora\\tool_repair_nano_v1\\examples.jsonl",
+      "size_bytes": 3645,
+      "sha256": "647175b53d29d722f2b4b6818160a2eceacce18ebe3366e92a867bbf62a9267b",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\tool_repair_nano_v1\\manifest.json",
+      "size_bytes": 385,
+      "sha256": "9743e3d203db89790490b85834367bc9cb9f115514468be202519de7b5b641ef",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\tool_repair_nano_v1\\README.md",
+      "size_bytes": 286,
+      "sha256": "7edbbf044c35efa13ec1e1e2defa5a0ab98bd1d1aa0e2419414f2620207f4950",
+      "relative_path": "README.md"
+    }
+  ]
+}

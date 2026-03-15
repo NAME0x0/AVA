@@ -1,0 +1,82 @@
+[
+  {
+    "category": "english",
+    "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "The plan is not finished yet.",
+    "retrieval_completion": "c]\n93 III Th wityyy"
+  },
+  {
+    "category": "english",
+    "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "The cat slept on the warm sill.",
+    "retrieval_completion": "delc]\n9"
+  },
+  {
+    "category": "math",
+    "prompt": "What is 17 * 29?",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "493",
+    "retrieval_completion": "19[/ 49[/calcalc]\n8"
+  },
+  {
+    "category": "math",
+    "prompt": "Solve for x: 2x + 6 = 14.",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "4",
+    "retrieval_completion": "493"
+  },
+  {
+    "category": "science",
+    "prompt": "What planet is known as the Red Planet?",
+    "baseline_matched": false,
+    "retrieval_matched": false,
+    "baseline_completion": "[car 493",
+    "retrieval_completion": "IIII / TTh [/ with Th Theffffit."
+  },
+  {
+    "category": "science",
+    "prompt": "What force keeps planets in orbit around the Sun?",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "gravity",
+    "retrieval_completion": "ffffffit."
+  },
+  {
+    "category": "coding",
+    "prompt": "In Python, which keyword defines a function?",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "def",
+    "retrieval_completion": "[/ I with [/ / [calcat."
+  },
+  {
+    "category": "coding",
+    "prompt": "What does len('ava') return in Python?",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "3",
+    "retrieval_completion": "9"
+  },
+  {
+    "category": "tool",
+    "prompt": "Use the calculator tool for 144 / 12.",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "12",
+    "retrieval_completion": "[cavvinnoth [/calcath [calcalp [/calcalcannnnoty"
+  },
+  {
+    "category": "tool",
+    "prompt": "Use the calculator tool for sqrt(81).",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "9",
+    "retrieval_completion": "[cavvinnoth [/calcath [calcalcannnnoth wity"
+  }
+]

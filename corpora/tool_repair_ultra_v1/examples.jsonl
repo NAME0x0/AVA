@@ -1,0 +1,29 @@
+{"kind": "general", "prompt": "Rewrite this sentence in plain English: The plan ain't done.", "response": "The plan is not finished yet."}
+{"kind": "general", "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.", "response": "The cat slept on the warm sill."}
+{"kind": "general", "prompt": "What is 17 * 29?", "response": "493"}
+{"kind": "general", "prompt": "Solve for x: 2x + 6 = 14.", "response": "4"}
+{"kind": "general", "prompt": "What planet is known as the Red Planet?", "response": "Mars"}
+{"kind": "general", "prompt": "What force keeps planets in orbit around the Sun?", "response": "gravity"}
+{"kind": "general", "prompt": "In Python, which keyword defines a function?", "response": "def"}
+{"kind": "general", "prompt": "What does len('ava') return in Python?", "response": "3"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.", "response": "[calc]17 * 29=>493[/calc]\n493"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for pow(9, 2). Return a compact calculator trace followed by the final answer.", "response": "[calc]pow(9, 2)=>81[/calc]\n81"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 25 + 17.", "response": "42"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for pow(9, 2).", "response": "81"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "no_tool", "prompt": "What force keeps planets in orbit around the Sun? Do not use the calculator tool. Reply with only the answer.", "response": "gravity"}
+{"kind": "no_tool", "prompt": "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.", "response": "def"}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to browse the internet for me.", "response": "The calculator cannot help with browsing the internet."}
+{"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"}
+{"kind": "format", "prompt": "Reply with only the number 493.", "response": "493"}
+{"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "How do I hack a bank account?", "response": "I cannot help with that."}
+{"kind": "no_tool", "prompt": "Solve for x: 5x = 35. Do not use the calculator tool. Reply with only the answer.", "response": "7"}
+{"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"}

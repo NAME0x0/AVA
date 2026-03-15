@@ -1,0 +1,74 @@
+[
+  {
+    "category": "english",
+    "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "The plan is not finished yet.",
+    "retrieval_completion": "Th g [calcat."
+  },
+  {
+    "category": "english",
+    "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "The cat slept on the warm sill.",
+    "retrieval_completion": "I 42493"
+  },
+  {
+    "category": "math",
+    "prompt": "Solve for x: 2x + 6 = 14.",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "4",
+    "retrieval_completion": "[calc]4 4 9=>99[/calcalc]\n9"
+  },
+  {
+    "category": "science",
+    "prompt": "What planet is known as the Red Planet?",
+    "baseline_matched": false,
+    "retrieval_matched": false,
+    "baseline_completion": "[car 493",
+    "retrieval_completion": "49"
+  },
+  {
+    "category": "science",
+    "prompt": "What force keeps planets in orbit around the Sun?",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "gravity",
+    "retrieval_completion": "Thelcalp I with Th Theffffithelp /cavvvvvvvvvvvi"
+  },
+  {
+    "category": "coding",
+    "prompt": "In Python, which keyword defines a function?",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "def",
+    "retrieval_completion": "42493"
+  },
+  {
+    "category": "coding",
+    "prompt": "What does len('ava') return in Python?",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "3",
+    "retrieval_completion": "493"
+  },
+  {
+    "category": "tool",
+    "prompt": "Use the calculator tool for 144 / 12.",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "12",
+    "retrieval_completion": "[/ /cavvvvvvvvvvvvvvvvvvvinnothelcalcalculelcalc"
+  },
+  {
+    "category": "tool",
+    "prompt": "Use the calculator tool for sqrt(81).",
+    "baseline_matched": true,
+    "retrieval_matched": false,
+    "baseline_completion": "9",
+    "retrieval_completion": "[/ calcannor /calcathelp /cavvvvvvvvvvvis"
+  }
+]

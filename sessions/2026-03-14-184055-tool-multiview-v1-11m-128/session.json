@@ -1,0 +1,10 @@
+{
+  "name": "tool-multiview-v1-11m-128",
+  "slug": "tool-multiview-v1-11m-128",
+  "kind": "training",
+  "created_at_utc": "2026-03-14T18:40:55.271561+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-tool-multiview-v1.yaml",
+    "corpora\\tool_multiview_v1"
+  ]
+}

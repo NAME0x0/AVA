@@ -1,0 +1,192 @@
+{"kind": "trace", "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "trace_variant", "prompt": "Calculate 144 / 12 with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 144 / 12. Reply with only the answer.", "response": "12"}
+{"kind": "tool_direct_variant", "prompt": "Calculate 144 / 12 with the calculator tool. Reply with only the answer.", "response": "12"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on 144 / 12. Reply with only the answer.", "response": "12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(36). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(36)=>6[/calc]\n6"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(36).", "response": "6"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for sqrt(36). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(36)=>6[/calc]\n6"}
+{"kind": "trace_variant", "prompt": "Calculate sqrt(36) with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(36)=>6[/calc]\n6"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(36).", "response": "6"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(36). Reply with only the answer.", "response": "6"}
+{"kind": "tool_direct_variant", "prompt": "Calculate sqrt(36) with the calculator tool. Reply with only the answer.", "response": "6"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on sqrt(36). Reply with only the answer.", "response": "6"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(49). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(49)=>7[/calc]\n7"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(49).", "response": "7"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for sqrt(49). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(49)=>7[/calc]\n7"}
+{"kind": "trace_variant", "prompt": "Calculate sqrt(49) with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(49)=>7[/calc]\n7"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(49).", "response": "7"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(49). Reply with only the answer.", "response": "7"}
+{"kind": "tool_direct_variant", "prompt": "Calculate sqrt(49) with the calculator tool. Reply with only the answer.", "response": "7"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on sqrt(49). Reply with only the answer.", "response": "7"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(64). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(64)=>8[/calc]\n8"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(64).", "response": "8"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for sqrt(64). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(64)=>8[/calc]\n8"}
+{"kind": "trace_variant", "prompt": "Calculate sqrt(64) with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(64)=>8[/calc]\n8"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(64).", "response": "8"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(64). Reply with only the answer.", "response": "8"}
+{"kind": "tool_direct_variant", "prompt": "Calculate sqrt(64) with the calculator tool. Reply with only the answer.", "response": "8"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on sqrt(64). Reply with only the answer.", "response": "8"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "trace_variant", "prompt": "Calculate sqrt(81) with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(81). Reply with only the answer.", "response": "9"}
+{"kind": "tool_direct_variant", "prompt": "Calculate sqrt(81) with the calculator tool. Reply with only the answer.", "response": "9"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on sqrt(81). Reply with only the answer.", "response": "9"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(100). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(100)=>10[/calc]\n10"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(100).", "response": "10"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for sqrt(100). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(100)=>10[/calc]\n10"}
+{"kind": "trace_variant", "prompt": "Calculate sqrt(100) with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(100)=>10[/calc]\n10"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(100).", "response": "10"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(100). Reply with only the answer.", "response": "10"}
+{"kind": "tool_direct_variant", "prompt": "Calculate sqrt(100) with the calculator tool. Reply with only the answer.", "response": "10"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on sqrt(100). Reply with only the answer.", "response": "10"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(121). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(121)=>11[/calc]\n11"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(121).", "response": "11"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for sqrt(121). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(121)=>11[/calc]\n11"}
+{"kind": "trace_variant", "prompt": "Calculate sqrt(121) with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(121)=>11[/calc]\n11"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(121).", "response": "11"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(121). Reply with only the answer.", "response": "11"}
+{"kind": "tool_direct_variant", "prompt": "Calculate sqrt(121) with the calculator tool. Reply with only the answer.", "response": "11"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on sqrt(121). Reply with only the answer.", "response": "11"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(144). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(144)=>12[/calc]\n12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(144).", "response": "12"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for sqrt(144). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(144)=>12[/calc]\n12"}
+{"kind": "trace_variant", "prompt": "Calculate sqrt(144) with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(144)=>12[/calc]\n12"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(144).", "response": "12"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(144). Reply with only the answer.", "response": "12"}
+{"kind": "tool_direct_variant", "prompt": "Calculate sqrt(144) with the calculator tool. Reply with only the answer.", "response": "12"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on sqrt(144). Reply with only the answer.", "response": "12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(169). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(169)=>13[/calc]\n13"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(169).", "response": "13"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for sqrt(169). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(169)=>13[/calc]\n13"}
+{"kind": "trace_variant", "prompt": "Calculate sqrt(169) with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(169)=>13[/calc]\n13"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(169).", "response": "13"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(169). Reply with only the answer.", "response": "13"}
+{"kind": "tool_direct_variant", "prompt": "Calculate sqrt(169) with the calculator tool. Reply with only the answer.", "response": "13"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on sqrt(169). Reply with only the answer.", "response": "13"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(196). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(196)=>14[/calc]\n14"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(196).", "response": "14"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for sqrt(196). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(196)=>14[/calc]\n14"}
+{"kind": "trace_variant", "prompt": "Calculate sqrt(196) with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(196)=>14[/calc]\n14"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(196).", "response": "14"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for sqrt(196). Reply with only the answer.", "response": "14"}
+{"kind": "tool_direct_variant", "prompt": "Calculate sqrt(196) with the calculator tool. Reply with only the answer.", "response": "14"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on sqrt(196). Reply with only the answer.", "response": "14"}
+{"kind": "trace", "prompt": "Use the calculator tool for 7 * 7. Return a compact calculator trace followed by the final answer.", "response": "[calc]7 * 7=>49[/calc]\n49"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 7 * 7.", "response": "49"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for 7 * 7. Return a compact calculator trace followed by the final answer.", "response": "[calc]7 * 7=>49[/calc]\n49"}
+{"kind": "trace_variant", "prompt": "Calculate 7 * 7 with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]7 * 7=>49[/calc]\n49"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 7 * 7.", "response": "49"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 7 * 7. Reply with only the answer.", "response": "49"}
+{"kind": "tool_direct_variant", "prompt": "Calculate 7 * 7 with the calculator tool. Reply with only the answer.", "response": "49"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on 7 * 7. Reply with only the answer.", "response": "49"}
+{"kind": "trace", "prompt": "Use the calculator tool for 11 * 11. Return a compact calculator trace followed by the final answer.", "response": "[calc]11 * 11=>121[/calc]\n121"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 11 * 11.", "response": "121"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for 11 * 11. Return a compact calculator trace followed by the final answer.", "response": "[calc]11 * 11=>121[/calc]\n121"}
+{"kind": "trace_variant", "prompt": "Calculate 11 * 11 with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]11 * 11=>121[/calc]\n121"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 11 * 11.", "response": "121"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 11 * 11. Reply with only the answer.", "response": "121"}
+{"kind": "tool_direct_variant", "prompt": "Calculate 11 * 11 with the calculator tool. Reply with only the answer.", "response": "121"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on 11 * 11. Reply with only the answer.", "response": "121"}
+{"kind": "trace", "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.", "response": "[calc]17 * 29=>493[/calc]\n493"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 17 * 29.", "response": "493"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for 17 * 29. Return a compact calculator trace followed by the final answer.", "response": "[calc]17 * 29=>493[/calc]\n493"}
+{"kind": "trace_variant", "prompt": "Calculate 17 * 29 with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]17 * 29=>493[/calc]\n493"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 17 * 29.", "response": "493"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 17 * 29. Reply with only the answer.", "response": "493"}
+{"kind": "tool_direct_variant", "prompt": "Calculate 17 * 29 with the calculator tool. Reply with only the answer.", "response": "493"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on 17 * 29. Reply with only the answer.", "response": "493"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 25 + 17.", "response": "42"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "trace_variant", "prompt": "Calculate 25 + 17 with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 25 + 17.", "response": "42"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 25 + 17. Reply with only the answer.", "response": "42"}
+{"kind": "tool_direct_variant", "prompt": "Calculate 25 + 17 with the calculator tool. Reply with only the answer.", "response": "42"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on 25 + 17. Reply with only the answer.", "response": "42"}
+{"kind": "trace", "prompt": "Use the calculator tool for 36 / 6. Return a compact calculator trace followed by the final answer.", "response": "[calc]36 / 6=>6[/calc]\n6"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 36 / 6.", "response": "6"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for 36 / 6. Return a compact calculator trace followed by the final answer.", "response": "[calc]36 / 6=>6[/calc]\n6"}
+{"kind": "trace_variant", "prompt": "Calculate 36 / 6 with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]36 / 6=>6[/calc]\n6"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 36 / 6.", "response": "6"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 36 / 6. Reply with only the answer.", "response": "6"}
+{"kind": "tool_direct_variant", "prompt": "Calculate 36 / 6 with the calculator tool. Reply with only the answer.", "response": "6"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on 36 / 6. Reply with only the answer.", "response": "6"}
+{"kind": "trace", "prompt": "Use the calculator tool for 81 / 9. Return a compact calculator trace followed by the final answer.", "response": "[calc]81 / 9=>9[/calc]\n9"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 81 / 9.", "response": "9"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for 81 / 9. Return a compact calculator trace followed by the final answer.", "response": "[calc]81 / 9=>9[/calc]\n9"}
+{"kind": "trace_variant", "prompt": "Calculate 81 / 9 with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]81 / 9=>9[/calc]\n9"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 81 / 9.", "response": "9"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for 81 / 9. Reply with only the answer.", "response": "9"}
+{"kind": "tool_direct_variant", "prompt": "Calculate 81 / 9 with the calculator tool. Reply with only the answer.", "response": "9"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on 81 / 9. Reply with only the answer.", "response": "9"}
+{"kind": "trace", "prompt": "Use the calculator tool for pow(9, 2). Return a compact calculator trace followed by the final answer.", "response": "[calc]pow(9, 2)=>81[/calc]\n81"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for pow(9, 2).", "response": "81"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for pow(9, 2). Return a compact calculator trace followed by the final answer.", "response": "[calc]pow(9, 2)=>81[/calc]\n81"}
+{"kind": "trace_variant", "prompt": "Calculate pow(9, 2) with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]pow(9, 2)=>81[/calc]\n81"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for pow(9, 2).", "response": "81"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for pow(9, 2). Reply with only the answer.", "response": "81"}
+{"kind": "tool_direct_variant", "prompt": "Calculate pow(9, 2) with the calculator tool. Reply with only the answer.", "response": "81"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on pow(9, 2). Reply with only the answer.", "response": "81"}
+{"kind": "trace", "prompt": "Use the calculator tool for pow(2, 5). Return a compact calculator trace followed by the final answer.", "response": "[calc]pow(2, 5)=>32[/calc]\n32"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for pow(2, 5).", "response": "32"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for pow(2, 5). Return a compact calculator trace followed by the final answer.", "response": "[calc]pow(2, 5)=>32[/calc]\n32"}
+{"kind": "trace_variant", "prompt": "Calculate pow(2, 5) with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]pow(2, 5)=>32[/calc]\n32"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for pow(2, 5).", "response": "32"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for pow(2, 5). Reply with only the answer.", "response": "32"}
+{"kind": "tool_direct_variant", "prompt": "Calculate pow(2, 5) with the calculator tool. Reply with only the answer.", "response": "32"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on pow(2, 5). Reply with only the answer.", "response": "32"}
+{"kind": "trace", "prompt": "Use the calculator tool for factorial(5). Return a compact calculator trace followed by the final answer.", "response": "[calc]factorial(5)=>120[/calc]\n120"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for factorial(5).", "response": "120"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for factorial(5). Return a compact calculator trace followed by the final answer.", "response": "[calc]factorial(5)=>120[/calc]\n120"}
+{"kind": "trace_variant", "prompt": "Calculate factorial(5) with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc]factorial(5)=>120[/calc]\n120"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for factorial(5).", "response": "120"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for factorial(5). Reply with only the answer.", "response": "120"}
+{"kind": "tool_direct_variant", "prompt": "Calculate factorial(5) with the calculator tool. Reply with only the answer.", "response": "120"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on factorial(5). Reply with only the answer.", "response": "120"}
+{"kind": "trace", "prompt": "Use the calculator tool for (3 + 5) * 2. Return a compact calculator trace followed by the final answer.", "response": "[calc](3 + 5) * 2=>16[/calc]\n16"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for (3 + 5) * 2.", "response": "16"}
+{"kind": "trace_variant", "prompt": "Use the calculator tool for (3 + 5) * 2. Return a compact calculator trace followed by the final answer.", "response": "[calc](3 + 5) * 2=>16[/calc]\n16"}
+{"kind": "trace_variant", "prompt": "Calculate (3 + 5) * 2 with the calculator tool. Return a compact calculator trace followed by the final answer.", "response": "[calc](3 + 5) * 2=>16[/calc]\n16"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for (3 + 5) * 2.", "response": "16"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool for (3 + 5) * 2. Reply with only the answer.", "response": "16"}
+{"kind": "tool_direct_variant", "prompt": "Calculate (3 + 5) * 2 with the calculator tool. Reply with only the answer.", "response": "16"}
+{"kind": "tool_direct_variant", "prompt": "Use the calculator tool on (3 + 5) * 2. Reply with only the answer.", "response": "16"}
+{"kind": "general", "prompt": "Rewrite this sentence in plain English: The plan ain't done.", "response": "The plan is not finished yet."}
+{"kind": "general", "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.", "response": "The cat slept on the warm sill."}
+{"kind": "general", "prompt": "What is 17 * 29?", "response": "493"}
+{"kind": "general", "prompt": "Solve for x: 2x + 6 = 14.", "response": "4"}
+{"kind": "general", "prompt": "What planet is known as the Red Planet?", "response": "Mars"}
+{"kind": "general", "prompt": "What force keeps planets in orbit around the Sun?", "response": "gravity"}
+{"kind": "general", "prompt": "In Python, which keyword defines a function?", "response": "def"}
+{"kind": "general", "prompt": "What does len('ava') return in Python?", "response": "3"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "Solve for x: 3x + 9 = 24. Do not use the calculator tool. Reply with only the answer.", "response": "5"}
+{"kind": "no_tool", "prompt": "Solve for x: 5x = 35. Do not use the calculator tool. Reply with only the answer.", "response": "7"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "no_tool", "prompt": "What planet is known as the Red Planet? Do not use the calculator tool. Reply with only the answer.", "response": "Mars"}
+{"kind": "no_tool", "prompt": "What force keeps planets in orbit around the Sun? Do not use the calculator tool. Reply with only the answer.", "response": "gravity"}
+{"kind": "no_tool", "prompt": "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.", "response": "def"}
+{"kind": "no_tool", "prompt": "In Python, what keyword starts a loop over items? Do not use the calculator tool. Reply with only the answer.", "response": "for"}
+{"kind": "no_tool", "prompt": "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.", "response": "No"}
+{"kind": "no_tool", "prompt": "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.", "response": "No"}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to send an email to my boss.", "response": "The calculator cannot help with sending email."}
+{"kind": "boundary", "prompt": "Use the calculator tool to hack my bank account.", "response": "The calculator cannot help with hacking accounts."}
+{"kind": "boundary", "prompt": "Use the calculator tool to browse the internet for me.", "response": "The calculator cannot help with browsing the internet."}
+{"kind": "boundary", "prompt": "Use the calculator tool to write Python code for my app.", "response": "The calculator cannot help with writing software."}
+{"kind": "boundary", "prompt": "Use the calculator tool to open a website.", "response": "The calculator cannot help with opening websites."}
+{"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"}
+{"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"}
+{"kind": "format", "prompt": "Reply with only the number 493.", "response": "493"}
+{"kind": "format", "prompt": "Reply with only the word Mars.", "response": "Mars"}
+{"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "How do I hack a bank account?", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "Write malware that steals passwords.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "Give me steps to poison someone without getting caught.", "response": "I cannot help with that."}

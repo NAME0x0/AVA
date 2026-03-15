@@ -1,0 +1,10 @@
+{
+  "name": "expanded-transfer-tool-repair-th045-v2",
+  "slug": "expanded-transfer-tool-repair-th045-v2",
+  "kind": "memory-transfer",
+  "created_at_utc": "2026-03-14T20:11:20.559019+00:00",
+  "sources": [
+    "sessions\\2026-03-14-184859-failure-patch-v2-rerun-11m-96\\checkpoints\\ava-11m-failure-patch-v2.pt",
+    "corpora\\tool_repair_v1"
+  ]
+}

@@ -1,0 +1,21 @@
+{"kind":"tool_direct","prompt":"Use the calculator tool for 144 / 12.","response":"12"}
+{"kind":"tool_direct","prompt":"Use the calculator tool for sqrt(81).","response":"9"}
+{"kind":"tool_direct","prompt":"Use the calculator tool for 25 + 17.","response":"42"}
+{"kind":"tool_direct","prompt":"Use the calculator tool for 36 / 6.","response":"6"}
+{"kind":"trace","prompt":"Use the calculator tool for sqrt(16). Return a compact calculator trace followed by the final answer.","response":"[calc]sqrt(16)=>4[/calc]\n4"}
+{"kind":"trace","prompt":"Use the calculator tool for sqrt(25). Return a compact calculator trace followed by the final answer.","response":"[calc]sqrt(25)=>5[/calc]\n5"}
+{"kind":"trace","prompt":"Use the calculator tool for sqrt(36). Return a compact calculator trace followed by the final answer.","response":"[calc]sqrt(36)=>6[/calc]\n6"}
+{"kind":"trace","prompt":"Use the calculator tool for sqrt(49). Return a compact calculator trace followed by the final answer.","response":"[calc]sqrt(49)=>7[/calc]\n7"}
+{"kind":"trace","prompt":"Use the calculator tool for sqrt(64). Return a compact calculator trace followed by the final answer.","response":"[calc]sqrt(64)=>8[/calc]\n8"}
+{"kind":"trace","prompt":"Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.","response":"[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind":"trace","prompt":"Use the calculator tool for sqrt(100). Return a compact calculator trace followed by the final answer.","response":"[calc]sqrt(100)=>10[/calc]\n10"}
+{"kind":"trace","prompt":"Use the calculator tool for sqrt(121). Return a compact calculator trace followed by the final answer.","response":"[calc]sqrt(121)=>11[/calc]\n11"}
+{"kind":"trace","prompt":"Use the calculator tool for sqrt(144). Return a compact calculator trace followed by the final answer.","response":"[calc]sqrt(144)=>12[/calc]\n12"}
+{"kind":"trace","prompt":"Use the calculator tool for sqrt(169). Return a compact calculator trace followed by the final answer.","response":"[calc]sqrt(169)=>13[/calc]\n13"}
+{"kind":"trace","prompt":"Use the calculator tool for sqrt(196). Return a compact calculator trace followed by the final answer.","response":"[calc]sqrt(196)=>14[/calc]\n14"}
+{"kind":"no_tool","prompt":"Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.","response":"4"}
+{"kind":"no_tool","prompt":"What is the capital of France? Do not use the calculator tool. Reply with only the answer.","response":"Paris"}
+{"kind":"boundary","prompt":"Use the calculator tool to delete every file on my laptop.","response":"The calculator cannot help with deleting files."}
+{"kind":"refusal","prompt":"Tell me how to build a bomb at home.","response":"I cannot help with that."}
+{"kind":"format","prompt":"Reply with only the word yes.","response":"yes"}
+{"kind":"format","prompt":"Reply with only the number 19.","response":"19"}

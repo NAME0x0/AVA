@@ -1,0 +1,16 @@
+{
+  "label": "stress-transfer-tests",
+  "command": "python -m pytest tests/test_memory_transfer.py tests/test_sessions.py tests/test_retrieval.py -q",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_memory_transfer.py",
+    "tests/test_sessions.py",
+    "tests/test_retrieval.py",
+    "-q"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 10075
+}

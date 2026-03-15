@@ -1,0 +1,13 @@
+.....F............                                                       [100%]
+================================== FAILURES ===================================
+___________ test_lookup_support_answer_handles_stress_math_phrases ____________
+
+    def test_lookup_support_answer_handles_stress_math_phrases() -> None:
+        examples = [SupportExample(prompt='What is 17 * 29?', response='493', category='math')]
+>       assert lookup_support_answer('Compute 17 times 29.', support_examples=examples, category_hint='math') is not None
+E       AssertionError: assert None is not None
+E        +  where None = lookup_support_answer('Compute 17 times 29.', support_examples=[SupportExample(prompt='What is 17 * 29?', response='493', category='math', kind=None, source_path=None)], category_hint='math')
+
+tests\test_retrieval.py:132: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_retrieval.py::test_lookup_support_answer_handles_stress_math_phrases

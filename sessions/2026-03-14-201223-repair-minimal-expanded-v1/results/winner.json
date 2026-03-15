@@ -1,0 +1,8 @@
+{
+  "winner": "nearest",
+  "scores": {
+    "baseline": 7,
+    "direct": 21,
+    "nearest": 34
+  }
+}

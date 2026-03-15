@@ -1,0 +1,514 @@
+{
+  "name": "ava-11m-tool-repair-from-large-v1",
+  "dataset_kind": "supervised",
+  "steps": 192,
+  "optimizer_steps": 96,
+  "final_loss": 1.0378,
+  "min_loss": 0.3527,
+  "train_eval_loss": 0.6776,
+  "val_loss": 1.9493,
+  "runtime_seconds": 25.137,
+  "tokens_per_optimizer_step": 4096,
+  "tokens_seen": 393216,
+  "corpus_tokens": 20044,
+  "supervised_stats": {
+    "total_examples": 192,
+    "kept_examples": 192,
+    "truncated_examples": 0,
+    "skipped_no_target_examples": 0,
+    "max_full_tokens": 167,
+    "avg_full_tokens": 104.4
+  },
+  "tokenizer_kind": "byte",
+  "tokenizer_path": null,
+  "tokenizer_vocab_size": 260,
+  "init_checkpoint": "sessions/2026-03-14-130005-tool-synth-v5-large-byte-11m-1024/checkpoints/ava-11m-tool-synth-v5-large-byte.pt",
+  "device_requested": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "checkpoint": "sessions\\2026-03-14-183946-tool-repair-from-large-v1-11m-192\\checkpoints\\ava-11m-tool-repair-from-large-v1.pt",
+  "loss_history": [
+    {
+      "step": 2,
+      "loss": 2.089,
+      "lr": 7.5e-06
+    },
+    {
+      "step": 4,
+      "loss": 1.1743,
+      "lr": 1.5e-05
+    },
+    {
+      "step": 6,
+      "loss": 4.4418,
+      "lr": 2.25e-05
+    },
+    {
+      "step": 8,
+      "loss": 2.5391,
+      "lr": 3e-05
+    },
+    {
+      "step": 10,
+      "loss": 0.7442,
+      "lr": 3e-05
+    },
+    {
+      "step": 12,
+      "loss": 2.8324,
+      "lr": 3e-05
+    },
+    {
+      "step": 14,
+      "loss": 0.9243,
+      "lr": 3e-05
+    },
+    {
+      "step": 16,
+      "loss": 1.7869,
+      "lr": 3e-05
+    },
+    {
+      "step": 18,
+      "loss": 2.2374,
+      "lr": 3e-05
+    },
+    {
+      "step": 20,
+      "loss": 4.0719,
+      "lr": 3e-05
+    },
+    {
+      "step": 22,
+      "loss": 3.5136,
+      "lr": 3e-05
+    },
+    {
+      "step": 24,
+      "loss": 0.8747,
+      "lr": 3e-05
+    },
+    {
+      "step": 26,
+      "loss": 1.0528,
+      "lr": 3e-05
+    },
+    {
+      "step": 28,
+      "loss": 2.1962,
+      "lr": 3e-05
+    },
+    {
+      "step": 30,
+      "loss": 2.1039,
+      "lr": 3e-05
+    },
+    {
+      "step": 32,
+      "loss": 1.1649,
+      "lr": 3e-05
+    },
+    {
+      "step": 34,
+      "loss": 2.0576,
+      "lr": 3e-05
+    },
+    {
+      "step": 36,
+      "loss": 1.4496,
+      "lr": 3e-05
+    },
+    {
+      "step": 38,
+      "loss": 2.4883,
+      "lr": 3e-05
+    },
+    {
+      "step": 40,
+      "loss": 1.8777,
+      "lr": 3e-05
+    },
+    {
+      "step": 42,
+      "loss": 1.1719,
+      "lr": 3e-05
+    },
+    {
+      "step": 44,
+      "loss": 3.2246,
+      "lr": 3e-05
+    },
+    {
+      "step": 46,
+      "loss": 0.9734,
+      "lr": 3e-05
+    },
+    {
+      "step": 48,
+      "loss": 1.7142,
+      "lr": 3e-05
+    },
+    {
+      "step": 50,
+      "loss": 1.8094,
+      "lr": 3e-05
+    },
+    {
+      "step": 52,
+      "loss": 0.9261,
+      "lr": 3e-05
+    },
+    {
+      "step": 54,
+      "loss": 0.9776,
+      "lr": 3e-05
+    },
+    {
+      "step": 56,
+      "loss": 1.8713,
+      "lr": 3e-05
+    },
+    {
+      "step": 58,
+      "loss": 1.959,
+      "lr": 3e-05
+    },
+    {
+      "step": 60,
+      "loss": 1.9208,
+      "lr": 3e-05
+    },
+    {
+      "step": 62,
+      "loss": 0.7706,
+      "lr": 3e-05
+    },
+    {
+      "step": 64,
+      "loss": 1.4205,
+      "lr": 3e-05
+    },
+    {
+      "step": 66,
+      "loss": 1.2863,
+      "lr": 3e-05
+    },
+    {
+      "step": 68,
+      "loss": 1.6413,
+      "lr": 3e-05
+    },
+    {
+      "step": 70,
+      "loss": 0.8308,
+      "lr": 3e-05
+    },
+    {
+      "step": 72,
+      "loss": 1.2172,
+      "lr": 3e-05
+    },
+    {
+      "step": 74,
+      "loss": 1.0185,
+      "lr": 3e-05
+    },
+    {
+      "step": 76,
+      "loss": 1.3419,
+      "lr": 3e-05
+    },
+    {
+      "step": 78,
+      "loss": 1.9361,
+      "lr": 3e-05
+    },
+    {
+      "step": 80,
+      "loss": 1.2589,
+      "lr": 3e-05
+    },
+    {
+      "step": 82,
+      "loss": 0.834,
+      "lr": 3e-05
+    },
+    {
+      "step": 84,
+      "loss": 2.0844,
+      "lr": 3e-05
+    },
+    {
+      "step": 86,
+      "loss": 0.456,
+      "lr": 3e-05
+    },
+    {
+      "step": 88,
+      "loss": 1.6574,
+      "lr": 3e-05
+    },
+    {
+      "step": 90,
+      "loss": 1.6659,
+      "lr": 3e-05
+    },
+    {
+      "step": 92,
+      "loss": 0.8931,
+      "lr": 3e-05
+    },
+    {
+      "step": 94,
+      "loss": 0.9052,
+      "lr": 3e-05
+    },
+    {
+      "step": 96,
+      "loss": 1.226,
+      "lr": 3e-05
+    },
+    {
+      "step": 98,
+      "loss": 1.6223,
+      "lr": 3e-05
+    },
+    {
+      "step": 100,
+      "loss": 2.0056,
+      "lr": 3e-05
+    },
+    {
+      "step": 102,
+      "loss": 1.0175,
+      "lr": 3e-05
+    },
+    {
+      "step": 104,
+      "loss": 1.7166,
+      "lr": 3e-05
+    },
+    {
+      "step": 106,
+      "loss": 0.765,
+      "lr": 3e-05
+    },
+    {
+      "step": 108,
+      "loss": 1.4369,
+      "lr": 3e-05
+    },
+    {
+      "step": 110,
+      "loss": 1.6557,
+      "lr": 3e-05
+    },
+    {
+      "step": 112,
+      "loss": 1.1077,
+      "lr": 3e-05
+    },
+    {
+      "step": 114,
+      "loss": 1.3948,
+      "lr": 3e-05
+    },
+    {
+      "step": 116,
+      "loss": 1.8447,
+      "lr": 3e-05
+    },
+    {
+      "step": 118,
+      "loss": 1.6122,
+      "lr": 3e-05
+    },
+    {
+      "step": 120,
+      "loss": 0.7282,
+      "lr": 3e-05
+    },
+    {
+      "step": 122,
+      "loss": 0.4542,
+      "lr": 3e-05
+    },
+    {
+      "step": 124,
+      "loss": 0.709,
+      "lr": 3e-05
+    },
+    {
+      "step": 126,
+      "loss": 0.5421,
+      "lr": 3e-05
+    },
+    {
+      "step": 128,
+      "loss": 0.7728,
+      "lr": 3e-05
+    },
+    {
+      "step": 130,
+      "loss": 1.0795,
+      "lr": 3e-05
+    },
+    {
+      "step": 132,
+      "loss": 0.6133,
+      "lr": 3e-05
+    },
+    {
+      "step": 134,
+      "loss": 0.692,
+      "lr": 3e-05
+    },
+    {
+      "step": 136,
+      "loss": 1.2712,
+      "lr": 3e-05
+    },
+    {
+      "step": 138,
+      "loss": 0.5901,
+      "lr": 3e-05
+    },
+    {
+      "step": 140,
+      "loss": 0.9487,
+      "lr": 3e-05
+    },
+    {
+      "step": 142,
+      "loss": 1.1076,
+      "lr": 3e-05
+    },
+    {
+      "step": 144,
+      "loss": 0.6599,
+      "lr": 3e-05
+    },
+    {
+      "step": 146,
+      "loss": 1.101,
+      "lr": 3e-05
+    },
+    {
+      "step": 148,
+      "loss": 1.5903,
+      "lr": 3e-05
+    },
+    {
+      "step": 150,
+      "loss": 0.7912,
+      "lr": 3e-05
+    },
+    {
+      "step": 152,
+      "loss": 0.9102,
+      "lr": 3e-05
+    },
+    {
+      "step": 154,
+      "loss": 0.9507,
+      "lr": 3e-05
+    },
+    {
+      "step": 156,
+      "loss": 0.4338,
+      "lr": 3e-05
+    },
+    {
+      "step": 158,
+      "loss": 0.3527,
+      "lr": 3e-05
+    },
+    {
+      "step": 160,
+      "loss": 1.6302,
+      "lr": 3e-05
+    },
+    {
+      "step": 162,
+      "loss": 1.5749,
+      "lr": 3e-05
+    },
+    {
+      "step": 164,
+      "loss": 1.1829,
+      "lr": 3e-05
+    },
+    {
+      "step": 166,
+      "loss": 1.7037,
+      "lr": 3e-05
+    },
+    {
+      "step": 168,
+      "loss": 2.4156,
+      "lr": 3e-05
+    },
+    {
+      "step": 170,
+      "loss": 0.8379,
+      "lr": 3e-05
+    },
+    {
+      "step": 172,
+      "loss": 1.1003,
+      "lr": 3e-05
+    },
+    {
+      "step": 174,
+      "loss": 1.7476,
+      "lr": 3e-05
+    },
+    {
+      "step": 176,
+      "loss": 1.3222,
+      "lr": 3e-05
+    },
+    {
+      "step": 178,
+      "loss": 1.2147,
+      "lr": 3e-05
+    },
+    {
+      "step": 180,
+      "loss": 0.9367,
+      "lr": 3e-05
+    },
+    {
+      "step": 182,
+      "loss": 0.4321,
+      "lr": 3e-05
+    },
+    {
+      "step": 184,
+      "loss": 1.1247,
+      "lr": 3e-05
+    },
+    {
+      "step": 186,
+      "loss": 1.7954,
+      "lr": 3e-05
+    },
+    {
+      "step": 188,
+      "loss": 0.6516,
+      "lr": 3e-05
+    },
+    {
+      "step": 190,
+      "loss": 1.2903,
+      "lr": 3e-05
+    },
+    {
+      "step": 192,
+      "loss": 1.0378,
+      "lr": 3e-05
+    }
+  ],
+  "checkpoint_sha256": "3efe7ba871ce6f3800d66987d70ed4f018e603b21ba53a9e28d3a1faf04a2afe",
+  "checkpoint_size_bytes": 43322219
+}

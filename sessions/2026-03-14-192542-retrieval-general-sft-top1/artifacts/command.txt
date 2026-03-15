@@ -1,0 +1,1 @@
+ava session retrieval retrieval-general-sft-top1 sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt corpora/general_sft --device cuda --max-new-tokens 48 --retrieval-top-k 1

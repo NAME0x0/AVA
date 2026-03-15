@@ -1,0 +1,1 @@
+ava session memory-transfer expanded-transfer-tool-repair-th045-v3 sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt corpora/tool_repair_v1 --device cuda --max-new-tokens 48 --nearest-threshold 0.45 --nearest-margin 0.0 --suite expanded

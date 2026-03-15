@@ -1,0 +1,1 @@
+ava session train mars-patch-v1-11m-48 configs/experiments/ava-11m-mars-patch-v1.yaml corpora/mars_patch_v1 --max-steps 48

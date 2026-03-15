@@ -1,0 +1,110 @@
+{
+  "requested_device": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "max_new_tokens": 48,
+  "correct": 3,
+  "total": 10,
+  "accuracy": 0.3,
+  "by_category": {
+    "tool": {
+      "correct": 2,
+      "total": 2,
+      "accuracy": 1.0
+    },
+    "coding": {
+      "correct": 0,
+      "total": 2,
+      "accuracy": 0.0
+    },
+    "science": {
+      "correct": 0,
+      "total": 2,
+      "accuracy": 0.0
+    },
+    "math": {
+      "correct": 1,
+      "total": 2,
+      "accuracy": 0.5
+    },
+    "english": {
+      "correct": 0,
+      "total": 2,
+      "accuracy": 0.0
+    }
+  },
+  "results": [
+    {
+      "category": "english",
+      "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+      "expected": "The plan is not finished yet.",
+      "completion": "The plan is not help th sending emaing [calc]81",
+      "matched": false
+    },
+    {
+      "category": "english",
+      "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+      "expected": "The cat slept on the warm sill.",
+      "completion": "t 1249 4",
+      "matched": false
+    },
+    {
+      "category": "math",
+      "prompt": "What is 17 * 29?",
+      "expected": "493",
+      "completion": "12",
+      "matched": false
+    },
+    {
+      "category": "math",
+      "prompt": "Solve for x: 2x + 6 = 14.",
+      "expected": "4",
+      "completion": "4",
+      "matched": true
+    },
+    {
+      "category": "science",
+      "prompt": "What planet is known as the Red Planet?",
+      "expected": "Mars",
+      "completion": "t 12",
+      "matched": false
+    },
+    {
+      "category": "science",
+      "prompt": "What force keeps planets in orbit around the Sun?",
+      "expected": "gravity",
+      "completion": "he The calculcalculator cannot help wit.",
+      "matched": false
+    },
+    {
+      "category": "coding",
+      "prompt": "In Python, which keyword defines a function?",
+      "expected": "def",
+      "completion": "wilcat wito calculcalculator w with help wit.",
+      "matched": false
+    },
+    {
+      "category": "coding",
+      "prompt": "What does len('ava') return in Python?",
+      "expected": "3",
+      "completion": "12",
+      "matched": false
+    },
+    {
+      "category": "tool",
+      "prompt": "Use the calculator tool for 144 / 12.",
+      "expected": "12",
+      "completion": "12",
+      "matched": true
+    },
+    {
+      "category": "tool",
+      "prompt": "Use the calculator tool for sqrt(81).",
+      "expected": "9",
+      "completion": "9",
+      "matched": true
+    }
+  ],
+  "checkpoint": "sessions\\2026-03-14-184359-tool-canonical-patch-from-repair-v1-11m-64\\checkpoints\\ava-11m-tool-canonical-patch-from-repair-v1.pt",
+  "config_name": "ava-11m-tool-canonical-patch-from-repair-v1"
+}

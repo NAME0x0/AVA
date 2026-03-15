@@ -1,3 +1,4 @@
+import json
 import shutil
 from pathlib import Path
 
@@ -13,7 +14,7 @@ def _tiny_config() -> ExperimentConfig:
             "name": "ava-inspect-tiny",
             "tokenizer": {"kind": "byte", "vocab_size": 260},
             "model": {
-                "block_size": 64,
+                "block_size": 128,
                 "n_layer": 2,
                 "n_head": 2,
                 "n_embd": 64,
@@ -78,3 +79,40 @@ def test_trace_checkpoint_returns_step_and_layer_data() -> None:
 
     shutil.rmtree(workspace)
 
+
+def test_trace_checkpoint_records_retrieval_prompt_metadata() -> None:
+    workspace = Path("sessions") / "test-inspect-retrieval-workspace"
+    if workspace.exists():
+        shutil.rmtree(workspace)
+    workspace.mkdir(parents=True, exist_ok=True)
+
+    config = _tiny_config()
+    tokenizer = ByteTokenizer()
+    torch.manual_seed(0)
+    model = build_model(config.model, tokenizer.vocab_size)
+    checkpoint_path = workspace / "tiny.pt"
+    support_root = workspace / "support"
+    support_root.mkdir(parents=True, exist_ok=True)
+    torch.save({"model": model.state_dict(), "config": config.to_dict()}, checkpoint_path)
+    (support_root / "examples.jsonl").write_text(
+        json.dumps({"prompt": "What is 2 + 2?", "response": "4"}) + "\n",
+        encoding="utf-8",
+    )
+
+    trace = trace_checkpoint(
+        checkpoint_path,
+        "What is 2 + 2?",
+        requested_device="cpu",
+        max_new_tokens=2,
+        top_k_neurons=4,
+        top_k_logits=4,
+        top_k_attention=2,
+        support_corpus=support_root,
+        retrieval_top_k=1,
+        category_hint="math",
+    )
+    assert trace["retrieval"]["enabled"]
+    assert trace["retrieval"]["references"]
+    assert trace["support_corpus"] == str(support_root)
+
+    shutil.rmtree(workspace)

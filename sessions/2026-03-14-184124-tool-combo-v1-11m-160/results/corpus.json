@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\tool_combo_v1",
+  "file_count": 3,
+  "text_count": 202,
+  "character_count": 17193,
+  "token_count": 17597,
+  "supervised_example_count": 201,
+  "files": [
+    {
+      "path": "corpora\\tool_combo_v1\\examples.jsonl",
+      "size_bytes": 28437,
+      "sha256": "62b1846a87d5b6167bfdeb991e1ad481f7c8d9040369e1326e4ce09df36473fb",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\tool_combo_v1\\manifest.json",
+      "size_bytes": 366,
+      "sha256": "a7b9c9f02f48213b61ed98ebe1941ebb79bc76010e9fb42cbe5c91d4153db699",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\tool_combo_v1\\README.md",
+      "size_bytes": 211,
+      "sha256": "1678c0e8e1698db8d4c0fcc155d5c8c0ce278e12673b88b9a0ac26af945eee09",
+      "relative_path": "README.md"
+    }
+  ]
+}

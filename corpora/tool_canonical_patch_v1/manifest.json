@@ -1,0 +1,16 @@
+{
+  "protocol": "compact_tags",
+  "curriculum": "canonical_patch",
+  "direct_expression_count": 33,
+  "trace_expression_count": 11,
+  "total_examples": 53,
+  "by_kind": {
+    "tool_direct": 33,
+    "trace": 11,
+    "no_tool": 2,
+    "format": 2,
+    "refusal": 2,
+    "boundary": 3
+  },
+  "examples_path": "corpora\\tool_canonical_patch_v1\\examples.jsonl"
+}

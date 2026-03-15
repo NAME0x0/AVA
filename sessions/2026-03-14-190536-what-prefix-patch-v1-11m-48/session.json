@@ -1,0 +1,10 @@
+{
+  "name": "what-prefix-patch-v1-11m-48",
+  "slug": "what-prefix-patch-v1-11m-48",
+  "kind": "training",
+  "created_at_utc": "2026-03-14T19:05:36.231977+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-what-prefix-patch-v1.yaml",
+    "corpora\\what_prefix_patch_v1"
+  ]
+}

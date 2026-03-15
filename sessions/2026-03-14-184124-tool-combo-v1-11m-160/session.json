@@ -1,0 +1,10 @@
+{
+  "name": "tool-combo-v1-11m-160",
+  "slug": "tool-combo-v1-11m-160",
+  "kind": "training",
+  "created_at_utc": "2026-03-14T18:41:24.751981+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-tool-combo-v1.yaml",
+    "corpora\\tool_combo_v1"
+  ]
+}

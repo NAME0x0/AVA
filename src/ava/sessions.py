@@ -34,6 +34,12 @@ from ava.experiments import (
 from ava.activity import record_activity
 from ava.inspect import trace_checkpoint
 from ava.model import TORCH_AVAILABLE, torch
+from ava.memory_transfer import (
+    evaluate_transfer_suite_checkpoint,
+    transfer_benchmark_as_dicts,
+    transfer_compliance_benchmark_as_dicts,
+    transfer_tool_benchmark_as_dicts,
+)
 from ava.research import (
     serialize_hypotheses,
     serialize_papers,
@@ -1063,3 +1069,558 @@ def inspection_session(
 
 
 
+
+def _changed_results(
+    baseline: dict[str, object],
+    retrieval: dict[str, object],
+) -> list[dict[str, object]]:
+    changed: list[dict[str, object]] = []
+    baseline_results = list(baseline.get("results", []))
+    retrieval_results = list(retrieval.get("results", []))
+    for before, after in zip(baseline_results, retrieval_results, strict=True):
+        if before.get("matched") == after.get("matched") and before.get("completion") == after.get("completion"):
+            continue
+        changed.append(
+            {
+                "category": after.get("category"),
+                "prompt": after.get("prompt"),
+                "baseline_matched": before.get("matched"),
+                "retrieval_matched": after.get("matched"),
+                "baseline_completion": before.get("completion"),
+                "retrieval_completion": after.get("completion"),
+            }
+        )
+    return changed
+
+
+def render_retrieval_notes(
+    *,
+    session_name: str,
+    command: str,
+    checkpoint_path: str,
+    support_corpus: str,
+    support_manifest: dict[str, object],
+    retrieval_top_k: int,
+    category_gated: bool,
+    retrieval_mode: str,
+    baseline_benchmark: dict[str, object],
+    retrieval_benchmark: dict[str, object],
+    baseline_tool: dict[str, object],
+    retrieval_tool: dict[str, object],
+    baseline_compliance: dict[str, object],
+    retrieval_compliance: dict[str, object],
+    changed_benchmark: list[dict[str, object]],
+    changed_tool: list[dict[str, object]],
+    changed_compliance: list[dict[str, object]],
+    focus_prompt: str | None,
+) -> str:
+    lines = [
+        f"# Retrieval Session: {session_name}",
+        "",
+        "## Command",
+        "",
+        f"`{command}`",
+        "",
+        "## Inputs",
+        "",
+        f"- Checkpoint: `{checkpoint_path}`",
+        f"- Support corpus: `{support_corpus}`",
+        f"- Support files: `{support_manifest['file_count']}`",
+        f"- Support examples: `{support_manifest['supervised_example_count']}`",
+        f"- Retrieval top_k: `{retrieval_top_k}`",
+        f"- Retrieval mode: `{retrieval_mode}`",
+        f"- Category gated: `{category_gated}`",
+        "",
+        "## Accuracy Delta",
+        "",
+        f"- Benchmark: `{baseline_benchmark['correct']}/{baseline_benchmark['total']}` -> `{retrieval_benchmark['correct']}/{retrieval_benchmark['total']}`",
+        f"- Tool eval: `{baseline_tool['correct']}/{baseline_tool['total']}` -> `{retrieval_tool['correct']}/{retrieval_tool['total']}`",
+        f"- Compliance: `{baseline_compliance['correct']}/{baseline_compliance['total']}` -> `{retrieval_compliance['correct']}/{retrieval_compliance['total']}`",
+        "",
+        "## Changed Benchmark Rows",
+        "",
+    ]
+    if changed_benchmark:
+        for item in changed_benchmark:
+            lines.append(
+                f"- [{item['category']}] prompt=`{item['prompt']}` baseline=`{item['baseline_completion']}` -> retrieval=`{item['retrieval_completion']}`"
+            )
+    else:
+        lines.append("- none")
+    lines.extend(["", "## Changed Tool Rows", ""])
+    if changed_tool:
+        for item in changed_tool:
+            lines.append(
+                f"- [{item['category']}] prompt=`{item['prompt']}` baseline=`{item['baseline_completion']}` -> retrieval=`{item['retrieval_completion']}`"
+            )
+    else:
+        lines.append("- none")
+    lines.extend(["", "## Changed Compliance Rows", ""])
+    if changed_compliance:
+        for item in changed_compliance:
+            lines.append(
+                f"- [{item['category']}] prompt=`{item['prompt']}` baseline=`{item['baseline_completion']}` -> retrieval=`{item['retrieval_completion']}`"
+            )
+    else:
+        lines.append("- none")
+    lines.extend(["", "## Focus Prompt", ""])
+    if focus_prompt:
+        lines.append(f"- `{focus_prompt}`")
+        lines.append("- Baseline trace: `results/focus_trace_baseline.json`")
+        lines.append("- Retrieval trace: `results/focus_trace_retrieval.json`")
+    else:
+        lines.append("- none")
+    lines.extend(["", "## Artifacts", ""])
+    lines.append("- Baseline benchmark/tool/compliance under `results/`")
+    lines.append("- Retrieval benchmark/tool/compliance under `results/`")
+    return "\n".join(lines) + "\n"
+
+
+def retrieval_session(
+    root: str | Path,
+    name: str,
+    checkpoint_path: str | Path,
+    support_corpus: str | Path,
+    *,
+    requested_device: str = "cuda",
+    max_new_tokens: int = 48,
+    retrieval_top_k: int = 1,
+    category_gated: bool = True,
+    retrieval_mode: str = "prompt",
+) -> Path:
+    command_parts = [
+        "ava",
+        "session",
+        "retrieval",
+        quote(name),
+        quote(str(checkpoint_path)),
+        quote(str(support_corpus)),
+        "--device",
+        quote(requested_device),
+        "--max-new-tokens",
+        str(max_new_tokens),
+        "--retrieval-top-k",
+        str(retrieval_top_k),
+        "--mode",
+        quote(retrieval_mode),
+    ]
+    if not category_gated:
+        command_parts.append("--no-category-gating")
+    command = " ".join(command_parts)
+
+    session_dir = create_session(
+        root,
+        name,
+        sources=[str(Path(checkpoint_path)), str(Path(support_corpus))],
+        kind="retrieval",
+    )
+    artifacts_dir = session_dir / "artifacts"
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+    (artifacts_dir / "command.txt").write_text(command + "\n", encoding="utf-8")
+
+    environment = _environment_manifest(requested_device)
+    support_manifest = _corpus_manifest(support_corpus)
+    write_json(session_dir / "results" / "environment.json", environment)
+    write_json(session_dir / "results" / "support_corpus.json", support_manifest)
+
+    baseline_benchmark = evaluate_checkpoint(
+        checkpoint_path,
+        requested_device=requested_device,
+        max_new_tokens=max_new_tokens,
+    )
+    baseline_tool = evaluate_tool_use_checkpoint(
+        checkpoint_path,
+        requested_device=requested_device,
+        max_new_tokens=max_new_tokens,
+    )
+    baseline_compliance = evaluate_compliance_checkpoint(
+        checkpoint_path,
+        requested_device=requested_device,
+        max_new_tokens=max_new_tokens,
+    )
+
+    retrieval_benchmark = evaluate_checkpoint(
+        checkpoint_path,
+        requested_device=requested_device,
+        max_new_tokens=max_new_tokens,
+        support_corpus=support_corpus,
+        retrieval_top_k=retrieval_top_k,
+        category_gated=category_gated,
+        retrieval_mode=retrieval_mode,
+    )
+    retrieval_tool = evaluate_tool_use_checkpoint(
+        checkpoint_path,
+        requested_device=requested_device,
+        max_new_tokens=max_new_tokens,
+        support_corpus=support_corpus,
+        retrieval_top_k=retrieval_top_k,
+        category_gated=category_gated,
+        retrieval_mode=retrieval_mode,
+    )
+    retrieval_compliance = evaluate_compliance_checkpoint(
+        checkpoint_path,
+        requested_device=requested_device,
+        max_new_tokens=max_new_tokens,
+        support_corpus=support_corpus,
+        retrieval_top_k=retrieval_top_k,
+        category_gated=category_gated,
+        retrieval_mode=retrieval_mode,
+    )
+
+    changed_benchmark = _changed_results(baseline_benchmark, retrieval_benchmark)
+    changed_tool = _changed_results(baseline_tool, retrieval_tool)
+    changed_compliance = _changed_results(baseline_compliance, retrieval_compliance)
+    focus_prompt = None
+    focus_category = None
+    for item in changed_benchmark:
+        if not item["baseline_matched"] and item["retrieval_matched"]:
+            focus_prompt = str(item["prompt"])
+            focus_category = str(item["category"])
+            break
+    if focus_prompt is None:
+        for collection in (changed_tool, changed_compliance):
+            for item in collection:
+                if not item["baseline_matched"] and item["retrieval_matched"]:
+                    focus_prompt = str(item["prompt"])
+                    focus_category = str(item["category"])
+                    break
+            if focus_prompt is not None:
+                break
+
+    if focus_prompt is not None:
+        baseline_trace = trace_checkpoint(
+            checkpoint_path,
+            focus_prompt,
+            requested_device=requested_device,
+            max_new_tokens=min(max_new_tokens, 16),
+            top_k_neurons=8,
+            top_k_logits=8,
+            top_k_attention=4,
+        )
+        if retrieval_mode == "direct":
+            retrieval_trace = {
+                "mode": "direct",
+                "prompt": focus_prompt,
+                "generated_text": next(
+                    item["retrieval_completion"]
+                    for item in (changed_benchmark + changed_tool + changed_compliance)
+                    if item["prompt"] == focus_prompt
+                ),
+                "steps": [],
+                "retrieval": {
+                    "enabled": True,
+                    "mode": "direct",
+                    "category_hint": focus_category,
+                },
+            }
+        else:
+            retrieval_trace = trace_checkpoint(
+                checkpoint_path,
+                focus_prompt,
+                requested_device=requested_device,
+                max_new_tokens=min(max_new_tokens, 16),
+                top_k_neurons=8,
+                top_k_logits=8,
+                top_k_attention=4,
+                support_corpus=support_corpus,
+                retrieval_top_k=retrieval_top_k,
+                category_hint=focus_category,
+                category_gated=category_gated,
+            )
+        write_json(session_dir / "results" / "focus_trace_baseline.json", baseline_trace)
+        write_json(session_dir / "results" / "focus_trace_retrieval.json", retrieval_trace)
+
+    write_json(session_dir / "results" / "baseline_benchmark.json", baseline_benchmark)
+    write_json(session_dir / "results" / "baseline_tool_eval.json", baseline_tool)
+    write_json(session_dir / "results" / "baseline_compliance.json", baseline_compliance)
+    write_json(session_dir / "results" / "retrieval_benchmark.json", retrieval_benchmark)
+    write_json(session_dir / "results" / "retrieval_tool_eval.json", retrieval_tool)
+    write_json(session_dir / "results" / "retrieval_compliance.json", retrieval_compliance)
+    write_json(session_dir / "results" / "changed_benchmark.json", changed_benchmark)
+    write_json(session_dir / "results" / "changed_tool.json", changed_tool)
+    write_json(session_dir / "results" / "changed_compliance.json", changed_compliance)
+    (session_dir / "notes.md").write_text(
+        render_retrieval_notes(
+            session_name=name,
+            command=command,
+            checkpoint_path=str(checkpoint_path),
+            support_corpus=str(support_corpus),
+            support_manifest=support_manifest,
+            retrieval_top_k=retrieval_top_k,
+            retrieval_mode=retrieval_mode,
+            category_gated=category_gated,
+            baseline_benchmark=baseline_benchmark,
+            retrieval_benchmark=retrieval_benchmark,
+            baseline_tool=baseline_tool,
+            retrieval_tool=retrieval_tool,
+            baseline_compliance=baseline_compliance,
+            retrieval_compliance=retrieval_compliance,
+            changed_benchmark=changed_benchmark,
+            changed_tool=changed_tool,
+            changed_compliance=changed_compliance,
+            focus_prompt=focus_prompt,
+        ),
+        encoding="utf-8",
+    )
+    _record_session_completion(
+        root,
+        session_dir,
+        name=name,
+        kind="retrieval",
+        metadata={
+            "checkpoint": str(checkpoint_path),
+            "support_corpus": str(support_corpus),
+            "baseline_benchmark_accuracy": baseline_benchmark["accuracy"],
+            "retrieval_benchmark_accuracy": retrieval_benchmark["accuracy"],
+            "baseline_tool_accuracy": baseline_tool["accuracy"],
+            "retrieval_tool_accuracy": retrieval_tool["accuracy"],
+            "baseline_compliance_accuracy": baseline_compliance["accuracy"],
+            "retrieval_compliance_accuracy": retrieval_compliance["accuracy"],
+            "retrieval_mode": retrieval_mode,
+        },
+    )
+    return session_dir
+
+def _suite_total_score(suite: dict[str, object]) -> int:
+    return int(suite["benchmark"]["correct"]) + int(suite["tool"]["correct"]) + int(suite["compliance"]["correct"])
+
+
+def _suite_changes(before: dict[str, object], after: dict[str, object], key: str) -> list[dict[str, object]]:
+    baseline_results = list(before[key]["results"])
+    candidate_results = list(after[key]["results"])
+    changed: list[dict[str, object]] = []
+    for previous, current in zip(baseline_results, candidate_results, strict=True):
+        if previous.get("matched") == current.get("matched") and previous.get("completion") == current.get("completion"):
+            continue
+        changed.append(
+            {
+                "category": current.get("category"),
+                "prompt": current.get("prompt"),
+                "baseline_matched": previous.get("matched"),
+                "candidate_matched": current.get("matched"),
+                "baseline_completion": previous.get("completion"),
+                "candidate_completion": current.get("completion"),
+                "retrieval": current.get("retrieval"),
+            }
+        )
+    return changed
+
+
+def render_memory_transfer_notes(
+    *,
+    session_name: str,
+    command: str,
+    checkpoint_path: str,
+    support_corpus: str,
+    support_manifest: dict[str, object],
+    suite: str,
+    nearest_threshold: float,
+    nearest_margin: float,
+    category_gated: bool,
+    baseline: dict[str, object],
+    direct: dict[str, object],
+    nearest: dict[str, object],
+    direct_benchmark_changes: list[dict[str, object]],
+    direct_tool_changes: list[dict[str, object]],
+    direct_compliance_changes: list[dict[str, object]],
+    nearest_benchmark_changes: list[dict[str, object]],
+    nearest_tool_changes: list[dict[str, object]],
+    nearest_compliance_changes: list[dict[str, object]],
+    winner: str,
+) -> str:
+    lines = [
+        f"# Memory Transfer Session: {session_name}",
+        "",
+        "## Command",
+        "",
+        f"`{command}`",
+        "",
+        "## Inputs",
+        "",
+        f"- Checkpoint: `{checkpoint_path}`",
+        f"- Support corpus: `{support_corpus}`",
+        f"- Support files: `{support_manifest['file_count']}`",
+        f"- Support examples: `{support_manifest['supervised_example_count']}`",
+        f"- Transfer suite: `{suite}`",
+        f"- Nearest threshold: `{nearest_threshold}`",
+        f"- Nearest margin: `{nearest_margin}`",
+        f"- Category gated: `{category_gated}`",
+        "",
+        "## Transfer Scores",
+        "",
+        f"- Baseline: benchmark `{baseline['benchmark']['correct']}/{baseline['benchmark']['total']}`, tool `{baseline['tool']['correct']}/{baseline['tool']['total']}`, compliance `{baseline['compliance']['correct']}/{baseline['compliance']['total']}`",
+        f"- Exact direct: benchmark `{direct['benchmark']['correct']}/{direct['benchmark']['total']}`, tool `{direct['tool']['correct']}/{direct['tool']['total']}`, compliance `{direct['compliance']['correct']}/{direct['compliance']['total']}`",
+        f"- Nearest direct: benchmark `{nearest['benchmark']['correct']}/{nearest['benchmark']['total']}`, tool `{nearest['tool']['correct']}/{nearest['tool']['total']}`, compliance `{nearest['compliance']['correct']}/{nearest['compliance']['total']}`",
+        f"- Winner: `{winner}`",
+        "",
+        "## Exact Direct Changes",
+        "",
+    ]
+    for heading, items in (("benchmark", direct_benchmark_changes), ("tool", direct_tool_changes), ("compliance", direct_compliance_changes)):
+        lines.append(f"- {heading}: `{len(items)}` changed rows")
+        for item in items[:6]:
+            lines.append(
+                f"- [{heading}:{item['category']}] prompt=`{item['prompt']}` baseline=`{item['baseline_completion']}` -> exact=`{item['candidate_completion']}`"
+            )
+    lines.extend(["", "## Nearest Direct Changes", ""])
+    for heading, items in (("benchmark", nearest_benchmark_changes), ("tool", nearest_tool_changes), ("compliance", nearest_compliance_changes)):
+        lines.append(f"- {heading}: `{len(items)}` changed rows")
+        for item in items[:6]:
+            lines.append(
+                f"- [{heading}:{item['category']}] prompt=`{item['prompt']}` baseline=`{item['baseline_completion']}` -> nearest=`{item['candidate_completion']}`"
+            )
+    lines.extend(["", "## Artifacts", ""])
+    lines.append("- Transfer benchmark definitions under `results/`")
+    lines.append("- Per-mode transfer results under `results/`")
+    lines.append("- Changed rows for exact and nearest memory under `results/`")
+    return "\n".join(lines) + "\n"
+
+
+def memory_transfer_session(
+    root: str | Path,
+    name: str,
+    checkpoint_path: str | Path,
+    support_corpus: str | Path,
+    *,
+    requested_device: str = "cuda",
+    max_new_tokens: int = 48,
+    nearest_threshold: float = 0.58,
+    nearest_margin: float = 0.03,
+    category_gated: bool = True,
+    suite: str = "small",
+) -> Path:
+    command_parts = [
+        "ava",
+        "session",
+        "memory-transfer",
+        quote(name),
+        quote(str(checkpoint_path)),
+        quote(str(support_corpus)),
+        "--device",
+        quote(requested_device),
+        "--max-new-tokens",
+        str(max_new_tokens),
+        "--nearest-threshold",
+        str(nearest_threshold),
+        "--nearest-margin",
+        str(nearest_margin),
+        "--suite",
+        quote(suite),
+    ]
+    if not category_gated:
+        command_parts.append("--no-category-gating")
+    command = " ".join(command_parts)
+
+    session_dir = create_session(
+        root,
+        name,
+        sources=[str(Path(checkpoint_path)), str(Path(support_corpus))],
+        kind="memory-transfer",
+    )
+    artifacts_dir = session_dir / "artifacts"
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+    (artifacts_dir / "command.txt").write_text(command + "\n", encoding="utf-8")
+
+    environment = _environment_manifest(requested_device)
+    support_manifest = _corpus_manifest(support_corpus)
+    write_json(session_dir / "results" / "environment.json", environment)
+    write_json(session_dir / "results" / "support_corpus.json", support_manifest)
+    write_json(session_dir / "results" / "transfer_benchmark.json", transfer_benchmark_as_dicts(suite))
+    write_json(session_dir / "results" / "transfer_tool_benchmark.json", transfer_tool_benchmark_as_dicts(suite))
+    write_json(session_dir / "results" / "transfer_compliance_benchmark.json", transfer_compliance_benchmark_as_dicts(suite))
+
+    baseline = evaluate_transfer_suite_checkpoint(
+        checkpoint_path,
+        requested_device=requested_device,
+        max_new_tokens=max_new_tokens,
+        retrieval_mode="baseline",
+        suite=suite,
+    )
+    direct = evaluate_transfer_suite_checkpoint(
+        checkpoint_path,
+        requested_device=requested_device,
+        max_new_tokens=max_new_tokens,
+        support_corpus=support_corpus,
+        retrieval_mode="direct",
+        category_gated=category_gated,
+        nearest_threshold=nearest_threshold,
+        nearest_margin=nearest_margin,
+        suite=suite,
+    )
+    nearest = evaluate_transfer_suite_checkpoint(
+        checkpoint_path,
+        requested_device=requested_device,
+        max_new_tokens=max_new_tokens,
+        support_corpus=support_corpus,
+        retrieval_mode="nearest",
+        category_gated=category_gated,
+        nearest_threshold=nearest_threshold,
+        nearest_margin=nearest_margin,
+        suite=suite,
+    )
+
+    direct_benchmark_changes = _suite_changes(baseline, direct, "benchmark")
+    direct_tool_changes = _suite_changes(baseline, direct, "tool")
+    direct_compliance_changes = _suite_changes(baseline, direct, "compliance")
+    nearest_benchmark_changes = _suite_changes(baseline, nearest, "benchmark")
+    nearest_tool_changes = _suite_changes(baseline, nearest, "tool")
+    nearest_compliance_changes = _suite_changes(baseline, nearest, "compliance")
+
+    scores = {
+        "baseline": _suite_total_score(baseline),
+        "direct": _suite_total_score(direct),
+        "nearest": _suite_total_score(nearest),
+    }
+    winner = sorted(scores.items(), key=lambda item: item[1], reverse=True)[0][0]
+
+    write_json(session_dir / "results" / "baseline_transfer.json", baseline)
+    write_json(session_dir / "results" / "direct_transfer.json", direct)
+    write_json(session_dir / "results" / "nearest_transfer.json", nearest)
+    write_json(session_dir / "results" / "direct_benchmark_changes.json", direct_benchmark_changes)
+    write_json(session_dir / "results" / "direct_tool_changes.json", direct_tool_changes)
+    write_json(session_dir / "results" / "direct_compliance_changes.json", direct_compliance_changes)
+    write_json(session_dir / "results" / "nearest_benchmark_changes.json", nearest_benchmark_changes)
+    write_json(session_dir / "results" / "nearest_tool_changes.json", nearest_tool_changes)
+    write_json(session_dir / "results" / "nearest_compliance_changes.json", nearest_compliance_changes)
+    write_json(session_dir / "results" / "winner.json", {"winner": winner, "scores": scores})
+
+    (session_dir / "notes.md").write_text(
+        render_memory_transfer_notes(
+            session_name=name,
+            command=command,
+            checkpoint_path=str(checkpoint_path),
+            support_corpus=str(support_corpus),
+            support_manifest=support_manifest,
+            suite=suite,
+            nearest_threshold=nearest_threshold,
+            nearest_margin=nearest_margin,
+            category_gated=category_gated,
+            baseline=baseline,
+            direct=direct,
+            nearest=nearest,
+            direct_benchmark_changes=direct_benchmark_changes,
+            direct_tool_changes=direct_tool_changes,
+            direct_compliance_changes=direct_compliance_changes,
+            nearest_benchmark_changes=nearest_benchmark_changes,
+            nearest_tool_changes=nearest_tool_changes,
+            nearest_compliance_changes=nearest_compliance_changes,
+            winner=winner,
+        ),
+        encoding="utf-8",
+    )
+    _record_session_completion(
+        root,
+        session_dir,
+        name=name,
+        kind="memory-transfer",
+        metadata={
+            "checkpoint": str(checkpoint_path),
+            "support_corpus": str(support_corpus),
+            "suite": suite,
+            "winner": winner,
+            "baseline_score": scores["baseline"],
+            "direct_score": scores["direct"],
+            "nearest_score": scores["nearest"],
+        },
+    )
+    return session_dir

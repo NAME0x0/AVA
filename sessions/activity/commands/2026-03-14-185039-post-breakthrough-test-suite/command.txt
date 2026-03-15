@@ -1,0 +1,1 @@
+python -m pytest tests/test_synthetic.py tests/test_train.py tests/test_eval.py tests/test_sessions.py tests/test_tokenizer.py tests/test_tools.py -q

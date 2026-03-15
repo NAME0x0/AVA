@@ -1,0 +1,228 @@
+{
+  "requested_device": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "max_new_tokens": 48,
+  "correct": 9,
+  "total": 10,
+  "accuracy": 0.9,
+  "by_category": {
+    "english": {
+      "correct": 2,
+      "total": 2,
+      "accuracy": 1.0
+    },
+    "tool": {
+      "correct": 2,
+      "total": 2,
+      "accuracy": 1.0
+    },
+    "math": {
+      "correct": 2,
+      "total": 2,
+      "accuracy": 1.0
+    },
+    "science": {
+      "correct": 1,
+      "total": 2,
+      "accuracy": 0.5
+    },
+    "coding": {
+      "correct": 2,
+      "total": 2,
+      "accuracy": 1.0
+    }
+  },
+  "retrieval": {
+    "enabled": false,
+    "top_k": 0,
+    "category_gated": true,
+    "mode": "prompt",
+    "support_example_count": 0
+  },
+  "results": [
+    {
+      "category": "english",
+      "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+      "expected": "The plan is not finished yet.",
+      "completion": "The plan is not finished yet.",
+      "matched": true,
+      "retrieval": {
+        "enabled": false,
+        "query": "Rewrite this sentence in plain English: The plan ain't done.",
+        "category_hint": "english",
+        "base_prompt": "Question: Rewrite this sentence in plain English: The plan ain't done.\nAnswer: ",
+        "prompt": "Question: Rewrite this sentence in plain English: The plan ain't done.\nAnswer: ",
+        "prompt_token_count": 80,
+        "dropped_references": 0,
+        "references": [],
+        "mode": "prompt"
+      }
+    },
+    {
+      "category": "english",
+      "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+      "expected": "The cat slept on the warm sill.",
+      "completion": "The cat slept on the warm sill.",
+      "matched": true,
+      "retrieval": {
+        "enabled": false,
+        "query": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+        "category_hint": "english",
+        "base_prompt": "Question: Summarize this sentence in fewer words: The cat slept on the warm window sill.\nAnswer: ",
+        "prompt": "Question: Summarize this sentence in fewer words: The cat slept on the warm window sill.\nAnswer: ",
+        "prompt_token_count": 98,
+        "dropped_references": 0,
+        "references": [],
+        "mode": "prompt"
+      }
+    },
+    {
+      "category": "math",
+      "prompt": "What is 17 * 29?",
+      "expected": "493",
+      "completion": "493",
+      "matched": true,
+      "retrieval": {
+        "enabled": false,
+        "query": "What is 17 * 29?",
+        "category_hint": "math",
+        "base_prompt": "Question: What is 17 * 29?\nAnswer: ",
+        "prompt": "Question: What is 17 * 29?\nAnswer: ",
+        "prompt_token_count": 36,
+        "dropped_references": 0,
+        "references": [],
+        "mode": "prompt"
+      }
+    },
+    {
+      "category": "math",
+      "prompt": "Solve for x: 2x + 6 = 14.",
+      "expected": "4",
+      "completion": "4",
+      "matched": true,
+      "retrieval": {
+        "enabled": false,
+        "query": "Solve for x: 2x + 6 = 14.",
+        "category_hint": "math",
+        "base_prompt": "Question: Solve for x: 2x + 6 = 14.\nAnswer: ",
+        "prompt": "Question: Solve for x: 2x + 6 = 14.\nAnswer: ",
+        "prompt_token_count": 45,
+        "dropped_references": 0,
+        "references": [],
+        "mode": "prompt"
+      }
+    },
+    {
+      "category": "science",
+      "prompt": "What planet is known as the Red Planet?",
+      "expected": "Mars",
+      "completion": "[car 493",
+      "matched": false,
+      "retrieval": {
+        "enabled": false,
+        "query": "What planet is known as the Red Planet?",
+        "category_hint": "science",
+        "base_prompt": "Question: What planet is known as the Red Planet?\nAnswer: ",
+        "prompt": "Question: What planet is known as the Red Planet?\nAnswer: ",
+        "prompt_token_count": 59,
+        "dropped_references": 0,
+        "references": [],
+        "mode": "prompt"
+      }
+    },
+    {
+      "category": "science",
+      "prompt": "What force keeps planets in orbit around the Sun?",
+      "expected": "gravity",
+      "completion": "gravity",
+      "matched": true,
+      "retrieval": {
+        "enabled": false,
+        "query": "What force keeps planets in orbit around the Sun?",
+        "category_hint": "science",
+        "base_prompt": "Question: What force keeps planets in orbit around the Sun?\nAnswer: ",
+        "prompt": "Question: What force keeps planets in orbit around the Sun?\nAnswer: ",
+        "prompt_token_count": 69,
+        "dropped_references": 0,
+        "references": [],
+        "mode": "prompt"
+      }
+    },
+    {
+      "category": "coding",
+      "prompt": "In Python, which keyword defines a function?",
+      "expected": "def",
+      "completion": "def",
+      "matched": true,
+      "retrieval": {
+        "enabled": false,
+        "query": "In Python, which keyword defines a function?",
+        "category_hint": "coding",
+        "base_prompt": "Question: In Python, which keyword defines a function?\nAnswer: ",
+        "prompt": "Question: In Python, which keyword defines a function?\nAnswer: ",
+        "prompt_token_count": 64,
+        "dropped_references": 0,
+        "references": [],
+        "mode": "prompt"
+      }
+    },
+    {
+      "category": "coding",
+      "prompt": "What does len('ava') return in Python?",
+      "expected": "3",
+      "completion": "3",
+      "matched": true,
+      "retrieval": {
+        "enabled": false,
+        "query": "What does len('ava') return in Python?",
+        "category_hint": "coding",
+        "base_prompt": "Question: What does len('ava') return in Python?\nAnswer: ",
+        "prompt": "Question: What does len('ava') return in Python?\nAnswer: ",
+        "prompt_token_count": 58,
+        "dropped_references": 0,
+        "references": [],
+        "mode": "prompt"
+      }
+    },
+    {
+      "category": "tool",
+      "prompt": "Use the calculator tool for 144 / 12.",
+      "expected": "12",
+      "completion": "12",
+      "matched": true,
+      "retrieval": {
+        "enabled": false,
+        "query": "Use the calculator tool for 144 / 12.",
+        "category_hint": "tool",
+        "base_prompt": "Question: Use the calculator tool for 144 / 12.\nAnswer: ",
+        "prompt": "Question: Use the calculator tool for 144 / 12.\nAnswer: ",
+        "prompt_token_count": 57,
+        "dropped_references": 0,
+        "references": [],
+        "mode": "prompt"
+      }
+    },
+    {
+      "category": "tool",
+      "prompt": "Use the calculator tool for sqrt(81).",
+      "expected": "9",
+      "completion": "9",
+      "matched": true,
+      "retrieval": {
+        "enabled": false,
+        "query": "Use the calculator tool for sqrt(81).",
+        "category_hint": "tool",
+        "base_prompt": "Question: Use the calculator tool for sqrt(81).\nAnswer: ",
+        "prompt": "Question: Use the calculator tool for sqrt(81).\nAnswer: ",
+        "prompt_token_count": 57,
+        "dropped_references": 0,
+        "references": [],
+        "mode": "prompt"
+      }
+    }
+  ],
+  "checkpoint": "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+  "config_name": "ava-11m-failure-patch-v2",
+  "support_corpus": null
+}

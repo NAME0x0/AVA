@@ -1,0 +1,34 @@
+............F.......                                                     [100%]
+================================== FAILURES ===================================
+________ test_memory_transfer_session_writes_mode_comparison_artifacts ________
+
+    def test_memory_transfer_session_writes_mode_comparison_artifacts() -> None:
+        root = Path("sessions") / "test-memory-transfer"
+        workspace = Path("sessions") / "test-memory-transfer-session-workspace"
+        if root.exists():
+            shutil.rmtree(root)
+        if workspace.exists():
+            shutil.rmtree(workspace)
+        workspace.mkdir(parents=True, exist_ok=True)
+        checkpoint_path = workspace / "tiny.pt"
+        support_root = workspace / "support"
+        _write_tiny_checkpoint(checkpoint_path)
+        _write_tiny_support_corpus(support_root)
+    
+>       session_dir = memory_transfer_session(
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+            root,
+            "memory-transfer-test",
+            checkpoint_path,
+            support_root,
+            requested_device="cpu",
+            max_new_tokens=2,
+            nearest_threshold=0.5,
+            nearest_margin=0.0,
+            category_gated=True,
+        )
+E       NameError: name 'memory_transfer_session' is not defined
+
+tests\test_sessions.py:343: NameError
+=========================== short test summary info ===========================
+FAILED tests/test_sessions.py::test_memory_transfer_session_writes_mode_comparison_artifacts
