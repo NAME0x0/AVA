@@ -478,6 +478,7 @@ def _memory_completion(
     category_gated: bool,
     nearest_threshold: float,
     nearest_margin: float,
+    support_top_k: int = 2,
 ) -> tuple[str, dict[str, object]]:
     base_prompt = prepare_retrieval_prompt(prompt, tokenizer=tokenizer, block_size=model.config.block_size)
 
@@ -527,6 +528,17 @@ def _memory_completion(
             "nearest_threshold": nearest_threshold,
             "nearest_margin": nearest_margin,
         }
+    elif retrieval_mode == "prompt_support":
+        retrieval = prepare_retrieval_prompt(
+            prompt,
+            tokenizer=tokenizer,
+            block_size=model.config.block_size,
+            support_examples=support_examples,
+            top_k=support_top_k,
+            category_hint=category_hint,
+            category_gated=category_gated,
+        )
+        retrieval["mode"] = "prompt_support"
     else:
         raise ValueError(f"unknown transfer retrieval mode: {retrieval_mode}")
 
@@ -556,6 +568,7 @@ def _generate_completion(
     category_gated: bool,
     nearest_threshold: float,
     nearest_margin: float,
+    support_top_k: int = 2,
 ) -> tuple[str, dict[str, object]]:
     if retrieval_mode == "baseline":
         return _baseline_completion(model, tokenizer, device, prompt, max_new_tokens)
@@ -571,6 +584,7 @@ def _generate_completion(
         category_gated=category_gated,
         nearest_threshold=nearest_threshold,
         nearest_margin=nearest_margin,
+        support_top_k=support_top_k,
     )
 
 

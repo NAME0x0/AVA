@@ -1,0 +1,20 @@
+{
+  "focus": "Recent Hugging Face and arXiv papers that materially affect AVA's tool-use, planning, and multimodal roadmap.",
+  "adopt_now": [
+    "ICRL is useful, but only after compact supervised tool traces already work; it is not a replacement for AVA's first tool SFT pass.",
+    "Add DeepPlanning to the benchmark contract now so long-horizon planning claims are measured before any agent push.",
+    "Treat SkillNet as a runtime and evaluation reference for reusable skills, not as a base-model scaling recipe.",
+    "Keep Penguin-VL as the leading compact multimodal reference for AVA's future vision branch."
+  ],
+  "later_only": [
+    "Use ToRL and ReTool as RL baselines after the tool RL environment and verifiers are stable.",
+    "Use InternVL-U as a larger multimodal reference point, not a 4 GB mainline target.",
+    "Use AReaL only if rollout throughput becomes the bottleneck after simpler RL loops already work."
+  ],
+  "next_actions": [
+    "Finish a stronger compact tool-supervision packet before opening the ICRL, ToRL, or ReTool branch.",
+    "Keep DeepPlanning, BFCL, and tau2-bench visible together so tool use and planning are measured separately.",
+    "Do not start a multimodal training branch until the text tokenizer, tool data, and compliance behavior are stable.",
+    "When multimodal work starts, begin with a compact encoder path and MathVista or ScienceQA style targets rather than a broad unified model."
+  ]
+}

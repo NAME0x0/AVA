@@ -1,0 +1,10 @@
+{
+  "name": "public-plus-teacher-control-v2-512",
+  "slug": "public-plus-teacher-control-v2-512",
+  "kind": "training",
+  "created_at_utc": "2026-03-15T15:27:51.436383+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-public-plus-teacher-control-v2-512.yaml",
+    "corpora\\public_benchmark_plus_teacher_v1"
+  ]
+}

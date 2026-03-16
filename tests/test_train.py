@@ -1,16 +1,19 @@
 import shutil
 from pathlib import Path
 
+import torch
+
 from ava.config import ModelConfig, load_experiment_config
 from ava.model import build_model
 from ava.tokenizer import ByteBPETokenizer, load_tokenizer, load_hf_subword_tokenizer, token_piece_bytes
 from ava.tokenizer_artifacts import build_hf_bpe_artifact
 from ava.train import (
-    _load_supervised_dataset,
-    _split_supervised_samples,
     _configure_trainable_parameters,
     _expand_state_dict_for_tokenizer,
+    _load_init_checkpoint,
+    _load_supervised_dataset,
     _resize_state_dict_for_block_size,
+    _split_supervised_samples,
     dry_run_summary,
     summarize_corpus,
     summarize_supervised_dataset,
@@ -118,12 +121,11 @@ def test_expand_state_dict_for_hf_bpe_rebuilds_non_aligned_vocab() -> None:
     )
     build_hf_bpe_artifact(root, artifact_path, target_vocab_size=96, min_frequency=1)
     tokenizer = load_hf_subword_tokenizer(artifact_path)
-    torch = __import__("torch")
     embedding = torch.arange(260 * 2, dtype=torch.float32).view(260, 2)
     state = {"wte.weight": embedding, "lm_head.weight": embedding.clone()}
     expanded = _expand_state_dict_for_tokenizer(state, tokenizer)
     bos_id = tokenizer.token_to_id["<bos>"]
-    assert torch.allclose(expanded["wte.weight"][bos_id], embedding[1])
+    assert torch.allclose(expanded["wte.weight"][bos_id], embedding.mean(dim=0))
     mars_token_id = next(token_id for token_id in tokenizer.encode("Mars") if token_piece_bytes(tokenizer, token_id))
     piece = token_piece_bytes(tokenizer, mars_token_id)
     assert piece is not None
@@ -149,3 +151,69 @@ def test_configure_trainable_parameters_filters_by_pattern() -> None:
     assert count == sum(parameter.numel() for parameter in parameters)
     assert model.wpe.weight.requires_grad is True
     assert model.wte.weight.requires_grad is False
+
+
+def test_load_init_checkpoint_allows_transformer_to_looped_warm_start() -> None:
+    tokenizer = load_tokenizer()
+    workspace = Path("sessions") / "test-loop-init"
+    checkpoint_path = workspace / "base.pt"
+    if workspace.exists():
+        shutil.rmtree(workspace)
+    workspace.mkdir(parents=True, exist_ok=True)
+
+    base_model = build_model(
+        ModelConfig(block_size=32, n_layer=1, n_head=2, n_embd=8, dropout=0.0, bias=False),
+        tokenizer.vocab_size,
+    )
+    torch = __import__("torch")
+    torch.save(
+        {
+            "model": base_model.state_dict(),
+            "config": {"tokenizer": {"kind": "byte"}},
+        },
+        checkpoint_path,
+    )
+
+    looped_model = build_model(
+        ModelConfig(
+            block_size=32,
+            n_layer=1,
+            n_head=2,
+            n_embd=8,
+            dropout=0.0,
+            bias=False,
+            architecture="looped",
+            loop_repeats=3,
+        ),
+        tokenizer.vocab_size,
+    )
+    init_kind = _load_init_checkpoint(looped_model, tokenizer, checkpoint_path)
+    assert init_kind == "byte"
+    assert looped_model.loop_step_embeddings is not None
+    shutil.rmtree(workspace)
+
+
+def test_expand_state_dict_for_hf_tokenizer_neutralizes_special_tokens() -> None:
+    root = Path("sessions") / "test-hf-special-neutralize"
+    artifact_path = root / "hf_bpe.json"
+    if root.exists():
+        shutil.rmtree(root)
+    root.mkdir(parents=True, exist_ok=True)
+    (root / "examples.jsonl").write_text(
+        "\n".join(
+            [
+                '{"prompt":"What planet is known as the Red Planet?","response":"Mars"}',
+                '{"prompt":"Use the calculator tool for 144 / 12.","response":"12"}',
+            ]
+        ),
+        encoding="utf-8",
+    )
+    build_hf_bpe_artifact(root, artifact_path, target_vocab_size=96, min_frequency=1)
+    tokenizer = load_hf_subword_tokenizer(artifact_path)
+    state = {"wte.weight": torch.arange(260 * 4, dtype=torch.float32).reshape(260, 4)}
+    expanded = _expand_state_dict_for_tokenizer(state, tokenizer)
+    fallback = state["wte.weight"].mean(dim=0)
+    for token_name in ("<pad>", "<bos>", "<eos>", "<sep>"):
+        token_id = tokenizer.token_to_id[token_name]
+        assert torch.allclose(expanded["wte.weight"][token_id], fallback)
+    shutil.rmtree(root)

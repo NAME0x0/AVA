@@ -32,6 +32,8 @@ class ModelConfig:
     n_embd: int = 640
     dropout: float = 0.0
     bias: bool = False
+    architecture: str = "transformer"
+    loop_repeats: int = 1
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> "ModelConfig":
@@ -43,14 +45,22 @@ class ModelConfig:
             n_embd=int(data.get("n_embd", 640)),
             dropout=float(data.get("dropout", 0.0)),
             bias=bool(data.get("bias", False)),
+            architecture=str(data.get("architecture", "transformer")),
+            loop_repeats=max(1, int(data.get("loop_repeats", 1))),
         )
+
+    def effective_layers(self) -> int:
+        if self.architecture == "looped":
+            return self.n_layer * self.loop_repeats
+        return self.n_layer
 
     def estimated_parameters(self, vocab_size: int) -> int:
         per_block = (12 * self.n_embd * self.n_embd) + (13 * self.n_embd)
         token_embeddings = vocab_size * self.n_embd
         positional_embeddings = self.block_size * self.n_embd
         final_norm = 2 * self.n_embd
-        return token_embeddings + positional_embeddings + (self.n_layer * per_block) + final_norm
+        loop_parameters = self.loop_repeats * self.n_embd if self.architecture == "looped" else 0
+        return token_embeddings + positional_embeddings + (self.n_layer * per_block) + final_norm + loop_parameters
 
 
 @dataclass(slots=True)

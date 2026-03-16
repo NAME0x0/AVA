@@ -1,0 +1,251 @@
+{
+  "name": "ava-11m-public-plus-teacher-qwen-warm-v1",
+  "dataset_kind": "supervised",
+  "steps": 64,
+  "optimizer_steps": 32,
+  "final_loss": 16.5408,
+  "min_loss": 5.9229,
+  "train_eval_loss": 11.3215,
+  "val_loss": 7.8743,
+  "runtime_seconds": 10.418,
+  "tokens_per_optimizer_step": 1024,
+  "tokens_seen": 32768,
+  "corpus_tokens": 928870,
+  "supervised_stats": {
+    "total_examples": 12532,
+    "kept_examples": 12532,
+    "truncated_examples": 0,
+    "skipped_no_target_examples": 0,
+    "max_full_tokens": 226,
+    "avg_full_tokens": 74.12
+  },
+  "tokenizer_kind": "hf_auto",
+  "tokenizer_path": "artifacts/tokenizers/qwen2.5-0.5b-hf-auto.json",
+  "tokenizer_vocab_size": 151669,
+  "trainable_patterns": [],
+  "trainable_parameter_names": [
+    "wte.weight",
+    "wpe.weight",
+    "blocks.0.ln_1.weight",
+    "blocks.0.ln_1.bias",
+    "blocks.0.attn.c_attn.weight",
+    "blocks.0.attn.c_proj.weight",
+    "blocks.0.ln_2.weight",
+    "blocks.0.ln_2.bias",
+    "blocks.0.mlp.c_fc.weight",
+    "blocks.0.mlp.c_proj.weight",
+    "blocks.1.ln_1.weight",
+    "blocks.1.ln_1.bias",
+    "blocks.1.attn.c_attn.weight",
+    "blocks.1.attn.c_proj.weight",
+    "blocks.1.ln_2.weight",
+    "blocks.1.ln_2.bias",
+    "blocks.1.mlp.c_fc.weight",
+    "blocks.1.mlp.c_proj.weight",
+    "blocks.2.ln_1.weight",
+    "blocks.2.ln_1.bias",
+    "blocks.2.attn.c_attn.weight",
+    "blocks.2.attn.c_proj.weight",
+    "blocks.2.ln_2.weight",
+    "blocks.2.ln_2.bias",
+    "blocks.2.mlp.c_fc.weight",
+    "blocks.2.mlp.c_proj.weight",
+    "blocks.3.ln_1.weight",
+    "blocks.3.ln_1.bias",
+    "blocks.3.attn.c_attn.weight",
+    "blocks.3.attn.c_proj.weight",
+    "blocks.3.ln_2.weight",
+    "blocks.3.ln_2.bias",
+    "blocks.3.mlp.c_fc.weight",
+    "blocks.3.mlp.c_proj.weight",
+    "blocks.4.ln_1.weight",
+    "blocks.4.ln_1.bias",
+    "blocks.4.attn.c_attn.weight",
+    "blocks.4.attn.c_proj.weight",
+    "blocks.4.ln_2.weight",
+    "blocks.4.ln_2.bias",
+    "blocks.4.mlp.c_fc.weight",
+    "blocks.4.mlp.c_proj.weight",
+    "blocks.5.ln_1.weight",
+    "blocks.5.ln_1.bias",
+    "blocks.5.attn.c_attn.weight",
+    "blocks.5.attn.c_proj.weight",
+    "blocks.5.ln_2.weight",
+    "blocks.5.ln_2.bias",
+    "blocks.5.mlp.c_fc.weight",
+    "blocks.5.mlp.c_proj.weight",
+    "ln_f.weight",
+    "ln_f.bias"
+  ],
+  "trainable_parameter_count": 68966016,
+  "init_tokenizer_kind": "byte",
+  "init_checkpoint": "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+  "device_requested": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "checkpoint": "sessions\\2026-03-15-163627-qwen-public-plus-teacher-warm-v1\\checkpoints\\ava-11m-public-plus-teacher-qwen-warm-v1.pt",
+  "loss_history": [
+    {
+      "step": 2,
+      "loss": 8.3454,
+      "lr": 5e-07
+    },
+    {
+      "step": 4,
+      "loss": 11.5619,
+      "lr": 1e-06
+    },
+    {
+      "step": 6,
+      "loss": 6.7727,
+      "lr": 1.5e-06
+    },
+    {
+      "step": 8,
+      "loss": 7.5652,
+      "lr": 2e-06
+    },
+    {
+      "step": 10,
+      "loss": 9.9968,
+      "lr": 2e-06
+    },
+    {
+      "step": 12,
+      "loss": 7.2284,
+      "lr": 2e-06
+    },
+    {
+      "step": 14,
+      "loss": 6.713,
+      "lr": 2e-06
+    },
+    {
+      "step": 16,
+      "loss": 11.3614,
+      "lr": 2e-06
+    },
+    {
+      "step": 18,
+      "loss": 15.6227,
+      "lr": 2e-06
+    },
+    {
+      "step": 20,
+      "loss": 9.506,
+      "lr": 2e-06
+    },
+    {
+      "step": 22,
+      "loss": 27.529,
+      "lr": 2e-06
+    },
+    {
+      "step": 24,
+      "loss": 15.834,
+      "lr": 2e-06
+    },
+    {
+      "step": 26,
+      "loss": 7.1181,
+      "lr": 2e-06
+    },
+    {
+      "step": 28,
+      "loss": 11.4764,
+      "lr": 2e-06
+    },
+    {
+      "step": 30,
+      "loss": 15.9564,
+      "lr": 2e-06
+    },
+    {
+      "step": 32,
+      "loss": 7.1688,
+      "lr": 2e-06
+    },
+    {
+      "step": 34,
+      "loss": 20.16,
+      "lr": 2e-06
+    },
+    {
+      "step": 36,
+      "loss": 18.8969,
+      "lr": 2e-06
+    },
+    {
+      "step": 38,
+      "loss": 8.7339,
+      "lr": 2e-06
+    },
+    {
+      "step": 40,
+      "loss": 15.1186,
+      "lr": 2e-06
+    },
+    {
+      "step": 42,
+      "loss": 6.5201,
+      "lr": 2e-06
+    },
+    {
+      "step": 44,
+      "loss": 7.3446,
+      "lr": 2e-06
+    },
+    {
+      "step": 46,
+      "loss": 5.9229,
+      "lr": 2e-06
+    },
+    {
+      "step": 48,
+      "loss": 8.9913,
+      "lr": 2e-06
+    },
+    {
+      "step": 50,
+      "loss": 12.534,
+      "lr": 2e-06
+    },
+    {
+      "step": 52,
+      "loss": 5.9564,
+      "lr": 2e-06
+    },
+    {
+      "step": 54,
+      "loss": 17.4546,
+      "lr": 2e-06
+    },
+    {
+      "step": 56,
+      "loss": 9.7413,
+      "lr": 2e-06
+    },
+    {
+      "step": 58,
+      "loss": 15.4287,
+      "lr": 2e-06
+    },
+    {
+      "step": 60,
+      "loss": 6.7569,
+      "lr": 2e-06
+    },
+    {
+      "step": 62,
+      "loss": 6.5685,
+      "lr": 2e-06
+    },
+    {
+      "step": 64,
+      "loss": 16.5408,
+      "lr": 2e-06
+    }
+  ],
+  "checkpoint_sha256": "2dc6b07b0cb7f0cea36a7468ec57392b0d726664913b9f6f6b69207d4ad727c2",
+  "checkpoint_size_bytes": 275886977
+}

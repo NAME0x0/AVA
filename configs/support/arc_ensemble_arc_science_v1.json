@@ -1,0 +1,16 @@
+{
+  "kind": "banks",
+  "strategy": "margin_gate",
+  "margin_threshold": 0.0,
+  "primary_bank": "arc",
+  "banks": [
+    {
+      "name": "arc",
+      "path": "../../corpora/arc_train_support_v1"
+    },
+    {
+      "name": "science",
+      "path": "../../corpora/public_science_support_v1"
+    }
+  ]
+}

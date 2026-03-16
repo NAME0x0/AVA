@@ -15,6 +15,18 @@ venv/
 .coverage
 htmlcov/
 
+# Python / benchmark temp outputs
+pip-wheel-metadata/
+.hf-home/
+hf-home/
+.huggingface/
+.cache/huggingface/
+
+# Local env files
+.env
+.env.*
+!.env.example
+
 # Local experiment and tokenizer build artifacts
 artifacts/
 tokenizers/

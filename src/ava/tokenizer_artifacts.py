@@ -5,6 +5,7 @@ from collections import Counter
 from pathlib import Path
 
 from ava.data import load_supervised_examples, load_text_corpus
+from ava.env import huggingface_token, load_project_env
 from ava.tokenizer import SPECIAL_TOKENS
 
 try:
@@ -26,6 +27,14 @@ except ImportError:
     HFBpeTrainer = None
     HFUnigramTrainer = None
     HF_TOKENIZERS_AVAILABLE = False
+
+try:
+    from transformers import AutoTokenizer
+
+    TRANSFORMERS_AVAILABLE = True
+except ImportError:  # pragma: no cover - optional dependency
+    AutoTokenizer = None
+    TRANSFORMERS_AVAILABLE = False
 
 
 HF_EXTRA_SPECIAL_TOKENS = ("<unk>",)
@@ -308,6 +317,55 @@ def build_hf_unigram_artifact(
             "character_count": sum(len(text) for text in texts),
         }
     )
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(artifact, indent=2, ensure_ascii=False), encoding="utf-8")
+    return artifact
+
+
+def build_hf_remote_artifact(
+    repo_id: str,
+    output_path: str | Path,
+    *,
+    revision: str | None = None,
+    trust_remote_code: bool = False,
+) -> dict[str, object]:
+    if not TRANSFORMERS_AVAILABLE:
+        raise RuntimeError("transformers is required to import Hugging Face tokenizers")
+    load_project_env()
+    token = huggingface_token()
+    tokenizer = AutoTokenizer.from_pretrained(
+        repo_id,
+        revision=revision,
+        token=token,
+        trust_remote_code=trust_remote_code,
+        use_fast=True,
+    )
+    additions: dict[str, str] = {}
+    if getattr(tokenizer, "pad_token", None) != "<pad>":
+        additions["pad_token"] = "<pad>"
+    if getattr(tokenizer, "bos_token", None) != "<bos>":
+        additions["bos_token"] = "<bos>"
+    if getattr(tokenizer, "eos_token", None) != "<eos>":
+        additions["eos_token"] = "<eos>"
+    if getattr(tokenizer, "sep_token", None) != "<sep>":
+        additions["sep_token"] = "<sep>"
+    if additions:
+        tokenizer.add_special_tokens(additions)
+    backend = getattr(tokenizer, "backend_tokenizer", None)
+    if backend is None:
+        raise RuntimeError(f"{repo_id} did not produce a fast tokenizer backend")
+    artifact = {
+        "kind": "hf_auto",
+        "tokenizer_json": json.loads(backend.to_str()),
+        "vocab_size": len(tokenizer),
+        "special_tokens": sorted(set(list(getattr(tokenizer, "all_special_tokens", [])) + list(HF_ALL_SPECIAL_TOKENS))),
+        "metaspace_replacement": "▁",
+        "source_repo": repo_id,
+        "source_revision": revision,
+        "source_class": tokenizer.__class__.__name__,
+        "trust_remote_code": trust_remote_code,
+    }
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(artifact, indent=2, ensure_ascii=False), encoding="utf-8")

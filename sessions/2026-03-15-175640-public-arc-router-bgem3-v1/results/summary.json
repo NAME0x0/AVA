@@ -1,0 +1,49 @@
+{
+  "baseline_sparse_ensemble": {
+    "correct": 88,
+    "total": 299,
+    "accuracy": 0.294,
+    "path": "sessions/activity/arc-hybrid-support-ensemble-299-v1.json"
+  },
+  "dense_bgem3": {
+    "correct": 82,
+    "total": 299,
+    "accuracy": 0.274,
+    "path": "sessions/activity/arc-dense-bgem3-299.json"
+  },
+  "router_bgem3": {
+    "correct": 90,
+    "total": 299,
+    "accuracy": 0.301,
+    "path": "sessions/activity/arc-router-bgem3-299.json",
+    "held_out_correct": 57,
+    "held_out_total": 199,
+    "held_out_accuracy": 0.286,
+    "held_out_path": "sessions/activity/arc-router-bgem3-test199.json",
+    "thresholds": {
+      "dense_score_min": 0.66,
+      "dense_margin_min": 0.014,
+      "sparse_margin_max": 0.022,
+      "margin_gap_min": -0.02
+    }
+  },
+  "complementarity": {
+    "both_correct": 57,
+    "sparse_only": 31,
+    "dense_only": 25,
+    "neither": 186,
+    "oracle_union": 113
+  },
+  "router_gain_count_over_sparse": 4,
+  "router_regression_count_vs_sparse": 2,
+  "router_gain_examples": [
+    "Mercury_192168",
+    "LEAP_2012_8_10441",
+    "Mercury_SC_405973",
+    "Mercury_7074865"
+  ],
+  "router_regression_examples": [
+    "MCAS_2000_8_10",
+    "TIMSS_2003_8_pg29"
+  ]
+}

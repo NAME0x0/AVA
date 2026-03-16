@@ -1,0 +1,10 @@
+{
+  "name": "qwen-public-plus-teacher-warm-v2-neutral-specials",
+  "slug": "qwen-public-plus-teacher-warm-v2-neutral-specials",
+  "kind": "training",
+  "created_at_utc": "2026-03-15T16:46:45.912594+00:00",
+  "sources": [
+    "configs\\experiments\\ava-11m-public-plus-teacher-qwen-warm-v1.yaml",
+    "corpora\\public_benchmark_plus_teacher_v1"
+  ]
+}

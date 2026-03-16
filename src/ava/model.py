@@ -76,14 +76,32 @@ if TORCH_AVAILABLE:
     class GPT(nn.Module):
         def __init__(self, config: ModelConfig, vocab_size: int) -> None:
             super().__init__()
+            if config.architecture not in {"transformer", "looped"}:
+                raise ValueError(f"unsupported architecture: {config.architecture}")
             self.config = config
             self.wte = nn.Embedding(vocab_size, config.n_embd)
             self.wpe = nn.Embedding(config.block_size, config.n_embd)
             self.drop = nn.Dropout(config.dropout)
             self.blocks = nn.ModuleList([Block(config) for _ in range(config.n_layer)])
+            self.loop_step_embeddings = (
+                nn.Embedding(config.loop_repeats, config.n_embd)
+                if config.architecture == "looped"
+                else None
+            )
             self.ln_f = nn.LayerNorm(config.n_embd)
             self.lm_head = nn.Linear(config.n_embd, vocab_size, bias=False)
             self.lm_head.weight = self.wte.weight
+
+        def _repeat_count(self) -> int:
+            if self.config.architecture == "looped":
+                return self.config.loop_repeats
+            return 1
+
+        def _apply_loop_embedding(self, x: Any, loop_index: int) -> Any:
+            if self.loop_step_embeddings is None:
+                return x
+            step = self.loop_step_embeddings.weight[loop_index].view(1, 1, -1)
+            return x + step
 
         def forward(self, idx: Any, targets: Any | None = None) -> tuple[Any, Any | None]:
             _, sequence_length = idx.size()
@@ -93,7 +111,9 @@ if TORCH_AVAILABLE:
             x = self.wte(idx) + self.wpe(positions)
             x = self.drop(x)
             for block in self.blocks:
-                x = block(x)
+                for loop_index in range(self._repeat_count()):
+                    x = self._apply_loop_embedding(x, loop_index)
+                    x = block(x)
             x = self.ln_f(x)
             logits = self.lm_head(x)
             loss = None

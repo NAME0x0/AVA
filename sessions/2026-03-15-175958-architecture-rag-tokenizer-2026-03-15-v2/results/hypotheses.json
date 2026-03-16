@@ -1,0 +1,89 @@
+[
+  {
+    "key": "exp-013",
+    "name": "Latent recurrent-depth AVA-v2 core",
+    "priority": 6,
+    "paper_keys": [
+      "latent-recurrent-depth"
+    ],
+    "experiment": "Replace the current naive looped baseline with a cleaner prelude/shared-recurrent/coda student branch that can spend more latent compute without increasing parameter count.",
+    "success_signal": "A recurrent student matches or beats the dense control at similar parameter count while improving public reasoning benchmarks when allowed extra loop steps."
+  },
+  {
+    "key": "exp-014",
+    "name": "Open-tokenizer reboot around Qwen-style segmentation",
+    "priority": 7,
+    "paper_keys": [
+      "qwen3",
+      "phi-4"
+    ],
+    "experiment": "Start AVA-v2 from a strong open tokenizer and retrain or distill early, instead of migrating a byte-trained checkpoint late.",
+    "success_signal": "Lower token counts and better public-benchmark learning efficiency without the collapse seen in late tokenizer migration."
+  },
+  {
+    "key": "exp-015",
+    "name": "RAFT-style retrieval-aware distillation",
+    "priority": 8,
+    "paper_keys": [
+      "raft",
+      "toolace-r"
+    ],
+    "experiment": "Distill public knowledge into AVA with retrieved evidence plus distractors so the student learns evidence selection instead of answer memorization.",
+    "success_signal": "Public-benchmark gains survive when support banks contain distractors, and the student becomes more robust to noisy retrieval."
+  },
+  {
+    "key": "exp-016",
+    "name": "HippoRAG2-style structured memory graph",
+    "priority": 9,
+    "paper_keys": [
+      "hipporag2",
+      "titans"
+    ],
+    "experiment": "Upgrade AVA's external memory from flat nearest-neighbor lookup to a graph-augmented retrieval layer with propagation over related support facts.",
+    "success_signal": "Structured memory beats the current sparse+dense router on ARC-like public benchmarks or held-out transfer suites without hiding the reasoning path."
+  },
+  {
+    "key": "exp-009",
+    "name": "In-context tool RL after compact tool SFT",
+    "priority": 9,
+    "paper_keys": [
+      "icrl-tool-use",
+      "torl",
+      "retool"
+    ],
+    "experiment": "After compact calculator and search traces work under supervised training, run a small RL branch that starts with in-context tool demonstrations during rollouts and anneals them away.",
+    "success_signal": "Higher tool accuracy and better abstention behavior than SFT-only traces without a large prompt tax."
+  },
+  {
+    "key": "exp-010",
+    "name": "Planning benchmarks before agent claims",
+    "priority": 10,
+    "paper_keys": [
+      "deepplanning",
+      "skillnet"
+    ],
+    "experiment": "Add long-horizon planning evaluation and reusable skill instrumentation before claiming agentic competence.",
+    "success_signal": "Session packets report planning success, constraint satisfaction, and tool-step efficiency instead of vague demos."
+  },
+  {
+    "key": "exp-011",
+    "name": "Compact multimodal branch after text stability",
+    "priority": 11,
+    "paper_keys": [
+      "penguin-vl",
+      "internvl-u"
+    ],
+    "experiment": "After the text backbone is stable, prototype a compact vision branch that reuses the text model and targets MathVista, ScienceQA, and DocVQA first.",
+    "success_signal": "Useful multimodal gains under a tight VRAM budget without regressing the text product."
+  },
+  {
+    "key": "exp-012",
+    "name": "Async RL infra only when rollouts dominate cost",
+    "priority": 12,
+    "paper_keys": [
+      "areal"
+    ],
+    "experiment": "Only invest in asynchronous RL infrastructure if rollout throughput, not model quality or data quality, becomes the main bottleneck.",
+    "success_signal": "Better verifier throughput and wall-clock efficiency on RL runs without turning the stack into a black box."
+  }
+]

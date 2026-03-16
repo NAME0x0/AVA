@@ -1,0 +1,1 @@
+python -c "import json; from ava.synthetic import materialize_public_science_support_corpus as m; print(json.dumps(m(r'corpora/public_science_support_v1', rotations=1), indent=2))"

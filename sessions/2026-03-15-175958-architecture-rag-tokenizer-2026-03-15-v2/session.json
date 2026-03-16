@@ -1,0 +1,20 @@
+{
+  "name": "architecture-rag-tokenizer-2026-03-15-v2",
+  "slug": "architecture-rag-tokenizer-2026-03-15-v2",
+  "kind": "hf-research",
+  "created_at_utc": "2026-03-15T17:59:58.773656+00:00",
+  "sources": [
+    "https://arxiv.org/abs/2502.05171",
+    "https://arxiv.org/abs/2502.14802",
+    "https://arxiv.org/abs/2505.09388",
+    "https://arxiv.org/abs/2603.08068",
+    "https://arxiv.org/abs/2601.18137",
+    "https://arxiv.org/abs/2603.04448",
+    "https://arxiv.org/abs/2603.06569",
+    "https://arxiv.org/abs/2603.09877",
+    "https://arxiv.org/abs/2503.23383",
+    "https://arxiv.org/abs/2504.11536",
+    "https://arxiv.org/abs/2505.24298",
+    "https://huggingface.co/papers/trending"
+  ]
+}

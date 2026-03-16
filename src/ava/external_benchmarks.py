@@ -11,6 +11,8 @@ from typing import Any
 HF_DATASETS_CACHE = Path.home() / ".cache" / "huggingface" / "datasets"
 
 from ava.config import ExperimentConfig
+from ava.dense_retrieval import DenseSupportRetriever, build_dense_support_retriever
+from ava.reranking import SupportReranker, build_support_reranker
 from ava.eval import _resolve_device
 from ava.memory_transfer import _generate_completion
 from ava.model import TORCH_AVAILABLE, build_model, torch
@@ -69,10 +71,14 @@ class ExternalBenchmarkResult:
     scoring: dict[str, object] | None = None
 
 
-def _slice_split(split: str, limit: int | None) -> str:
-    if limit is None or "[" in split:
+def _slice_split(split: str, limit: int | None, offset: int = 0) -> str:
+    if "[" in split:
         return split
-    return f"{split}[:{limit}]"
+    start = max(offset, 0)
+    if limit is None:
+        return f"{split}[{start}:]" if start else split
+    end = start + max(limit, 0)
+    return f"{split}[{start}:{end}]"
 
 
 def _normalize_text(text: str) -> str:
@@ -502,6 +508,222 @@ def _predict_multiple_choice_hybrid_from_support(
 
 
 
+def _predict_multiple_choice_dense_hybrid_from_support(
+    *,
+    prompt: str,
+    choices: tuple[tuple[str, str], ...],
+    dense_retriever: DenseSupportRetriever | None,
+    category_hint: str | None,
+    category_gated: bool,
+    shortlist_top_k: int = 64,
+    top_k: int = 8,
+) -> tuple[str, dict[str, object]] | None:
+    if dense_retriever is None:
+        return None
+    shortlisted_examples, dense_payload = dense_retriever.shortlist(
+        prompt,
+        top_k=shortlist_top_k,
+        category_hint=category_hint,
+        category_gated=category_gated,
+    )
+    if not shortlisted_examples:
+        return None
+    prediction = _predict_multiple_choice_hybrid_from_support(
+        prompt=prompt,
+        choices=choices,
+        support_examples=shortlisted_examples,
+        support_index=_build_sparse_support_index(shortlisted_examples),
+        category_hint=category_hint,
+        category_gated=category_gated,
+        top_k=min(max(top_k, 1), len(shortlisted_examples)),
+    )
+    if prediction is None:
+        return None
+    label, scoring = prediction
+    scoring["mode"] = "dense_hybrid_support_mc"
+    scoring["dense_model"] = dense_retriever.model_name
+    scoring["dense_device"] = dense_retriever.device
+    scoring["dense_shortlist"] = dense_payload["matches"]
+    scoring["dense_candidate_count"] = dense_payload["candidate_count"]
+    scoring["dense_top_k"] = dense_payload["top_k"]
+    return label, scoring
+
+
+def _predict_multiple_choice_dense_rerank_from_support(
+    *,
+    prompt: str,
+    choices: tuple[tuple[str, str], ...],
+    dense_retriever: DenseSupportRetriever | None,
+    support_reranker: SupportReranker | None,
+    category_hint: str | None,
+    category_gated: bool,
+    shortlist_top_k: int = 64,
+    rerank_top_k: int = 12,
+    top_k: int = 8,
+) -> tuple[str, dict[str, object]] | None:
+    if dense_retriever is None or support_reranker is None:
+        return None
+    shortlisted_examples, dense_payload = dense_retriever.shortlist(
+        prompt,
+        top_k=shortlist_top_k,
+        category_hint=category_hint,
+        category_gated=category_gated,
+    )
+    if not shortlisted_examples:
+        return None
+    reranked_examples, rerank_payload = support_reranker.rerank(
+        prompt,
+        shortlisted_examples,
+        top_k=min(max(rerank_top_k, 1), len(shortlisted_examples)),
+        category_hint=category_hint,
+        category_gated=category_gated,
+    )
+    if not reranked_examples:
+        return None
+    prediction = _predict_multiple_choice_hybrid_from_support(
+        prompt=prompt,
+        choices=choices,
+        support_examples=reranked_examples,
+        support_index=_build_sparse_support_index(reranked_examples),
+        category_hint=category_hint,
+        category_gated=category_gated,
+        top_k=min(max(top_k, 1), len(reranked_examples)),
+    )
+    if prediction is None:
+        return None
+    label, scoring = prediction
+    scoring["mode"] = "dense_rerank_support_mc"
+    scoring["dense_model"] = dense_retriever.model_name
+    scoring["dense_device"] = dense_retriever.device
+    scoring["dense_shortlist"] = dense_payload["matches"]
+    scoring["dense_candidate_count"] = dense_payload["candidate_count"]
+    scoring["dense_top_k"] = dense_payload["top_k"]
+    scoring["reranker_model"] = support_reranker.model_name
+    scoring["reranker_device"] = support_reranker.device
+    scoring["rerank_matches"] = rerank_payload["matches"]
+    scoring["rerank_top_k"] = rerank_payload["top_k"]
+    return label, scoring
+
+
+def _predict_multiple_choice_sparse_dense_router(
+    *,
+    prompt: str,
+    choices: tuple[tuple[str, str], ...],
+    support_resource: dict[str, object] | None,
+    dense_retriever: DenseSupportRetriever | None,
+    support_reranker: SupportReranker | None = None,
+    category_hint: str | None,
+    category_gated: bool,
+    shortlist_top_k: int = 64,
+    rerank_top_k: int = 12,
+    top_k: int = 8,
+    dense_score_min: float = 0.7,
+    dense_margin_min: float = 0.0,
+    sparse_margin_max: float = 0.015,
+    margin_gap_min: float = 0.0,
+) -> tuple[str, dict[str, object]] | None:
+    sparse_prediction = (
+        _predict_multiple_choice_support_ensemble(
+            prompt=prompt,
+            choices=choices,
+            support_resource=support_resource,
+            category_hint=category_hint,
+            category_gated=category_gated,
+            top_k=top_k,
+        )
+        if support_resource is not None and support_resource.get('kind') == 'banks'
+        else _predict_multiple_choice_hybrid_from_support(
+            prompt=prompt,
+            choices=choices,
+            support_examples=(list(support_resource.get('examples', [])) if support_resource else None),
+            support_index=(support_resource.get('index') if support_resource else None),
+            category_hint=category_hint,
+            category_gated=category_gated,
+            top_k=top_k,
+        )
+    )
+    dense_prediction = (
+        _predict_multiple_choice_dense_rerank_from_support(
+            prompt=prompt,
+            choices=choices,
+            dense_retriever=dense_retriever,
+            support_reranker=support_reranker,
+            category_hint=category_hint,
+            category_gated=category_gated,
+            shortlist_top_k=shortlist_top_k,
+            rerank_top_k=rerank_top_k,
+            top_k=top_k,
+        )
+        if support_reranker is not None
+        else _predict_multiple_choice_dense_hybrid_from_support(
+            prompt=prompt,
+            choices=choices,
+            dense_retriever=dense_retriever,
+            category_hint=category_hint,
+            category_gated=category_gated,
+            shortlist_top_k=shortlist_top_k,
+            top_k=top_k,
+        )
+    )
+    if sparse_prediction is None:
+        return dense_prediction
+    if dense_prediction is None:
+        return sparse_prediction
+
+    sparse_label, sparse_scoring = sparse_prediction
+    dense_label, dense_scoring = dense_prediction
+    sparse_margin = _scoring_margin(sparse_scoring)
+    dense_margin = _scoring_margin(dense_scoring)
+    dense_top_score = _rerank_top_score(dense_scoring) if support_reranker is not None else _dense_shortlist_top_score(dense_scoring)
+
+    if sparse_label == dense_label:
+        router_decision = 'agreement'
+        selected_label = sparse_label
+        selected_scoring = sparse_scoring
+    else:
+        use_dense = (
+            dense_top_score >= dense_score_min
+            and dense_margin >= dense_margin_min
+            and sparse_margin <= sparse_margin_max
+            and (dense_margin - sparse_margin) >= margin_gap_min
+        )
+        router_decision = 'dense' if use_dense else 'sparse'
+        selected_label = dense_label if use_dense else sparse_label
+        selected_scoring = dense_scoring if use_dense else sparse_scoring
+
+    scoring = {
+        'mode': 'sparse_dense_router_support_mc',
+        'selected': selected_label,
+        'router_decision': router_decision,
+        'router_thresholds': {
+            'dense_score_min': dense_score_min,
+            'dense_margin_min': dense_margin_min,
+            'sparse_margin_max': sparse_margin_max,
+            'margin_gap_min': margin_gap_min,
+        },
+        'scores': dict(selected_scoring.get('scores', {})),
+        'supports': list(selected_scoring.get('supports', [])),
+        'choice_supports': dict(selected_scoring.get('choice_supports', {})),
+        'dense_shortlist': list(dense_scoring.get('dense_shortlist', [])),
+        'dense_model': dense_scoring.get('dense_model'),
+        'dense_device': dense_scoring.get('dense_device'),
+        'dense_candidate_count': dense_scoring.get('dense_candidate_count'),
+        'dense_top_k': dense_scoring.get('dense_top_k'),
+        'sparse_mode': sparse_scoring.get('mode'),
+        'dense_mode': dense_scoring.get('mode'),
+        'sparse_margin': round(float(sparse_margin), 6),
+        'dense_margin': round(float(dense_margin), 6),
+        'dense_top_score': round(float(dense_top_score), 6),
+        'dense_score_source': 'rerank' if support_reranker is not None else 'dense_shortlist',
+        'sparse_selected': sparse_label,
+        'dense_selected': dense_label,
+    }
+    if 'selected_bank' in sparse_scoring:
+        scoring['selected_bank'] = sparse_scoring.get('selected_bank')
+        scoring['bank_results'] = dict(sparse_scoring.get('bank_results', {}))
+    return selected_label, scoring
+
+
 def _score_margin(scores: dict[str, float]) -> float:
     ordered = sorted(scores.values(), reverse=True)
     if not ordered:
@@ -509,6 +731,30 @@ def _score_margin(scores: dict[str, float]) -> float:
     if len(ordered) == 1:
         return float(ordered[0])
     return float(ordered[0] - ordered[1])
+
+
+def _scoring_margin(scoring: dict[str, object] | None) -> float:
+    scores = dict(scoring.get('scores', {})) if scoring else {}
+    numeric = {str(key): float(value) for key, value in scores.items()}
+    return _score_margin(numeric)
+
+
+def _dense_shortlist_top_score(scoring: dict[str, object] | None) -> float:
+    if not scoring:
+        return 0.0
+    shortlist = list(scoring.get('dense_shortlist', []))
+    if not shortlist:
+        return 0.0
+    return float(dict(shortlist[0]).get('score', 0.0))
+
+
+def _rerank_top_score(scoring: dict[str, object] | None) -> float:
+    if not scoring:
+        return 0.0
+    rerank_matches = list(scoring.get('rerank_matches', []))
+    if not rerank_matches:
+        return 0.0
+    return float(dict(rerank_matches[0]).get('score', 0.0))
 
 
 def _load_support_resource(path: str | Path) -> dict[str, object]:
@@ -614,7 +860,7 @@ def _predict_multiple_choice_support_ensemble(
         'candidate_count': scoring.get('candidate_count'),
     }
 
-def _load_cached_rows(parts: tuple[str, ...], filename: str, limit: int | None) -> list[dict[str, object]] | None:
+def _load_cached_rows(parts: tuple[str, ...], filename: str, limit: int | None, offset: int = 0) -> list[dict[str, object]] | None:
     if pa_ipc is None:
         return None
     base = HF_DATASETS_CACHE.joinpath(*parts)
@@ -624,18 +870,19 @@ def _load_cached_rows(parts: tuple[str, ...], filename: str, limit: int | None) 
         with candidate.open("rb") as handle:
             table = pa_ipc.open_stream(handle).read_all()
         rows = table.to_pylist()
-        if limit is not None:
-            rows = rows[:limit]
+        start = max(offset, 0)
+        end = None if limit is None else start + max(limit, 0)
+        rows = rows[start:end]
         return rows
     return None
 
 
-def load_gsm8k_tasks(*, split: str = "test", limit: int | None = 50) -> list[ExternalBenchmarkTask]:
-    rows = _load_cached_rows(("gsm8k", "main", "0.0.0"), f"gsm8k-{split}.arrow", limit)
+def load_gsm8k_tasks(*, split: str = "test", limit: int | None = 50, offset: int = 0) -> list[ExternalBenchmarkTask]:
+    rows = _load_cached_rows(("gsm8k", "main", "0.0.0"), f"gsm8k-{split}.arrow", limit, offset)
     if rows is None:
         if not DATASETS_AVAILABLE:
             raise RuntimeError("datasets is required for external benchmarks.")
-        rows = list(load_dataset("gsm8k", "main", split=_slice_split(split, limit)))
+        rows = list(load_dataset("gsm8k", "main", split=_slice_split(split, limit, offset)))
     tasks: list[ExternalBenchmarkTask] = []
     for idx, row in enumerate(rows):
         tasks.append(
@@ -651,12 +898,12 @@ def load_gsm8k_tasks(*, split: str = "test", limit: int | None = 50) -> list[Ext
     return tasks
 
 
-def load_arc_challenge_tasks(*, split: str = "validation", limit: int | None = 50) -> list[ExternalBenchmarkTask]:
-    rows = _load_cached_rows(("allenai___ai2_arc", "ARC-Challenge", "0.0.0"), f"ai2_arc-{split}.arrow", limit)
+def load_arc_challenge_tasks(*, split: str = "validation", limit: int | None = 50, offset: int = 0) -> list[ExternalBenchmarkTask]:
+    rows = _load_cached_rows(("allenai___ai2_arc", "ARC-Challenge", "0.0.0"), f"ai2_arc-{split}.arrow", limit, offset)
     if rows is None:
         if not DATASETS_AVAILABLE:
             raise RuntimeError("datasets is required for external benchmarks.")
-        rows = list(load_dataset("allenai/ai2_arc", "ARC-Challenge", split=_slice_split(split, limit)))
+        rows = list(load_dataset("allenai/ai2_arc", "ARC-Challenge", split=_slice_split(split, limit, offset)))
     tasks: list[ExternalBenchmarkTask] = []
     for row in rows:
         labels = tuple(str(item) for item in row["choices"]["label"])
@@ -679,10 +926,10 @@ def load_arc_challenge_tasks(*, split: str = "validation", limit: int | None = 5
     return tasks
 
 
-def load_piqa_tasks(*, split: str = "validation", limit: int | None = 50) -> list[ExternalBenchmarkTask]:
+def load_piqa_tasks(*, split: str = "validation", limit: int | None = 50, offset: int = 0) -> list[ExternalBenchmarkTask]:
     if not DATASETS_AVAILABLE:
         raise RuntimeError("datasets is required for external benchmarks.")
-    dataset = load_dataset("piqa", split=_slice_split(split, limit))
+    dataset = load_dataset("piqa", split=_slice_split(split, limit, offset))
     tasks: list[ExternalBenchmarkTask] = []
     for idx, row in enumerate(dataset):
         choices = (("A", str(row["sol1"])), ("B", str(row["sol2"])))
@@ -708,14 +955,15 @@ def load_external_benchmark_tasks(
     *,
     split: str | None = None,
     limit: int | None = 50,
+    offset: int = 0,
 ) -> list[ExternalBenchmarkTask]:
     key = benchmark.lower()
     if key == "gsm8k":
-        return load_gsm8k_tasks(split=split or "test", limit=limit)
+        return load_gsm8k_tasks(split=split or "test", limit=limit, offset=offset)
     if key in {"arc", "arc-challenge"}:
-        return load_arc_challenge_tasks(split=split or "validation", limit=limit)
+        return load_arc_challenge_tasks(split=split or "validation", limit=limit, offset=offset)
     if key == "piqa":
-        return load_piqa_tasks(split=split or "validation", limit=limit)
+        return load_piqa_tasks(split=split or "validation", limit=limit, offset=offset)
     raise ValueError(f"unsupported external benchmark: {benchmark}")
 
 
@@ -736,6 +984,7 @@ def _prepare_retrieval_prompt_for_task(
     category_gated: bool,
     nearest_threshold: float,
     nearest_margin: float,
+    support_top_k: int,
 ) -> tuple[str | None, dict[str, object]]:
     base_prompt = prepare_retrieval_prompt(prompt, tokenizer=tokenizer, block_size=model.config.block_size)
     if retrieval_mode == "baseline":
@@ -797,6 +1046,19 @@ def _prepare_retrieval_prompt_for_task(
             "nearest_threshold": nearest_threshold,
             "nearest_margin": nearest_margin,
         }
+
+    if retrieval_mode == "prompt_support":
+        retrieval = prepare_retrieval_prompt(
+            prompt,
+            tokenizer=tokenizer,
+            block_size=model.config.block_size,
+            support_examples=support_examples,
+            top_k=support_top_k,
+            category_hint=category_hint,
+            category_gated=category_gated,
+        )
+        retrieval["mode"] = "prompt_support"
+        return None, retrieval
 
     raise ValueError(f"unknown external retrieval mode: {retrieval_mode}")
 
@@ -872,13 +1134,26 @@ def evaluate_external_benchmark(
     benchmark: str,
     split: str | None = None,
     limit: int | None = 50,
+    offset: int = 0,
     requested_device: str = "cuda",
     max_new_tokens: int = 48,
     support_corpus: str | Path | None = None,
+    dense_support_corpus: str | Path | None = None,
     retrieval_mode: str = "baseline",
     category_gated: bool = True,
     nearest_threshold: float = 0.45,
     nearest_margin: float = 0.0,
+    support_top_k: int = 2,
+    dense_encoder_model: str = "BAAI/bge-small-en-v1.5",
+    dense_encoder_device: str = "cpu",
+    dense_candidate_top_k: int = 64,
+    reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    reranker_device: str = "cpu",
+    rerank_top_k: int = 12,
+    router_dense_score_min: float = 0.7,
+    router_dense_margin_min: float = 0.0,
+    router_sparse_margin_max: float = 0.015,
+    router_margin_gap_min: float = 0.0,
 ) -> dict[str, object]:
     if not TORCH_AVAILABLE:
         raise RuntimeError("PyTorch is required for evaluation.")
@@ -893,7 +1168,7 @@ def evaluate_external_benchmark(
     model = model.to(device)
     model.eval()
 
-    tasks = load_external_benchmark_tasks(benchmark, split=split, limit=limit)
+    tasks = load_external_benchmark_tasks(benchmark, split=split, limit=limit, offset=offset)
     support_resource = _load_support_resource(support_corpus) if support_corpus else None
     if support_resource is None:
         support_examples = None
@@ -906,21 +1181,95 @@ def evaluate_external_benchmark(
         support_examples = list(support_resource.get("examples", []))
         support_index = support_resource.get("index")
 
+    dense_support_resource = _load_support_resource(dense_support_corpus) if dense_support_corpus else support_resource
+    if dense_support_resource is None:
+        dense_support_examples = None
+    elif dense_support_resource.get("kind") == "banks":
+        dense_support_examples = list(dense_support_resource.get("primary_examples", []))
+    else:
+        dense_support_examples = list(dense_support_resource.get("examples", []))
+
+    dense_retriever: DenseSupportRetriever | None = None
+    support_reranker: SupportReranker | None = None
+    if retrieval_mode in {"dense_hybrid_support_mc", "dense_rerank_support_mc", "sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"}:
+        if not dense_support_examples:
+            raise RuntimeError(f"{retrieval_mode} requires dense support examples")
+        dense_retriever = build_dense_support_retriever(
+            dense_support_examples,
+            model_name=dense_encoder_model,
+            device=dense_encoder_device,
+        )
+    if retrieval_mode in {"dense_rerank_support_mc", "sparse_dense_rerank_router_support_mc"}:
+        support_reranker = build_support_reranker(
+            model_name=reranker_model,
+            device=reranker_device,
+        )
+
     results: list[ExternalBenchmarkResult] = []
     for task in tasks:
         scoring: dict[str, object] | None = None
         if task.metric == "multiple_choice":
-            if retrieval_mode in {"support_mc", "hybrid_support_mc", "hybrid_support_ensemble"}:
-                support_prediction = (
-                    _predict_multiple_choice_support_ensemble(
+            if retrieval_mode in {"support_mc", "hybrid_support_mc", "hybrid_support_ensemble", "dense_hybrid_support_mc", "dense_rerank_support_mc", "sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"}:
+                if retrieval_mode == "sparse_dense_rerank_router_support_mc":
+                    support_prediction = _predict_multiple_choice_sparse_dense_router(
+                        prompt=task.prompt,
+                        choices=task.choices,
+                        support_resource=support_resource,
+                        dense_retriever=dense_retriever,
+                        support_reranker=support_reranker,
+                        category_hint=task.category,
+                        category_gated=category_gated,
+                        shortlist_top_k=dense_candidate_top_k,
+                        rerank_top_k=rerank_top_k,
+                        dense_score_min=router_dense_score_min,
+                        dense_margin_min=router_dense_margin_min,
+                        sparse_margin_max=router_sparse_margin_max,
+                        margin_gap_min=router_margin_gap_min,
+                    )
+                elif retrieval_mode == "sparse_dense_router_support_mc":
+                    support_prediction = _predict_multiple_choice_sparse_dense_router(
+                        prompt=task.prompt,
+                        choices=task.choices,
+                        support_resource=support_resource,
+                        dense_retriever=dense_retriever,
+                        category_hint=task.category,
+                        category_gated=category_gated,
+                        shortlist_top_k=dense_candidate_top_k,
+                        dense_score_min=router_dense_score_min,
+                        dense_margin_min=router_dense_margin_min,
+                        sparse_margin_max=router_sparse_margin_max,
+                        margin_gap_min=router_margin_gap_min,
+                    )
+                elif retrieval_mode == "dense_rerank_support_mc":
+                    support_prediction = _predict_multiple_choice_dense_rerank_from_support(
+                        prompt=task.prompt,
+                        choices=task.choices,
+                        dense_retriever=dense_retriever,
+                        support_reranker=support_reranker,
+                        category_hint=task.category,
+                        category_gated=category_gated,
+                        shortlist_top_k=dense_candidate_top_k,
+                        rerank_top_k=rerank_top_k,
+                    )
+                elif retrieval_mode == "dense_hybrid_support_mc":
+                    support_prediction = _predict_multiple_choice_dense_hybrid_from_support(
+                        prompt=task.prompt,
+                        choices=task.choices,
+                        dense_retriever=dense_retriever,
+                        category_hint=task.category,
+                        category_gated=category_gated,
+                        shortlist_top_k=dense_candidate_top_k,
+                    )
+                elif retrieval_mode == "hybrid_support_ensemble":
+                    support_prediction = _predict_multiple_choice_support_ensemble(
                         prompt=task.prompt,
                         choices=task.choices,
                         support_resource=support_resource,
                         category_hint=task.category,
                         category_gated=category_gated,
                     )
-                    if retrieval_mode == "hybrid_support_ensemble"
-                    else _predict_multiple_choice_hybrid_from_support(
+                elif retrieval_mode == "hybrid_support_mc":
+                    support_prediction = _predict_multiple_choice_hybrid_from_support(
                         prompt=task.prompt,
                         choices=task.choices,
                         support_examples=support_examples,
@@ -928,8 +1277,8 @@ def evaluate_external_benchmark(
                         category_hint=task.category,
                         category_gated=category_gated,
                     )
-                    if retrieval_mode == "hybrid_support_mc"
-                    else _predict_multiple_choice_from_support(
+                else:
+                    support_prediction = _predict_multiple_choice_from_support(
                         prompt=task.prompt,
                         choices=task.choices,
                         support_examples=support_examples,
@@ -937,15 +1286,18 @@ def evaluate_external_benchmark(
                         category_hint=task.category,
                         category_gated=category_gated,
                     )
-                )
                 if support_prediction is not None:
                     completion, scoring = support_prediction
+                    references = list(scoring.get("dense_shortlist", scoring.get("supports", [])))
                     retrieval = {
                         "enabled": True,
                         "mode": retrieval_mode,
-                        "references": list(scoring.get("supports", [])),
+                        "references": references,
                         "category_hint": task.category,
                     }
+                    if "dense_shortlist" in scoring:
+                        retrieval["rerank_supports"] = list(scoring.get("supports", []))
+                        retrieval["dense_model"] = scoring.get("dense_model")
                 else:
                     retrieval = {
                         "enabled": False,
@@ -972,6 +1324,7 @@ def evaluate_external_benchmark(
                     category_gated=category_gated,
                     nearest_threshold=nearest_threshold,
                     nearest_margin=nearest_margin,
+                    support_top_k=support_top_k,
                 )
                 if direct_completion is not None:
                     completion = direct_completion
@@ -998,6 +1351,7 @@ def evaluate_external_benchmark(
                 category_gated=category_gated,
                 nearest_threshold=nearest_threshold,
                 nearest_margin=nearest_margin,
+                support_top_k=support_top_k,
             )
         results.append(
             ExternalBenchmarkResult(
@@ -1031,17 +1385,29 @@ def evaluate_external_benchmark(
         "benchmark": benchmark,
         "split": split,
         "limit": limit,
+        "offset": offset,
         "checkpoint": str(checkpoint_path),
         "config_name": config.name,
         "requested_device": requested_device,
         "device_used": device,
         "warnings": warnings,
         "support_corpus": str(support_corpus) if support_corpus else None,
+        "dense_support_corpus": str(dense_support_corpus) if dense_support_corpus else None,
         "support_index_rows": len(support_index.rows) if support_index is not None else 0,
         "retrieval_mode": retrieval_mode,
         "category_gated": category_gated,
         "nearest_threshold": nearest_threshold,
         "nearest_margin": nearest_margin,
+        "dense_encoder_model": dense_encoder_model if retrieval_mode in {"dense_hybrid_support_mc", "dense_rerank_support_mc", "sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
+        "dense_encoder_device": dense_encoder_device if retrieval_mode in {"dense_hybrid_support_mc", "dense_rerank_support_mc", "sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
+        "dense_candidate_top_k": dense_candidate_top_k if retrieval_mode in {"dense_hybrid_support_mc", "dense_rerank_support_mc", "sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
+        "reranker_model": reranker_model if retrieval_mode in {"dense_rerank_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
+        "reranker_device": reranker_device if retrieval_mode in {"dense_rerank_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
+        "rerank_top_k": rerank_top_k if retrieval_mode in {"dense_rerank_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
+        "router_dense_score_min": router_dense_score_min if retrieval_mode in {"sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
+        "router_dense_margin_min": router_dense_margin_min if retrieval_mode in {"sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
+        "router_sparse_margin_max": router_sparse_margin_max if retrieval_mode in {"sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
+        "router_margin_gap_min": router_margin_gap_min if retrieval_mode in {"sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
         "correct": correct,
         "total": total,
         "accuracy": round(correct / max(total, 1), 3),

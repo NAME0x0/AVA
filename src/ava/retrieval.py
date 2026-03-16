@@ -17,6 +17,7 @@ class SupportExample:
     category: str
     kind: str | None = None
     source_path: str | None = None
+    teacher_rationale_short: str | None = None
 
 
 def _unwrap_prompt(prompt: str) -> str:
@@ -96,6 +97,7 @@ def load_support_examples(path: str | Path) -> list[SupportExample]:
                     category=category,
                     kind=kind,
                     source_path=str(item),
+                    teacher_rationale_short=(str(payload["teacher_rationale_short"]).strip() if payload.get("teacher_rationale_short") else None),
                 )
             )
     return examples
@@ -127,6 +129,15 @@ def _serialize_record(record: Any) -> dict[str, object]:
 
 def render_base_prompt(prompt: str) -> str:
     return f"Question: {_unwrap_prompt(prompt)}\nAnswer: "
+
+
+def _render_support_block(metadata: dict[str, object]) -> str:
+    lines = [f"Question: {metadata['prompt']}"]
+    rationale = metadata.get("teacher_rationale_short")
+    if rationale:
+        lines.append(f"Reasoning: {rationale}")
+    lines.append(f"Answer: {metadata['response']}")
+    return "\n".join(lines)
 
 
 def prepare_retrieval_prompt(
@@ -170,7 +181,7 @@ def prepare_retrieval_prompt(
         blocks: list[str] = []
         for record in chosen:
             metadata = record.metadata
-            blocks.append(f"Question: {metadata['prompt']}\nAnswer: {metadata['response']}")
+            blocks.append(_render_support_block(metadata))
         candidate = "\n\n".join(blocks + [base_prompt]) if blocks else base_prompt
         if tokenizer is None or block_size is None:
             prompt_token_count = None

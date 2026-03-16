@@ -206,7 +206,7 @@ def _build_tokenizer_aligned_embedding(embedding: Any, tokenizer: Any) -> Any:
         for token_name in SPECIAL_TOKENS:
             new_id = token_to_id.get(token_name)
             if new_id is not None:
-                expanded[new_id] = embedding[SPECIAL_TOKENS.index(token_name)]
+                expanded[new_id] = fallback
 
     for token_id in range(tokenizer.vocab_size):
         if _tokenizer_preserves_byte_prefix(tokenizer) and token_id < min(current_vocab, tokenizer.vocab_size):
@@ -254,7 +254,16 @@ def _load_init_checkpoint(model: Any, tokenizer: Any, init_checkpoint_path: Path
         init_state = _expand_state_dict_for_tokenizer(init_state, tokenizer)
     if "wpe.weight" in init_state and model.wpe.weight.shape != init_state["wpe.weight"].shape:
         init_state = _resize_state_dict_for_block_size(init_state, model.config.block_size)
-    model.load_state_dict(init_state)
+    missing_keys, unexpected_keys = model.load_state_dict(init_state, strict=False)
+    allowed_missing = {"loop_step_embeddings.weight"} if getattr(model, "loop_step_embeddings", None) is not None else set()
+    disallowed_missing = set(missing_keys) - allowed_missing
+    allowed_unexpected = {"loop_step_embeddings.weight"} if getattr(model, "loop_step_embeddings", None) is None else set()
+    disallowed_unexpected = set(unexpected_keys) - allowed_unexpected
+    if disallowed_missing or disallowed_unexpected:
+        raise RuntimeError(
+            "checkpoint init mismatch: "
+            f"missing={sorted(disallowed_missing)} unexpected={sorted(disallowed_unexpected)}"
+        )
     return init_tokenizer_kind
 
 

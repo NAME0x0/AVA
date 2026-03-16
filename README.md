@@ -6,12 +6,14 @@ The repo contains the model code, training loop, tokenizers, corpora, benchmark 
 
 ## Current Status
 
-As of March 15, 2026, AVA has four live stories:
+As of March 16, 2026, AVA has six live stories:
 
 - a compact `11M` checkpoint with strong internal tool/compliance behavior
 - a small-memory transfer path that turns that checkpoint into a much stronger hybrid system on held-out internal suites
 - a real public benchmark lift on `ARC-Challenge`
-- a new best public path through margin-gated support-bank ensembling
+- a science-first sparse retrieval ensemble that is now the best verified public result in the repo
+- a tokenizer branch that shows open-model tokenization can compress AVA's data sharply
+- an AVA-v2 research direction centered on better tokenization, recurrent/looped reasoning, and stronger non-parametric memory instead of more blind weight patches
 
 ### Scoreboard
 
@@ -24,31 +26,46 @@ As of March 15, 2026, AVA has four live stories:
 | Stress transfer suite with `21`-example memory bank | `87/87` | [stress-tool-minimal-v3-rerun](/D:/AVA/sessions/2026-03-14-202211-stress-tool-minimal-v3-rerun/notes.md) |
 | Same stress suite without memory | `17/87` | [stress-tool-minimal-v3-rerun](/D:/AVA/sessions/2026-03-14-202211-stress-tool-minimal-v3-rerun/notes.md) |
 | ARC-Challenge baseline, first `100` | `19/100` | [arc-baseline-100-v3.json](/D:/AVA/sessions/activity/arc-baseline-100-v3.json) |
-| ARC-Challenge with dedicated `support_mc`, first `100` | `30/100` | [arc-support-mc-100-kindscience.json](/D:/AVA/sessions/activity/arc-support-mc-100-kindscience.json) |
-| ARC-Challenge with dedicated `support_mc`, full `299` | `84/299` | [arc-support-mc-299-kindscience.json](/D:/AVA/sessions/activity/arc-support-mc-299-kindscience.json) |
-| ARC-Challenge with tuned public hybrid bank, first `100` | `30/100` | [summary.json](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/results/summary.json) |
-| ARC-Challenge with tuned public hybrid bank, full `299` | `86/299` | [summary.json](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/results/summary.json) |
-| ARC-Challenge with margin-gated two-bank ensemble, first `100` | `31/100` | [notes.md](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/notes.md) |
-| ARC-Challenge with margin-gated two-bank ensemble, full `299` | `88/299` | [notes.md](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/notes.md) |
+| ARC-Challenge sparse support, first `100` | `30/100` | [arc-support-mc-100-kindscience.json](/D:/AVA/sessions/activity/arc-support-mc-100-kindscience.json) |
+| ARC-Challenge sparse support, full `299` | `84/299` | [arc-support-mc-299-kindscience.json](/D:/AVA/sessions/activity/arc-support-mc-299-kindscience.json) |
+| ARC-Challenge tuned sparse ensemble, full `299` | `88/299` | [arc-hybrid-support-ensemble-299-v1.json](/D:/AVA/sessions/activity/arc-hybrid-support-ensemble-299-v1.json) |
+| ARC-Challenge dense hybrid with `BAAI/bge-m3`, first `100` | `32/100` | [arc-dense-bgem3-100.json](/D:/AVA/sessions/activity/arc-dense-bgem3-100.json) |
+| ARC-Challenge dense hybrid with `BAAI/bge-m3`, full `299` | `82/299` | [arc-dense-bgem3-299.json](/D:/AVA/sessions/activity/arc-dense-bgem3-299.json) |
+| ARC-Challenge sparse+dense router, full `299` | `90/299` | [arc-router-bgem3-299.json](/D:/AVA/sessions/activity/arc-router-bgem3-299.json) |
+| ARC-Challenge sparse+dense router, held-out `199` | `57/199` | [arc-router-bgem3-test199.json](/D:/AVA/sessions/activity/arc-router-bgem3-test199.json) |
+| ARC-Challenge science-primary sparse ensemble, first `100` | `32/100` | [arc-ensemble-science-public-arc-100-v1.json](/D:/AVA/sessions/activity/arc-ensemble-science-public-arc-100-v1.json) |
+| ARC-Challenge science-primary sparse ensemble, full `299` | `91/299` | [arc-ensemble-science-public-arc-299-v1.json](/D:/AVA/sessions/activity/arc-ensemble-science-public-arc-299-v1.json) |
+| ARC-Challenge science-primary sparse ensemble, held-out `199` | `59/199` | [arc-ensemble-science-public-arc-test199-v1.json](/D:/AVA/sessions/activity/arc-ensemble-science-public-arc-test199-v1.json) |
 | GSM8K baseline, first `50` | `0/50` | [gsm8k-baseline-50-v2.json](/D:/AVA/sessions/activity/gsm8k-baseline-50-v2.json) |
-| GSM8K nearest retrieval on cleaned math support, first `50` | `0/50` | [notes.md](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/notes.md) |
+| GSM8K retrieval variants, first `50` | `0/50` | [hybrid-public-benchmark-rag-v1](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/notes.md) |
+| Qwen tokenizer compression on `public_benchmark_plus_teacher_v1` | `0.2407x` byte tokens | [2026-03-15.jsonl](/D:/AVA/sessions/activity/2026-03-15.jsonl) |
+| Qwen tokenizer compression on `general_sft` | `0.2537x` byte tokens | [2026-03-15.jsonl](/D:/AVA/sessions/activity/2026-03-15.jsonl) |
+| Qwen tokenizer compression on `tool_sft` | `0.2656x` byte tokens | [2026-03-15.jsonl](/D:/AVA/sessions/activity/2026-03-15.jsonl) |
 
-### ARC Progress
-
-```mermaid
-xychart-beta
-    title "ARC-Challenge Progress (First 100)"
-    x-axis ["Baseline", "support_mc", "Public Hybrid", "Ensemble"]
-    y-axis "Correct" 0 --> 35
-    bar [19, 30, 30, 31]
-```
+### Public ARC Progress
 
 ```mermaid
 xychart-beta
     title "ARC-Challenge Progress (Full 299)"
-    x-axis ["support_mc", "Public Hybrid", "Ensemble"]
+    x-axis ["Baseline-100", "Sparse-299", "Ensemble-299", "Dense-299", "Router-299", "Science-First-299"]
     y-axis "Correct" 0 --> 100
-    bar [84, 86, 88]
+    bar [19, 84, 88, 82, 90, 91]
+```
+
+```mermaid
+xychart-beta
+    title "ARC-Challenge Held-Out Slice (199 Rows)"
+    x-axis ["Sparse Ensemble", "Sparse+Dense Router", "Science-First Sparse"]
+    y-axis "Correct" 0 --> 60
+    bar [55, 57, 59]
+```
+
+```mermaid
+xychart-beta
+    title "Tokenizer Compression vs Byte Baseline"
+    x-axis ["tool_sft", "general_sft", "public+teacher"]
+    y-axis "Ratio" 0 --> 0.35
+    bar [0.2656, 0.2537, 0.2407]
 ```
 
 ```mermaid
@@ -56,38 +73,42 @@ flowchart LR
     A["Base 11M checkpoint
 Internal 9/10
 Tool 6/6
-Compliance 4/4"] --> B["Nearest-memory transfer
+Compliance 4/4"] --> B["Exact memory transfer
 Expanded 40/40
 Stress 87/87"]
-    C["ARC baseline
-19/100"] --> D["Dedicated support bank
-30/100
-84/299"] --> E["Public hybrid bank
-30/100
-86/299"] --> F["Two-bank ensemble
-31/100
-88/299"]
+    C["Public ARC baseline
+19/100"] --> D["Sparse support bank
+84/299"] --> E["Sparse ensemble
+88/299"] --> F["Dense support branch
+82/299"] --> G["Sparse+dense router
+90/299"] --> H["Science-first sparse ensemble
+91/299
+Held-out 59/199"]
+    I["Open tokenizer branch
+Qwen ratio 0.24x to 0.27x"] --> J["AVA-v2 direction
+open tokenizer + looped reasoning + stronger memory"]
 ```
 
 ## What Changed Most Recently
 
-The newest branch is captured in [notes.md](/D:/AVA/sessions/2026-03-15-160500-hybrid-public-benchmark-rag-v1/notes.md).
+The newest measured public breakthrough is the science-first sparse ARC ensemble:
 
-What worked:
+- a real public-science bank from SciQ and OpenBookQA adds useful coverage, but the main gain came from routing discipline rather than just more rows
+- making `science` the primary sparse bank while keeping `public` and `arc` as fallback banks beat the previous sparse+dense mainline
+- the new best verified public result is [arc-ensemble-science-public-arc-299-v1.json](/D:/AVA/sessions/activity/arc-ensemble-science-public-arc-299-v1.json) at `91/299`
+- the held-out ARC slice also improved to [arc-ensemble-science-public-arc-test199-v1.json](/D:/AVA/sessions/activity/arc-ensemble-science-public-arc-test199-v1.json) at `59/199`
+- the full experimental packet is [public-science-ensemble-v1](/D:/AVA/sessions/2026-03-15-223240-public-science-ensemble-v1/notes.md)
 
-- explicit support-bank `category` preservation in [retrieval.py](/D:/AVA/src/ava/retrieval.py) fixed a real mixed-bank routing bug
-- reusable sparse support indexing in [external_benchmarks.py](/D:/AVA/src/ava/external_benchmarks.py) made larger public support banks usable again
-- keeping rotated ARC support rows materially improved the public bank
-- a question/semantic-heavy hybrid scorer improved the broad public ARC bank
-- a margin-gated two-bank ensemble over [public_benchmark_distill_v1](/D:/AVA/corpora/public_benchmark_distill_v1) and [arc_train_support_v1](/D:/AVA/corpora/arc_train_support_v1) produced the new best `88/299`
+The newest architecture lesson is separate from that benchmark win:
 
-What did not work:
+- open tokenizers from strong open models compress AVA's actual corpora far better than the byte baseline
+- `Qwen/Qwen2.5-0.5B` is the strongest tokenizer tested so far on AVA data
+- late tokenizer migration into the current byte-trained checkpoint still collapses behavior, so tokenizer improvement belongs in AVA-v2 rather than as a last-minute transplant
 
-- GSM8K stayed at `0/50` under the retrieval variants tried so far
-- adding teacher science anchors on top of the public bank did not improve ARC
-- PIQA is currently blocked by the local `datasets` runtime path rather than model inference quality
+The repo is now converging on a cleaner technical story:
 
-The current lesson is simple: public science MCQ is moving through better retrieval systems faster than through naive weight surgery.
+- current AVA mainline: compact checkpoint + transparent external memory/retrieval, with science-first sparse routing as the strongest public ARC path
+- AVA-v2 direction: better open tokenizer, stronger retrieval/memory, and a more principled looped/recurrent architecture instead of more ad hoc patch tuning
 
 ## What AVA Is
 
@@ -133,7 +154,7 @@ Run the baseline budget check:
 ava train dry-run configs/base.yaml
 ```
 
-Run the current benchmark registry smoke:
+Run the benchmark registry smoke:
 
 ```bash
 ava benchmark registry --stage foundation
@@ -143,7 +164,7 @@ ava benchmark registry --modality vision
 Replay the current best public ARC path:
 
 ```bash
-ava benchmark external arc-challenge sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --limit 299 --device cuda --retrieval-mode hybrid_support_ensemble --support-corpus configs/support/arc_ensemble_public_primary_v1.json
+ava benchmark external arc-challenge sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --limit 299 --device cuda --retrieval-mode hybrid_support_ensemble --support-corpus configs/support/arc_ensemble_science_public_arc_v1.json
 ```
 
 Replay the current best internal transfer path:
@@ -155,7 +176,7 @@ ava session memory-transfer stress-tool-minimal-v3-rerun sessions/2026-03-14-184
 Archive a test run in the activity ledger:
 
 ```bash
-ava activity run -- python -m pytest -q
+ava activity run -- python -m pytest -q --basetemp .pytest-tmp
 ```
 
 ## Experiment Discipline
@@ -169,22 +190,19 @@ AVA is session-first. Meaningful work is recorded under `sessions/` with:
 - checkpoint or support-bank artifacts
 - written notes and explicit next-step decisions
 
-There should be no silent fallbacks, no hidden benchmark state, and no untraceable “magic improvement.”
+There should be no silent fallbacks, no hidden benchmark state, and no untraceable magic improvement.
 
 ## CI / CD
 
-The repository now treats CI as part of the research contract.
+CI is part of the research contract.
 
-Current CI in [.github/workflows/ci.yml](/D:/AVA/.github/workflows/ci.yml) runs:
+Current CI in [.github/workflows/ci.yml](/D:/AVA/.github/workflows/ci.yml) now checks three different failure surfaces:
 
-- Python matrix quality checks on `3.10` and `3.11`
-- `ruff check`
-- `ruff format --check`
-- `mypy src tests`
-- `pytest -q`
-- CLI smoke checks for `train dry-run` and benchmark registry commands
+- `quality` on Linux across Python `3.10`, `3.11`, and `3.13`
+- a full Linux research-core job with `dev + train + bench` extras and the full `pytest` suite
+- a Windows smoke job with the core env/retrieval tests and CLI benchmark smoke so local path and temp handling do not drift away from the user's real environment
 
-That keeps the model stack, benchmark surface, and docs/install path from drifting silently.
+The workflow also forces `pytest` into a repo-local temp directory so Windows runs do not silently fail on global temp permission issues.
 
 ## Transparency
 
@@ -212,4 +230,4 @@ For command-level provenance, AVA keeps an append-only activity ledger under `se
 
 ## Status
 
-AVA is still in active experimentation. The current best honest story is not “tiny model beats everything.” The current best honest story is stronger than that: a transparent compact checkpoint plus well-shaped external support already produces strong internal control and a measured public benchmark lift, and the repo makes the wins, failures, and tradeoffs inspectable end to end.
+AVA is still in active experimentation. The best honest story today is not tiny model beats everything. The best honest story is stronger and more useful than that: a transparent compact checkpoint plus well-shaped external memory already produces strong internal control, the public ARC benchmark is still moving through measured retrieval-system improvements, and the next serious leap looks architectural rather than cosmetic.

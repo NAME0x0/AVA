@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\public_benchmark_plus_teacher_v1",
+  "file_count": 3,
+  "text_count": 12533,
+  "character_count": 3480032,
+  "token_count": 3506373,
+  "supervised_example_count": 12532,
+  "files": [
+    {
+      "path": "corpora\\public_benchmark_plus_teacher_v1\\examples.jsonl",
+      "size_bytes": 7057075,
+      "sha256": "098ae351e18cea149bd119c37067dbf1c2d0b58ad1408afac280e20f4ee32d98",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\public_benchmark_plus_teacher_v1\\manifest.json",
+      "size_bytes": 211,
+      "sha256": "76de3e80d4de2159df736400319e52849e76c8b5228128fe378a05bab6086fbf",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\public_benchmark_plus_teacher_v1\\README.md",
+      "size_bytes": 145,
+      "sha256": "727d411705420a211288f539d7a6552d083f73b5aa09cdd892a6916c0f043443",
+      "relative_path": "README.md"
+    }
+  ]
+}

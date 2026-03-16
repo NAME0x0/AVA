@@ -1,3 +1,4 @@
+import json
 import shutil
 from pathlib import Path
 
@@ -142,4 +143,30 @@ def test_hf_unigram_tokenizer_artifact_roundtrip_and_compression() -> None:
     assert artifact["vocab_size"] == tokenizer.vocab_size
     assert tokenizer.decode(tokenizer.encode(text, add_bos=True, add_eos=True)) == text
     assert tokenizer.count_tokens(text) <= byte_tokenizer.count_tokens(text)
+    shutil.rmtree(root)
+
+
+def test_hf_auto_tokenizer_artifact_loads_like_other_hf_artifacts() -> None:
+    root = Path("sessions") / "test-hf-auto-artifact"
+    artifact_path = root / "hf_auto.json"
+    if root.exists():
+        shutil.rmtree(root)
+    root.mkdir(parents=True, exist_ok=True)
+    (root / "examples.jsonl").write_text(
+        "\n".join(
+            [
+                '{"prompt":"What planet is known as the Red Planet?","response":"Mars"}',
+                '{"prompt":"Use the calculator tool for 144 / 12.","response":"12"}',
+            ]
+        ),
+        encoding="utf-8",
+    )
+    build_hf_bpe_artifact(root, artifact_path, target_vocab_size=96, min_frequency=1)
+    payload = json.loads(artifact_path.read_text(encoding="utf-8"))
+    payload["kind"] = "hf_auto"
+    artifact_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    tokenizer = load_hf_subword_tokenizer(artifact_path)
+    text = "What planet is known as the Red Planet?"
+    assert tokenizer.decode(tokenizer.encode(text, add_bos=True, add_eos=True)) == text
+    assert load_tokenizer({"kind": "hf_auto", "path": str(artifact_path)}).decode(tokenizer.encode("Mars")) == "Mars"
     shutil.rmtree(root)

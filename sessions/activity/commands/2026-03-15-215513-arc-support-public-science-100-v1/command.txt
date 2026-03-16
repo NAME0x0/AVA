@@ -1,0 +1,1 @@
+python -m ava.cli benchmark external arc-challenge sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --device cuda --limit 100 --support-corpus corpora/public_science_support_v1 --retrieval-mode support_mc --output sessions/activity/arc-support-public-science-100-v1.json

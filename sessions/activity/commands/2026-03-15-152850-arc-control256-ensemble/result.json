@@ -1,0 +1,24 @@
+{
+  "label": "arc-control256-ensemble",
+  "command": "python -m ava.cli benchmark external arc-challenge sessions/2026-03-15-152500-public-plus-teacher-control-v1/checkpoints/ava-11m-public-plus-teacher-control-v1.pt --limit 100 --device cuda --support-corpus configs/support/arc_ensemble_public_primary_v1.json --retrieval-mode hybrid_support_ensemble",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "benchmark",
+    "external",
+    "arc-challenge",
+    "sessions/2026-03-15-152500-public-plus-teacher-control-v1/checkpoints/ava-11m-public-plus-teacher-control-v1.pt",
+    "--limit",
+    "100",
+    "--device",
+    "cuda",
+    "--support-corpus",
+    "configs/support/arc_ensemble_public_primary_v1.json",
+    "--retrieval-mode",
+    "hybrid_support_ensemble"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 113949
+}

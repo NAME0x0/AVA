@@ -24,6 +24,14 @@ This roadmap maps current arXiv work to concrete AVA experiments.
   AVA takeaway: keep long-term memory external and gated by surprise.
 - `Phi-4 Technical Report` (`arXiv:2412.08905`, submitted December 12, 2024)
   AVA takeaway: data quality and synthetic curriculum can dominate raw size.
+- `Scaling up Test-Time Compute with Latent Reasoning: A Recurrent Depth Approach` (`arXiv:2502.05171`, submitted February 7, 2025)
+  AVA takeaway: if AVA wants more reasoning without more parameters, recurrent latent loops are the strongest current architecture lead.
+- `From RAG to Memory: Non-Parametric Continual Learning for Large Language Models` (`arXiv:2502.14802`, submitted February 20, 2025)
+  AVA takeaway: structured memory is a stronger target than flat vector lookup for the next retrieval branch.
+- `RAFT: Adapting Language Model to Domain Specific RAG` (`arXiv:2403.10131`, submitted March 15, 2024)
+  AVA takeaway: distillation should teach evidence selection under distractors, not just answer memorization.
+- `Qwen3 Technical Report` (`arXiv:2505.09388`, submitted May 14, 2025)
+  AVA takeaway: AVA should steal the open-tokenizer and thinking-budget lessons before copying any large-model scale.
 - `DAPO` (`arXiv:2503.14476`, submitted March 18, 2025; revised May 20, 2025)
   AVA takeaway: RL infrastructure quality matters if we add verifiable post-training.
 - `In-Context Reinforcement Learning for Tool Use in Large Language Models` (`arXiv:2603.08068`, submitted March 9, 2026)
@@ -64,15 +72,18 @@ This roadmap maps current arXiv work to concrete AVA experiments.
 3. Compact tool-use traces
 4. Planning and skill evaluation scaffolding
 5. Verifiable RL on math, science, coding, and tool tasks
-6. Selective test-time scaling on the hardest queries
-7. External memory for product behavior
-8. Compact multimodal branch after the text line is stable
-9. Aggressive deployment compression
-10. Tiny MoE branch only after a strong dense teacher exists
+6. Recurrent-depth AVA-v2 architecture branch
+7. Selective test-time scaling on the hardest queries
+8. External memory for product behavior
+9. Compact multimodal branch after the text line is stable
+10. Aggressive deployment compression
+11. Tiny MoE branch only after a strong dense teacher exists
 
 ## Mainline Decision
 
-The mainline AVA path stays dense and text-first.
+The mainline AVA path stays compact and text-first, but it is no longer just “dense GPT plus patches.”
+
+Current AVA remains a hybrid product stack: compact checkpoint plus transparent external retrieval and memory. AVA-v2 should open three deeper branches in parallel: a stronger open tokenizer, a cleaner recurrent-depth student core, and a more structured retrieval/memory layer.
 
 Sparse MoE remains a research branch for later because the main 4 GB problem is total weight residency, bandwidth, KV/runtime overhead, and training budget, not just FLOPs per token.
 
@@ -90,6 +101,14 @@ Tool RL is also a later branch. Recent HF papers make it more attractive, not mo
   Add verifiable RL only after the model can already solve easy arithmetic, short science QA, and simple code tasks.
 - `exp-005`
   Enable budget forcing only on hard reasoning prompts.
+- `exp-013`
+  Replace the naive looped baseline with a real recurrent-depth AVA-v2 branch inspired by latent reasoning in shared recurrent blocks.
+- `exp-014`
+  Reboot AVA-v2 around a strong open tokenizer, with Qwen-style segmentation as the current lead candidate.
+- `exp-015`
+  Distill knowledge with RAFT-style retrieved evidence plus distractors so the student learns what to ignore, not just what to copy.
+- `exp-016`
+  Upgrade retrieval toward HippoRAG2-style structured memory instead of flat sparse or dense lookup alone.
 - `exp-006`
   Keep Titans-inspired memory as a product-side augmentation, not as a claim that the base model has infinite context.
 - `exp-007`
@@ -104,6 +123,6 @@ Tool RL is also a later branch. Recent HF papers make it more attractive, not mo
   Use Penguin-VL as the first reference when AVA opens a compact multimodal branch; treat InternVL-U as a scale reference, not a target.
 - `exp-012`
   Only invest in AReaL-style asynchronous RL infra if rollout throughput becomes the real bottleneck.
-- `exp-013`
+- `exp-017`
   Add a terminal-proof capture branch using `asciinema` plus optional `ffmpeg` rendering so experiments can ship with compact human-readable replay artifacts without replacing the structured audit trail.
 

@@ -10,12 +10,14 @@ from time import monotonic
 from ava.activity import record_activity, render_command, run_logged_command, snapshot_repo_state
 from ava.benchmarks import serialize_benchmark_registry
 from ava.config import load_experiment_config
+from ava.env import load_project_env
 from ava.external_benchmarks import evaluate_external_benchmark, summarize_external_benchmark
 from ava.inspect import trace_checkpoint
 from ava.tokenizer_artifacts import (
     build_byte_bpe_artifact,
     build_greedy_byte_piece_artifact,
     build_hf_bpe_artifact,
+    build_hf_remote_artifact,
     build_hf_unigram_artifact,
 )
 from ava.sessions import (
@@ -123,6 +125,12 @@ def build_parser() -> argparse.ArgumentParser:
     tokenizer_build.add_argument("--min-frequency", type=int, default=2)
     tokenizer_build.add_argument("--min-pair-frequency", type=int, default=2)
 
+    tokenizer_import = tokenizer_subparsers.add_parser("import-hf")
+    tokenizer_import.add_argument("repo_id")
+    tokenizer_import.add_argument("output")
+    tokenizer_import.add_argument("--revision")
+    tokenizer_import.add_argument("--trust-remote-code", action="store_true")
+
     inspect_parser = subparsers.add_parser("inspect")
     inspect_subparsers = inspect_parser.add_subparsers(dest="inspect_command", required=True)
 
@@ -151,11 +159,24 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark_external.add_argument("checkpoint")
     benchmark_external.add_argument("--split")
     benchmark_external.add_argument("--limit", type=int, default=50)
+    benchmark_external.add_argument("--offset", type=int, default=0)
     benchmark_external.add_argument("--device", default="cuda")
     benchmark_external.add_argument("--support-corpus")
-    benchmark_external.add_argument("--retrieval-mode", choices=("baseline", "direct", "nearest", "support_mc", "hybrid_support_mc", "hybrid_support_ensemble"), default="baseline")
+    benchmark_external.add_argument("--dense-support-corpus")
+    benchmark_external.add_argument("--retrieval-mode", choices=("baseline", "direct", "nearest", "prompt_support", "support_mc", "hybrid_support_mc", "hybrid_support_ensemble", "dense_hybrid_support_mc", "dense_rerank_support_mc", "sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"), default="baseline")
     benchmark_external.add_argument("--nearest-threshold", type=float, default=0.45)
     benchmark_external.add_argument("--nearest-margin", type=float, default=0.0)
+    benchmark_external.add_argument("--support-top-k", type=int, default=2)
+    benchmark_external.add_argument("--dense-encoder-model", default="BAAI/bge-small-en-v1.5")
+    benchmark_external.add_argument("--dense-encoder-device", default="cpu")
+    benchmark_external.add_argument("--dense-candidate-top-k", type=int, default=64)
+    benchmark_external.add_argument("--reranker-model", default="cross-encoder/ms-marco-MiniLM-L-6-v2")
+    benchmark_external.add_argument("--reranker-device", default="cpu")
+    benchmark_external.add_argument("--rerank-top-k", type=int, default=12)
+    benchmark_external.add_argument("--router-dense-score-min", type=float, default=0.7)
+    benchmark_external.add_argument("--router-dense-margin-min", type=float, default=0.0)
+    benchmark_external.add_argument("--router-sparse-margin-max", type=float, default=0.015)
+    benchmark_external.add_argument("--router-margin-gap-min", type=float, default=0.0)
     benchmark_external.add_argument("--no-category-gating", action="store_true")
     benchmark_external.add_argument("--output")
 
@@ -396,6 +417,22 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
             "vocab_size": payload.get("vocab_size"),
         }
 
+    if args.command == "tokenizer" and args.tokenizer_command == "import-hf":
+        payload = build_hf_remote_artifact(
+            args.repo_id,
+            args.output,
+            revision=args.revision,
+            trust_remote_code=args.trust_remote_code,
+        )
+        print(json.dumps(payload, indent=2))
+        return 0, {
+            "tokenizer_command": "import-hf",
+            "repo_id": args.repo_id,
+            "output": args.output,
+            "vocab_size": payload.get("vocab_size"),
+            "revision": args.revision,
+        }
+
     if args.command == "benchmark" and args.benchmark_command == "registry":
         payload = serialize_benchmark_registry(modality=args.modality, stage=args.stage)
         print(json.dumps(payload, indent=2))
@@ -412,12 +449,25 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
             benchmark=args.benchmark,
             split=args.split,
             limit=args.limit,
+            offset=args.offset,
             requested_device=args.device,
             support_corpus=args.support_corpus,
+            dense_support_corpus=args.dense_support_corpus,
             retrieval_mode=args.retrieval_mode,
             category_gated=not args.no_category_gating,
             nearest_threshold=args.nearest_threshold,
             nearest_margin=args.nearest_margin,
+            support_top_k=args.support_top_k,
+            dense_encoder_model=args.dense_encoder_model,
+            dense_encoder_device=args.dense_encoder_device,
+            dense_candidate_top_k=args.dense_candidate_top_k,
+            reranker_model=args.reranker_model,
+            reranker_device=args.reranker_device,
+            rerank_top_k=args.rerank_top_k,
+            router_dense_score_min=args.router_dense_score_min,
+            router_dense_margin_min=args.router_dense_margin_min,
+            router_sparse_margin_max=args.router_sparse_margin_max,
+            router_margin_gap_min=args.router_margin_gap_min,
         )
         if args.output:
             Path(args.output).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
@@ -427,7 +477,10 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
             "benchmark": args.benchmark,
             "checkpoint": args.checkpoint,
             "support_corpus": args.support_corpus,
+            "dense_support_corpus": args.dense_support_corpus,
             "retrieval_mode": args.retrieval_mode,
+            "support_top_k": args.support_top_k,
+            "offset": args.offset,
             "accuracy": payload["accuracy"],
             "correct": payload["correct"],
             "total": payload["total"],
@@ -460,6 +513,7 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
 
 
 def main() -> int:
+    load_project_env()
     parser = build_parser()
     args = parser.parse_args()
 

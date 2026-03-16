@@ -45,7 +45,7 @@ def test_forward_trace_matches_model_logits() -> None:
         top_k_attention=2,
     )
     assert torch.allclose(logits, traced_logits, atol=1e-5)
-    assert len(trace["layers"]) == config.model.n_layer
+    assert len(trace["layers"]) == config.model.effective_layers()
     assert trace["top_next_token_logits"]
 
 
@@ -73,7 +73,7 @@ def test_trace_checkpoint_returns_step_and_layer_data() -> None:
     )
     assert trace["config_name"] == "ava-inspect-tiny"
     assert trace["steps"]
-    assert len(trace["steps"][0]["layers"]) == config.model.n_layer
+    assert len(trace["steps"][0]["layers"]) == config.model.effective_layers()
     assert trace["steps"][0]["layers"][0]["top_mlp_neurons"]
     assert trace["steps"][0]["layers"][0]["attention"]
 
@@ -116,3 +116,43 @@ def test_trace_checkpoint_records_retrieval_prompt_metadata() -> None:
     assert trace["support_corpus"] == str(support_root)
 
     shutil.rmtree(workspace)
+
+
+def test_forward_trace_handles_looped_model() -> None:
+    config = ExperimentConfig.from_dict(
+        {
+            "name": "ava-inspect-looped",
+            "tokenizer": {"kind": "byte", "vocab_size": 260},
+            "model": {
+                "block_size": 128,
+                "n_layer": 1,
+                "n_head": 2,
+                "n_embd": 64,
+                "dropout": 0.0,
+                "bias": False,
+                "architecture": "looped",
+                "loop_repeats": 3,
+            },
+            "training": {"device": "cpu", "dtype": "float32"},
+            "memory": {},
+            "tools": {},
+        }
+    )
+    tokenizer = ByteTokenizer()
+    torch.manual_seed(0)
+    model = build_model(config.model, tokenizer.vocab_size)
+    prompt = "Question: What is 2 + 2?\nAnswer: "
+    idx = torch.tensor([tokenizer.encode(prompt, add_bos=True)], dtype=torch.long)
+    logits, _ = model(idx)
+    traced_logits, trace = _forward_with_trace(
+        model,
+        idx,
+        tokenizer,
+        top_k_neurons=4,
+        top_k_logits_count=4,
+        top_k_attention=2,
+    )
+    assert torch.allclose(logits, traced_logits, atol=1e-5)
+    assert len(trace["layers"]) == 3
+    assert trace["layers"][0]["loop_iteration"] == 0
+    assert trace["layers"][-1]["loop_iteration"] == 2

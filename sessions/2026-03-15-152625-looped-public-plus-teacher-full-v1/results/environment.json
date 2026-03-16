@@ -1,0 +1,75 @@
+{
+  "python_version": "3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "torch_available": true,
+  "torch_version": "2.9.1+cu130",
+  "torch_cuda_version": "13.0",
+  "cuda_available": true,
+  "cudnn_available": true,
+  "device_requested": "cuda",
+  "device_count": 1,
+  "gpu_devices": [
+    {
+      "index": 0,
+      "name": "NVIDIA RTX A2000 Laptop GPU",
+      "total_memory_bytes": 4294508544,
+      "multi_processor_count": 20
+    }
+  ],
+  "nvidia_smi": [
+    {
+      "name": "NVIDIA RTX A2000 Laptop GPU",
+      "driver_version": "581.95",
+      "memory_total": "4096 MiB"
+    }
+  ],
+  "repo": {
+    "head": "3aca0c6e7d6115d56996e22ca176bccf9ebfeaa1",
+    "dirty": true,
+    "dirty_paths": [
+      "M sessions/activity/2026-03-15.jsonl",
+      " M src/ava/config.py",
+      " M src/ava/experiments.py",
+      " M src/ava/inspect.py",
+      " M src/ava/model.py",
+      " M src/ava/train.py",
+      " M tests/test_experiments.py",
+      " M tests/test_inspect.py",
+      " M tests/test_train.py",
+      "?? configs/experiments/ava-11m-looped-public-plus-teacher-adapter-v1.yaml",
+      "?? configs/experiments/ava-11m-looped-public-plus-teacher-full-v1.yaml",
+      "?? configs/experiments/ava-11m-public-plus-teacher-control-v1.yaml",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/notes.md",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/benchmark.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/benchmark_registry.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/budget.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/compliance.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/compliance_benchmark.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/config.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/corpus.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/environment.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/evaluation.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/next_actions.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/tool_benchmark.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/tool_eval.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/results/training.json",
+      "?? sessions/2026-03-15-152500-public-plus-teacher-control-v1/session.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/notes.md",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/benchmark.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/benchmark_registry.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/budget.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/compliance.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/compliance_benchmark.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/config.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/corpus.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/environment.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/evaluation.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/next_actions.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/tool_benchmark.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/tool_eval.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/results/training.json",
+      "?? sessions/2026-03-15-152550-looped-public-plus-teacher-adapter-v1/session.json",
+      "?? sessions/2026-03-15-152625-looped-public-plus-teacher-full-v1/session.json"
+    ]
+  }
+}

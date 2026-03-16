@@ -1,0 +1,103 @@
+{
+  "objective": "Test whether real public-train science support and simple sparse-bank routing can improve AVA on public ARC-Challenge without touching model weights.",
+  "baseline": {
+    "arc_train_support_100": {
+      "correct": 30,
+      "total": 100,
+      "accuracy": 0.3,
+      "artifact": "sessions/activity/arc-support-mc-100-kindscience.json"
+    },
+    "best_prior_sparse_ensemble_299": {
+      "correct": 88,
+      "total": 299,
+      "accuracy": 0.29431438127090304,
+      "artifact": "sessions/activity/arc-ensemble-public-primary-299-v1.json"
+    },
+    "best_prior_sparse_dense_router_299": {
+      "correct": 90,
+      "total": 299,
+      "accuracy": 0.3010033444816054,
+      "artifact": "sessions/activity/arc-router-bgem3-299.json"
+    },
+    "best_prior_sparse_dense_router_test199": {
+      "correct": 57,
+      "total": 199,
+      "accuracy": 0.2864321608040201,
+      "artifact": "sessions/activity/arc-router-bgem3-test199.json"
+    }
+  },
+  "new_corpus": {
+    "path": "corpora/public_science_support_v1",
+    "sciq_examples": 23358,
+    "openbookqa_examples": 9914,
+    "total_examples": 33272,
+    "artifact": "corpora/public_science_support_v1/manifest.json"
+  },
+  "ensemble_search": [
+    {
+      "name": "science_support_only_100",
+      "correct": 28,
+      "total": 100,
+      "accuracy": 0.28,
+      "artifact": "sessions/activity/arc-support-public-science-100-v1.json"
+    },
+    {
+      "name": "arc_plus_science_ensemble_100",
+      "correct": 31,
+      "total": 100,
+      "accuracy": 0.31,
+      "artifact": "sessions/activity/arc-ensemble-arc-science-100-v1.json"
+    },
+    {
+      "name": "public_plus_arc_plus_science_ensemble_100",
+      "correct": 31,
+      "total": 100,
+      "accuracy": 0.31,
+      "artifact": "sessions/activity/arc-ensemble-public-arc-science-100-v1.json"
+    },
+    {
+      "name": "public_plus_arc_plus_science_ensemble_299",
+      "correct": 90,
+      "total": 299,
+      "accuracy": 0.3010033444816054,
+      "artifact": "sessions/activity/arc-ensemble-public-arc-science-299-v1.json"
+    },
+    {
+      "name": "public_plus_arc_plus_science_ensemble_test199",
+      "correct": 59,
+      "total": 199,
+      "accuracy": 0.2964824120603015,
+      "artifact": "sessions/activity/arc-ensemble-public-arc-science-test199-v1.json"
+    },
+    {
+      "name": "science_primary_public_arc_ensemble_100",
+      "correct": 32,
+      "total": 100,
+      "accuracy": 0.32,
+      "artifact": "sessions/activity/arc-ensemble-science-public-arc-100-v1.json"
+    },
+    {
+      "name": "science_primary_public_arc_ensemble_299",
+      "correct": 91,
+      "total": 299,
+      "accuracy": 0.30434782608695654,
+      "artifact": "sessions/activity/arc-ensemble-science-public-arc-299-v1.json"
+    },
+    {
+      "name": "science_primary_public_arc_ensemble_test199",
+      "correct": 59,
+      "total": 199,
+      "accuracy": 0.2964824120603015,
+      "artifact": "sessions/activity/arc-ensemble-science-public-arc-test199-v1.json"
+    }
+  ],
+  "selector_delta_vs_prior_router_test199": {
+    "old_correct": 57,
+    "new_correct": 59,
+    "wrong_to_right": 18,
+    "right_to_wrong": 16,
+    "artifact": "sessions/2026-03-15-223240-public-science-ensemble-v1/results/heldout_delta.json"
+  },
+  "decision": "Promote the science-primary three-bank sparse ensemble as the new public ARC mainline. It sets a new best full ARC score at 91/299 and matches the held-out best at 59/199 without using a dense encoder.",
+  "next_step": "Target the remaining held-out miss clusters, especially life science and earth/space/weather, with compact support-bank additions or teacher-distilled label-only calibration packets."
+}

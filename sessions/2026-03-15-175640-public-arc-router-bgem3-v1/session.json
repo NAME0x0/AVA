@@ -1,0 +1,12 @@
+{
+  "name": "public-arc-router-bgem3-v1",
+  "slug": "public-arc-router-bgem3-v1",
+  "kind": "public-benchmark",
+  "created_at_utc": "2026-03-15T17:56:40.375834+00:00",
+  "sources": [
+    "sessions/activity/arc-hybrid-support-ensemble-299-v1.json",
+    "sessions/activity/arc-dense-bgem3-299.json",
+    "sessions/activity/arc-router-bgem3-299.json",
+    "sessions/activity/arc-router-bgem3-test199.json"
+  ]
+}

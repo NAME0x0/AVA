@@ -1,0 +1,28 @@
+{
+  "label": "arc-ensemble-public-arc-science-test199-v1",
+  "command": "python -m ava.cli benchmark external arc-challenge sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --offset 100 --limit 199 --device cuda --support-corpus configs/support/arc_ensemble_public_arc_science_v1.json --retrieval-mode hybrid_support_ensemble --output sessions/activity/arc-ensemble-public-arc-science-test199-v1.json",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "benchmark",
+    "external",
+    "arc-challenge",
+    "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+    "--offset",
+    "100",
+    "--limit",
+    "199",
+    "--device",
+    "cuda",
+    "--support-corpus",
+    "configs/support/arc_ensemble_public_arc_science_v1.json",
+    "--retrieval-mode",
+    "hybrid_support_ensemble",
+    "--output",
+    "sessions/activity/arc-ensemble-public-arc-science-test199-v1.json"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 651200
+}

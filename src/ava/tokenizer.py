@@ -293,7 +293,7 @@ class HFSubwordTokenizer:
 
     def __post_init__(self) -> None:
         if not HF_TOKENIZERS_AVAILABLE:
-            raise RuntimeError("tokenizers is required for hf_bpe and hf_unigram tokenizers")
+            raise RuntimeError("tokenizers is required for hf_bpe, hf_unigram, and hf_auto tokenizers")
         self.backend = HFTokenizer.from_str(json.dumps(self.tokenizer_json))
         vocab = self.backend.get_vocab(with_added_tokens=True)
         self.token_to_id = {str(token): int(token_id) for token, token_id in vocab.items()}
@@ -357,7 +357,7 @@ def load_byte_bpe_tokenizer(path: str | Path) -> ByteBPETokenizer:
 def load_hf_subword_tokenizer(path: str | Path) -> HFSubwordTokenizer:
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
     kind = str(payload.get("kind"))
-    if kind not in {"hf_bpe", "hf_unigram"}:
+    if kind not in {"hf_bpe", "hf_unigram", "hf_auto"}:
         raise ValueError(f"unsupported tokenizer artifact kind: {payload.get('kind')}")
     return HFSubwordTokenizer(
         tokenizer_json=dict(payload.get("tokenizer_json", {})),
@@ -407,7 +407,7 @@ def load_tokenizer(config: object | None = None) -> ByteTokenizer | GreedyBytePi
         if not artifact_path:
             raise RuntimeError("tokenizer.kind=byte_bpe requires tokenizer.path")
         return load_byte_bpe_tokenizer(artifact_path)
-    if kind in {"hf_bpe", "hf_unigram"}:
+    if kind in {"hf_bpe", "hf_unigram", "hf_auto"}:
         artifact_path = _config_value(config, "path")
         if not artifact_path:
             raise RuntimeError(f"tokenizer.kind={kind} requires tokenizer.path")

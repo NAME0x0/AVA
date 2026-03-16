@@ -1,0 +1,8 @@
+{
+  "name": "ava-11m-qwen-tokenizer-align-v2",
+  "parameters": 68986752,
+  "train_vram_gb": 1.556,
+  "infer_vram_gb": 0.882,
+  "tokens_per_optimizer_step": 1024,
+  "fits_4gb": true
+}

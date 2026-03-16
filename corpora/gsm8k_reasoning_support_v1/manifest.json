@@ -1,0 +1,9 @@
+{
+  "curriculum": "math_reasoning_support",
+  "teacher_model": "codex",
+  "total_examples": 102,
+  "by_kind": {
+    "math_reasoning_support": 102
+  },
+  "examples_path": "corpora\\gsm8k_reasoning_support_v1\\examples.jsonl"
+}

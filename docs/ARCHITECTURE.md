@@ -16,19 +16,20 @@ That distinction matters. The current model code is still text-first, but the be
 1. Curate high-quality language, math, science, and code text.
 2. Tokenize with a simple baseline tokenizer.
 3. Train a compact GPT-2 style causal decoder.
-4. Add compact tool traces for calculator use.
-5. Add verifiable post-training on math, science, coding, and tool tasks.
-6. Add compliance tuning for formatting obedience, refusal quality, and tool boundaries.
-7. Add external memory writes gated by surprise.
-8. Track every decision in a dated session.
-9. Expand evaluation before expanding claims: multilingual first, multimodal after that.
+4. Use the decoder as the control branch while AVA-v2 tests a cleaner recurrent-depth student.
+5. Add compact tool traces for calculator use.
+6. Add verifiable post-training on math, science, coding, and tool tasks.
+7. Add compliance tuning for formatting obedience, refusal quality, and tool boundaries.
+8. Add external memory writes gated by surprise.
+9. Track every decision in a dated session.
+10. Expand evaluation before expanding claims: multilingual first, multimodal after that.
 
 ## Modules
 
 - `ava.tokenizer`
-  A byte-level baseline tokenizer. It is intentionally simple and fully local.
+  A byte-level baseline tokenizer plus artifact-backed open-tokenizer imports. The byte path is still the stable control; the best compression result so far comes from a Qwen-family tokenizer.
 - `ava.model`
-  A minimal GPT-2 style decoder-only Transformer.
+  A minimal GPT-2 style decoder-only Transformer plus an early looped branch. The current looped implementation is only a scaffold, not yet a faithful recurrent-depth architecture.
 - `ava.train`
   Dry-run sizing plus a simple from-scratch training loop for raw text corpora.
 - `ava.eval`
@@ -88,3 +89,23 @@ This is an engineering approximation, not a claim of literal infinite context.
 - A tiny 4 GB baseline will not beat frontier systems everywhere.
 
 The scaffolding now supports broader scope, but the model still has to earn it through data, architecture, and evaluation.
+
+
+## AVA-v2 Direction
+
+The next serious architecture branch is no longer just “scale the same stack a bit.”
+
+The current evidence points toward three coordinated upgrades:
+
+- open tokenizer first
+  The best measured tokenizer on AVA's real corpora is a Qwen-family tokenizer, cutting token counts to roughly one quarter of the byte baseline on the largest tracked corpus.
+- recurrent-depth student core
+  The strongest recent architecture lead for “more reasoning without more parameters” is latent recurrent depth: a prelude, a shared recurrent block, and a coda. AVA's current looped path is only a rough placeholder and should not be confused with that paper's design.
+- structured retrieval and memory
+  AVA's public benchmark wins are coming faster from better retrieval than from checkpoint surgery. The next retrieval target is not another flat nearest-neighbor tweak, but a more structured memory layer that can combine sparse, dense, and graph-style propagation.
+
+## Architecture Lessons So Far
+
+- Late tokenizer migration is not working on the current byte-trained checkpoint. Tokenizer improvement belongs early in AVA-v2, not late in AVA-v1.
+- Naive loop repetition is not enough. The failed looped runs show that AVA needs a cleaner recurrent design and curriculum if loops are going to matter.
+- Retrieval quality matters more than small weight patches on public science MCQ. That is why the best current public path is a routed sparse+dense system rather than a newly fine-tuned checkpoint.

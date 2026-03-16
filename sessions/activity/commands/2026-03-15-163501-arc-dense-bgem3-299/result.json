@@ -1,0 +1,32 @@
+{
+  "label": "arc-dense-bgem3-299",
+  "command": "python -m ava.cli benchmark external arc-challenge sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt --limit 299 --device cuda --support-corpus corpora/arc_train_support_v1 --retrieval-mode dense_hybrid_support_mc --dense-encoder-model BAAI/bge-m3 --dense-encoder-device cpu --dense-candidate-top-k 64 --output sessions/activity/arc-dense-bgem3-299.json",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "benchmark",
+    "external",
+    "arc-challenge",
+    "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+    "--limit",
+    "299",
+    "--device",
+    "cuda",
+    "--support-corpus",
+    "corpora/arc_train_support_v1",
+    "--retrieval-mode",
+    "dense_hybrid_support_mc",
+    "--dense-encoder-model",
+    "BAAI/bge-m3",
+    "--dense-encoder-device",
+    "cpu",
+    "--dense-candidate-top-k",
+    "64",
+    "--output",
+    "sessions/activity/arc-dense-bgem3-299.json"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 423451
+}

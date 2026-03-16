@@ -1,0 +1,52 @@
+[
+  {
+    "category": "english",
+    "prompt": "Rewrite this sentence in plain English: The plan ain't done.",
+    "expected": "The plan is not finished yet."
+  },
+  {
+    "category": "english",
+    "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+    "expected": "The cat slept on the warm sill."
+  },
+  {
+    "category": "math",
+    "prompt": "What is 17 * 29?",
+    "expected": "493"
+  },
+  {
+    "category": "math",
+    "prompt": "Solve for x: 2x + 6 = 14.",
+    "expected": "4"
+  },
+  {
+    "category": "science",
+    "prompt": "What planet is known as the Red Planet?",
+    "expected": "Mars"
+  },
+  {
+    "category": "science",
+    "prompt": "What force keeps planets in orbit around the Sun?",
+    "expected": "gravity"
+  },
+  {
+    "category": "coding",
+    "prompt": "In Python, which keyword defines a function?",
+    "expected": "def"
+  },
+  {
+    "category": "coding",
+    "prompt": "What does len('ava') return in Python?",
+    "expected": "3"
+  },
+  {
+    "category": "tool",
+    "prompt": "Use the calculator tool for 144 / 12.",
+    "expected": "12"
+  },
+  {
+    "category": "tool",
+    "prompt": "Use the calculator tool for sqrt(81).",
+    "expected": "9"
+  }
+]

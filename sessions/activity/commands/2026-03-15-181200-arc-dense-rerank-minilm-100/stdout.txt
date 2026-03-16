@@ -1,0 +1,10 @@
+{
+  "benchmark": "arc-challenge",
+  "split": null,
+  "limit": 100,
+  "retrieval_mode": "dense_rerank_support_mc",
+  "accuracy": 0.29,
+  "correct": 29,
+  "total": 100,
+  "support_corpus": null
+}

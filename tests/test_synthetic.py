@@ -1,4 +1,5 @@
 from ava.synthetic import (
+    generate_math_reasoning_support_examples,
     generate_tool_repair_examples,
     generate_tool_sft_examples,
     repair_expression_pool,
@@ -91,3 +92,38 @@ def test_generate_public_benchmark_distill_examples_uses_train_splits_and_anchor
     assert len({item["prompt"] for item in arc_rows}) == len(arc_rows)
     assert all(item["prompt"].endswith("Reply with only the final answer.") for item in gsm_rows)
 
+
+
+def test_generate_math_reasoning_support_examples_adds_short_rationales() -> None:
+    examples = generate_math_reasoning_support_examples()
+    assert examples
+    assert all(item["category"] == "math" for item in examples)
+    assert all(item["teacher_rationale_short"] for item in examples)
+    assert all(item["format_contract"] == "final_answer_only" for item in examples)
+
+
+def test_public_science_support_examples_from_rows_preserve_labels_and_rotations() -> None:
+    from ava.synthetic import _openbookqa_train_examples_from_rows, _sciq_train_examples_from_rows
+
+    sciq_examples = _sciq_train_examples_from_rows([
+        {
+            "question": "What gas do plants take in from the air for photosynthesis?",
+            "correct_answer": "carbon dioxide",
+            "distractor1": "oxygen",
+            "distractor2": "helium",
+            "distractor3": "nitrogen",
+        }
+    ], rotations=1)
+    openbookqa_examples = _openbookqa_train_examples_from_rows([
+        {
+            "question_stem": "Which force keeps planets in orbit around the Sun?",
+            "choices": {"label": ["A", "B", "C", "D"], "text": ["magnetism", "gravity", "friction", "sound"]},
+            "answerKey": "B",
+        }
+    ], rotations=1)
+
+    assert {item["response"] for item in sciq_examples}.issubset({"A", "B", "C", "D"})
+    assert {item["response"] for item in openbookqa_examples}.issubset({"A", "B", "C", "D"})
+    assert len(sciq_examples) == 2
+    assert len(openbookqa_examples) == 2
+    assert all(item["category"] == "science" for item in sciq_examples + openbookqa_examples)

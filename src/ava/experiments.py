@@ -8,7 +8,7 @@ from pathlib import Path
 from ava.config import ExperimentConfig, load_experiment_config
 from ava.eval import BenchmarkTask, default_benchmark
 from ava.memory import TitansMemory
-from ava.tokenizer import ByteTokenizer
+from ava.tokenizer import ByteTokenizer, load_tokenizer
 from ava.tools import list_protocol_names, render_tool_trace
 
 
@@ -91,7 +91,9 @@ def _dtype_bytes(dtype: str) -> int:
 
 
 def estimate_budget(config: ExperimentConfig, vram_limit_gb: float = 3.4) -> BudgetEstimate:
-    parameters = config.model.estimated_parameters(config.tokenizer.vocab_size)
+    tokenizer = load_tokenizer(config.tokenizer)
+    parameters = config.model.estimated_parameters(tokenizer.vocab_size)
+    effective_layers = config.model.effective_layers()
     dtype_bytes = _dtype_bytes(config.training.dtype)
     weights = parameters * dtype_bytes
     grads = parameters * dtype_bytes
@@ -100,7 +102,7 @@ def estimate_budget(config: ExperimentConfig, vram_limit_gb: float = 3.4) -> Bud
         config.training.micro_batch_size
         * config.model.block_size
         * config.model.n_embd
-        * config.model.n_layer
+        * effective_layers
         * dtype_bytes
         * 28
     )
@@ -109,6 +111,7 @@ def estimate_budget(config: ExperimentConfig, vram_limit_gb: float = 3.4) -> Bud
         * config.model.block_size
         * config.model.block_size
         * config.model.n_head
+        * effective_layers
         * dtype_bytes
     )
     runtime_margin = 768 * 1024 * 1024

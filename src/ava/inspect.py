@@ -80,6 +80,8 @@ def _attention_summary(
 def _layer_trace(
     *,
     layer_index: int,
+    block_index: int,
+    loop_iteration: int,
     residual_before: Any,
     ln1: Any,
     attn_output: Any,
@@ -96,6 +98,8 @@ def _layer_trace(
     positive_fraction = float((last_hidden > 0).float().mean().item())
     return {
         "layer": layer_index,
+        "block": block_index,
+        "loop_iteration": loop_iteration,
         "residual_norm_before": round(float(residual_before[0, -1, :].norm().item()), 6),
         "ln1_norm": round(float(ln1[0, -1, :].norm().item()), 6),
         "attention_output_norm": round(float(attn_output[0, -1, :].norm().item()), 6),
@@ -131,50 +135,56 @@ def _forward_with_trace(
     x = model.drop(x)
     layers: list[dict[str, object]] = []
 
-    for layer_index, block in enumerate(model.blocks):
-        residual_before = x
-        ln1 = block.ln_1(x)
-        batch_size, _, channels = ln1.size()
-        qkv = block.attn.c_attn(ln1)
-        query, key, value = qkv.split(channels, dim=2)
-        query = query.view(batch_size, sequence_length, block.attn.n_head, block.attn.head_dim).transpose(1, 2)
-        key = key.view(batch_size, sequence_length, block.attn.n_head, block.attn.head_dim).transpose(1, 2)
-        value = value.view(batch_size, sequence_length, block.attn.n_head, block.attn.head_dim).transpose(1, 2)
+    repeat_count = model.config.loop_repeats if getattr(model.config, "architecture", "transformer") == "looped" else 1
+    for block_index, block in enumerate(model.blocks):
+        for loop_iteration in range(repeat_count):
+            if getattr(model, "loop_step_embeddings", None) is not None:
+                x = x + model.loop_step_embeddings.weight[loop_iteration].view(1, 1, -1)
+            residual_before = x
+            ln1 = block.ln_1(x)
+            batch_size, _, channels = ln1.size()
+            qkv = block.attn.c_attn(ln1)
+            query, key, value = qkv.split(channels, dim=2)
+            query = query.view(batch_size, sequence_length, block.attn.n_head, block.attn.head_dim).transpose(1, 2)
+            key = key.view(batch_size, sequence_length, block.attn.n_head, block.attn.head_dim).transpose(1, 2)
+            value = value.view(batch_size, sequence_length, block.attn.n_head, block.attn.head_dim).transpose(1, 2)
 
-        scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(block.attn.head_dim)
-        causal_mask = torch.triu(
-            torch.ones(sequence_length, sequence_length, device=idx.device, dtype=torch.bool),
-            diagonal=1,
-        )
-        scores = scores.masked_fill(causal_mask, float("-inf"))
-        attn_weights = torch.softmax(scores, dim=-1)
-        attn_output = torch.matmul(attn_weights, value)
-        attn_output = attn_output.transpose(1, 2).contiguous().view(batch_size, sequence_length, channels)
-        attn_output = block.attn.c_proj(attn_output)
-        x = x + attn_output
-
-        ln2 = block.ln_2(x)
-        mlp_fc = block.mlp.c_fc(ln2)
-        mlp_hidden = F.gelu(mlp_fc)
-        mlp_output = block.mlp.dropout(block.mlp.c_proj(mlp_hidden))
-        x = x + mlp_output
-
-        layers.append(
-            _layer_trace(
-                layer_index=layer_index,
-                residual_before=residual_before,
-                ln1=ln1,
-                attn_output=attn_output,
-                attn_weights=attn_weights,
-                ln2=ln2,
-                mlp_hidden=mlp_hidden,
-                mlp_output=mlp_output,
-                token_ids=idx[0].tolist(),
-                tokenizer=tokenizer,
-                top_k_neurons=top_k_neurons,
-                top_k_attention=top_k_attention,
+            scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(block.attn.head_dim)
+            causal_mask = torch.triu(
+                torch.ones(sequence_length, sequence_length, device=idx.device, dtype=torch.bool),
+                diagonal=1,
             )
-        )
+            scores = scores.masked_fill(causal_mask, float("-inf"))
+            attn_weights = torch.softmax(scores, dim=-1)
+            attn_output = torch.matmul(attn_weights, value)
+            attn_output = attn_output.transpose(1, 2).contiguous().view(batch_size, sequence_length, channels)
+            attn_output = block.attn.c_proj(attn_output)
+            x = x + attn_output
+
+            ln2 = block.ln_2(x)
+            mlp_fc = block.mlp.c_fc(ln2)
+            mlp_hidden = F.gelu(mlp_fc)
+            mlp_output = block.mlp.dropout(block.mlp.c_proj(mlp_hidden))
+            x = x + mlp_output
+
+            layers.append(
+                _layer_trace(
+                    layer_index=len(layers),
+                    block_index=block_index,
+                    loop_iteration=loop_iteration,
+                    residual_before=residual_before,
+                    ln1=ln1,
+                    attn_output=attn_output,
+                    attn_weights=attn_weights,
+                    ln2=ln2,
+                    mlp_hidden=mlp_hidden,
+                    mlp_output=mlp_output,
+                    token_ids=idx[0].tolist(),
+                    tokenizer=tokenizer,
+                    top_k_neurons=top_k_neurons,
+                    top_k_attention=top_k_attention,
+                )
+            )
 
     x = model.ln_f(x)
     logits = model.lm_head(x)

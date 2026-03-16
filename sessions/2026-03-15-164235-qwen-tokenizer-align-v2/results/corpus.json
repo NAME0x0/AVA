@@ -1,0 +1,40 @@
+{
+  "corpus_root": "corpora\\tool_repair_v1_plus_general",
+  "file_count": 5,
+  "text_count": 202,
+  "character_count": 18668,
+  "token_count": 5462,
+  "supervised_example_count": 199,
+  "files": [
+    {
+      "path": "corpora\\tool_repair_v1_plus_general\\general\\examples.jsonl",
+      "size_bytes": 7149,
+      "sha256": "7761ff6dfbf215a6c8ad47ae4871f9825a6db40675353423e1e7189859f4990a",
+      "relative_path": "general\\examples.jsonl"
+    },
+    {
+      "path": "corpora\\tool_repair_v1_plus_general\\general\\README.md",
+      "size_bytes": 406,
+      "sha256": "918b3a48a99a7a2113e3d8cd698e53959f39abbc69e63494180a0cd785000b6e",
+      "relative_path": "general\\README.md"
+    },
+    {
+      "path": "corpora\\tool_repair_v1_plus_general\\README.md",
+      "size_bytes": 251,
+      "sha256": "f87b163685fb2d5990d9848d4905a0c91f759af612cf8b803ecc5f3547479c9c",
+      "relative_path": "README.md"
+    },
+    {
+      "path": "corpora\\tool_repair_v1_plus_general\\repair\\examples.jsonl",
+      "size_bytes": 19515,
+      "sha256": "34360aea460f162fca9b5b015e3fc2e08b89f634254c2d5d1ad1192bd878d02b",
+      "relative_path": "repair\\examples.jsonl"
+    },
+    {
+      "path": "corpora\\tool_repair_v1_plus_general\\repair\\README.md",
+      "size_bytes": 249,
+      "sha256": "e8f85c2ff248ffd02877ae216d684d5a51132de4dd64b3322c52597cba508bf1",
+      "relative_path": "repair\\README.md"
+    }
+  ]
+}

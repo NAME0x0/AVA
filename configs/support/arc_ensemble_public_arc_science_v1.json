@@ -1,0 +1,20 @@
+{
+  "kind": "banks",
+  "strategy": "margin_gate",
+  "margin_threshold": 0.0,
+  "primary_bank": "public",
+  "banks": [
+    {
+      "name": "public",
+      "path": "../../corpora/public_benchmark_distill_v1"
+    },
+    {
+      "name": "arc",
+      "path": "../../corpora/arc_train_support_v1"
+    },
+    {
+      "name": "science",
+      "path": "../../corpora/public_science_support_v1"
+    }
+  ]
+}

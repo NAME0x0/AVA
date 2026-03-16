@@ -1,0 +1,10 @@
+{
+  "benchmark": "arc-challenge",
+  "split": null,
+  "limit": 199,
+  "retrieval_mode": "sparse_dense_router_support_mc",
+  "accuracy": 0.286,
+  "correct": 57,
+  "total": 199,
+  "support_corpus": "corpora/arc_support_ensemble_v1"
+}

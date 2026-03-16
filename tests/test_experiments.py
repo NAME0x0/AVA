@@ -1,13 +1,17 @@
+import shutil
 from pathlib import Path
 
+from ava.config import ExperimentConfig
 from ava.experiments import (
     choose_next_step,
+    estimate_budget,
     run_budget_sweep,
     run_memory_sweep,
     run_prompt_protocol_sweep,
     run_test_time_strategy_sweep,
 )
 from ava.tokenizer import ByteTokenizer
+from ava.tokenizer_artifacts import build_hf_bpe_artifact
 
 
 def test_budget_sweep_returns_sorted_results() -> None:
@@ -42,3 +46,67 @@ def test_recommendation_contains_next_actions() -> None:
     assert recommendation["recommended_protocol"]
     assert recommendation["next_actions"]
 
+
+
+def test_looped_budget_uses_effective_layers() -> None:
+    base = ExperimentConfig.from_dict(
+        {
+            "name": "base",
+            "tokenizer": {"kind": "byte", "vocab_size": 260},
+            "model": {"block_size": 64, "n_layer": 2, "n_head": 2, "n_embd": 64, "dropout": 0.0, "bias": False},
+            "training": {"device": "cpu", "dtype": "float32", "micro_batch_size": 1, "gradient_accumulation_steps": 1},
+            "memory": {},
+            "tools": {},
+        }
+    )
+    looped = ExperimentConfig.from_dict(
+        {
+            "name": "looped",
+            "tokenizer": {"kind": "byte", "vocab_size": 260},
+            "model": {
+                "block_size": 64,
+                "n_layer": 2,
+                "n_head": 2,
+                "n_embd": 64,
+                "dropout": 0.0,
+                "bias": False,
+                "architecture": "looped",
+                "loop_repeats": 3,
+            },
+            "training": {"device": "cpu", "dtype": "float32", "micro_batch_size": 1, "gradient_accumulation_steps": 1},
+            "memory": {},
+            "tools": {},
+        }
+    )
+    base_budget = estimate_budget(base)
+    looped_budget = estimate_budget(looped)
+    assert looped_budget.parameters > base_budget.parameters
+    assert looped_budget.train_vram_gb > base_budget.train_vram_gb
+
+
+def test_budget_uses_tokenizer_artifact_vocab_size() -> None:
+    root = Path("sessions") / "test-budget-tokenizer-artifact"
+    artifact_path = root / "hf_bpe.json"
+    if root.exists():
+        shutil.rmtree(root)
+    root.mkdir(parents=True, exist_ok=True)
+    (root / "examples.jsonl").write_text(
+        "\n".join(
+            [
+                '{"prompt":"What planet is known as the Red Planet?","response":"Mars"}',
+                '{"prompt":"Use the calculator tool for 144 / 12.","response":"12"}',
+            ]
+        ),
+        encoding="utf-8",
+    )
+    artifact = build_hf_bpe_artifact(root, artifact_path, target_vocab_size=96, min_frequency=1)
+    config = ExperimentConfig.from_dict(
+        {
+            "name": "artifact-budget",
+            "tokenizer": {"kind": "hf_bpe", "path": str(artifact_path), "vocab_size": 260},
+            "model": {"n_layer": 2, "n_head": 2, "n_embd": 32, "block_size": 64},
+        }
+    )
+    estimate = estimate_budget(config)
+    assert estimate.parameters == config.model.estimated_parameters(int(artifact["vocab_size"]))
+    shutil.rmtree(root)

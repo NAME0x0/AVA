@@ -1,0 +1,16 @@
+{
+  "curriculum": "public_science_support",
+  "sciq_limit": null,
+  "openbookqa_limit": null,
+  "rotations": 1,
+  "sciq_examples": 23358,
+  "openbookqa_examples": 9914,
+  "total_examples": 33272,
+  "by_kind": {
+    "sciq_mc": 11679,
+    "sciq_mc_aug": 11679,
+    "openbookqa_mc": 4957,
+    "openbookqa_mc_aug": 4957
+  },
+  "examples_path": "corpora\\public_science_support_v1\\examples.jsonl"
+}

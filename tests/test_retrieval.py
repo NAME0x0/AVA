@@ -186,3 +186,25 @@ def test_lookup_support_answer_nearest_handles_stress_tool_and_policy_phrases() 
     assert policy_match is not None
     assert tool_match['response'] == '[calc]sqrt(81)=>9[/calc]\n9'
     assert policy_match['response'] == 'The calculator cannot help with deleting files.'
+
+
+def test_prepare_retrieval_prompt_includes_teacher_rationale_when_available() -> None:
+    tokenizer = ByteTokenizer()
+    payload = prepare_retrieval_prompt(
+        "Ava had 3 apples and bought 2 more. How many apples does Ava have now?",
+        tokenizer=tokenizer,
+        block_size=256,
+        support_examples=[
+            SupportExample(
+                prompt="Mia had 4 pencils and bought 3 more. How many pencils does Mia have now?",
+                response="7",
+                category="math",
+                teacher_rationale_short="4 + 3 = 7",
+            )
+        ],
+        top_k=1,
+        category_hint="math",
+        category_gated=True,
+    )
+    assert payload["enabled"]
+    assert "Reasoning: 4 + 3 = 7" in str(payload["prompt"])

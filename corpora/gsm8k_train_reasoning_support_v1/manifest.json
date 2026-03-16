@@ -1,0 +1,5 @@
+{
+  "curriculum": "gsm8k_train_reasoning_support",
+  "total_examples": 7473,
+  "examples_path": "corpora\\gsm8k_train_reasoning_support_v1\\examples.jsonl"
+}

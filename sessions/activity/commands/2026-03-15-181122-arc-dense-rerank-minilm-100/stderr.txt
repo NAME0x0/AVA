@@ -1,0 +1,260 @@
+'[WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions' thrown while requesting HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/adapter_config.json
+Retrying in 1s [Retry 1/5].
+
+Loading weights:   0%|          | 0/391 [00:00<?, ?it/s]
+Loading weights: 100%|##########| 391/391 [00:00<00:00, 37810.92it/s]
+Exception in thread Thread-auto_conversion:
+Traceback (most recent call last):
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_transports\default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+        pool_request.request
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_sync\connection.py", line 101, in handle_request
+    raise exc
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_sync\connection.py", line 78, in handle_request
+    stream = self._connect(request)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_sync\connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_backends\sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Program Files\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+    ~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\safetensors_conversion.py", line 117, in auto_conversion
+    raise e
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\safetensors_conversion.py", line 96, in auto_conversion
+    sha = get_conversion_pr_reference(api, pretrained_model_name_or_path, **cached_file_kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\safetensors_conversion.py", line 60, in get_conversion_pr_reference
+    private = api.model_info(model_id).private
+              ~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\hf_api.py", line 2939, in model_info
+    r = get_session().get(path, headers=headers, timeout=timeout, params=params)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1053, in get
+    return self.request(
+           ~~~~~~~~~~~~^
+        "GET",
+        ^^^^^^
+    ...<7 lines>...
+        extensions=extensions,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+        request,
+    ...<2 lines>...
+        history=[],
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+        request,
+        follow_redirects=follow_redirects,
+        history=history,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_transports\default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+Traceback (most recent call last):
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_transports\default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+        pool_request.request
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_sync\connection.py", line 101, in handle_request
+    raise exc
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_sync\connection.py", line 78, in handle_request
+    stream = self._connect(request)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_sync\connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_backends\sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\AVA\src\ava\cli.py", line 568, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "D:\AVA\src\ava\cli.py", line 540, in main
+    exit_code, metadata = _dispatch(args)
+                          ~~~~~~~~~^^^^^^
+  File "D:\AVA\src\ava\cli.py", line 447, in _dispatch
+    payload = evaluate_external_benchmark(
+        args.checkpoint,
+    ...<21 lines>...
+        router_margin_gap_min=args.router_margin_gap_min,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\torch\utils\_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "D:\AVA\src\ava\external_benchmarks.py", line 1197, in evaluate_external_benchmark
+    dense_retriever = build_dense_support_retriever(
+        dense_support_examples,
+        model_name=dense_encoder_model,
+        device=dense_encoder_device,
+    )
+  File "D:\AVA\src\ava\dense_retrieval.py", line 147, in build_dense_support_retriever
+    backend = SentenceTransformer(
+        model_name,
+    ...<3 lines>...
+        local_files_only=True,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\sentence_transformers\SentenceTransformer.py", line 327, in __init__
+    modules, self.module_kwargs = self._load_sbert_model(
+                                  ~~~~~~~~~~~~~~~~~~~~~~^
+        model_name_or_path,
+        ^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+        config_kwargs=config_kwargs,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\sentence_transformers\SentenceTransformer.py", line 2323, in _load_sbert_model
+    module = module_class.load(
+        model_name_or_path,
+    ...<11 lines>...
+        backend=self.backend,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\sentence_transformers\models\Transformer.py", line 436, in load
+    return cls(model_name_or_path=model_name_or_path, **init_kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\sentence_transformers\models\Transformer.py", line 135, in __init__
+    self.tokenizer = AutoTokenizer.from_pretrained(
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        tokenizer_name_or_path if tokenizer_name_or_path is not None else model_name_or_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        cache_dir=cache_dir,
+        ^^^^^^^^^^^^^^^^^^^^
+        **tokenizer_args,
+        ^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\models\auto\tokenization_auto.py", line 749, in from_pretrained
+    return tokenizer_class.from_pretrained(pretrained_model_name_or_path, *inputs, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\tokenization_utils_base.py", line 1721, in from_pretrained
+    return cls._from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~^
+        resolved_vocab_files,
+        ^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\tokenization_utils_base.py", line 1910, in _from_pretrained
+    tokenizer = cls(*init_inputs, **init_kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\models\xlm_roberta\tokenization_xlm_roberta.py", line 94, in __init__
+    super().__init__(
+    ~~~~~~~~~~~~~~~~^
+        bos_token=bos_token,
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\tokenization_utils_tokenizers.py", line 442, in __init__
+    self._tokenizer = self._patch_mistral_regex(
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self._tokenizer,
+        ^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\tokenization_utils_tokenizers.py", line 1262, in _patch_mistral_regex
+    is_local or (not is_local and is_base_mistral(pretrained_model_name_or_path))
+                                  ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\tokenization_utils_tokenizers.py", line 1252, in is_base_mistral
+    model = model_info(model_id)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\hf_api.py", line 2939, in model_info
+    r = get_session().get(path, headers=headers, timeout=timeout, params=params)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1053, in get
+    return self.request(
+           ~~~~~~~~~~~~^
+        "GET",
+        ^^^^^^
+    ...<7 lines>...
+        extensions=extensions,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 914, in send
+    response = self._send_handling_auth(
+        request,
+    ...<2 lines>...
+        history=[],
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+        request,
+        follow_redirects=follow_redirects,
+        history=history,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_transports\default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions

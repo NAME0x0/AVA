@@ -143,6 +143,42 @@ PAPERS = (
         ava_takeaway="Data quality and curriculum design can dominate parameter count for narrow tasks.",
     ),
     ResearchPaper(
+        key="latent-recurrent-depth",
+        title="Scaling up Test-Time Compute with Latent Reasoning: A Recurrent Depth Approach",
+        arxiv_url="https://arxiv.org/abs/2502.05171",
+        submitted="2025-02-07",
+        updated=None,
+        theme="recurrent latent reasoning",
+        ava_takeaway="Test-time loops over a shared latent block are the strongest current evidence that extra compute can substitute for extra parameters, but AVA needs a cleaner recurrent core than the current naive looped baseline.",
+    ),
+    ResearchPaper(
+        key="hipporag2",
+        title="From RAG to Memory: Non-Parametric Continual Learning for Large Language Models",
+        arxiv_url="https://arxiv.org/abs/2502.14802",
+        submitted="2025-02-20",
+        updated=None,
+        theme="structured rag memory",
+        ava_takeaway="Graph-style memory plus passage integration is a better target than plain vector lookup for AVA's long-term memory layer.",
+    ),
+    ResearchPaper(
+        key="raft",
+        title="RAFT: Adapting Language Model to Domain Specific RAG",
+        arxiv_url="https://arxiv.org/abs/2403.10131",
+        submitted="2024-03-15",
+        updated=None,
+        theme="retrieval-aware distillation",
+        ava_takeaway="If AVA distills knowledge into the student, it should learn to use retrieved evidence and ignore distractors, not just memorize answers.",
+    ),
+    ResearchPaper(
+        key="qwen3",
+        title="Qwen3 Technical Report",
+        arxiv_url="https://arxiv.org/abs/2505.09388",
+        submitted="2025-05-14",
+        updated=None,
+        theme="open tokenizer and reasoning modes",
+        ava_takeaway="Qwen3 is the strongest current open reference for tokenizer quality, multilingual coverage, and explicit thinking-budget control; AVA should steal the tokenizer lesson before the large-scale model lesson.",
+    ),
+    ResearchPaper(
         key="bitnet",
         title="BitNet b1.58 2B4T Technical Report",
         arxiv_url="https://arxiv.org/abs/2504.12285",
@@ -304,6 +340,38 @@ HYPOTHESES = (
         success_signal="Reasoning gains with small average token overhead.",
     ),
     ResearchHypothesis(
+        key="exp-013",
+        name="Latent recurrent-depth AVA-v2 core",
+        priority=6,
+        paper_keys=("latent-recurrent-depth",),
+        experiment="Replace the current naive looped baseline with a cleaner prelude/shared-recurrent/coda student branch that can spend more latent compute without increasing parameter count.",
+        success_signal="A recurrent student matches or beats the dense control at similar parameter count while improving public reasoning benchmarks when allowed extra loop steps.",
+    ),
+    ResearchHypothesis(
+        key="exp-014",
+        name="Open-tokenizer reboot around Qwen-style segmentation",
+        priority=7,
+        paper_keys=("qwen3", "phi-4"),
+        experiment="Start AVA-v2 from a strong open tokenizer and retrain or distill early, instead of migrating a byte-trained checkpoint late.",
+        success_signal="Lower token counts and better public-benchmark learning efficiency without the collapse seen in late tokenizer migration.",
+    ),
+    ResearchHypothesis(
+        key="exp-015",
+        name="RAFT-style retrieval-aware distillation",
+        priority=8,
+        paper_keys=("raft", "toolace-r"),
+        experiment="Distill public knowledge into AVA with retrieved evidence plus distractors so the student learns evidence selection instead of answer memorization.",
+        success_signal="Public-benchmark gains survive when support banks contain distractors, and the student becomes more robust to noisy retrieval.",
+    ),
+    ResearchHypothesis(
+        key="exp-016",
+        name="HippoRAG2-style structured memory graph",
+        priority=9,
+        paper_keys=("hipporag2", "titans"),
+        experiment="Upgrade AVA's external memory from flat nearest-neighbor lookup to a graph-augmented retrieval layer with propagation over related support facts.",
+        success_signal="Structured memory beats the current sparse+dense router on ARC-like public benchmarks or held-out transfer suites without hiding the reasoning path.",
+    ),
+    ResearchHypothesis(
         key="exp-006",
         name="Titans-inspired external memory",
         priority=6,
@@ -363,6 +431,9 @@ HYPOTHESES = (
 
 
 RECENT_HF_PAPER_KEYS = (
+    "latent-recurrent-depth",
+    "hipporag2",
+    "qwen3",
     "icrl-tool-use",
     "deepplanning",
     "skillnet",
@@ -374,6 +445,10 @@ RECENT_HF_PAPER_KEYS = (
 )
 
 RECENT_HF_HYPOTHESIS_KEYS = (
+    "exp-013",
+    "exp-014",
+    "exp-015",
+    "exp-016",
     "exp-009",
     "exp-010",
     "exp-011",

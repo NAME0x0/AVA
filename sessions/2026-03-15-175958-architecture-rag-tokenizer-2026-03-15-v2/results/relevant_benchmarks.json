@@ -1,0 +1,74 @@
+[
+  {
+    "key": "bfcl",
+    "name": "BFCL",
+    "modality": "text",
+    "capability": "tool_use",
+    "metric": "function_call_accuracy",
+    "stage": "foundation",
+    "priority": 5,
+    "source_url": "https://gorilla.cs.berkeley.edu/leaderboard",
+    "runner": "planned_external",
+    "note": "Function-calling benchmark for tool selection, argument correctness, and abstention."
+  },
+  {
+    "key": "deepplanning",
+    "name": "DeepPlanning",
+    "modality": "agentic",
+    "capability": "long_horizon_planning",
+    "metric": "constraint_satisfaction",
+    "stage": "agentic",
+    "priority": 19,
+    "source_url": "https://arxiv.org/abs/2601.18137",
+    "runner": "registry_only",
+    "note": "Long-horizon planning benchmark with verifiable budget and ordering constraints."
+  },
+  {
+    "key": "tau2-bench",
+    "name": "tau2-bench",
+    "modality": "agentic",
+    "capability": "policy_constrained_tool_use",
+    "metric": "task_success",
+    "stage": "scale_only",
+    "priority": 22,
+    "source_url": "https://github.com/sierra-research/tau2-bench",
+    "runner": "registry_only",
+    "note": "Agentic customer-service benchmark for multi-turn policy and tool adherence."
+  },
+  {
+    "key": "mathvista",
+    "name": "MathVista",
+    "modality": "vision",
+    "capability": "visual_math_reasoning",
+    "metric": "accuracy",
+    "stage": "multimodal",
+    "priority": 14,
+    "source_url": "https://mathvista.github.io/",
+    "runner": "registry_only",
+    "note": "Best fit vision benchmark for AVA's eventual math-heavy multimodal branch."
+  },
+  {
+    "key": "scienceqa",
+    "name": "ScienceQA",
+    "modality": "vision",
+    "capability": "multimodal_science_reasoning",
+    "metric": "accuracy",
+    "stage": "multimodal",
+    "priority": 15,
+    "source_url": "https://scienceqa.github.io/",
+    "runner": "registry_only",
+    "note": "Science-focused multimodal benchmark that ties AVA's science scope to later vision-language work."
+  },
+  {
+    "key": "docvqa",
+    "name": "DocVQA",
+    "modality": "vision",
+    "capability": "document_reasoning",
+    "metric": "anls",
+    "stage": "multimodal",
+    "priority": 18,
+    "source_url": "https://www.docvqa.org/",
+    "runner": "registry_only",
+    "note": "Document-image QA benchmark for OCR-heavy and layout-sensitive use cases."
+  }
+]

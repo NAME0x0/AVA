@@ -1,0 +1,132 @@
+'[WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions' thrown while requesting HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/adapter_config.json
+Retrying in 1s [Retry 1/5].
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\AVA\src\ava\cli.py", line 548, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "D:\AVA\src\ava\cli.py", line 520, in main
+    exit_code, metadata = _dispatch(args)
+                          ~~~~~~~~~^^^^^^
+  File "D:\AVA\src\ava\cli.py", line 438, in _dispatch
+    payload = evaluate_external_benchmark(
+        args.checkpoint,
+    ...<12 lines>...
+        dense_candidate_top_k=args.dense_candidate_top_k,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\torch\utils\_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "D:\AVA\src\ava\external_benchmarks.py", line 973, in evaluate_external_benchmark
+    dense_retriever = build_dense_support_retriever(
+        support_examples,
+        model_name=dense_encoder_model,
+        device=dense_encoder_device,
+    )
+  File "D:\AVA\src\ava\dense_retrieval.py", line 137, in build_dense_support_retriever
+    backend = SentenceTransformer(
+        model_name,
+    ...<2 lines>...
+        trust_remote_code=trust_remote_code,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\sentence_transformers\SentenceTransformer.py", line 327, in __init__
+    modules, self.module_kwargs = self._load_sbert_model(
+                                  ~~~~~~~~~~~~~~~~~~~~~~^
+        model_name_or_path,
+        ^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+        config_kwargs=config_kwargs,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\sentence_transformers\SentenceTransformer.py", line 2323, in _load_sbert_model
+    module = module_class.load(
+        model_name_or_path,
+    ...<11 lines>...
+        backend=self.backend,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\sentence_transformers\models\Transformer.py", line 436, in load
+    return cls(model_name_or_path=model_name_or_path, **init_kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\sentence_transformers\models\Transformer.py", line 120, in __init__
+    config, is_peft_model = self._load_config(model_name_or_path, cache_dir, backend, config_args)
+                            ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\sentence_transformers\models\Transformer.py", line 171, in _load_config
+    find_adapter_config_file(
+    ~~~~~~~~~~~~~~~~~~~~~~~~^
+        model_name_or_path,
+        ^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        local_files_only=config_args.get("local_files_only", False),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\utils\peft_utils.py", line 84, in find_adapter_config_file
+    adapter_cached_filename = cached_file(
+        model_id,
+    ...<11 lines>...
+        _raise_exceptions_for_connection_errors=False,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\utils\hub.py", line 277, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\utils\hub.py", line 508, in cached_files
+    raise e
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\transformers\utils\hub.py", line 420, in cached_files
+    hf_hub_download(
+    ~~~~~~~~~~~~~~~^
+        path_or_repo_id,
+        ^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        local_files_only=local_files_only,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\file_download.py", line 986, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+        # Destination
+    ...<15 lines>...
+        dry_run=dry_run,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\file_download.py", line 1119, in _hf_hub_download_to_cache_dir
+    _get_metadata_or_catch_error(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        repo_id=repo_id,
+        ^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+        retry_on_errors=True,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\file_download.py", line 1653, in _get_metadata_or_catch_error
+    metadata = get_hf_file_metadata(
+        url=url,
+    ...<4 lines>...
+        retry_on_errors=retry_on_errors,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\file_download.py", line 1576, in get_hf_file_metadata
+    response = _httpx_follow_relative_redirects_with_backoff(
+        method="HEAD", url=url, headers=hf_headers, timeout=timeout, retry_on_errors=retry_on_errors
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_http.py", line 685, in _httpx_follow_relative_redirects_with_backoff
+    response = http_backoff(
+        method=method,
+    ...<3 lines>...
+        **no_retry_kwargs,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_http.py", line 559, in http_backoff
+    return next(
+        _http_backoff_base(
+    ...<9 lines>...
+        )
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_http.py", line 467, in _http_backoff_base
+    response = client.request(method=method, url=url, **kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 901, in send
+    raise RuntimeError("Cannot send a request, as the client has been closed.")
+RuntimeError: Cannot send a request, as the client has been closed.

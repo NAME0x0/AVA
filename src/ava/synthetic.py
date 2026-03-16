@@ -942,3 +942,261 @@ def materialize_public_benchmark_distill_corpus(
         ],
     )
 
+
+
+def _openbookqa_train_examples_from_rows(rows: list[dict[str, object]], *, rotations: int = 1) -> list[dict[str, object]]:
+    examples: list[dict[str, object]] = []
+    for index, row in enumerate(rows):
+        choice_payload = row["choices"]
+        labels = tuple(str(label) for label in choice_payload["label"])
+        texts = tuple(str(choice) for choice in choice_payload["text"])
+        choices = tuple(zip(labels, texts, strict=True))
+        answer_key = str(row["answerKey"])
+        prompt = _multiple_choice_prompt(str(row["question_stem"]), choices)
+        examples.append(
+            {
+                "kind": "openbookqa_mc",
+                "prompt": prompt,
+                "response": answer_key,
+                "benchmark": "openbookqa",
+                "source_type": "hf_train_split",
+                "category": "science",
+                "difficulty": "train",
+                "format_contract": "label_only",
+                "verifier_status": "ground_truth",
+                "tags": ["openbookqa", "science", "label_only"],
+            }
+        )
+        for offset in range(1, max(rotations, 0) + 1):
+            rotated_prompt, rotated_answer = _rotate_multiple_choice_task(prompt, choices, answer_key, offset)
+            examples.append(
+                {
+                    "kind": "openbookqa_mc_aug",
+                    "prompt": rotated_prompt,
+                    "response": rotated_answer,
+                    "benchmark": "openbookqa",
+                    "source_type": "hf_train_split_augmented",
+                    "category": "science",
+                    "difficulty": "train",
+                    "format_contract": "label_only",
+                    "verifier_status": "ground_truth",
+                    "tags": ["openbookqa", "science", "label_only", "rotated_choices"],
+                }
+            )
+    return examples
+
+
+
+def _sciq_train_examples_from_rows(rows: list[dict[str, object]], *, rotations: int = 1) -> list[dict[str, object]]:
+    examples: list[dict[str, object]] = []
+    for index, row in enumerate(rows):
+        correct = str(row["correct_answer"])
+        distractors = (
+            str(row["distractor1"]),
+            str(row["distractor2"]),
+            str(row["distractor3"]),
+        )
+        choices, answer_key = _rotated_choice_set(correct, distractors, index)
+        prompt = _multiple_choice_prompt(str(row["question"]), choices)
+        examples.append(
+            {
+                "kind": "sciq_mc",
+                "prompt": prompt,
+                "response": answer_key,
+                "benchmark": "sciq",
+                "source_type": "hf_train_split",
+                "category": "science",
+                "difficulty": "train",
+                "format_contract": "label_only",
+                "verifier_status": "ground_truth",
+                "tags": ["sciq", "science", "label_only"],
+            }
+        )
+        for offset in range(1, max(rotations, 0) + 1):
+            rotated_prompt, rotated_answer = _rotate_multiple_choice_task(prompt, choices, answer_key, offset)
+            examples.append(
+                {
+                    "kind": "sciq_mc_aug",
+                    "prompt": rotated_prompt,
+                    "response": rotated_answer,
+                    "benchmark": "sciq",
+                    "source_type": "hf_train_split_augmented",
+                    "category": "science",
+                    "difficulty": "train",
+                    "format_contract": "label_only",
+                    "verifier_status": "ground_truth",
+                    "tags": ["sciq", "science", "label_only", "rotated_choices"],
+                }
+            )
+    return examples
+
+
+
+def generate_public_science_support_examples(
+    *,
+    sciq_limit: int | None = None,
+    openbookqa_limit: int | None = None,
+    rotations: int = 1,
+) -> list[dict[str, object]]:
+    try:
+        from datasets import load_dataset
+    except ImportError as exc:  # pragma: no cover - optional dependency
+        raise RuntimeError("datasets is required for public science support generation") from exc
+
+    sciq_split = f"train[:{sciq_limit}]" if sciq_limit is not None else "train"
+    openbookqa_split = f"train[:{openbookqa_limit}]" if openbookqa_limit is not None else "train"
+    sciq_rows = [dict(row) for row in load_dataset("sciq", split=sciq_split)]
+    openbookqa_rows = [dict(row) for row in load_dataset("allenai/openbookqa", split=openbookqa_split)]
+
+    examples: list[dict[str, object]] = []
+    examples.extend(_sciq_train_examples_from_rows(sciq_rows, rotations=rotations))
+    examples.extend(_openbookqa_train_examples_from_rows(openbookqa_rows, rotations=rotations))
+    return examples
+
+
+
+def materialize_public_science_support_corpus(
+    root: str | Path,
+    *,
+    sciq_limit: int | None = None,
+    openbookqa_limit: int | None = None,
+    rotations: int = 1,
+) -> dict[str, object]:
+    examples = generate_public_science_support_examples(
+        sciq_limit=sciq_limit,
+        openbookqa_limit=openbookqa_limit,
+        rotations=rotations,
+    )
+    return _write_examples_corpus(
+        Path(root),
+        examples,
+        metadata={
+            "curriculum": "public_science_support",
+            "sciq_limit": sciq_limit,
+            "openbookqa_limit": openbookqa_limit,
+            "rotations": rotations,
+            "sciq_examples": len([item for item in examples if item["kind"] in {"sciq_mc", "sciq_mc_aug"}]),
+            "openbookqa_examples": len([item for item in examples if item["kind"] in {"openbookqa_mc", "openbookqa_mc_aug"}]),
+        },
+        readme_lines=[
+            "# Public Science Support Corpus",
+            "",
+            "A train-split support bank built from SciQ and OpenBookQA.",
+            "",
+            "This branch is purely non-parametric distillation: it adds more real public science multiple-choice structure to AVA's support layer without touching the student weights.",
+        ],
+    )
+
+
+
+def generate_math_reasoning_support_examples(teacher_model: str = "codex") -> list[dict[str, object]]:
+    examples: list[dict[str, object]] = []
+
+    for start in range(12, 84, 4):
+        spent = (start // 4) % 5 + 2
+        bought = (start // 6) % 4 + 1
+        answer = start - spent + bought
+        examples.append({
+            "kind": "math_reasoning_support",
+            "prompt": (
+                f"Ava had {start} stickers. She gave {spent} to her friend and then bought {bought} more. "
+                "How many stickers does she have now?\n\nReply with only the final answer."
+            ),
+            "response": str(answer),
+            "teacher_model": teacher_model,
+            "source_type": "synthetic_teacher",
+            "category": "math",
+            "difficulty": "easy",
+            "format_contract": "final_answer_only",
+            "teacher_rationale_short": f"{start} - {spent} + {bought} = {answer}",
+            "verifier_status": "pass",
+            "tags": ["math", "reasoning_support", "add_subtract"],
+        })
+
+    for boxes in range(3, 18):
+        per_box = boxes % 5 + 4
+        answer = boxes * per_box
+        examples.append({
+            "kind": "math_reasoning_support",
+            "prompt": (
+                f"A store has {boxes} boxes with {per_box} pencils in each box. "
+                "How many pencils are there in all?\n\nReply with only the final answer."
+            ),
+            "response": str(answer),
+            "teacher_model": teacher_model,
+            "source_type": "synthetic_teacher",
+            "category": "math",
+            "difficulty": "easy",
+            "format_contract": "final_answer_only",
+            "teacher_rationale_short": f"{boxes} * {per_box} = {answer}",
+            "verifier_status": "pass",
+            "tags": ["math", "reasoning_support", "multiplication"],
+        })
+
+    for total in range(24, 144, 8):
+        for group in range(2, 10):
+            if total % group != 0:
+                continue
+            answer = total // group
+            examples.append({
+                "kind": "math_reasoning_support",
+                "prompt": (
+                    f"A teacher divides {total} notebooks equally among {group} students. "
+                    "How many notebooks does each student get?\n\nReply with only the final answer."
+                ),
+                "response": str(answer),
+                "teacher_model": teacher_model,
+                "source_type": "synthetic_teacher",
+                "category": "math",
+                "difficulty": "easy",
+                "format_contract": "final_answer_only",
+                "teacher_rationale_short": f"{total} / {group} = {answer}",
+                "verifier_status": "pass",
+                "tags": ["math", "reasoning_support", "division"],
+            })
+
+    for price in range(3, 11):
+        count = price + 2
+        extra = count // 2
+        subtotal = price * count
+        answer = subtotal + extra
+        examples.append({
+            "kind": "math_reasoning_support",
+            "prompt": (
+                f"Each notebook costs {price} dollars. Mia buys {count} notebooks and then pays {extra} extra dollars for a pen. "
+                "How many dollars does she spend in total?\n\nReply with only the final answer."
+            ),
+            "response": str(answer),
+            "teacher_model": teacher_model,
+            "source_type": "synthetic_teacher",
+            "category": "math",
+            "difficulty": "easy",
+            "format_contract": "final_answer_only",
+            "teacher_rationale_short": f"{price} * {count} = {subtotal}; {subtotal} + {extra} = {answer}",
+            "verifier_status": "pass",
+            "tags": ["math", "reasoning_support", "two_step"],
+        })
+
+    return _dedupe_examples(examples)
+
+
+def materialize_math_reasoning_support_corpus(
+    root: str | Path,
+    teacher_model: str = "codex",
+) -> dict[str, object]:
+    examples = generate_math_reasoning_support_examples(teacher_model=teacher_model)
+    return _write_examples_corpus(
+        Path(root),
+        examples,
+        metadata={
+            "curriculum": "math_reasoning_support",
+            "teacher_model": teacher_model,
+        },
+        readme_lines=[
+            "# Math Reasoning Support Corpus",
+            "",
+            "Compact worked-example support bank for answer-only arithmetic transfer.",
+            "",
+            "Each row keeps the visible student target short but stores a compact rationale for retrieval-time prompting.",
+        ],
+    )

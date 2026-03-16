@@ -31,6 +31,9 @@ bench = [
     "datasets>=3.2,<5",
     "pyarrow>=18,<22",
     "tokenizers>=0.20,<1",
+    "transformers>=4.51,<5",
+    "huggingface-hub>=0.34,<1",
+    "sentence-transformers>=3.0,<6",
 ]
 all = [
     "ava[dev,train,bench]",
@@ -55,6 +58,7 @@ addopts = [
     "-q",
     "-p",
     "no:cacheprovider",
+    "--basetemp=.pytest-tmp",
 ]
 
 [tool.mypy]
