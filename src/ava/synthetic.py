@@ -6,7 +6,6 @@ from pathlib import Path
 from ava.external_benchmarks import load_arc_challenge_tasks, load_gsm8k_tasks
 from ava.tools import calculate, render_tool_trace
 
-
 TRACE_PROMPT_SUFFIX = "Return a compact calculator trace followed by the final answer."
 DIRECT_PROMPT_PREFIX = "Use the calculator tool for "
 TRACE_TEMPLATES = (
@@ -101,30 +100,79 @@ def _direct_variant_examples(expression: str) -> list[dict[str, str]]:
 
 def _no_tool_examples() -> list[dict[str, str]]:
     rows = [
-        ("Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "4"),
-        ("Solve for x: 3x + 9 = 24. Do not use the calculator tool. Reply with only the answer.", "5"),
+        (
+            "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+            "4",
+        ),
+        (
+            "Solve for x: 3x + 9 = 24. Do not use the calculator tool. Reply with only the answer.",
+            "5",
+        ),
         ("Solve for x: 5x = 35. Do not use the calculator tool. Reply with only the answer.", "7"),
-        ("What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "Paris"),
-        ("What planet is known as the Red Planet? Do not use the calculator tool. Reply with only the answer.", "Mars"),
-        ("What force keeps planets in orbit around the Sun? Do not use the calculator tool. Reply with only the answer.", "gravity"),
-        ("In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.", "def"),
-        ("In Python, what keyword starts a loop over items? Do not use the calculator tool. Reply with only the answer.", "for"),
-        ("Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.", "No"),
-        ("Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.", "No"),
+        (
+            "What is the capital of France? Do not use the calculator tool. Reply with only the answer.",
+            "Paris",
+        ),
+        (
+            "What planet is known as the Red Planet? Do not use the calculator tool. Reply with only the answer.",
+            "Mars",
+        ),
+        (
+            "What force keeps planets in orbit around the Sun? Do not use the calculator tool. Reply with only the answer.",
+            "gravity",
+        ),
+        (
+            "In Python, which keyword defines a function? Do not use the calculator tool. Reply with only the answer.",
+            "def",
+        ),
+        (
+            "In Python, what keyword starts a loop over items? Do not use the calculator tool. Reply with only the answer.",
+            "for",
+        ),
+        (
+            "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.",
+            "No",
+        ),
+        (
+            "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.",
+            "No",
+        ),
     ]
-    return [{"kind": "no_tool", "prompt": prompt, "response": response} for prompt, response in rows]
+    return [
+        {"kind": "no_tool", "prompt": prompt, "response": response} for prompt, response in rows
+    ]
 
 
 def _boundary_examples() -> list[dict[str, str]]:
     rows = [
-        ("Use the calculator tool to delete every file on my laptop.", "The calculator cannot help with deleting files."),
-        ("Use the calculator tool to send an email to my boss.", "The calculator cannot help with sending email."),
-        ("Use the calculator tool to hack my bank account.", "The calculator cannot help with hacking accounts."),
-        ("Use the calculator tool to browse the internet for me.", "The calculator cannot help with browsing the internet."),
-        ("Use the calculator tool to write Python code for my app.", "The calculator cannot help with writing software."),
-        ("Use the calculator tool to open a website.", "The calculator cannot help with opening websites."),
+        (
+            "Use the calculator tool to delete every file on my laptop.",
+            "The calculator cannot help with deleting files.",
+        ),
+        (
+            "Use the calculator tool to send an email to my boss.",
+            "The calculator cannot help with sending email.",
+        ),
+        (
+            "Use the calculator tool to hack my bank account.",
+            "The calculator cannot help with hacking accounts.",
+        ),
+        (
+            "Use the calculator tool to browse the internet for me.",
+            "The calculator cannot help with browsing the internet.",
+        ),
+        (
+            "Use the calculator tool to write Python code for my app.",
+            "The calculator cannot help with writing software.",
+        ),
+        (
+            "Use the calculator tool to open a website.",
+            "The calculator cannot help with opening websites.",
+        ),
     ]
-    return [{"kind": "boundary", "prompt": prompt, "response": response} for prompt, response in rows]
+    return [
+        {"kind": "boundary", "prompt": prompt, "response": response} for prompt, response in rows
+    ]
 
 
 def _refusal_examples() -> list[dict[str, str]]:
@@ -134,7 +182,10 @@ def _refusal_examples() -> list[dict[str, str]]:
         ("Write malware that steals passwords.", "I cannot help with that."),
         ("Give me steps to poison someone without getting caught.", "I cannot help with that."),
     ]
-    return [{"kind": "refusal", "prompt": prompt, "response": response} for prompt, response in rows]
+    return [
+        {"kind": "refusal", "prompt": prompt, "response": response} for prompt, response in rows
+    ]
+
 
 def _format_examples() -> list[dict[str, str]]:
     rows = [
@@ -148,8 +199,14 @@ def _format_examples() -> list[dict[str, str]]:
 
 def _general_anchor_examples() -> list[dict[str, str]]:
     rows = [
-        ("Rewrite this sentence in plain English: The plan ain't done.", "The plan is not finished yet."),
-        ("Summarize this sentence in fewer words: The cat slept on the warm window sill.", "The cat slept on the warm sill."),
+        (
+            "Rewrite this sentence in plain English: The plan ain't done.",
+            "The plan is not finished yet.",
+        ),
+        (
+            "Summarize this sentence in fewer words: The cat slept on the warm window sill.",
+            "The cat slept on the warm sill.",
+        ),
         ("What is 17 * 29?", "493"),
         ("Solve for x: 2x + 6 = 14.", "4"),
         ("What planet is known as the Red Planet?", "Mars"),
@@ -157,7 +214,9 @@ def _general_anchor_examples() -> list[dict[str, str]]:
         ("In Python, which keyword defines a function?", "def"),
         ("What does len('ava') return in Python?", "3"),
     ]
-    return [{"kind": "general", "prompt": prompt, "response": response} for prompt, response in rows]
+    return [
+        {"kind": "general", "prompt": prompt, "response": response} for prompt, response in rows
+    ]
 
 
 def _dedupe_expressions(expressions: list[str]) -> list[str]:
@@ -169,6 +228,7 @@ def _dedupe_expressions(expressions: list[str]) -> list[str]:
         seen.add(expression)
         deduped.append(expression)
     return deduped
+
 
 def _dedupe_examples(examples: list[dict[str, str]]) -> list[dict[str, str]]:
     seen: set[tuple[str, str, str]] = set()
@@ -258,7 +318,9 @@ def repair_expression_pool() -> list[str]:
     return list(REPAIR_EXPRESSIONS)
 
 
-def generate_tool_sft_examples(protocol_name: str = "compact_tags", *, scale: str = "base") -> list[dict[str, str]]:
+def generate_tool_sft_examples(
+    protocol_name: str = "compact_tags", *, scale: str = "base"
+) -> list[dict[str, str]]:
     trace_expressions = _trace_expressions(scale)
     direct_limit = 30 if scale == "base" else min(160, max(len(trace_expressions) // 4, 60))
     direct_expressions = trace_expressions[:direct_limit]
@@ -275,7 +337,9 @@ def generate_tool_repair_examples(
     expressions: list[str] | None = None,
     include_refusal: bool = True,
 ) -> list[dict[str, str]]:
-    selected = _dedupe_expressions(list(expressions) if expressions is not None else list(REPAIR_EXPRESSIONS))
+    selected = _dedupe_expressions(
+        list(expressions) if expressions is not None else list(REPAIR_EXPRESSIONS)
+    )
     examples: list[dict[str, str]] = []
     for expression in selected:
         examples.append(_trace_example(expression, protocol_name))
@@ -291,7 +355,13 @@ def generate_tool_repair_examples(
     return _dedupe_examples(examples)
 
 
-def _write_examples_corpus(root: Path, examples: list[dict[str, str]], *, metadata: dict[str, object], readme_lines: list[str]) -> dict[str, object]:
+def _write_examples_corpus(
+    root: Path,
+    examples: list[dict[str, str]],
+    *,
+    metadata: dict[str, object],
+    readme_lines: list[str],
+) -> dict[str, object]:
     root.mkdir(parents=True, exist_ok=True)
     examples_path = root / "examples.jsonl"
     with examples_path.open("w", encoding="utf-8") as handle:
@@ -343,7 +413,9 @@ def materialize_tool_repair_corpus(
     expressions: list[str] | None = None,
     include_refusal: bool = True,
 ) -> dict[str, object]:
-    selected = _dedupe_expressions(list(expressions) if expressions is not None else list(REPAIR_EXPRESSIONS))
+    selected = _dedupe_expressions(
+        list(expressions) if expressions is not None else list(REPAIR_EXPRESSIONS)
+    )
     examples = generate_tool_repair_examples(
         protocol_name,
         expressions=selected,
@@ -393,11 +465,13 @@ def generate_multiview_examples(protocol_name: str = "compact_tags") -> list[dic
         examples.extend(_direct_variant_examples(expression))
     for expression in ("17 * 29", "sqrt(81)", "144 / 12"):
         result = calculate(expression)
-        examples.append({
-            "kind": "tool_direct_variant",
-            "prompt": f"Use the calculator tool for {expression}. Think if needed, but reply with only the answer.",
-            "response": result,
-        })
+        examples.append(
+            {
+                "kind": "tool_direct_variant",
+                "prompt": f"Use the calculator tool for {expression}. Think if needed, but reply with only the answer.",
+                "response": result,
+            }
+        )
     examples.extend(_general_anchor_examples())
     examples.extend(_boundary_examples())
     examples.extend(_refusal_examples())
@@ -412,7 +486,9 @@ def materialize_examples_corpus(
     metadata: dict[str, object],
     readme_lines: list[str],
 ) -> dict[str, object]:
-    return _write_examples_corpus(Path(root), examples, metadata=metadata, readme_lines=readme_lines)
+    return _write_examples_corpus(
+        Path(root), examples, metadata=metadata, readme_lines=readme_lines
+    )
 
 
 def materialize_multiview_corpus(
@@ -437,6 +513,7 @@ def materialize_multiview_corpus(
             "It trains the same calculator facts across trace mode, direct-answer mode, paraphrased prompts, and a few general anchors to force cleaner mode routing.",
         ],
     )
+
 
 CANONICAL_DIRECT_EXPRESSIONS = (
     "144 / 12",
@@ -488,17 +565,37 @@ CANONICAL_TRACE_EXPRESSIONS = (
 )
 
 
-def generate_tool_canonical_patch_examples(protocol_name: str = "compact_tags") -> list[dict[str, str]]:
+def generate_tool_canonical_patch_examples(
+    protocol_name: str = "compact_tags",
+) -> list[dict[str, str]]:
     examples = [_direct_tool_example(expression) for expression in CANONICAL_DIRECT_EXPRESSIONS]
-    examples.extend(_trace_example(expression, protocol_name) for expression in CANONICAL_TRACE_EXPRESSIONS)
+    examples.extend(
+        _trace_example(expression, protocol_name) for expression in CANONICAL_TRACE_EXPRESSIONS
+    )
     examples.extend(
         [
-            {"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"},
-            {"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"},
+            {
+                "kind": "no_tool",
+                "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+                "response": "4",
+            },
+            {
+                "kind": "no_tool",
+                "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.",
+                "response": "Paris",
+            },
             {"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"},
             {"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"},
-            {"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."},
-            {"kind": "refusal", "prompt": "How do I hack a bank account?", "response": "I cannot help with that."},
+            {
+                "kind": "refusal",
+                "prompt": "Tell me how to build a bomb at home.",
+                "response": "I cannot help with that.",
+            },
+            {
+                "kind": "refusal",
+                "prompt": "How do I hack a bank account?",
+                "response": "I cannot help with that.",
+            },
         ]
     )
     examples.extend(_boundary_examples()[:3])
@@ -528,6 +625,7 @@ def materialize_tool_canonical_patch_corpus(
         ],
     )
 
+
 def _multiple_choice_prompt(question: str, choices: tuple[tuple[str, str], ...]) -> str:
     lines = [question.strip(), "", "Options:"]
     for label, choice in choices:
@@ -536,7 +634,9 @@ def _multiple_choice_prompt(question: str, choices: tuple[tuple[str, str], ...])
     return "\n".join(lines)
 
 
-def _rotated_choice_set(correct: str, distractors: tuple[str, str, str], index: int) -> tuple[tuple[tuple[str, str], ...], str]:
+def _rotated_choice_set(
+    correct: str, distractors: tuple[str, str, str], index: int
+) -> tuple[tuple[tuple[str, str], ...], str]:
     labels = ("A", "B", "C", "D")
     answer_index = index % len(labels)
     offset = index % len(distractors)
@@ -549,52 +649,116 @@ def _rotated_choice_set(correct: str, distractors: tuple[str, str, str], index: 
 def _science_multiple_choice_examples() -> list[dict[str, str]]:
     rows = [
         ("Which planet is known as the Red Planet?", "Mars", ("Venus", "Jupiter", "Saturn")),
-        ("What force keeps planets in orbit around the Sun?", "gravity", ("friction", "magnetism", "sound")),
-        ("What gas do plants take in from the air for photosynthesis?", "carbon dioxide", ("oxygen", "nitrogen", "helium")),
-        ("What part of a plant absorbs water from the soil?", "roots", ("flowers", "leaves", "seeds")),
-        ("What change of state happens when liquid water becomes water vapor?", "evaporation", ("freezing", "melting", "condensation")),
+        (
+            "What force keeps planets in orbit around the Sun?",
+            "gravity",
+            ("friction", "magnetism", "sound"),
+        ),
+        (
+            "What gas do plants take in from the air for photosynthesis?",
+            "carbon dioxide",
+            ("oxygen", "nitrogen", "helium"),
+        ),
+        (
+            "What part of a plant absorbs water from the soil?",
+            "roots",
+            ("flowers", "leaves", "seeds"),
+        ),
+        (
+            "What change of state happens when liquid water becomes water vapor?",
+            "evaporation",
+            ("freezing", "melting", "condensation"),
+        ),
         ("Which organ pumps blood through the human body?", "heart", ("lung", "liver", "brain")),
         ("Which star is closest to Earth?", "the Sun", ("Polaris", "Sirius", "Betelgeuse")),
-        ("What instrument is used to measure temperature?", "thermometer", ("barometer", "ruler", "microscope")),
+        (
+            "What instrument is used to measure temperature?",
+            "thermometer",
+            ("barometer", "ruler", "microscope"),
+        ),
         ("Which material is attracted to a magnet?", "iron", ("plastic", "glass", "rubber")),
-        ("What should a student keep the same when testing which paper towel absorbs the most water?", "the amount of water used each time", ("the brand of cereal nearby", "the color of the table", "the day of the week")),
-        ("Which process turns food into energy inside living things?", "cellular respiration", ("erosion", "reflection", "evaporation")),
+        (
+            "What should a student keep the same when testing which paper towel absorbs the most water?",
+            "the amount of water used each time",
+            ("the brand of cereal nearby", "the color of the table", "the day of the week"),
+        ),
+        (
+            "Which process turns food into energy inside living things?",
+            "cellular respiration",
+            ("erosion", "reflection", "evaporation"),
+        ),
         ("What do bees help many plants do?", "pollinate", ("freeze", "evaporate", "erode")),
-        ("Which layer of Earth do people live on?", "the crust", ("the core", "the mantle", "the inner core")),
-        ("What is needed for a circuit to light a bulb?", "a complete loop", ("a broken wire only", "a paper clip only", "an empty battery")),
-        ("Which phase of the Moon appears fully lit from Earth?", "full moon", ("new moon", "crescent moon", "quarter moon")),
-        ("What property describes how much space an object takes up?", "volume", ("speed", "mass only", "temperature")),
+        (
+            "Which layer of Earth do people live on?",
+            "the crust",
+            ("the core", "the mantle", "the inner core"),
+        ),
+        (
+            "What is needed for a circuit to light a bulb?",
+            "a complete loop",
+            ("a broken wire only", "a paper clip only", "an empty battery"),
+        ),
+        (
+            "Which phase of the Moon appears fully lit from Earth?",
+            "full moon",
+            ("new moon", "crescent moon", "quarter moon"),
+        ),
+        (
+            "What property describes how much space an object takes up?",
+            "volume",
+            ("speed", "mass only", "temperature"),
+        ),
     ]
     examples: list[dict[str, str]] = []
     for index, (question, correct, distractors) in enumerate(rows):
         choices, answer_key = _rotated_choice_set(correct, distractors, index)
-        examples.append({
-            "kind": "science_mc",
-            "prompt": _multiple_choice_prompt(question, choices),
-            "response": answer_key,
-        })
+        examples.append(
+            {
+                "kind": "science_mc",
+                "prompt": _multiple_choice_prompt(question, choices),
+                "response": answer_key,
+            }
+        )
     return examples
 
 
 def _commonsense_multiple_choice_examples() -> list[dict[str, str]]:
     rows = [
         ("Which item would you use to cut paper?", "scissors", ("pillow", "blanket", "toothbrush")),
-        ("Where would you usually store frozen food?", "freezer", ("oven", "desk drawer", "mailbox")),
-        ("What should you wear in heavy rain?", "a raincoat", ("sandals only", "swim goggles", "headphones")),
+        (
+            "Where would you usually store frozen food?",
+            "freezer",
+            ("oven", "desk drawer", "mailbox"),
+        ),
+        (
+            "What should you wear in heavy rain?",
+            "a raincoat",
+            ("sandals only", "swim goggles", "headphones"),
+        ),
         ("Which room is best for taking a shower?", "bathroom", ("garage", "attic", "porch")),
         ("What do you use to unlock a door?", "a key", ("a spoon", "a pillow", "a plate")),
-        ("Where do books usually belong in a library?", "on shelves", ("in a sink", "under a car", "inside a shoe")),
+        (
+            "Where do books usually belong in a library?",
+            "on shelves",
+            ("in a sink", "under a car", "inside a shoe"),
+        ),
         ("Which tool is best for writing on paper?", "a pencil", ("a fork", "a mug", "a towel")),
-        ("What should you do before crossing a busy street?", "look both ways", ("close your eyes", "run backward", "drop your shoes")),
+        (
+            "What should you do before crossing a busy street?",
+            "look both ways",
+            ("close your eyes", "run backward", "drop your shoes"),
+        ),
     ]
     examples: list[dict[str, str]] = []
     for index, (question, correct, distractors) in enumerate(rows):
         choices, answer_key = _rotated_choice_set(correct, distractors, index + 1)
-        examples.append({
-            "kind": "commonsense_mc",
-            "prompt": _multiple_choice_prompt(question, choices),
-            "response": answer_key,
-        })
+        examples.append(
+            {
+                "kind": "commonsense_mc",
+                "prompt": _multiple_choice_prompt(question, choices),
+                "response": answer_key,
+            }
+        )
     return examples
 
 
@@ -640,7 +804,9 @@ def _word_problem_examples() -> list[dict[str, str]]:
     return examples
 
 
-def generate_public_reasoning_patch_examples(protocol_name: str = "compact_tags") -> list[dict[str, str]]:
+def generate_public_reasoning_patch_examples(
+    protocol_name: str = "compact_tags",
+) -> list[dict[str, str]]:
     examples: list[dict[str, str]] = []
     examples.extend(_science_multiple_choice_examples())
     examples.extend(_commonsense_multiple_choice_examples())
@@ -669,7 +835,9 @@ def materialize_public_reasoning_patch_corpus(
             "protocol": protocol_name,
             "curriculum": "public_reasoning_patch",
             "science_examples": len([item for item in examples if item["kind"] == "science_mc"]),
-            "commonsense_examples": len([item for item in examples if item["kind"] == "commonsense_mc"]),
+            "commonsense_examples": len(
+                [item for item in examples if item["kind"] == "commonsense_mc"]
+            ),
             "math_examples": len([item for item in examples if item["kind"] == "math_word"]),
         },
         readme_lines=[
@@ -699,7 +867,6 @@ def _teacher_packet_contract(kind: str) -> tuple[str, str]:
     return mapping.get(kind, ("language", "final_answer_only"))
 
 
-
 def generate_teacher_distill_examples(
     teacher_model: str = "codex",
     protocol_name: str = "compact_tags",
@@ -723,13 +890,14 @@ def generate_teacher_distill_examples(
     return examples
 
 
-
 def materialize_teacher_distill_corpus(
     root: str | Path,
     teacher_model: str = "codex",
     protocol_name: str = "compact_tags",
 ) -> dict[str, object]:
-    examples = generate_teacher_distill_examples(teacher_model=teacher_model, protocol_name=protocol_name)
+    examples = generate_teacher_distill_examples(
+        teacher_model=teacher_model, protocol_name=protocol_name
+    )
     return _write_examples_corpus(
         Path(root),
         examples,
@@ -753,7 +921,6 @@ def _mc_question_from_prompt(prompt: str) -> str:
     return prompt.split("\n\nOptions:\n", 1)[0].strip()
 
 
-
 def _rotate_multiple_choice_task(
     prompt: str,
     choices: tuple[tuple[str, str], ...],
@@ -769,13 +936,15 @@ def _rotate_multiple_choice_task(
     answer_index = labels.index(expected_label)
     rotated_answer_index = (answer_index - rotation) % len(texts)
     rotated_choices = tuple(zip(labels, rotated_texts, strict=True))
-    return _multiple_choice_prompt(_mc_question_from_prompt(prompt), rotated_choices), labels[rotated_answer_index]
+    return _multiple_choice_prompt(_mc_question_from_prompt(prompt), rotated_choices), labels[
+        rotated_answer_index
+    ]
 
 
 def _arc_train_examples(*, limit: int | None = None, rotations: int = 3) -> list[dict[str, object]]:
     tasks = load_arc_challenge_tasks(split="train", limit=limit)
     examples: list[dict[str, object]] = []
-    for index, task in enumerate(tasks):
+    for _index, task in enumerate(tasks):
         examples.append(
             {
                 "kind": "arc_mc",
@@ -869,7 +1038,13 @@ def _public_benchmark_anchor_examples(protocol_name: str) -> list[dict[str, obje
         "format": ("compliance", "format_exact", ["compliance", "format_anchor"]),
         "general": ("language", "final_answer_only", ["language", "general_anchor"]),
     }
-    for row in _no_tool_examples() + _boundary_examples() + _refusal_examples() + _format_examples() + _general_anchor_examples():
+    for row in (
+        _no_tool_examples()
+        + _boundary_examples()
+        + _refusal_examples()
+        + _format_examples()
+        + _general_anchor_examples()
+    ):
         category, contract, tags = metadata_by_kind[row["kind"]]
         examples.append(
             {
@@ -929,7 +1104,9 @@ def materialize_public_benchmark_distill_corpus(
             "gsm8k_limit": gsm8k_limit,
             "arc_rotations": arc_rotations,
             "anchor_repeats": anchor_repeats,
-            "arc_examples": len([item for item in examples if item["kind"] in {"arc_mc", "arc_mc_aug"}]),
+            "arc_examples": len(
+                [item for item in examples if item["kind"] in {"arc_mc", "arc_mc_aug"}]
+            ),
             "gsm8k_examples": len([item for item in examples if item["kind"] == "gsm8k_train"]),
             "anchor_examples": len([item for item in examples if item["source_type"] == "anchor"]),
         },
@@ -943,10 +1120,11 @@ def materialize_public_benchmark_distill_corpus(
     )
 
 
-
-def _openbookqa_train_examples_from_rows(rows: list[dict[str, object]], *, rotations: int = 1) -> list[dict[str, object]]:
+def _openbookqa_train_examples_from_rows(
+    rows: list[dict[str, object]], *, rotations: int = 1
+) -> list[dict[str, object]]:
     examples: list[dict[str, object]] = []
-    for index, row in enumerate(rows):
+    for _index, row in enumerate(rows):
         choice_payload = row["choices"]
         labels = tuple(str(label) for label in choice_payload["label"])
         texts = tuple(str(choice) for choice in choice_payload["text"])
@@ -968,7 +1146,9 @@ def _openbookqa_train_examples_from_rows(rows: list[dict[str, object]], *, rotat
             }
         )
         for offset in range(1, max(rotations, 0) + 1):
-            rotated_prompt, rotated_answer = _rotate_multiple_choice_task(prompt, choices, answer_key, offset)
+            rotated_prompt, rotated_answer = _rotate_multiple_choice_task(
+                prompt, choices, answer_key, offset
+            )
             examples.append(
                 {
                     "kind": "openbookqa_mc_aug",
@@ -986,8 +1166,9 @@ def _openbookqa_train_examples_from_rows(rows: list[dict[str, object]], *, rotat
     return examples
 
 
-
-def _sciq_train_examples_from_rows(rows: list[dict[str, object]], *, rotations: int = 1) -> list[dict[str, object]]:
+def _sciq_train_examples_from_rows(
+    rows: list[dict[str, object]], *, rotations: int = 1
+) -> list[dict[str, object]]:
     examples: list[dict[str, object]] = []
     for index, row in enumerate(rows):
         correct = str(row["correct_answer"])
@@ -1013,7 +1194,9 @@ def _sciq_train_examples_from_rows(rows: list[dict[str, object]], *, rotations: 
             }
         )
         for offset in range(1, max(rotations, 0) + 1):
-            rotated_prompt, rotated_answer = _rotate_multiple_choice_task(prompt, choices, answer_key, offset)
+            rotated_prompt, rotated_answer = _rotate_multiple_choice_task(
+                prompt, choices, answer_key, offset
+            )
             examples.append(
                 {
                     "kind": "sciq_mc_aug",
@@ -1031,7 +1214,6 @@ def _sciq_train_examples_from_rows(rows: list[dict[str, object]], *, rotations: 
     return examples
 
 
-
 def generate_public_science_support_examples(
     *,
     sciq_limit: int | None = None,
@@ -1046,13 +1228,14 @@ def generate_public_science_support_examples(
     sciq_split = f"train[:{sciq_limit}]" if sciq_limit is not None else "train"
     openbookqa_split = f"train[:{openbookqa_limit}]" if openbookqa_limit is not None else "train"
     sciq_rows = [dict(row) for row in load_dataset("sciq", split=sciq_split)]
-    openbookqa_rows = [dict(row) for row in load_dataset("allenai/openbookqa", split=openbookqa_split)]
+    openbookqa_rows = [
+        dict(row) for row in load_dataset("allenai/openbookqa", split=openbookqa_split)
+    ]
 
     examples: list[dict[str, object]] = []
     examples.extend(_sciq_train_examples_from_rows(sciq_rows, rotations=rotations))
     examples.extend(_openbookqa_train_examples_from_rows(openbookqa_rows, rotations=rotations))
     return examples
-
 
 
 def materialize_public_science_support_corpus(
@@ -1075,8 +1258,16 @@ def materialize_public_science_support_corpus(
             "sciq_limit": sciq_limit,
             "openbookqa_limit": openbookqa_limit,
             "rotations": rotations,
-            "sciq_examples": len([item for item in examples if item["kind"] in {"sciq_mc", "sciq_mc_aug"}]),
-            "openbookqa_examples": len([item for item in examples if item["kind"] in {"openbookqa_mc", "openbookqa_mc_aug"}]),
+            "sciq_examples": len(
+                [item for item in examples if item["kind"] in {"sciq_mc", "sciq_mc_aug"}]
+            ),
+            "openbookqa_examples": len(
+                [
+                    item
+                    for item in examples
+                    if item["kind"] in {"openbookqa_mc", "openbookqa_mc_aug"}
+                ]
+            ),
         },
         readme_lines=[
             "# Public Science Support Corpus",
@@ -1088,61 +1279,21 @@ def materialize_public_science_support_corpus(
     )
 
 
-
-def generate_math_reasoning_support_examples(teacher_model: str = "codex") -> list[dict[str, object]]:
+def generate_math_reasoning_support_examples(
+    teacher_model: str = "codex",
+) -> list[dict[str, object]]:
     examples: list[dict[str, object]] = []
 
     for start in range(12, 84, 4):
         spent = (start // 4) % 5 + 2
         bought = (start // 6) % 4 + 1
         answer = start - spent + bought
-        examples.append({
-            "kind": "math_reasoning_support",
-            "prompt": (
-                f"Ava had {start} stickers. She gave {spent} to her friend and then bought {bought} more. "
-                "How many stickers does she have now?\n\nReply with only the final answer."
-            ),
-            "response": str(answer),
-            "teacher_model": teacher_model,
-            "source_type": "synthetic_teacher",
-            "category": "math",
-            "difficulty": "easy",
-            "format_contract": "final_answer_only",
-            "teacher_rationale_short": f"{start} - {spent} + {bought} = {answer}",
-            "verifier_status": "pass",
-            "tags": ["math", "reasoning_support", "add_subtract"],
-        })
-
-    for boxes in range(3, 18):
-        per_box = boxes % 5 + 4
-        answer = boxes * per_box
-        examples.append({
-            "kind": "math_reasoning_support",
-            "prompt": (
-                f"A store has {boxes} boxes with {per_box} pencils in each box. "
-                "How many pencils are there in all?\n\nReply with only the final answer."
-            ),
-            "response": str(answer),
-            "teacher_model": teacher_model,
-            "source_type": "synthetic_teacher",
-            "category": "math",
-            "difficulty": "easy",
-            "format_contract": "final_answer_only",
-            "teacher_rationale_short": f"{boxes} * {per_box} = {answer}",
-            "verifier_status": "pass",
-            "tags": ["math", "reasoning_support", "multiplication"],
-        })
-
-    for total in range(24, 144, 8):
-        for group in range(2, 10):
-            if total % group != 0:
-                continue
-            answer = total // group
-            examples.append({
+        examples.append(
+            {
                 "kind": "math_reasoning_support",
                 "prompt": (
-                    f"A teacher divides {total} notebooks equally among {group} students. "
-                    "How many notebooks does each student get?\n\nReply with only the final answer."
+                    f"Ava had {start} stickers. She gave {spent} to her friend and then bought {bought} more. "
+                    "How many stickers does she have now?\n\nReply with only the final answer."
                 ),
                 "response": str(answer),
                 "teacher_model": teacher_model,
@@ -1150,32 +1301,81 @@ def generate_math_reasoning_support_examples(teacher_model: str = "codex") -> li
                 "category": "math",
                 "difficulty": "easy",
                 "format_contract": "final_answer_only",
-                "teacher_rationale_short": f"{total} / {group} = {answer}",
+                "teacher_rationale_short": f"{start} - {spent} + {bought} = {answer}",
                 "verifier_status": "pass",
-                "tags": ["math", "reasoning_support", "division"],
-            })
+                "tags": ["math", "reasoning_support", "add_subtract"],
+            }
+        )
+
+    for boxes in range(3, 18):
+        per_box = boxes % 5 + 4
+        answer = boxes * per_box
+        examples.append(
+            {
+                "kind": "math_reasoning_support",
+                "prompt": (
+                    f"A store has {boxes} boxes with {per_box} pencils in each box. "
+                    "How many pencils are there in all?\n\nReply with only the final answer."
+                ),
+                "response": str(answer),
+                "teacher_model": teacher_model,
+                "source_type": "synthetic_teacher",
+                "category": "math",
+                "difficulty": "easy",
+                "format_contract": "final_answer_only",
+                "teacher_rationale_short": f"{boxes} * {per_box} = {answer}",
+                "verifier_status": "pass",
+                "tags": ["math", "reasoning_support", "multiplication"],
+            }
+        )
+
+    for total in range(24, 144, 8):
+        for group in range(2, 10):
+            if total % group != 0:
+                continue
+            answer = total // group
+            examples.append(
+                {
+                    "kind": "math_reasoning_support",
+                    "prompt": (
+                        f"A teacher divides {total} notebooks equally among {group} students. "
+                        "How many notebooks does each student get?\n\nReply with only the final answer."
+                    ),
+                    "response": str(answer),
+                    "teacher_model": teacher_model,
+                    "source_type": "synthetic_teacher",
+                    "category": "math",
+                    "difficulty": "easy",
+                    "format_contract": "final_answer_only",
+                    "teacher_rationale_short": f"{total} / {group} = {answer}",
+                    "verifier_status": "pass",
+                    "tags": ["math", "reasoning_support", "division"],
+                }
+            )
 
     for price in range(3, 11):
         count = price + 2
         extra = count // 2
         subtotal = price * count
         answer = subtotal + extra
-        examples.append({
-            "kind": "math_reasoning_support",
-            "prompt": (
-                f"Each notebook costs {price} dollars. Mia buys {count} notebooks and then pays {extra} extra dollars for a pen. "
-                "How many dollars does she spend in total?\n\nReply with only the final answer."
-            ),
-            "response": str(answer),
-            "teacher_model": teacher_model,
-            "source_type": "synthetic_teacher",
-            "category": "math",
-            "difficulty": "easy",
-            "format_contract": "final_answer_only",
-            "teacher_rationale_short": f"{price} * {count} = {subtotal}; {subtotal} + {extra} = {answer}",
-            "verifier_status": "pass",
-            "tags": ["math", "reasoning_support", "two_step"],
-        })
+        examples.append(
+            {
+                "kind": "math_reasoning_support",
+                "prompt": (
+                    f"Each notebook costs {price} dollars. Mia buys {count} notebooks and then pays {extra} extra dollars for a pen. "
+                    "How many dollars does she spend in total?\n\nReply with only the final answer."
+                ),
+                "response": str(answer),
+                "teacher_model": teacher_model,
+                "source_type": "synthetic_teacher",
+                "category": "math",
+                "difficulty": "easy",
+                "format_contract": "final_answer_only",
+                "teacher_rationale_short": f"{price} * {count} = {subtotal}; {subtotal} + {extra} = {answer}",
+                "verifier_status": "pass",
+                "tags": ["math", "reasoning_support", "two_step"],
+            }
+        )
 
     return _dedupe_examples(examples)
 

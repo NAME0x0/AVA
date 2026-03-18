@@ -269,11 +269,11 @@ def _greedy_generate(model: Any, idx: Any, max_new_tokens: int, eos_token_id: in
 
 def _summarize_results(results: list[object]) -> tuple[int, int, dict[str, dict[str, float | int]]]:
     total = len(results)
-    correct = sum(1 for result in results if getattr(result, "matched"))
+    correct = sum(1 for result in results if result.matched)
     by_category: dict[str, dict[str, float | int]] = {}
-    for category in {getattr(result, "category") for result in results}:
-        subset = [result for result in results if getattr(result, "category") == category]
-        subset_correct = sum(1 for result in subset if getattr(result, "matched"))
+    for category in {result.category for result in results}:
+        subset = [result for result in results if result.category == category]
+        subset_correct = sum(1 for result in subset if result.matched)
         by_category[category] = {
             "correct": subset_correct,
             "total": len(subset),
