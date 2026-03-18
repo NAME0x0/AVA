@@ -8,10 +8,15 @@ from random import Random, randint, seed
 from typing import Any
 
 from ava.config import ExperimentConfig, load_experiment_config
-from ava.data import discover_corpus_files, encode_corpus, load_supervised_examples, load_text_corpus
+from ava.data import (
+    discover_corpus_files,
+    encode_corpus,
+    load_supervised_examples,
+    load_text_corpus,
+)
 from ava.experiments import estimate_budget
 from ava.model import TORCH_AVAILABLE, build_model, torch
-from ava.tokenizer import SPECIAL_TOKENS, SPECIAL_TOKEN_OFFSET, load_tokenizer, token_piece_bytes
+from ava.tokenizer import SPECIAL_TOKEN_OFFSET, SPECIAL_TOKENS, load_tokenizer, token_piece_bytes
 
 
 def dry_run_summary(config: ExperimentConfig) -> dict[str, object]:
@@ -26,7 +31,9 @@ def dry_run_summary(config: ExperimentConfig) -> dict[str, object]:
     }
 
 
-def summarize_corpus(corpus_root: str | Path, tokenizer_config: object | None = None) -> dict[str, object]:
+def summarize_corpus(
+    corpus_root: str | Path, tokenizer_config: object | None = None
+) -> dict[str, object]:
     corpus_path = Path(corpus_root)
     files = discover_corpus_files(corpus_path)
     texts = load_text_corpus(corpus_path)
@@ -56,7 +63,9 @@ def _render_supervised_prompt(prompt: str) -> str:
     return f"Question: {prompt}\nAnswer: "
 
 
-def _load_supervised_dataset(corpus_root: str | Path, block_size: int, tokenizer: Any) -> tuple[list[dict[str, list[int]]], int]:
+def _load_supervised_dataset(
+    corpus_root: str | Path, block_size: int, tokenizer: Any
+) -> tuple[list[dict[str, list[int]]], int]:
     examples = load_supervised_examples(corpus_root)
     if not examples:
         raise RuntimeError(f"no supervised prompt/response pairs found under {corpus_root}")
@@ -86,7 +95,9 @@ def _load_supervised_dataset(corpus_root: str | Path, block_size: int, tokenizer
     return samples, total_tokens
 
 
-def summarize_supervised_dataset(corpus_root: str | Path, block_size: int, tokenizer: Any) -> dict[str, int | float]:
+def summarize_supervised_dataset(
+    corpus_root: str | Path, block_size: int, tokenizer: Any
+) -> dict[str, int | float]:
     examples = load_supervised_examples(corpus_root)
     if not examples:
         return {
@@ -131,7 +142,9 @@ def summarize_supervised_dataset(corpus_root: str | Path, block_size: int, token
     }
 
 
-def _sample_batch(buffer: list[int], block_size: int, batch_size: int, device: str) -> tuple[Any, Any]:
+def _sample_batch(
+    buffer: list[int], block_size: int, batch_size: int, device: str
+) -> tuple[Any, Any]:
     if len(buffer) <= block_size + 1:
         raise RuntimeError("token buffer is too small for the configured block size")
     starts = [randint(0, len(buffer) - block_size - 2) for _ in range(batch_size)]
@@ -139,12 +152,17 @@ def _sample_batch(buffer: list[int], block_size: int, batch_size: int, device: s
         [torch.tensor(buffer[start : start + block_size], dtype=torch.long) for start in starts]
     )
     y = torch.stack(
-        [torch.tensor(buffer[start + 1 : start + block_size + 1], dtype=torch.long) for start in starts]
+        [
+            torch.tensor(buffer[start + 1 : start + block_size + 1], dtype=torch.long)
+            for start in starts
+        ]
     )
     return x.to(device), y.to(device)
 
 
-def _sample_supervised_batch(samples: list[dict[str, list[int]]], batch_size: int, device: str) -> tuple[Any, Any]:
+def _sample_supervised_batch(
+    samples: list[dict[str, list[int]]], batch_size: int, device: str
+) -> tuple[Any, Any]:
     if not samples:
         raise RuntimeError("no supervised samples available")
     indices = [randint(0, len(samples) - 1) for _ in range(batch_size)]
@@ -164,19 +182,25 @@ def _lr_for_step(config: ExperimentConfig, step: int) -> float:
         decay_steps = max(config.training.max_steps - config.training.warmup_steps, 1)
         progress = (step - config.training.warmup_steps) / decay_steps
         min_lr = config.training.learning_rate * config.training.min_lr_ratio
-        return min_lr + 0.5 * (config.training.learning_rate - min_lr) * (1.0 + math.cos(math.pi * progress))
+        return min_lr + 0.5 * (config.training.learning_rate - min_lr) * (
+            1.0 + math.cos(math.pi * progress)
+        )
     return config.training.learning_rate
 
 
 def _resolve_device(requested_device: str) -> tuple[str, list[str]]:
     warnings: list[str] = []
     if requested_device.startswith("cuda") and not torch.cuda.is_available():
-        warnings.append("CUDA was requested but is unavailable in the current PyTorch install; training ran on CPU.")
+        warnings.append(
+            "CUDA was requested but is unavailable in the current PyTorch install; training ran on CPU."
+        )
         return "cpu", warnings
     return requested_device, warnings
 
 
-def _configure_trainable_parameters(model: Any, patterns: tuple[str, ...]) -> tuple[list[Any], list[str], int]:
+def _configure_trainable_parameters(
+    model: Any, patterns: tuple[str, ...]
+) -> tuple[list[Any], list[str], int]:
     trainable_names: list[str] = []
     for name, parameter in model.named_parameters():
         parameter.requires_grad = True
@@ -186,7 +210,9 @@ def _configure_trainable_parameters(model: Any, patterns: tuple[str, ...]) -> tu
             trainable_names.append(name)
     if patterns and not trainable_names:
         raise RuntimeError(f"no trainable parameters matched patterns: {patterns}")
-    trainable_parameters = [parameter for parameter in model.parameters() if parameter.requires_grad]
+    trainable_parameters = [
+        parameter for parameter in model.parameters() if parameter.requires_grad
+    ]
     trainable_parameter_count = sum(parameter.numel() for parameter in trainable_parameters)
     return trainable_parameters, trainable_names, trainable_parameter_count
 
@@ -199,7 +225,9 @@ def _tokenizer_preserves_byte_prefix(tokenizer: Any) -> bool:
 def _build_tokenizer_aligned_embedding(embedding: Any, tokenizer: Any) -> Any:
     current_vocab, hidden_size = embedding.shape
     if current_vocab < SPECIAL_TOKEN_OFFSET + 256:
-        raise RuntimeError("init checkpoint vocab does not match the byte-level AVA baseline and cannot be remapped safely")
+        raise RuntimeError(
+            "init checkpoint vocab does not match the byte-level AVA baseline and cannot be remapped safely"
+        )
     expanded = embedding.new_empty((tokenizer.vocab_size, hidden_size))
     fallback = embedding.mean(dim=0)
     expanded[:] = fallback
@@ -215,7 +243,9 @@ def _build_tokenizer_aligned_embedding(embedding: Any, tokenizer: Any) -> Any:
                 expanded[new_id] = fallback
 
     for token_id in range(tokenizer.vocab_size):
-        if _tokenizer_preserves_byte_prefix(tokenizer) and token_id < min(current_vocab, tokenizer.vocab_size):
+        if _tokenizer_preserves_byte_prefix(tokenizer) and token_id < min(
+            current_vocab, tokenizer.vocab_size
+        ):
             continue
         piece = token_piece_bytes(tokenizer, token_id)
         if piece:
@@ -238,12 +268,16 @@ def _expand_state_dict_for_tokenizer(state_dict: dict[str, Any], tokenizer: Any)
     return updated
 
 
-def _resize_state_dict_for_block_size(state_dict: dict[str, Any], block_size: int) -> dict[str, Any]:
+def _resize_state_dict_for_block_size(
+    state_dict: dict[str, Any], block_size: int
+) -> dict[str, Any]:
     positional = state_dict.get("wpe.weight")
     if positional is None or positional.shape[0] == block_size:
         return state_dict
     source = positional.transpose(0, 1).unsqueeze(0)
-    resized = torch.nn.functional.interpolate(source, size=block_size, mode="linear", align_corners=True)
+    resized = torch.nn.functional.interpolate(
+        source, size=block_size, mode="linear", align_corners=True
+    )
     updated = dict(state_dict)
     updated["wpe.weight"] = resized.squeeze(0).transpose(0, 1).contiguous()
     return updated
@@ -279,7 +313,9 @@ def _pick_recurrent_source_indices(indices: list[int], count: int) -> list[int]:
     return picks
 
 
-def _remap_state_dict_for_recurrent_depth(model: Any, state_dict: dict[str, Any], init_model_config: dict[str, Any]) -> dict[str, Any]:
+def _remap_state_dict_for_recurrent_depth(
+    model: Any, state_dict: dict[str, Any], init_model_config: dict[str, Any]
+) -> dict[str, Any]:
     if getattr(model.config, "architecture", "transformer") != "recurrent_depth":
         return state_dict
     source_architecture = str(init_model_config.get("architecture", "transformer"))
@@ -306,7 +342,7 @@ def _remap_state_dict_for_recurrent_depth(model: Any, state_dict: dict[str, Any]
         prefix = f"blocks.{source_index}."
         for key, value in state_dict.items():
             if key.startswith(prefix):
-                remapped[target_prefix + key[len(prefix):]] = value
+                remapped[target_prefix + key[len(prefix) :]] = value
 
     for target_index, source_index in enumerate(prelude_sources):
         copy_block(source_index, f"prelude.{target_index}.")
@@ -325,9 +361,16 @@ def _load_init_checkpoint(model: Any, tokenizer: Any, init_checkpoint_path: Path
     init_model_config = init_config.get("model", {}) if isinstance(init_config, dict) else {}
     init_tokenizer_kind = str(tokenizer_config.get("kind", "byte"))
     current_tokenizer_kind = getattr(tokenizer, "kind", "byte")
-    if model.wte.weight.shape != init_state["wte.weight"].shape or init_tokenizer_kind != current_tokenizer_kind:
+    if (
+        model.wte.weight.shape != init_state["wte.weight"].shape
+        or init_tokenizer_kind != current_tokenizer_kind
+    ):
         init_state = _expand_state_dict_for_tokenizer(init_state, tokenizer)
-    if model.wpe is not None and "wpe.weight" in init_state and model.wpe.weight.shape != init_state["wpe.weight"].shape:
+    if (
+        model.wpe is not None
+        and "wpe.weight" in init_state
+        and model.wpe.weight.shape != init_state["wpe.weight"].shape
+    ):
         init_state = _resize_state_dict_for_block_size(init_state, model.config.block_size)
     if model.wpe is None and "wpe.weight" in init_state:
         del init_state["wpe.weight"]
@@ -369,7 +412,9 @@ def _split_train_val_buffer(buffer: list[int], block_size: int) -> tuple[list[in
     return train_buffer, val_buffer
 
 
-def _split_supervised_samples(samples: list[dict[str, list[int]]]) -> tuple[list[dict[str, list[int]]], list[dict[str, list[int]]]]:
+def _split_supervised_samples(
+    samples: list[dict[str, list[int]]],
+) -> tuple[list[dict[str, list[int]]], list[dict[str, list[int]]]]:
     if len(samples) < 4:
         return samples, []
     val_count = max(1, len(samples) // 5)
@@ -443,7 +488,9 @@ def run_training(
     checkpoint_root: str | Path = "checkpoints",
 ) -> dict[str, object]:
     if not TORCH_AVAILABLE:
-        raise RuntimeError("PyTorch is required for training. Install with `pip install -e .[train]`.")
+        raise RuntimeError(
+            "PyTorch is required for training. Install with `pip install -e .[train]`."
+        )
 
     seed(1337)
     torch.manual_seed(1337)
@@ -455,8 +502,12 @@ def run_training(
 
     dataset_kind = config.training.loss_mode
     if dataset_kind == "supervised":
-        supervised_stats = summarize_supervised_dataset(corpus_root, config.model.block_size, tokenizer)
-        samples, corpus_tokens = _load_supervised_dataset(corpus_root, config.model.block_size, tokenizer)
+        supervised_stats = summarize_supervised_dataset(
+            corpus_root, config.model.block_size, tokenizer
+        )
+        samples, corpus_tokens = _load_supervised_dataset(
+            corpus_root, config.model.block_size, tokenizer
+        )
         train_samples, val_samples = _split_supervised_samples(samples)
         train_buffer: list[int] = []
         val_buffer: list[int] = []
@@ -477,9 +528,11 @@ def run_training(
     if config.training.init_checkpoint:
         init_checkpoint_path = Path(config.training.init_checkpoint)
         init_tokenizer_kind = _load_init_checkpoint(model, tokenizer, init_checkpoint_path)
-    trainable_parameters, trainable_parameter_names, trainable_parameter_count = _configure_trainable_parameters(
-        model,
-        config.training.trainable_patterns,
+    trainable_parameters, trainable_parameter_names, trainable_parameter_count = (
+        _configure_trainable_parameters(
+            model,
+            config.training.trainable_patterns,
+        )
     )
     optimizer = torch.optim.AdamW(
         trainable_parameters,
@@ -505,8 +558,12 @@ def run_training(
         if dataset_kind == "supervised":
             x, y = _sample_supervised_batch(train_samples, config.training.micro_batch_size, device)
         else:
-            x, y = _sample_batch(train_buffer, config.model.block_size, config.training.micro_batch_size, device)
-        context_manager = torch.autocast(device_type="cuda", dtype=amp_dtype) if use_amp else nullcontext()
+            x, y = _sample_batch(
+                train_buffer, config.model.block_size, config.training.micro_batch_size, device
+            )
+        context_manager = (
+            torch.autocast(device_type="cuda", dtype=amp_dtype) if use_amp else nullcontext()
+        )
         with context_manager:
             _, loss = model(x, y)
         assert loss is not None
@@ -523,11 +580,13 @@ def run_training(
             optimizer.step()
             optimizer.zero_grad(set_to_none=True)
             optimizer_steps += 1
-            loss_history.append({
-                "step": step + 1,
-                "loss": round(float(loss.item()), 4),
-                "lr": round(lr, 8),
-            })
+            loss_history.append(
+                {
+                    "step": step + 1,
+                    "loss": round(float(loss.item()), 4),
+                    "lr": round(lr, 8),
+                }
+            )
 
     runtime_seconds = round(time.perf_counter() - start_time, 3)
     tokens_per_optimizer_step = (
@@ -603,5 +662,3 @@ def run_training(
 
 def load_config(path: str | Path) -> ExperimentConfig:
     return load_experiment_config(path)
-
-

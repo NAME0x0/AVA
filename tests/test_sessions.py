@@ -17,7 +17,6 @@ from ava.sessions import (
 )
 from ava.tokenizer import ByteTokenizer
 
-
 TINY_CONFIG = """name: ava-test-tiny
 tokenizer:
   kind: byte
@@ -118,7 +117,9 @@ def _write_tiny_support_corpus(root: Path) -> None:
         {"prompt": "What force keeps planets in orbit around the Sun?", "response": "gravity"},
         {"prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."},
     ]
-    (root / "examples.jsonl").write_text("\n".join(json.dumps(row) for row in rows) + "\n", encoding="utf-8")
+    (root / "examples.jsonl").write_text(
+        "\n".join(json.dumps(row) for row in rows) + "\n", encoding="utf-8"
+    )
 
 
 def _write_tiny_checkpoint(path: Path) -> None:
@@ -142,7 +143,9 @@ def test_bootstrap_session_writes_artifacts() -> None:
     recommendation_path = session_dir / "results" / "recommendation.json"
     assert recommendation_path.exists()
     payload = json.loads(recommendation_path.read_text(encoding="utf-8"))
-    registry = json.loads((session_dir / "results" / "benchmark_registry.json").read_text(encoding="utf-8"))
+    registry = json.loads(
+        (session_dir / "results" / "benchmark_registry.json").read_text(encoding="utf-8")
+    )
     events = read_activity_events(root)
     assert payload["recommended_model"]
     assert any(item["modality"] == "vision" for item in registry)
@@ -264,10 +267,18 @@ def test_training_session_writes_transparent_artifacts() -> None:
     assert (session_dir / "results" / "compliance_benchmark.json").exists()
     assert (session_dir / "results" / "tool_benchmark.json").exists()
     assert (session_dir / "results" / "benchmark_registry.json").exists()
-    training_payload = json.loads((session_dir / "results" / "training.json").read_text(encoding="utf-8"))
-    tool_payload = json.loads((session_dir / "results" / "tool_eval.json").read_text(encoding="utf-8"))
-    compliance_payload = json.loads((session_dir / "results" / "compliance.json").read_text(encoding="utf-8"))
-    registry_payload = json.loads((session_dir / "results" / "benchmark_registry.json").read_text(encoding="utf-8"))
+    training_payload = json.loads(
+        (session_dir / "results" / "training.json").read_text(encoding="utf-8")
+    )
+    tool_payload = json.loads(
+        (session_dir / "results" / "tool_eval.json").read_text(encoding="utf-8")
+    )
+    compliance_payload = json.loads(
+        (session_dir / "results" / "compliance.json").read_text(encoding="utf-8")
+    )
+    registry_payload = json.loads(
+        (session_dir / "results" / "benchmark_registry.json").read_text(encoding="utf-8")
+    )
     events = read_activity_events(root)
     assert training_payload["optimizer_steps"] >= 1
     assert tool_payload["total"] >= 1
@@ -325,7 +336,6 @@ def test_retrieval_session_writes_before_after_artifacts() -> None:
     )
     shutil.rmtree(root)
     shutil.rmtree(workspace)
-
 
 
 def test_memory_transfer_session_writes_mode_comparison_artifacts() -> None:

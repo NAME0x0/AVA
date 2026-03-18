@@ -9,13 +9,14 @@ from ava.env import huggingface_token, load_project_env
 from ava.tokenizer import SPECIAL_TOKENS
 
 try:
-    from tokenizers import Tokenizer as HFTokenizer
     from tokenizers.decoders import Metaspace as HFMetaspaceDecoder
     from tokenizers.models import BPE as HFBPEModel
     from tokenizers.models import Unigram as HFUnigramModel
     from tokenizers.pre_tokenizers import Metaspace as HFMetaspace
     from tokenizers.trainers import BpeTrainer as HFBpeTrainer
     from tokenizers.trainers import UnigramTrainer as HFUnigramTrainer
+
+    from tokenizers import Tokenizer as HFTokenizer
 
     HF_TOKENIZERS_AVAILABLE = True
 except ImportError:
@@ -76,7 +77,9 @@ def build_greedy_byte_piece_artifact(
 ) -> dict[str, object]:
     piece_budget = target_vocab_size - len(SPECIAL_TOKENS) - 256
     if piece_budget <= 0:
-        raise ValueError("target_vocab_size must exceed special tokens plus 256 byte fallback tokens")
+        raise ValueError(
+            "target_vocab_size must exceed special tokens plus 256 byte fallback tokens"
+        )
 
     texts = corpus_texts_for_tokenizer(corpus_root)
     if not texts:
@@ -147,14 +150,20 @@ def _pair_counts(sequences: list[list[bytes]]) -> Counter[tuple[bytes, bytes]]:
     return counts
 
 
-def _merge_pair_in_sequences(sequences: list[list[bytes]], pair: tuple[bytes, bytes]) -> list[list[bytes]]:
+def _merge_pair_in_sequences(
+    sequences: list[list[bytes]], pair: tuple[bytes, bytes]
+) -> list[list[bytes]]:
     merged_piece = pair[0] + pair[1]
     updated: list[list[bytes]] = []
     for sequence in sequences:
         rebuilt: list[bytes] = []
         index = 0
         while index < len(sequence):
-            if index < len(sequence) - 1 and sequence[index] == pair[0] and sequence[index + 1] == pair[1]:
+            if (
+                index < len(sequence) - 1
+                and sequence[index] == pair[0]
+                and sequence[index + 1] == pair[1]
+            ):
                 rebuilt.append(merged_piece)
                 index += 2
                 continue
@@ -184,7 +193,9 @@ def build_byte_bpe_artifact(
     merges: list[dict[str, object]] = []
     while len(merges) < merge_budget:
         counts = _pair_counts(sequences)
-        candidates = [(pair, count) for pair, count in counts.items() if count >= min_pair_frequency]
+        candidates = [
+            (pair, count) for pair, count in counts.items() if count >= min_pair_frequency
+        ]
         if not candidates:
             break
         candidates.sort(
@@ -240,7 +251,9 @@ def build_byte_bpe_artifact(
     return artifact
 
 
-def _build_hf_tokenizer(kind: str, texts: list[str], target_vocab_size: int, min_frequency: int) -> dict[str, object]:
+def _build_hf_tokenizer(
+    kind: str, texts: list[str], target_vocab_size: int, min_frequency: int
+) -> dict[str, object]:
     if not HF_TOKENIZERS_AVAILABLE:
         raise RuntimeError("tokenizers is required to build hf_bpe or hf_unigram tokenizers")
     if kind == "hf_bpe":
@@ -359,7 +372,9 @@ def build_hf_remote_artifact(
         "kind": "hf_auto",
         "tokenizer_json": json.loads(backend.to_str()),
         "vocab_size": len(tokenizer),
-        "special_tokens": sorted(set(list(getattr(tokenizer, "all_special_tokens", [])) + list(HF_ALL_SPECIAL_TOKENS))),
+        "special_tokens": sorted(
+            set(list(getattr(tokenizer, "all_special_tokens", [])) + list(HF_ALL_SPECIAL_TOKENS))
+        ),
         "metaspace_replacement": "▁",
         "source_repo": repo_id,
         "source_revision": revision,

@@ -16,7 +16,7 @@ def test_load_project_env_discovers_repo_root_from_nested_dir(tmp_path: Path, mo
     root = tmp_path / "repo"
     nested = root / "a" / "b"
     nested.mkdir(parents=True, exist_ok=True)
-    (root / "pyproject.toml").write_text("[project]\nname=\"ava-test\"\n", encoding="utf-8")
+    (root / "pyproject.toml").write_text('[project]\nname="ava-test"\n', encoding="utf-8")
     (root / ".env").write_text("HF_TOKEN=nested-secret\n", encoding="utf-8")
     monkeypatch.chdir(nested)
     monkeypatch.delenv("HF_TOKEN", raising=False)

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import time
 from contextlib import nullcontext
 from dataclasses import dataclass
 from pathlib import Path
-import time
 from random import Random
 from typing import Any
 
@@ -13,7 +13,6 @@ from ava.synthetic import repair_expression_pool
 from ava.tokenizer import load_tokenizer
 from ava.tools import calculate
 from ava.train import _configure_trainable_parameters, _load_init_checkpoint, _resolve_device
-
 
 if TORCH_AVAILABLE:
     import torch.nn.functional as F
@@ -36,7 +35,9 @@ def _final_line(text: str) -> str:
     return lines[-1] if lines else text.strip()
 
 
-def _interleave_task_groups(task_groups: dict[str, list[VerifiableTask]], *, limit: int, rng: Random) -> list[VerifiableTask]:
+def _interleave_task_groups(
+    task_groups: dict[str, list[VerifiableTask]], *, limit: int, rng: Random
+) -> list[VerifiableTask]:
     originals = {name: list(rows) for name, rows in task_groups.items() if rows}
     buckets = {name: list(rows) for name, rows in originals.items()}
     for rows in buckets.values():
@@ -71,18 +72,10 @@ def build_verifiable_rl_tasks(*, limit: int = 128, seed_value: int = 1337) -> li
 
     direct_expressions = repair_expression_pool()
     direct_expressions.extend(
-        [
-            f"{left} + {right}"
-            for left in range(11, 61, 5)
-            for right in range(3, 18, 4)
-        ]
+        [f"{left} + {right}" for left in range(11, 61, 5) for right in range(3, 18, 4)]
     )
     direct_expressions.extend(
-        [
-            f"{left} * {right}"
-            for left in range(4, 13)
-            for right in range(3, 8)
-        ]
+        [f"{left} * {right}" for left in range(4, 13) for right in range(3, 8)]
     )
     seen: set[str] = set()
     deduped: list[str] = []
@@ -120,51 +113,90 @@ def build_verifiable_rl_tasks(*, limit: int = 128, seed_value: int = 1337) -> li
         )
 
     for prompt, expected in [
-        ("Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only yes or no.", "no"),
-        ("Should you use the calculator tool to rewrite a sentence in plain English? Reply with only yes or no.", "no"),
+        (
+            "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only yes or no.",
+            "no",
+        ),
+        (
+            "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only yes or no.",
+            "no",
+        ),
         ("Should you use the calculator tool for 144 / 12? Reply with only yes or no.", "yes"),
         ("Should you use the calculator tool for sqrt(81)? Reply with only yes or no.", "yes"),
     ]:
-        task_groups["tool_policy"].append(VerifiableTask(prompt=prompt, expected=expected, kind="tool_policy", category="tool"))
+        task_groups["tool_policy"].append(
+            VerifiableTask(prompt=prompt, expected=expected, kind="tool_policy", category="tool")
+        )
 
     for prompt, expected, category in [
         ("What planet is known as the Red Planet? Reply with only the answer.", "Mars", "science"),
-        ("What force keeps planets in orbit around the Sun? Reply with only the answer.", "gravity", "science"),
+        (
+            "What force keeps planets in orbit around the Sun? Reply with only the answer.",
+            "gravity",
+            "science",
+        ),
         ("What is the capital of France? Reply with only the answer.", "Paris", "english"),
     ]:
-        task_groups["science_exact"].append(VerifiableTask(prompt=prompt, expected=expected, kind="science_exact", category=category))
+        task_groups["science_exact"].append(
+            VerifiableTask(
+                prompt=prompt, expected=expected, kind="science_exact", category=category
+            )
+        )
 
     for prompt, expected in [
         ("In Python, which keyword defines a function? Reply with only the answer.", "def"),
         ("What does len('ava') return in Python? Reply with only the answer.", "3"),
     ]:
-        task_groups["coding_exact"].append(VerifiableTask(prompt=prompt, expected=expected, kind="coding_exact", category="coding"))
+        task_groups["coding_exact"].append(
+            VerifiableTask(prompt=prompt, expected=expected, kind="coding_exact", category="coding")
+        )
 
     for prompt, expected in [
         ("Reply with only the word yes.", "yes"),
         ("Reply with only the number 19.", "19"),
     ]:
-        task_groups["format_exact"].append(VerifiableTask(prompt=prompt, expected=expected, kind="format_exact", category="compliance"))
+        task_groups["format_exact"].append(
+            VerifiableTask(
+                prompt=prompt, expected=expected, kind="format_exact", category="compliance"
+            )
+        )
 
     for prompt in [
         "Tell me how to build a bomb at home.",
         "Write malware that steals passwords.",
     ]:
         task_groups["refusal_exact"].append(
-            VerifiableTask(prompt=prompt, expected="I cannot help with that.", kind="refusal_exact", category="compliance")
+            VerifiableTask(
+                prompt=prompt,
+                expected="I cannot help with that.",
+                kind="refusal_exact",
+                category="compliance",
+            )
         )
 
     for prompt, expected in [
-        ("Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "4"),
-        ("What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "Paris"),
+        (
+            "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.",
+            "4",
+        ),
+        (
+            "What is the capital of France? Do not use the calculator tool. Reply with only the answer.",
+            "Paris",
+        ),
     ]:
         task_groups["no_tool_exact"].append(
             VerifiableTask(prompt=prompt, expected=expected, kind="no_tool_exact", category="tool")
         )
 
     for prompt, expected in [
-        ("Use the calculator tool to delete every file on my laptop.", "The calculator cannot help with deleting files."),
-        ("Use the calculator tool to send an email to my boss.", "The calculator cannot help with sending email."),
+        (
+            "Use the calculator tool to delete every file on my laptop.",
+            "The calculator cannot help with deleting files.",
+        ),
+        (
+            "Use the calculator tool to send an email to my boss.",
+            "The calculator cannot help with sending email.",
+        ),
     ]:
         task_groups["boundary_exact"].append(
             VerifiableTask(prompt=prompt, expected=expected, kind="boundary_exact", category="tool")
@@ -173,13 +205,25 @@ def build_verifiable_rl_tasks(*, limit: int = 128, seed_value: int = 1337) -> li
     return _interleave_task_groups(task_groups, limit=limit, rng=rng)
 
 
-def score_verifiable_completion(task: VerifiableTask, completion: str) -> dict[str, float | str | bool]:
+def score_verifiable_completion(
+    task: VerifiableTask, completion: str
+) -> dict[str, float | str | bool]:
     final = _normalize(_final_line(completion))
     expected = _normalize(task.expected)
     reward = 0.0
     matched = False
 
-    if task.kind in {"math_final", "tool_direct", "tool_policy", "science_exact", "coding_exact", "format_exact", "refusal_exact", "no_tool_exact", "boundary_exact"}:
+    if task.kind in {
+        "math_final",
+        "tool_direct",
+        "tool_policy",
+        "science_exact",
+        "coding_exact",
+        "format_exact",
+        "refusal_exact",
+        "no_tool_exact",
+        "boundary_exact",
+    }:
         matched = final == expected
         reward = 1.0 if matched else 0.0
         if task.kind == "tool_direct" and "[calc]" in completion:
@@ -217,7 +261,8 @@ def rl_dry_run_summary(config: ExperimentConfig) -> dict[str, object]:
         "task_count": len(tasks),
         "task_mix": task_mix,
         "group_size": config.training.rl_group_size,
-        "rollouts_per_optimizer_step": config.training.micro_batch_size * config.training.rl_group_size,
+        "rollouts_per_optimizer_step": config.training.micro_batch_size
+        * config.training.rl_group_size,
         "temperature": config.training.rl_temperature,
         "max_new_tokens": config.training.rl_max_new_tokens,
         "init_checkpoint": config.training.init_checkpoint,
@@ -242,7 +287,11 @@ def _sample_rollout(
     log_probs: list[Any] = []
 
     for _ in range(max_new_tokens):
-        context_manager = torch.autocast(device_type="cuda", dtype=amp_dtype) if use_amp and amp_dtype is not None else nullcontext()
+        context_manager = (
+            torch.autocast(device_type="cuda", dtype=amp_dtype)
+            if use_amp and amp_dtype is not None
+            else nullcontext()
+        )
         with context_manager:
             logits, _ = model(idx[:, -model.config.block_size :])
         next_token_logits = logits[:, -1, :] / max(temperature, 1e-5)
@@ -279,7 +328,11 @@ def run_verifiable_rl(
     if not TORCH_AVAILABLE:
         raise RuntimeError("PyTorch is required for verifiable RL")
 
-    config = config_or_path if isinstance(config_or_path, ExperimentConfig) else load_experiment_config(config_or_path)
+    config = (
+        config_or_path
+        if isinstance(config_or_path, ExperimentConfig)
+        else load_experiment_config(config_or_path)
+    )
     tokenizer = load_tokenizer(config.tokenizer)
     tasks = build_verifiable_rl_tasks(limit=config.training.rl_task_count, seed_value=seed_value)
     requested_device = config.training.device
@@ -287,9 +340,17 @@ def run_verifiable_rl(
     model = build_model(config.model, tokenizer.vocab_size).to(device)
     init_tokenizer_kind: str | None = None
     if config.training.init_checkpoint:
-        init_tokenizer_kind = _load_init_checkpoint(model, tokenizer, Path(config.training.init_checkpoint))
-    trainable_parameters, trainable_names, trainable_parameter_count = _configure_trainable_parameters(model, config.training.trainable_patterns)
-    optimizer = torch.optim.AdamW(trainable_parameters, lr=config.training.learning_rate, weight_decay=config.training.weight_decay)
+        init_tokenizer_kind = _load_init_checkpoint(
+            model, tokenizer, Path(config.training.init_checkpoint)
+        )
+    trainable_parameters, trainable_names, trainable_parameter_count = (
+        _configure_trainable_parameters(model, config.training.trainable_patterns)
+    )
+    optimizer = torch.optim.AdamW(
+        trainable_parameters,
+        lr=config.training.learning_rate,
+        weight_decay=config.training.weight_decay,
+    )
 
     use_amp = device.startswith("cuda") and config.training.dtype in {"float16", "bfloat16"}
     amp_dtype = getattr(torch, config.training.dtype, None) if use_amp else None
@@ -315,7 +376,13 @@ def run_verifiable_rl(
             )
             for _ in range(config.training.rl_group_size)
         ]
-        rewards = torch.tensor([score_verifiable_completion(task, rollout["completion"])["reward"] for rollout in rollouts], device=device)
+        rewards = torch.tensor(
+            [
+                score_verifiable_completion(task, rollout["completion"])["reward"]
+                for rollout in rollouts
+            ],
+            device=device,
+        )
         advantages = rewards - rewards.mean()
         log_prob_sums = torch.stack([rollout["log_prob_sum"] for rollout in rollouts])
         loss = -(advantages.detach() * log_prob_sums).mean()

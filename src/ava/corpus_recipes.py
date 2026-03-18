@@ -5,7 +5,6 @@ from pathlib import Path
 from random import Random
 from typing import Any
 
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_POSTTRAIN_SOURCE_LIMITS: dict[str, int] = {
     "teacher_distill": 103,
@@ -74,7 +73,9 @@ def _openbookqa_to_text(rows: list[dict[str, object]]) -> list[str]:
             if str(label) == answer_key:
                 answer_text = str(choice)
                 break
-        options = "\n".join(f"{label}. {choice}" for label, choice in zip(labels, texts, strict=False))
+        options = "\n".join(
+            f"{label}. {choice}" for label, choice in zip(labels, texts, strict=False)
+        )
         if question and options:
             records.append(
                 f"Science multiple choice:\n{question}\n\nOptions:\n{options}\n\nCorrect answer:\n{answer_text or answer_key}"
@@ -108,7 +109,9 @@ def _read_jsonl_examples(path: str | Path) -> list[dict[str, object]]:
     return rows
 
 
-def _sample_examples(rows: list[dict[str, object]], limit: int | None, *, seed_value: int) -> list[dict[str, object]]:
+def _sample_examples(
+    rows: list[dict[str, object]], limit: int | None, *, seed_value: int
+) -> list[dict[str, object]]:
     if limit is None or limit >= len(rows):
         return list(rows)
     rng = Random(seed_value)
@@ -172,7 +175,9 @@ def materialize_open_mix_corpus(
         "code_records": len(code_records),
         "files": list(files),
     }
-    (root_path / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    (root_path / "manifest.json").write_text(
+        json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+    )
     (root_path / "README.md").write_text(
         "# AVA-v2 Open Mix Corpus\n\n"
         "A mixed raw-text continuation corpus built from TinyStories, GSM8K train, SciQ train, OpenBookQA train, and MBPP train.\n",
@@ -200,7 +205,9 @@ def materialize_posttrain_mix_corpus(
     for offset, source_name in enumerate(DEFAULT_POSTTRAIN_SOURCE_LIMITS):
         path = POSTTRAIN_SOURCE_PATHS[source_name]
         rows = _read_jsonl_examples(path)
-        sampled = _sample_examples(rows, source_limits.get(source_name), seed_value=seed_value + offset)
+        sampled = _sample_examples(
+            rows, source_limits.get(source_name), seed_value=seed_value + offset
+        )
         repeat = max(1, int(source_repeats.get(source_name, 1)))
         repeated_rows = sampled * repeat
         source_counts[source_name] = len(repeated_rows)
@@ -220,7 +227,9 @@ def materialize_posttrain_mix_corpus(
         "by_kind": kind_counts,
         "examples_path": str(root_path / "examples.jsonl"),
     }
-    (root_path / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    (root_path / "manifest.json").write_text(
+        json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+    )
     (root_path / "README.md").write_text(
         "# AVA-v2 Post-Train Mix\n\n"
         "A deterministic supervised post-training mixture assembled from AVA teacher, public benchmark, science, math-reasoning, tool, compliance, and general instruction packets.\n",

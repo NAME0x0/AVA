@@ -43,4 +43,13 @@ def test_research_hypotheses_sorted_by_priority() -> None:
 def test_recent_hf_hypotheses_exist() -> None:
     hypotheses = recent_hf_hypotheses()
     keys = {item.key for item in hypotheses}
-    assert keys == {"exp-009", "exp-010", "exp-011", "exp-012", "exp-013", "exp-014", "exp-015", "exp-016"}
+    assert keys == {
+        "exp-009",
+        "exp-010",
+        "exp-011",
+        "exp-012",
+        "exp-013",
+        "exp-014",
+        "exp-015",
+        "exp-016",
+    }

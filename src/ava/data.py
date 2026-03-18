@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 from ava.tokenizer import ByteTokenizer
-
 
 TEXT_SUFFIXES = {".txt", ".md"}
 JSONL_SUFFIXES = {".jsonl"}

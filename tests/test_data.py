@@ -10,12 +10,13 @@ def test_load_supervised_examples_preserves_teacher_metadata() -> None:
         shutil.rmtree(root)
     root.mkdir(parents=True, exist_ok=True)
     (root / "examples.jsonl").write_text(
-        '\n'.join(
+        "\n".join(
             [
                 '{"prompt":"Question one","response":"A","teacher_model":"codex","format_contract":"label_only","verifier_status":"pass","tags":["science_mc","science"]}',
                 '{"prompt":"Question two","response":"19"}',
             ]
-        ) + '\n',
+        )
+        + "\n",
         encoding="utf-8",
     )
     examples = load_supervised_examples(root)

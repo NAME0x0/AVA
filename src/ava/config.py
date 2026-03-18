@@ -14,7 +14,7 @@ class TokenizerConfig:
     path: str | None = None
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any] | None) -> "TokenizerConfig":
+    def from_dict(cls, data: dict[str, Any] | None) -> TokenizerConfig:
         data = data or {}
         path = data.get("path")
         return cls(
@@ -43,7 +43,7 @@ class ModelConfig:
     recurrent_gate: bool = False
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any] | None) -> "ModelConfig":
+    def from_dict(cls, data: dict[str, Any] | None) -> ModelConfig:
         data = data or {}
         return cls(
             block_size=int(data.get("block_size", 256)),
@@ -67,7 +67,11 @@ class ModelConfig:
         if self.architecture == "looped":
             return self.n_layer * self.loop_repeats
         if self.architecture == "recurrent_depth":
-            return self.recurrent_prelude_layers + (self.n_layer * self.loop_repeats) + self.recurrent_coda_layers
+            return (
+                self.recurrent_prelude_layers
+                + (self.n_layer * self.loop_repeats)
+                + self.recurrent_coda_layers
+            )
         return self.n_layer
 
     def estimated_parameters(self, vocab_size: int) -> int:
@@ -80,14 +84,33 @@ class ModelConfig:
         norm_params = 2 * self.n_embd if self.norm_type == "layernorm" else self.n_embd
         per_block = attn_params + mlp_params + (2 * norm_params)
         token_embeddings = vocab_size * self.n_embd
-        positional_embeddings = self.block_size * self.n_embd if self.position_encoding == "learned" else 0
+        positional_embeddings = (
+            self.block_size * self.n_embd if self.position_encoding == "learned" else 0
+        )
         final_norm = norm_params
-        loop_parameters = self.loop_repeats * self.n_embd if self.architecture in {"looped", "recurrent_depth"} else 0
+        loop_parameters = (
+            self.loop_repeats * self.n_embd
+            if self.architecture in {"looped", "recurrent_depth"}
+            else 0
+        )
         gate_parameters = self.n_embd * self.n_embd + self.n_embd if self.recurrent_gate else 0
         if self.architecture == "recurrent_depth":
             scaffold_blocks = self.recurrent_prelude_layers + self.recurrent_coda_layers
-            return token_embeddings + positional_embeddings + ((self.n_layer + scaffold_blocks) * per_block) + final_norm + loop_parameters + gate_parameters
-        return token_embeddings + positional_embeddings + (self.n_layer * per_block) + final_norm + loop_parameters
+            return (
+                token_embeddings
+                + positional_embeddings
+                + ((self.n_layer + scaffold_blocks) * per_block)
+                + final_norm
+                + loop_parameters
+                + gate_parameters
+            )
+        return (
+            token_embeddings
+            + positional_embeddings
+            + (self.n_layer * per_block)
+            + final_norm
+            + loop_parameters
+        )
 
 
 @dataclass(slots=True)
@@ -113,7 +136,7 @@ class TrainingConfig:
     min_lr_ratio: float = 0.1
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any] | None) -> "TrainingConfig":
+    def from_dict(cls, data: dict[str, Any] | None) -> TrainingConfig:
         data = data or {}
         patterns = data.get("trainable_patterns") or []
         return cls(
@@ -147,7 +170,7 @@ class MemoryConfig:
     top_k: int = 4
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any] | None) -> "MemoryConfig":
+    def from_dict(cls, data: dict[str, Any] | None) -> MemoryConfig:
         data = data or {}
         return cls(
             enabled=bool(data.get("enabled", True)),
@@ -163,7 +186,7 @@ class ToolConfig:
     prompt_protocol: str = "compact_tags"
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any] | None) -> "ToolConfig":
+    def from_dict(cls, data: dict[str, Any] | None) -> ToolConfig:
         data = data or {}
         return cls(
             calculator=bool(data.get("calculator", True)),
@@ -181,7 +204,7 @@ class ExperimentConfig:
     tools: ToolConfig
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "ExperimentConfig":
+    def from_dict(cls, data: dict[str, Any]) -> ExperimentConfig:
         return cls(
             name=str(data.get("name", "ava-experiment")),
             tokenizer=TokenizerConfig.from_dict(data.get("tokenizer")),

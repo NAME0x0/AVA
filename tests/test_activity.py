@@ -2,7 +2,12 @@ import shutil
 import sys
 from pathlib import Path
 
-from ava.activity import read_activity_events, record_activity, run_logged_command, snapshot_repo_state
+from ava.activity import (
+    read_activity_events,
+    record_activity,
+    run_logged_command,
+    snapshot_repo_state,
+)
 from ava.cli import main
 
 
@@ -49,7 +54,9 @@ def test_run_logged_command_captures_output() -> None:
     assert "activity-run-ok" in result["stdout"]
     assert Path(result["stdout_path"]).exists()
     events = read_activity_events(root)
-    assert any(event["kind"] == "external_command" and event["status"] == "completed" for event in events)
+    assert any(
+        event["kind"] == "external_command" and event["status"] == "completed" for event in events
+    )
     shutil.rmtree(root)
 
 

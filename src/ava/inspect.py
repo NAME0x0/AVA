@@ -13,7 +13,9 @@ from ava.tokenizer import load_tokenizer
 def _resolve_device(requested_device: str) -> tuple[str, list[str]]:
     warnings: list[str] = []
     if requested_device.startswith("cuda") and not torch.cuda.is_available():
-        warnings.append("CUDA was requested for inspection but is unavailable; inspection ran on CPU.")
+        warnings.append(
+            "CUDA was requested for inspection but is unavailable; inspection ran on CPU."
+        )
         return "cpu", warnings
     return requested_device, warnings
 
@@ -135,7 +137,11 @@ def _forward_with_trace(
     x = model.drop(x)
     layers: list[dict[str, object]] = []
 
-    repeat_count = model.config.loop_repeats if getattr(model.config, "architecture", "transformer") == "looped" else 1
+    repeat_count = (
+        model.config.loop_repeats
+        if getattr(model.config, "architecture", "transformer") == "looped"
+        else 1
+    )
     for block_index, block in enumerate(model.blocks):
         for loop_iteration in range(repeat_count):
             if getattr(model, "loop_step_embeddings", None) is not None:
@@ -145,9 +151,15 @@ def _forward_with_trace(
             batch_size, _, channels = ln1.size()
             qkv = block.attn.c_attn(ln1)
             query, key, value = qkv.split(channels, dim=2)
-            query = query.view(batch_size, sequence_length, block.attn.n_head, block.attn.head_dim).transpose(1, 2)
-            key = key.view(batch_size, sequence_length, block.attn.n_head, block.attn.head_dim).transpose(1, 2)
-            value = value.view(batch_size, sequence_length, block.attn.n_head, block.attn.head_dim).transpose(1, 2)
+            query = query.view(
+                batch_size, sequence_length, block.attn.n_head, block.attn.head_dim
+            ).transpose(1, 2)
+            key = key.view(
+                batch_size, sequence_length, block.attn.n_head, block.attn.head_dim
+            ).transpose(1, 2)
+            value = value.view(
+                batch_size, sequence_length, block.attn.n_head, block.attn.head_dim
+            ).transpose(1, 2)
 
             scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(block.attn.head_dim)
             causal_mask = torch.triu(
@@ -157,7 +169,9 @@ def _forward_with_trace(
             scores = scores.masked_fill(causal_mask, float("-inf"))
             attn_weights = torch.softmax(scores, dim=-1)
             attn_output = torch.matmul(attn_weights, value)
-            attn_output = attn_output.transpose(1, 2).contiguous().view(batch_size, sequence_length, channels)
+            attn_output = (
+                attn_output.transpose(1, 2).contiguous().view(batch_size, sequence_length, channels)
+            )
             attn_output = block.attn.c_proj(attn_output)
             x = x + attn_output
 
@@ -191,7 +205,9 @@ def _forward_with_trace(
     step_trace = {
         "sequence_length": sequence_length,
         "input_token_ids": idx[0].tolist(),
-        "input_token_text": [_single_token_text(tokenizer, token_id) for token_id in idx[0].tolist()],
+        "input_token_text": [
+            _single_token_text(tokenizer, token_id) for token_id in idx[0].tolist()
+        ],
         "final_residual_norm": round(float(x[0, -1, :].norm().item()), 6),
         "top_next_token_logits": _topk_logits(logits[0, -1, :], tokenizer, top_k_logits_count),
         "layers": layers,

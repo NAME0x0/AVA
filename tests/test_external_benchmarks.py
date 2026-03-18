@@ -18,8 +18,8 @@ from ava.external_benchmarks import (
     format_arc_prompt,
 )
 from ava.model import build_model
-from ava.tokenizer import ByteTokenizer
 from ava.retrieval import SupportExample, load_support_examples
+from ava.tokenizer import ByteTokenizer
 
 
 def test_extract_gsm8k_answer_prefers_delimiter() -> None:
@@ -147,7 +147,11 @@ def test_predict_multiple_choice_support_ensemble_prefers_higher_margin_bank() -
         choices=(("A", "oxygen"), ("B", "carbon dioxide"), ("C", "helium")),
         support_resource={
             "kind": "banks",
-            "manifest": {"primary_bank": "primary", "margin_threshold": 0.001, "strategy": "margin_gate"},
+            "manifest": {
+                "primary_bank": "primary",
+                "margin_threshold": 0.001,
+                "strategy": "margin_gate",
+            },
             "banks": {
                 "primary": {
                     "path": "primary",
@@ -178,7 +182,12 @@ def test_predict_multiple_choice_from_support_uses_explicit_categories_from_corp
     workspace.mkdir(parents=True, exist_ok=True)
     corpus_path = workspace / "examples.jsonl"
     rows = [
-        {"kind": "arc_mc", "category": "science", "prompt": "Which gas do plants take in from the air for photosynthesis?\n\nOptions:\nA. oxygen\nB. carbon dioxide\nC. helium\n\nReply with only the correct option label.", "response": "B"},
+        {
+            "kind": "arc_mc",
+            "category": "science",
+            "prompt": "Which gas do plants take in from the air for photosynthesis?\n\nOptions:\nA. oxygen\nB. carbon dioxide\nC. helium\n\nReply with only the correct option label.",
+            "response": "B",
+        },
         {"kind": "gsm8k_train", "category": "math", "prompt": "What is 9 + 3?", "response": "12"},
     ]
     corpus_path.write_text("\n".join(json.dumps(row) for row in rows) + "\n", encoding="utf-8")
@@ -200,26 +209,37 @@ def test_predict_multiple_choice_from_support_uses_explicit_categories_from_corp
     shutil.rmtree(workspace)
 
 
-
 def test_predict_multiple_choice_dense_hybrid_from_support_uses_shortlist() -> None:
     class FakeDenseRetriever:
         model_name = "fake/dense"
         device = "cpu"
 
-        def shortlist(self, prompt: str, *, top_k: int, category_hint: str | None, category_gated: bool):
+        def shortlist(
+            self, prompt: str, *, top_k: int, category_hint: str | None, category_gated: bool
+        ):
             assert "photosynthesis" in prompt
             assert top_k == 4
-            return ([
-                SupportExample(
-                    prompt="What gas do plants take in from the air for photosynthesis?",
-                    response="carbon dioxide",
-                    category="science",
-                )
-            ], {
-                "candidate_count": 1,
-                "top_k": top_k,
-                "matches": [{"score": 0.99, "prompt": "What gas do plants take in from the air for photosynthesis?", "response": "carbon dioxide", "category": "science"}],
-            })
+            return (
+                [
+                    SupportExample(
+                        prompt="What gas do plants take in from the air for photosynthesis?",
+                        response="carbon dioxide",
+                        category="science",
+                    )
+                ],
+                {
+                    "candidate_count": 1,
+                    "top_k": top_k,
+                    "matches": [
+                        {
+                            "score": 0.99,
+                            "prompt": "What gas do plants take in from the air for photosynthesis?",
+                            "response": "carbon dioxide",
+                            "category": "science",
+                        }
+                    ],
+                },
+            )
 
     label, scoring = _predict_multiple_choice_dense_hybrid_from_support(
         prompt="Which gas do plants take in for photosynthesis?",
@@ -240,39 +260,67 @@ def test_predict_multiple_choice_dense_rerank_from_support_uses_reranked_shortli
         model_name = "fake/dense"
         device = "cpu"
 
-        def shortlist(self, prompt: str, *, top_k: int, category_hint: str | None, category_gated: bool):
-            return ([
-                SupportExample(
-                    prompt="Which gas is most common in the air people breathe?",
-                    response="oxygen",
-                    category="science",
-                ),
-                SupportExample(
-                    prompt="What gas do plants take in from the air for photosynthesis?",
-                    response="carbon dioxide",
-                    category="science",
-                ),
-            ], {
-                "candidate_count": 2,
-                "top_k": top_k,
-                "matches": [
-                    {"score": 0.8, "prompt": "Which gas do plants take in from the air for photosynthesis?", "response": "oxygen", "category": "science"},
-                    {"score": 0.7, "prompt": "What gas do plants take in from the air for photosynthesis?", "response": "carbon dioxide", "category": "science"},
+        def shortlist(
+            self, prompt: str, *, top_k: int, category_hint: str | None, category_gated: bool
+        ):
+            return (
+                [
+                    SupportExample(
+                        prompt="Which gas is most common in the air people breathe?",
+                        response="oxygen",
+                        category="science",
+                    ),
+                    SupportExample(
+                        prompt="What gas do plants take in from the air for photosynthesis?",
+                        response="carbon dioxide",
+                        category="science",
+                    ),
                 ],
-            })
+                {
+                    "candidate_count": 2,
+                    "top_k": top_k,
+                    "matches": [
+                        {
+                            "score": 0.8,
+                            "prompt": "Which gas do plants take in from the air for photosynthesis?",
+                            "response": "oxygen",
+                            "category": "science",
+                        },
+                        {
+                            "score": 0.7,
+                            "prompt": "What gas do plants take in from the air for photosynthesis?",
+                            "response": "carbon dioxide",
+                            "category": "science",
+                        },
+                    ],
+                },
+            )
 
     class FakeSupportReranker:
         model_name = "fake/reranker"
         device = "cpu"
 
-        def rerank(self, prompt: str, examples, *, top_k: int, category_hint: str | None, category_gated: bool):
+        def rerank(
+            self,
+            prompt: str,
+            examples,
+            *,
+            top_k: int,
+            category_hint: str | None,
+            category_gated: bool,
+        ):
             assert top_k == 1
             reordered = [examples[1]]
             return reordered, {
                 "candidate_count": 2,
                 "top_k": top_k,
                 "matches": [
-                    {"score": 1.2, "prompt": reordered[0].prompt, "response": reordered[0].response, "category": reordered[0].category},
+                    {
+                        "score": 1.2,
+                        "prompt": reordered[0].prompt,
+                        "response": reordered[0].response,
+                        "category": reordered[0].category,
+                    },
                 ],
             }
 
@@ -328,18 +376,30 @@ def test_predict_multiple_choice_sparse_dense_router_prefers_dense_on_low_margin
         model_name = "fake/dense"
         device = "cpu"
 
-        def shortlist(self, prompt: str, *, top_k: int, category_hint: str | None, category_gated: bool):
-            return ([
-                SupportExample(
-                    prompt="Which characteristic of a cheetah is more likely to be learned rather than inherited?",
-                    response="hunting style",
-                    category="science",
-                )
-            ], {
-                "candidate_count": 1,
-                "top_k": top_k,
-                "matches": [{"score": 0.82, "prompt": "Which characteristic of a cheetah is more likely to be learned rather than inherited?", "response": "hunting style", "category": "science"}],
-            })
+        def shortlist(
+            self, prompt: str, *, top_k: int, category_hint: str | None, category_gated: bool
+        ):
+            return (
+                [
+                    SupportExample(
+                        prompt="Which characteristic of a cheetah is more likely to be learned rather than inherited?",
+                        response="hunting style",
+                        category="science",
+                    )
+                ],
+                {
+                    "candidate_count": 1,
+                    "top_k": top_k,
+                    "matches": [
+                        {
+                            "score": 0.82,
+                            "prompt": "Which characteristic of a cheetah is more likely to be learned rather than inherited?",
+                            "response": "hunting style",
+                            "category": "science",
+                        }
+                    ],
+                },
+            )
 
     support_examples = [
         SupportExample(
@@ -358,7 +418,11 @@ def test_predict_multiple_choice_sparse_dense_router_prefers_dense_on_low_margin
         choices=(("A", "fur pattern"), ("B", "hunting style"), ("C", "tail length")),
         support_resource={
             "kind": "banks",
-            "manifest": {"primary_bank": "primary", "margin_threshold": 0.001, "strategy": "margin_gate"},
+            "manifest": {
+                "primary_bank": "primary",
+                "margin_threshold": 0.001,
+                "strategy": "margin_gate",
+            },
             "banks": {
                 "primary": {
                     "path": "primary",

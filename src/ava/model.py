@@ -30,12 +30,10 @@ if TORCH_AVAILABLE:
             norm = x.float().pow(2).mean(-1, keepdim=True).add(self.eps).rsqrt()
             return (x * norm).type_as(x) * self.weight
 
-
     def _build_norm(config: ModelConfig) -> Any:
         if config.norm_type == "rmsnorm":
             return RMSNorm(config.n_embd)
         return nn.LayerNorm(config.n_embd)
-
 
     def _precompute_rope_freqs(
         head_dim: int,
@@ -51,7 +49,6 @@ if TORCH_AVAILABLE:
         sin = angles.sin()
         return cos, sin
 
-
     def _apply_rope(x: Any, freqs_cos: Any, freqs_sin: Any) -> Any:
         seq_len = x.shape[2]
         cos = freqs_cos[:seq_len].unsqueeze(0).unsqueeze(0)
@@ -61,7 +58,6 @@ if TORCH_AVAILABLE:
         x2 = x_r[..., 1]
         out = torch.stack([x1 * cos - x2 * sin, x1 * sin + x2 * cos], dim=-1)
         return out.flatten(-2).type_as(x)
-
 
     class SwiGLUMLP(nn.Module):
         def __init__(self, config: ModelConfig) -> None:
@@ -74,7 +70,6 @@ if TORCH_AVAILABLE:
 
         def forward(self, x: Any) -> Any:
             return self.dropout(self.w2(F.silu(self.w1(x)) * self.w3(x)))
-
 
     class CausalSelfAttention(nn.Module):
         def __init__(self, config: ModelConfig) -> None:
@@ -92,9 +87,13 @@ if TORCH_AVAILABLE:
             batch_size, sequence_length, channels = x.size()
             qkv = self.c_attn(x)
             query, key, value = qkv.split(channels, dim=2)
-            query = query.view(batch_size, sequence_length, self.n_head, self.head_dim).transpose(1, 2)
+            query = query.view(batch_size, sequence_length, self.n_head, self.head_dim).transpose(
+                1, 2
+            )
             key = key.view(batch_size, sequence_length, self.n_head, self.head_dim).transpose(1, 2)
-            value = value.view(batch_size, sequence_length, self.n_head, self.head_dim).transpose(1, 2)
+            value = value.view(batch_size, sequence_length, self.n_head, self.head_dim).transpose(
+                1, 2
+            )
             if self.use_rope and freqs_cos is not None and freqs_sin is not None:
                 query = _apply_rope(query, freqs_cos, freqs_sin)
                 key = _apply_rope(key, freqs_cos, freqs_sin)
@@ -108,7 +107,6 @@ if TORCH_AVAILABLE:
             output = output.transpose(1, 2).contiguous().view(batch_size, sequence_length, channels)
             return self.c_proj(output)
 
-
     class MLP(nn.Module):
         def __init__(self, config: ModelConfig) -> None:
             super().__init__()
@@ -119,7 +117,6 @@ if TORCH_AVAILABLE:
 
         def forward(self, x: Any) -> Any:
             return self.dropout(self.c_proj(F.gelu(self.c_fc(x))))
-
 
     class Block(nn.Module):
         def __init__(self, config: ModelConfig) -> None:
@@ -136,7 +133,6 @@ if TORCH_AVAILABLE:
             x = x + self.attn(self.ln_1(x), freqs_cos, freqs_sin)
             x = x + self.mlp(self.ln_2(x))
             return x
-
 
     class GPT(nn.Module):
         def __init__(self, config: ModelConfig, vocab_size: int) -> None:
@@ -170,7 +166,9 @@ if TORCH_AVAILABLE:
                 self.rope_cos = None
                 self.rope_sin = None
             self.drop = nn.Dropout(config.dropout)
-            self.prelude = nn.ModuleList([Block(config) for _ in range(config.recurrent_prelude_layers)])
+            self.prelude = nn.ModuleList(
+                [Block(config) for _ in range(config.recurrent_prelude_layers)]
+            )
             self.blocks = nn.ModuleList([Block(config) for _ in range(config.n_layer)])
             self.coda = nn.ModuleList([Block(config) for _ in range(config.recurrent_coda_layers)])
             self.loop_step_embeddings = (
@@ -180,7 +178,11 @@ if TORCH_AVAILABLE:
             )
             if self.loop_step_embeddings is not None:
                 nn.init.zeros_(self.loop_step_embeddings.weight)
-            self.recurrent_step_scale = 1.0 / max(config.loop_repeats, 1) if config.architecture == "recurrent_depth" and not config.recurrent_gate else 1.0
+            self.recurrent_step_scale = (
+                1.0 / max(config.loop_repeats, 1)
+                if config.architecture == "recurrent_depth" and not config.recurrent_gate
+                else 1.0
+            )
             self.recurrent_gate_proj = (
                 nn.Linear(config.n_embd, config.n_embd, bias=True)
                 if config.recurrent_gate and config.architecture == "recurrent_depth"
@@ -204,11 +206,17 @@ if TORCH_AVAILABLE:
                 elif isinstance(module, nn.Embedding):
                     torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
             for block in list(self.prelude) + list(self.blocks) + list(self.coda):
-                if hasattr(block.mlp, 'c_proj'):
-                    torch.nn.init.normal_(block.mlp.c_proj.weight, mean=0.0, std=0.02 / math.sqrt(2 * n_layers))
-                elif hasattr(block.mlp, 'w2'):
-                    torch.nn.init.normal_(block.mlp.w2.weight, mean=0.0, std=0.02 / math.sqrt(2 * n_layers))
-                torch.nn.init.normal_(block.attn.c_proj.weight, mean=0.0, std=0.02 / math.sqrt(2 * n_layers))
+                if hasattr(block.mlp, "c_proj"):
+                    torch.nn.init.normal_(
+                        block.mlp.c_proj.weight, mean=0.0, std=0.02 / math.sqrt(2 * n_layers)
+                    )
+                elif hasattr(block.mlp, "w2"):
+                    torch.nn.init.normal_(
+                        block.mlp.w2.weight, mean=0.0, std=0.02 / math.sqrt(2 * n_layers)
+                    )
+                torch.nn.init.normal_(
+                    block.attn.c_proj.weight, mean=0.0, std=0.02 / math.sqrt(2 * n_layers)
+                )
             if self.loop_step_embeddings is not None:
                 nn.init.zeros_(self.loop_step_embeddings.weight)
             if self.recurrent_gate_proj is not None:
@@ -234,12 +242,21 @@ if TORCH_AVAILABLE:
             step = self.loop_step_embeddings.weight[idx].view(1, 1, -1)
             return x + step
 
-        def _run_blocks(self, x: Any, blocks: Any, freqs_cos: Any = None, freqs_sin: Any = None) -> Any:
+        def _run_blocks(
+            self, x: Any, blocks: Any, freqs_cos: Any = None, freqs_sin: Any = None
+        ) -> Any:
             for block in blocks:
                 x = block(x, freqs_cos, freqs_sin)
             return x
 
-        def _run_recurrent_depth(self, x: Any, freqs_cos: Any = None, freqs_sin: Any = None, *, repeat_override: int | None = None) -> Any:
+        def _run_recurrent_depth(
+            self,
+            x: Any,
+            freqs_cos: Any = None,
+            freqs_sin: Any = None,
+            *,
+            repeat_override: int | None = None,
+        ) -> Any:
             x = self._run_blocks(x, self.prelude, freqs_cos, freqs_sin)
             for loop_index in range(self._repeat_count(repeat_override)):
                 loop_input = self._apply_loop_embedding(x, loop_index)
@@ -252,7 +269,9 @@ if TORCH_AVAILABLE:
             x = self._run_blocks(x, self.coda, freqs_cos, freqs_sin)
             return x
 
-        def forward(self, idx: Any, targets: Any | None = None, *, repeat_override: int | None = None) -> tuple[Any, Any | None]:
+        def forward(
+            self, idx: Any, targets: Any | None = None, *, repeat_override: int | None = None
+        ) -> tuple[Any, Any | None]:
             _, sequence_length = idx.size()
             if sequence_length > self.config.block_size:
                 raise ValueError("sequence length exceeds block size")
@@ -264,7 +283,9 @@ if TORCH_AVAILABLE:
             freqs_cos = self.rope_cos if self.rope_cos is not None else None
             freqs_sin = self.rope_sin if self.rope_sin is not None else None
             if self.config.architecture == "recurrent_depth":
-                x = self._run_recurrent_depth(x, freqs_cos, freqs_sin, repeat_override=repeat_override)
+                x = self._run_recurrent_depth(
+                    x, freqs_cos, freqs_sin, repeat_override=repeat_override
+                )
             else:
                 for block in self.blocks:
                     for loop_index in range(self._repeat_count(repeat_override)):
@@ -274,7 +295,9 @@ if TORCH_AVAILABLE:
             logits = self.lm_head(x)
             loss = None
             if targets is not None:
-                loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-100)
+                loss = F.cross_entropy(
+                    logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-100
+                )
             return logits, loss
 
         @torch.no_grad()
@@ -288,16 +311,19 @@ if TORCH_AVAILABLE:
                 idx = torch.cat((idx, next_token), dim=1)
             return idx
 
-
     def build_model(config: ModelConfig, vocab_size: int) -> GPT:
         return GPT(config, vocab_size)
 
 
 else:
+
     class GPT:
         def __init__(self, *_args: object, **_kwargs: object) -> None:
-            raise RuntimeError("PyTorch is required to build AVA models. Install with `pip install -e .[train]`.")
-
+            raise RuntimeError(
+                "PyTorch is required to build AVA models. Install with `pip install -e .[train]`."
+            )
 
     def build_model(_config: ModelConfig, _vocab_size: int) -> GPT:
-        raise RuntimeError("PyTorch is required to build AVA models. Install with `pip install -e .[train]`.")
+        raise RuntimeError(
+            "PyTorch is required to build AVA models. Install with `pip install -e .[train]`."
+        )

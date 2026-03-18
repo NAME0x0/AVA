@@ -74,6 +74,7 @@ extend-exclude = ["experiments/", "scripts/generate_*.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]  # line length enforced by ruff format, not lint
 
 [tool.ruff.lint.isort]
 known-first-party = ["ava"]

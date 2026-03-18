@@ -20,10 +20,10 @@ Usage:
     # Specific quantizations:
     python scripts/convert_to_gguf.py --llama-cpp ./llama.cpp --quants Q4_K_M Q5_K_M Q8_0
 """
+
 from __future__ import annotations
 
 import argparse
-import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -76,10 +76,13 @@ def convert_to_gguf(merged_dir: Path, llama_cpp: Path, output_dir: Path) -> Path
 
     f16_path = output_dir / "AVA-v2-f16.gguf"
     cmd = [
-        sys.executable, str(convert_script),
+        sys.executable,
+        str(convert_script),
         str(merged_dir),
-        "--outfile", str(f16_path),
-        "--outtype", "f16",
+        "--outfile",
+        str(f16_path),
+        "--outtype",
+        "f16",
     ]
     print(f"Converting to GGUF F16: {' '.join(cmd)}")
     subprocess.run(cmd, check=True)
@@ -87,7 +90,9 @@ def convert_to_gguf(merged_dir: Path, llama_cpp: Path, output_dir: Path) -> Path
     return f16_path
 
 
-def quantize_gguf(f16_path: Path, llama_cpp: Path, output_dir: Path, quants: list[str]) -> list[Path]:
+def quantize_gguf(
+    f16_path: Path, llama_cpp: Path, output_dir: Path, quants: list[str]
+) -> list[Path]:
     """Quantize F16 GGUF to specified formats."""
     quantize_bin = llama_cpp / "build" / "bin" / "llama-quantize"
     if not quantize_bin.exists():
@@ -106,7 +111,8 @@ def quantize_gguf(f16_path: Path, llama_cpp: Path, output_dir: Path, quants: lis
         else:
             raise FileNotFoundError(
                 f"llama-quantize not found in {llama_cpp}. "
-                f"Build llama.cpp: cd {llama_cpp} && cmake -B build && cmake --build build --config Release"
+                f"Build llama.cpp: cd {llama_cpp} && cmake -B build && "
+                f"cmake --build build --config Release"
             )
 
     results = []
@@ -124,14 +130,35 @@ def quantize_gguf(f16_path: Path, llama_cpp: Path, output_dir: Path, quants: lis
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Convert AVA v2 to GGUF for Ollama/llama.cpp")
-    parser.add_argument("--adapter", default=DEFAULT_ADAPTER, help=f"Adapter source (default: {DEFAULT_ADAPTER})")
-    parser.add_argument("--merged-dir", default="./gguf_build/merged", help="Directory for merged HF model")
-    parser.add_argument("--output-dir", default="./gguf_build/gguf", help="Directory for GGUF output files")
-    parser.add_argument("--llama-cpp", default=None, help="Path to llama.cpp clone (skip GGUF conversion if omitted)")
-    parser.add_argument("--merge-only", action="store_true", help="Only merge adapter, skip GGUF conversion")
-    parser.add_argument("--skip-merge", action="store_true", help="Skip merge step (use existing merged model)")
-    parser.add_argument("--quants", nargs="+", default=DEFAULT_QUANTS, help=f"Quantization formats (default: {DEFAULT_QUANTS})")
-    parser.add_argument("--keep-f16", action="store_true", help="Keep the F16 GGUF (large, ~3.8 GB)")
+    parser.add_argument(
+        "--adapter", default=DEFAULT_ADAPTER, help=f"Adapter source (default: {DEFAULT_ADAPTER})"
+    )
+    parser.add_argument(
+        "--merged-dir", default="./gguf_build/merged", help="Directory for merged HF model"
+    )
+    parser.add_argument(
+        "--output-dir", default="./gguf_build/gguf", help="Directory for GGUF output files"
+    )
+    parser.add_argument(
+        "--llama-cpp",
+        default=None,
+        help="Path to llama.cpp clone (skip GGUF conversion if omitted)",
+    )
+    parser.add_argument(
+        "--merge-only", action="store_true", help="Only merge adapter, skip GGUF conversion"
+    )
+    parser.add_argument(
+        "--skip-merge", action="store_true", help="Skip merge step (use existing merged model)"
+    )
+    parser.add_argument(
+        "--quants",
+        nargs="+",
+        default=DEFAULT_QUANTS,
+        help=f"Quantization formats (default: {DEFAULT_QUANTS})",
+    )
+    parser.add_argument(
+        "--keep-f16", action="store_true", help="Keep the F16 GGUF (large, ~3.8 GB)"
+    )
     args = parser.parse_args()
 
     merged_dir = Path(args.merged_dir)
@@ -166,9 +193,9 @@ def main() -> None:
     for p in quant_paths:
         print(f"  {p.name}: {p.stat().st_size / 1e6:.0f} MB")
 
-    print(f"\nTo use with Ollama:")
-    print(f"  ollama create ava-v2 -f Modelfile")
-    print(f"  ollama run ava-v2")
+    print("\nTo use with Ollama:")
+    print("  ollama create ava-v2 -f Modelfile")
+    print("  ollama run ava-v2")
 
 
 if __name__ == "__main__":

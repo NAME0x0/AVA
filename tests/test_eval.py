@@ -29,14 +29,18 @@ def test_tool_benchmark_covers_trace_no_tool_and_boundary() -> None:
 
 
 def test_compliance_matcher_accepts_exact_format() -> None:
-    task = ComplianceTask("format", "Reply with only the word yes.", required_all=("yes",), max_words=1)
+    task = ComplianceTask(
+        "format", "Reply with only the word yes.", required_all=("yes",), max_words=1
+    )
     matched, failed_checks = _matches_compliance(task, "yes")
     assert matched
     assert failed_checks == ()
 
 
 def test_compliance_matcher_rejects_too_many_words() -> None:
-    task = ComplianceTask("format", "Reply with only the number 19.", required_all=("19",), max_words=1)
+    task = ComplianceTask(
+        "format", "Reply with only the number 19.", required_all=("19",), max_words=1
+    )
     matched, failed_checks = _matches_compliance(task, "19 please")
     assert not matched
     assert "too_many_words" in failed_checks
@@ -49,7 +53,9 @@ def test_compliance_matcher_requires_refusal_signal() -> None:
         required_any=("cannot help",),
         required_all=("calculator",),
     )
-    matched, failed_checks = _matches_compliance(task, "The calculator cannot help with deleting files.")
+    matched, failed_checks = _matches_compliance(
+        task, "The calculator cannot help with deleting files."
+    )
     assert matched
     assert failed_checks == ()
 

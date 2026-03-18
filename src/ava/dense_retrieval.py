@@ -41,9 +41,19 @@ class DenseSupportRetriever:
                 "matches": [],
             }
         query_text = prepare_dense_text(_unwrap_prompt(prompt), self.model_name, role="query")
-        query_vector = _normalize_vector(_to_vector(self.backend.encode(query_text, normalize_embeddings=True, show_progress_bar=False)))
-        allowed_indices = list(_allowed_indices(self.examples, category_hint=category_hint, category_gated=category_gated))
-        ranked = rank_dense_support_vectors(query_vector, self.vectors, allowed_indices=allowed_indices, top_k=top_k)
+        query_vector = _normalize_vector(
+            _to_vector(
+                self.backend.encode(query_text, normalize_embeddings=True, show_progress_bar=False)
+            )
+        )
+        allowed_indices = list(
+            _allowed_indices(
+                self.examples, category_hint=category_hint, category_gated=category_gated
+            )
+        )
+        ranked = rank_dense_support_vectors(
+            query_vector, self.vectors, allowed_indices=allowed_indices, top_k=top_k
+        )
         matches = [
             {
                 "score": round(float(score), 6),
@@ -94,7 +104,9 @@ def _normalize_vector(values: tuple[float, ...]) -> tuple[float, ...]:
 
 
 def _dot(left: tuple[float, ...], right: tuple[float, ...]) -> float:
-    return sum(left_value * right_value for left_value, right_value in zip(left, right, strict=True))
+    return sum(
+        left_value * right_value for left_value, right_value in zip(left, right, strict=True)
+    )
 
 
 def _allowed_indices(
@@ -105,7 +117,9 @@ def _allowed_indices(
 ) -> tuple[int, ...]:
     if not category_gated or not category_hint:
         return tuple(range(len(examples)))
-    filtered = tuple(index for index, example in enumerate(examples) if example.category == category_hint)
+    filtered = tuple(
+        index for index, example in enumerate(examples) if example.category == category_hint
+    )
     return filtered or tuple(range(len(examples)))
 
 
@@ -116,7 +130,9 @@ def rank_dense_support_vectors(
     allowed_indices: list[int] | tuple[int, ...] | None = None,
     top_k: int = 64,
 ) -> list[tuple[int, float]]:
-    indices = list(allowed_indices) if allowed_indices is not None else list(range(len(support_vectors)))
+    indices = (
+        list(allowed_indices) if allowed_indices is not None else list(range(len(support_vectors)))
+    )
     scored = [(index, _dot(query_vector, support_vectors[index])) for index in indices]
     scored.sort(key=lambda item: item[1], reverse=True)
     return scored[: max(top_k, 0)]
@@ -152,7 +168,9 @@ def build_dense_support_retriever(
                 local_files_only=True,
             )
         except TypeError:
-            backend = SentenceTransformer(model_name, device=device, token=token, local_files_only=True)
+            backend = SentenceTransformer(
+                model_name, device=device, token=token, local_files_only=True
+            )
     examples = tuple(support_examples)
     support_texts = [_support_dense_text(example, model_name) for example in examples]
     encoded = backend.encode(support_texts, normalize_embeddings=True, show_progress_bar=False)

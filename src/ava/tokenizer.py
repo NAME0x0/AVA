@@ -227,7 +227,11 @@ class ByteBPETokenizer:
             updated: list[bytes] = []
             index = 0
             while index < len(pieces):
-                if index < len(pieces) - 1 and pieces[index] == best_pair[0] and pieces[index + 1] == best_pair[1]:
+                if (
+                    index < len(pieces) - 1
+                    and pieces[index] == best_pair[0]
+                    and pieces[index + 1] == best_pair[1]
+                ):
                     updated.append(merged_piece)
                     index += 2
                     continue
@@ -293,16 +297,22 @@ class HFSubwordTokenizer:
 
     def __post_init__(self) -> None:
         if not HF_TOKENIZERS_AVAILABLE:
-            raise RuntimeError("tokenizers is required for hf_bpe, hf_unigram, and hf_auto tokenizers")
+            raise RuntimeError(
+                "tokenizers is required for hf_bpe, hf_unigram, and hf_auto tokenizers"
+            )
         self.backend = HFTokenizer.from_str(json.dumps(self.tokenizer_json))
         vocab = self.backend.get_vocab(with_added_tokens=True)
         self.token_to_id = {str(token): int(token_id) for token, token_id in vocab.items()}
         self.id_to_token = {int(token_id): str(token) for token, token_id in vocab.items()}
         self.vocab_size = len(self.token_to_id)
-        self.special_tokens = tuple(token for token in self.token_to_id if token.startswith("<") and token.endswith(">"))
+        self.special_tokens = tuple(
+            token for token in self.token_to_id if token.startswith("<") and token.endswith(">")
+        )
         for token in SPECIAL_TOKENS:
             if token not in self.token_to_id:
-                raise RuntimeError(f"{self.kind} tokenizer artifact is missing required special token {token}")
+                raise RuntimeError(
+                    f"{self.kind} tokenizer artifact is missing required special token {token}"
+                )
 
     def encode(
         self,
@@ -393,7 +403,9 @@ def _config_value(config: object | None, key: str, default: Any = None) -> Any:
     return getattr(config, key, default)
 
 
-def load_tokenizer(config: object | None = None) -> ByteTokenizer | GreedyBytePieceTokenizer | ByteBPETokenizer | HFSubwordTokenizer:
+def load_tokenizer(
+    config: object | None = None,
+) -> ByteTokenizer | GreedyBytePieceTokenizer | ByteBPETokenizer | HFSubwordTokenizer:
     kind = str(_config_value(config, "kind", "byte"))
     if kind == "byte":
         return ByteTokenizer()

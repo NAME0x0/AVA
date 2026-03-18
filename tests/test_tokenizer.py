@@ -49,7 +49,9 @@ def test_greedy_byte_piece_tokenizer_artifact_roundtrip() -> None:
         ),
         encoding="utf-8",
     )
-    artifact = build_greedy_byte_piece_artifact(root, artifact_path, target_vocab_size=320, max_piece_length=10)
+    artifact = build_greedy_byte_piece_artifact(
+        root, artifact_path, target_vocab_size=320, max_piece_length=10
+    )
     tokenizer = load_greedy_byte_piece_tokenizer(artifact_path)
     text = "[calc]sqrt(81)=>9[/calc]\n9"
     assert artifact["piece_count"] > 0
@@ -57,7 +59,10 @@ def test_greedy_byte_piece_tokenizer_artifact_roundtrip() -> None:
     assert tokenizer.decode(tokenizer.encode(text, add_bos=True, add_eos=True)) == text
     config_like = {"kind": "greedy_bytes", "path": str(artifact_path)}
     loaded = load_tokenizer(config_like)
-    assert loaded.decode(loaded.encode("The calculator cannot help with deleting files.")) == "The calculator cannot help with deleting files."
+    assert (
+        loaded.decode(loaded.encode("The calculator cannot help with deleting files."))
+        == "The calculator cannot help with deleting files."
+    )
     shutil.rmtree(root)
 
 
@@ -78,7 +83,9 @@ def test_byte_bpe_tokenizer_artifact_roundtrip_and_compression() -> None:
         ),
         encoding="utf-8",
     )
-    artifact = build_byte_bpe_artifact(root, artifact_path, target_vocab_size=300, min_pair_frequency=2)
+    artifact = build_byte_bpe_artifact(
+        root, artifact_path, target_vocab_size=300, min_pair_frequency=2
+    )
     tokenizer = load_byte_bpe_tokenizer(artifact_path)
     text = "What planet is known as the Red Planet?"
     byte_tokenizer = ByteTokenizer()
@@ -114,7 +121,9 @@ def test_hf_bpe_tokenizer_artifact_roundtrip_and_piece_bytes() -> None:
     assert artifact["vocab_size"] == tokenizer.vocab_size
     assert tokenizer.decode(encoded) == text
     assert tokenizer.count_tokens(text) <= byte_tokenizer.count_tokens(text)
-    mars_token_ids = [token_id for token_id in tokenizer.encode("Mars") if token_piece_bytes(tokenizer, token_id)]
+    mars_token_ids = [
+        token_id for token_id in tokenizer.encode("Mars") if token_piece_bytes(tokenizer, token_id)
+    ]
     assert mars_token_ids
     assert load_tokenizer({"kind": "hf_bpe", "path": str(artifact_path)}).decode(encoded) == text
     shutil.rmtree(root)
@@ -168,5 +177,10 @@ def test_hf_auto_tokenizer_artifact_loads_like_other_hf_artifacts() -> None:
     tokenizer = load_hf_subword_tokenizer(artifact_path)
     text = "What planet is known as the Red Planet?"
     assert tokenizer.decode(tokenizer.encode(text, add_bos=True, add_eos=True)) == text
-    assert load_tokenizer({"kind": "hf_auto", "path": str(artifact_path)}).decode(tokenizer.encode("Mars")) == "Mars"
+    assert (
+        load_tokenizer({"kind": "hf_auto", "path": str(artifact_path)}).decode(
+            tokenizer.encode("Mars")
+        )
+        == "Mars"
+    )
     shutil.rmtree(root)

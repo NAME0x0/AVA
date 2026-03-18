@@ -5,7 +5,12 @@ import torch
 
 from ava.config import ModelConfig, load_experiment_config
 from ava.model import build_model
-from ava.tokenizer import ByteBPETokenizer, load_tokenizer, load_hf_subword_tokenizer, token_piece_bytes
+from ava.tokenizer import (
+    ByteBPETokenizer,
+    load_hf_subword_tokenizer,
+    load_tokenizer,
+    token_piece_bytes,
+)
 from ava.tokenizer_artifacts import build_hf_bpe_artifact
 from ava.train import (
     _configure_trainable_parameters,
@@ -49,7 +54,9 @@ def test_supervised_loader_skips_samples_with_no_target_tokens() -> None:
         ),
         encoding="utf-8",
     )
-    samples, total_tokens = _load_supervised_dataset(corpus_root, block_size=40, tokenizer=tokenizer)
+    samples, total_tokens = _load_supervised_dataset(
+        corpus_root, block_size=40, tokenizer=tokenizer
+    )
     assert total_tokens > 0
     assert len(samples) == 1
     assert any(token_id != -100 for token_id in samples[0]["target_ids"])
@@ -126,7 +133,9 @@ def test_expand_state_dict_for_hf_bpe_rebuilds_non_aligned_vocab() -> None:
     expanded = _expand_state_dict_for_tokenizer(state, tokenizer)
     bos_id = tokenizer.token_to_id["<bos>"]
     assert torch.allclose(expanded["wte.weight"][bos_id], embedding.mean(dim=0))
-    mars_token_id = next(token_id for token_id in tokenizer.encode("Mars") if token_piece_bytes(tokenizer, token_id))
+    mars_token_id = next(
+        token_id for token_id in tokenizer.encode("Mars") if token_piece_bytes(tokenizer, token_id)
+    )
     piece = token_piece_bytes(tokenizer, mars_token_id)
     assert piece is not None
     expected = embedding[[4 + value for value in piece]].mean(dim=0)
@@ -145,7 +154,9 @@ def test_resize_state_dict_for_block_size_interpolates_endpoints() -> None:
 
 
 def test_configure_trainable_parameters_filters_by_pattern() -> None:
-    model = build_model(ModelConfig(block_size=32, n_layer=1, n_head=2, n_embd=8, dropout=0.0, bias=False), 260)
+    model = build_model(
+        ModelConfig(block_size=32, n_layer=1, n_head=2, n_embd=8, dropout=0.0, bias=False), 260
+    )
     parameters, names, count = _configure_trainable_parameters(model, ("wpe.weight", "ln_f"))
     assert set(names) == {"wpe.weight", "ln_f.weight", "ln_f.bias"}
     assert count == sum(parameter.numel() for parameter in parameters)

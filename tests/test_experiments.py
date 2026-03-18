@@ -47,14 +47,25 @@ def test_recommendation_contains_next_actions() -> None:
     assert recommendation["next_actions"]
 
 
-
 def test_looped_budget_uses_effective_layers() -> None:
     base = ExperimentConfig.from_dict(
         {
             "name": "base",
             "tokenizer": {"kind": "byte", "vocab_size": 260},
-            "model": {"block_size": 64, "n_layer": 2, "n_head": 2, "n_embd": 64, "dropout": 0.0, "bias": False},
-            "training": {"device": "cpu", "dtype": "float32", "micro_batch_size": 1, "gradient_accumulation_steps": 1},
+            "model": {
+                "block_size": 64,
+                "n_layer": 2,
+                "n_head": 2,
+                "n_embd": 64,
+                "dropout": 0.0,
+                "bias": False,
+            },
+            "training": {
+                "device": "cpu",
+                "dtype": "float32",
+                "micro_batch_size": 1,
+                "gradient_accumulation_steps": 1,
+            },
             "memory": {},
             "tools": {},
         }
@@ -73,7 +84,12 @@ def test_looped_budget_uses_effective_layers() -> None:
                 "architecture": "looped",
                 "loop_repeats": 3,
             },
-            "training": {"device": "cpu", "dtype": "float32", "micro_batch_size": 1, "gradient_accumulation_steps": 1},
+            "training": {
+                "device": "cpu",
+                "dtype": "float32",
+                "micro_batch_size": 1,
+                "gradient_accumulation_steps": 1,
+            },
             "memory": {},
             "tools": {},
         }
@@ -117,8 +133,20 @@ def test_recurrent_depth_budget_trades_parameters_for_compute() -> None:
         {
             "name": "base",
             "tokenizer": {"kind": "byte", "vocab_size": 260},
-            "model": {"block_size": 64, "n_layer": 8, "n_head": 2, "n_embd": 64, "dropout": 0.0, "bias": False},
-            "training": {"device": "cpu", "dtype": "float32", "micro_batch_size": 1, "gradient_accumulation_steps": 1},
+            "model": {
+                "block_size": 64,
+                "n_layer": 8,
+                "n_head": 2,
+                "n_embd": 64,
+                "dropout": 0.0,
+                "bias": False,
+            },
+            "training": {
+                "device": "cpu",
+                "dtype": "float32",
+                "micro_batch_size": 1,
+                "gradient_accumulation_steps": 1,
+            },
         }
     )
     recurrent = ExperimentConfig.from_dict(
@@ -137,7 +165,12 @@ def test_recurrent_depth_budget_trades_parameters_for_compute() -> None:
                 "recurrent_prelude_layers": 1,
                 "recurrent_coda_layers": 1,
             },
-            "training": {"device": "cpu", "dtype": "float32", "micro_batch_size": 1, "gradient_accumulation_steps": 1},
+            "training": {
+                "device": "cpu",
+                "dtype": "float32",
+                "micro_batch_size": 1,
+                "gradient_accumulation_steps": 1,
+            },
         }
     )
     base_budget = estimate_budget(base)

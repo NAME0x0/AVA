@@ -1,4 +1,8 @@
-from ava.benchmarks import benchmark_registry_summary, filter_benchmark_registry, serialize_benchmark_registry
+from ava.benchmarks import (
+    benchmark_registry_summary,
+    filter_benchmark_registry,
+    serialize_benchmark_registry,
+)
 
 
 def test_benchmark_registry_includes_multimodal_multilingual_and_code() -> None:

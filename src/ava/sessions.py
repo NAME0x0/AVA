@@ -9,6 +9,7 @@ from pathlib import Path
 from re import sub
 from shlex import quote
 
+from ava.activity import record_activity
 from ava.benchmarks import serialize_benchmark_registry
 from ava.config import load_experiment_config
 from ava.eval import (
@@ -31,15 +32,14 @@ from ava.experiments import (
     serialize_test_time_sweep,
     write_json,
 )
-from ava.activity import record_activity
 from ava.inspect import trace_checkpoint
-from ava.model import TORCH_AVAILABLE, torch
 from ava.memory_transfer import (
     evaluate_transfer_suite_checkpoint,
     transfer_benchmark_as_dicts,
     transfer_compliance_benchmark_as_dicts,
     transfer_tool_benchmark_as_dicts,
 )
+from ava.model import TORCH_AVAILABLE, torch
 from ava.research import (
     serialize_hypotheses,
     serialize_papers,
@@ -48,7 +48,6 @@ from ava.research import (
 )
 from ava.tokenizer import ByteTokenizer
 from ava.train import dry_run_summary, run_training, summarize_corpus
-
 
 BASE_SOURCES = [
     "https://github.com/karpathy/build-nanogpt",
@@ -203,14 +202,18 @@ def _environment_manifest(requested_device: str) -> dict[str, object]:
     }
 
 
-def _corpus_manifest(corpus_root: str | Path, tokenizer_config: object | None = None) -> dict[str, object]:
+def _corpus_manifest(
+    corpus_root: str | Path, tokenizer_config: object | None = None
+) -> dict[str, object]:
     summary = summarize_corpus(corpus_root, tokenizer_config)
     files = [Path(path) for path in summary["files"]]
     summary["files"] = [_file_manifest(path, root=corpus_root) for path in files]
     return summary
 
 
-def create_session(root: str | Path, name: str, *, sources: list[str] | None = None, kind: str = "baseline") -> Path:
+def create_session(
+    root: str | Path, name: str, *, sources: list[str] | None = None, kind: str = "baseline"
+) -> Path:
     root_path = Path(root)
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H%M%S")
     session_dir = root_path / f"{timestamp}-{slugify(name)}"
@@ -304,12 +307,17 @@ def render_notes(
 
 
 def _best_memory_setting(memory_results: list[dict[str, object]]) -> dict[str, object]:
-    return sorted(memory_results, key=lambda item: (-item["recall_at_1"], item["average_context_tokens"]))[0]
+    return sorted(
+        memory_results, key=lambda item: (-item["recall_at_1"], item["average_context_tokens"])
+    )[0]
 
 
 def _best_test_time_setting(test_time_results: list[dict[str, object]]) -> dict[str, object]:
     viable = [item for item in test_time_results if item["hard_task_coverage"] > 0]
-    return sorted(viable or test_time_results, key=lambda item: (-item["hard_task_coverage"], item["average_extra_tokens"]))[0]
+    return sorted(
+        viable or test_time_results,
+        key=lambda item: (-item["hard_task_coverage"], item["average_extra_tokens"]),
+    )[0]
 
 
 def _selected_benchmarks(keys: tuple[str, ...]) -> list[dict[str, object]]:
@@ -342,7 +350,9 @@ def render_sota_notes(
         lines.append(f"- {paper['title']} ({paper['submitted']}) -> {paper['ava_takeaway']}")
     lines.extend(["", "## Local Sweeps", ""])
     for item in budget_results:
-        lines.append(f"- Budget {item['name']}: train {item['train_vram_gb']} GB, fits_4gb={item['fits_4gb']}")
+        lines.append(
+            f"- Budget {item['name']}: train {item['train_vram_gb']} GB, fits_4gb={item['fits_4gb']}"
+        )
     for item in protocol_results:
         lines.append(f"- Tool protocol {item['protocol']}: avg {item['average_tokens']} tokens")
     for item in memory_results:
@@ -437,7 +447,9 @@ def render_moe_notes(
         lines.append(f"- {paper['title']} ({paper['submitted']}) -> {paper['ava_takeaway']}")
     lines.extend(["", "## Practical Read", ""])
     lines.append("Sparse MoE can help AVA beat some larger dense models on selected tasks.")
-    lines.append("Sparse MoE will not honestly support the target of beating frontier models everywhere on one 4 GB GPU.")
+    lines.append(
+        "Sparse MoE will not honestly support the target of beating frontier models everywhere on one 4 GB GPU."
+    )
     lines.extend(["", "## Rough Size Checks", ""])
     for item in feasibility["estimates"]:
         total = item["total_params_b"]
@@ -445,7 +457,9 @@ def render_moe_notes(
         weight = item.get("inferred_raw_4bit_weight_gb", item.get("compressed_weight_gb", "n/a"))
         total_label = f"{total}B" if isinstance(total, (int, float)) else str(total)
         active_label = f"{active}B" if isinstance(active, (int, float)) else str(active)
-        lines.append(f"- {item['model']}: total={total_label}, active={active_label}, weight_budget={weight} GB, note={item['note']}")
+        lines.append(
+            f"- {item['model']}: total={total_label}, active={active_label}, weight_budget={weight} GB, note={item['note']}"
+        )
     lines.extend(["", "## Next Experiments", ""])
     for action in feasibility["next_experiments"]:
         lines.append(f"- {action}")
@@ -460,27 +474,49 @@ def _training_next_actions(
 ) -> list[str]:
     actions: list[str] = []
     if training.get("optimizer_steps", 0) == 0:
-        actions.append("Lower gradient accumulation or raise the step count so the optimizer updates more than once.")
+        actions.append(
+            "Lower gradient accumulation or raise the step count so the optimizer updates more than once."
+        )
     if training.get("warnings"):
-        actions.append("Resolve the recorded warnings before treating this run as a meaningful baseline.")
+        actions.append(
+            "Resolve the recorded warnings before treating this run as a meaningful baseline."
+        )
     final_loss = training.get("final_loss")
     min_loss = training.get("min_loss")
-    if isinstance(final_loss, (int, float)) and isinstance(min_loss, (int, float)) and final_loss <= min_loss + 0.05:
-        actions.append("The optimization loop looks stable enough for a larger language, math, science, and coding packet next.")
+    if (
+        isinstance(final_loss, (int, float))
+        and isinstance(min_loss, (int, float))
+        and final_loss <= min_loss + 0.05
+    ):
+        actions.append(
+            "The optimization loop looks stable enough for a larger language, math, science, and coding packet next."
+        )
     else:
         actions.append("Tune learning rate or batch structure before scaling the model or corpus.")
     if evaluation.get("accuracy", 0.0) >= 0.66:
-        actions.append("Retire the smoke corpus after this run; it is only for plumbing and overfit checks.")
+        actions.append(
+            "Retire the smoke corpus after this run; it is only for plumbing and overfit checks."
+        )
     else:
-        actions.append("Do not infer product quality from the smoke benchmark; move next to a broader curated corpus.")
+        actions.append(
+            "Do not infer product quality from the smoke benchmark; move next to a broader curated corpus."
+        )
     if tool_eval.get("accuracy", 0.0) >= 0.66:
-        actions.append("Tool behavior is stable enough to start regenerating harder calculator cases instead of only hand-scripted traces.")
+        actions.append(
+            "Tool behavior is stable enough to start regenerating harder calculator cases instead of only hand-scripted traces."
+        )
     else:
-        actions.append("Expand the compact tool SFT packet; trace generation, no-tool abstention, and tool boundaries are not stable yet.")
+        actions.append(
+            "Expand the compact tool SFT packet; trace generation, no-tool abstention, and tool boundaries are not stable yet."
+        )
     if compliance.get("accuracy", 0.0) >= 0.75:
-        actions.append("Compliance behavior is strong enough to start measuring tradeoffs against English helpfulness and math exactness.")
+        actions.append(
+            "Compliance behavior is strong enough to start measuring tradeoffs against English helpfulness and math exactness."
+        )
     else:
-        actions.append("Add compact supervised compliance data for refusals, terse formatting, and tool-boundary obedience before broader product claims.")
+        actions.append(
+            "Add compact supervised compliance data for refusals, terse formatting, and tool-boundary obedience before broader product claims."
+        )
     return actions
 
 
@@ -513,8 +549,16 @@ def render_training_notes(
         f"- Requested device: `{environment['device_requested']}`",
         f"- Tokenizer kind: `{training.get('tokenizer_kind', 'byte')}`",
         f"- Tokenizer vocab size: `{training.get('tokenizer_vocab_size', 'unknown')}`",
-        *( [f"- Tokenizer artifact: `{training['tokenizer_path']}`"] if training.get("tokenizer_path") else [] ),
-        *( [f"- Init checkpoint: `{training['init_checkpoint']}`"] if training.get("init_checkpoint") else [] ),
+        *(
+            [f"- Tokenizer artifact: `{training['tokenizer_path']}`"]
+            if training.get("tokenizer_path")
+            else []
+        ),
+        *(
+            [f"- Init checkpoint: `{training['init_checkpoint']}`"]
+            if training.get("init_checkpoint")
+            else []
+        ),
         "",
         "## Environment",
         "",
@@ -553,7 +597,9 @@ def render_training_notes(
     lines.append(f"- Tokens seen: `{training['tokens_seen']}`")
     if training.get("supervised_stats"):
         stats = training["supervised_stats"]
-        lines.append(f"- Supervised examples kept: `{stats['kept_examples']}/{stats['total_examples']}`")
+        lines.append(
+            f"- Supervised examples kept: `{stats['kept_examples']}/{stats['total_examples']}`"
+        )
         lines.append(f"- Truncated supervised examples: `{stats['truncated_examples']}`")
         lines.append(f"- Max prompt+response tokens: `{stats['max_full_tokens']}`")
     lines.append(f"- Checkpoint: `{training['checkpoint']}`")
@@ -566,19 +612,25 @@ def render_training_notes(
         for warning in training["warnings"]:
             lines.append(f"- {warning}")
     lines.extend(["", "## Benchmark Eval", ""])
-    lines.append(f"- Accuracy: `{evaluation['correct']}/{evaluation['total']}` = `{evaluation['accuracy']}`")
+    lines.append(
+        f"- Accuracy: `{evaluation['correct']}/{evaluation['total']}` = `{evaluation['accuracy']}`"
+    )
     for category, payload in evaluation["by_category"].items():
         lines.append(
             f"- {category}: `{payload['correct']}/{payload['total']}` = `{payload['accuracy']}`"
         )
     lines.extend(["", "## Tool Eval", ""])
-    lines.append(f"- Accuracy: `{tool_eval['correct']}/{tool_eval['total']}` = `{tool_eval['accuracy']}`")
+    lines.append(
+        f"- Accuracy: `{tool_eval['correct']}/{tool_eval['total']}` = `{tool_eval['accuracy']}`"
+    )
     for category, payload in tool_eval["by_category"].items():
         lines.append(
             f"- {category}: `{payload['correct']}/{payload['total']}` = `{payload['accuracy']}`"
         )
     lines.extend(["", "## Compliance Eval", ""])
-    lines.append(f"- Accuracy: `{compliance['correct']}/{compliance['total']}` = `{compliance['accuracy']}`")
+    lines.append(
+        f"- Accuracy: `{compliance['correct']}/{compliance['total']}` = `{compliance['accuracy']}`"
+    )
     for category, payload in compliance["by_category"].items():
         lines.append(
             f"- {category}: `{payload['correct']}/{payload['total']}` = `{payload['accuracy']}`"
@@ -620,7 +672,9 @@ def bootstrap_session(root: str | Path, name: str) -> Path:
     write_json(session_dir / "results" / "prompt_protocol_sweep.json", serialized_protocols)
     write_json(session_dir / "results" / "benchmark.json", benchmark_as_dicts())
     write_json(session_dir / "results" / "benchmark_registry.json", serialize_benchmark_registry())
-    write_json(session_dir / "results" / "compliance_benchmark.json", compliance_benchmark_as_dicts())
+    write_json(
+        session_dir / "results" / "compliance_benchmark.json", compliance_benchmark_as_dicts()
+    )
     write_json(session_dir / "results" / "tool_benchmark.json", tool_benchmark_as_dicts())
     write_json(session_dir / "results" / "recommendation.json", recommendation)
     (session_dir / "notes.md").write_text(
@@ -660,7 +714,9 @@ def sota_session(root: str | Path, name: str) -> Path:
     memory_results = serialize_memory_sweep(run_memory_sweep(tokenizer))
     test_time_results = serialize_test_time_sweep(run_test_time_strategy_sweep())
 
-    base_recommendation = choose_next_step(run_budget_sweep(config_paths), run_prompt_protocol_sweep(tokenizer))
+    base_recommendation = choose_next_step(
+        run_budget_sweep(config_paths), run_prompt_protocol_sweep(tokenizer)
+    )
     best_memory = _best_memory_setting(memory_results)
     best_test_time = _best_test_time_setting(test_time_results)
 
@@ -686,7 +742,9 @@ def sota_session(root: str | Path, name: str) -> Path:
     write_json(session_dir / "results" / "test_time_sweep.json", test_time_results)
     write_json(session_dir / "results" / "benchmark.json", benchmark_as_dicts())
     write_json(session_dir / "results" / "benchmark_registry.json", serialize_benchmark_registry())
-    write_json(session_dir / "results" / "compliance_benchmark.json", compliance_benchmark_as_dicts())
+    write_json(
+        session_dir / "results" / "compliance_benchmark.json", compliance_benchmark_as_dicts()
+    )
     write_json(session_dir / "results" / "tool_benchmark.json", tool_benchmark_as_dicts())
     write_json(session_dir / "results" / "recommendation.json", recommendation)
     (session_dir / "notes.md").write_text(
@@ -743,7 +801,9 @@ def moe_feasibility_session(root: str | Path, name: str) -> Path:
     write_json(session_dir / "results" / "papers.json", papers)
     write_json(session_dir / "results" / "benchmark.json", benchmark_as_dicts())
     write_json(session_dir / "results" / "benchmark_registry.json", serialize_benchmark_registry())
-    write_json(session_dir / "results" / "compliance_benchmark.json", compliance_benchmark_as_dicts())
+    write_json(
+        session_dir / "results" / "compliance_benchmark.json", compliance_benchmark_as_dicts()
+    )
     write_json(session_dir / "results" / "tool_benchmark.json", tool_benchmark_as_dicts())
     write_json(session_dir / "results" / "feasibility.json", feasibility)
     (session_dir / "notes.md").write_text(
@@ -789,7 +849,8 @@ def hf_research_session(root: str | Path, name: str) -> Path:
     session_dir = create_session(
         root,
         name,
-        sources=[paper["arxiv_url"] for paper in papers] + ["https://huggingface.co/papers/trending"],
+        sources=[paper["arxiv_url"] for paper in papers]
+        + ["https://huggingface.co/papers/trending"],
         kind="hf-research",
     )
     write_json(session_dir / "results" / "papers.json", papers)
@@ -798,7 +859,9 @@ def hf_research_session(root: str | Path, name: str) -> Path:
     write_json(session_dir / "results" / "recommendation.json", recommendation)
     write_json(session_dir / "results" / "benchmark.json", benchmark_as_dicts())
     write_json(session_dir / "results" / "benchmark_registry.json", serialize_benchmark_registry())
-    write_json(session_dir / "results" / "compliance_benchmark.json", compliance_benchmark_as_dicts())
+    write_json(
+        session_dir / "results" / "compliance_benchmark.json", compliance_benchmark_as_dicts()
+    )
     write_json(session_dir / "results" / "tool_benchmark.json", tool_benchmark_as_dicts())
     (session_dir / "notes.md").write_text(
         render_hf_research_notes(
@@ -866,7 +929,9 @@ def training_session(
     write_json(session_dir / "results" / "budget.json", budget)
     write_json(session_dir / "results" / "benchmark.json", benchmark_as_dicts())
     write_json(session_dir / "results" / "benchmark_registry.json", serialize_benchmark_registry())
-    write_json(session_dir / "results" / "compliance_benchmark.json", compliance_benchmark_as_dicts())
+    write_json(
+        session_dir / "results" / "compliance_benchmark.json", compliance_benchmark_as_dicts()
+    )
     write_json(session_dir / "results" / "tool_benchmark.json", tool_benchmark_as_dicts())
     write_json(session_dir / "results" / "config.json", config.to_dict())
 
@@ -932,13 +997,6 @@ def training_session(
     return session_dir
 
 
-
-
-
-
-
-
-
 def render_inspection_notes(
     *,
     session_name: str,
@@ -981,7 +1039,11 @@ def render_inspection_notes(
             top_neurons = ", ".join(
                 f"{item['index']}:{item['value']}" for item in layer["top_mlp_neurons"][:3]
             )
-            head0 = layer["attention"][0]["top_positions"][0] if layer["attention"] and layer["attention"][0]["top_positions"] else None
+            head0 = (
+                layer["attention"][0]["top_positions"][0]
+                if layer["attention"] and layer["attention"][0]["top_positions"]
+                else None
+            )
             if head0 is not None:
                 lines.append(
                     f"- layer {layer['layer']}: top_mlp_neurons={top_neurons}; head0_focus=pos {head0['position']} token `{head0['token_text']}` weight {head0['weight']}"
@@ -1067,9 +1129,6 @@ def inspection_session(
     return session_dir
 
 
-
-
-
 def _changed_results(
     baseline: dict[str, object],
     retrieval: dict[str, object],
@@ -1078,7 +1137,9 @@ def _changed_results(
     baseline_results = list(baseline.get("results", []))
     retrieval_results = list(retrieval.get("results", []))
     for before, after in zip(baseline_results, retrieval_results, strict=True):
-        if before.get("matched") == after.get("matched") and before.get("completion") == after.get("completion"):
+        if before.get("matched") == after.get("matched") and before.get("completion") == after.get(
+            "completion"
+        ):
             continue
         changed.append(
             {
@@ -1381,16 +1442,25 @@ def retrieval_session(
     )
     return session_dir
 
+
 def _suite_total_score(suite: dict[str, object]) -> int:
-    return int(suite["benchmark"]["correct"]) + int(suite["tool"]["correct"]) + int(suite["compliance"]["correct"])
+    return (
+        int(suite["benchmark"]["correct"])
+        + int(suite["tool"]["correct"])
+        + int(suite["compliance"]["correct"])
+    )
 
 
-def _suite_changes(before: dict[str, object], after: dict[str, object], key: str) -> list[dict[str, object]]:
+def _suite_changes(
+    before: dict[str, object], after: dict[str, object], key: str
+) -> list[dict[str, object]]:
     baseline_results = list(before[key]["results"])
     candidate_results = list(after[key]["results"])
     changed: list[dict[str, object]] = []
     for previous, current in zip(baseline_results, candidate_results, strict=True):
-        if previous.get("matched") == current.get("matched") and previous.get("completion") == current.get("completion"):
+        if previous.get("matched") == current.get("matched") and previous.get(
+            "completion"
+        ) == current.get("completion"):
             continue
         changed.append(
             {
@@ -1456,14 +1526,22 @@ def render_memory_transfer_notes(
         "## Exact Direct Changes",
         "",
     ]
-    for heading, items in (("benchmark", direct_benchmark_changes), ("tool", direct_tool_changes), ("compliance", direct_compliance_changes)):
+    for heading, items in (
+        ("benchmark", direct_benchmark_changes),
+        ("tool", direct_tool_changes),
+        ("compliance", direct_compliance_changes),
+    ):
         lines.append(f"- {heading}: `{len(items)}` changed rows")
         for item in items[:6]:
             lines.append(
                 f"- [{heading}:{item['category']}] prompt=`{item['prompt']}` baseline=`{item['baseline_completion']}` -> exact=`{item['candidate_completion']}`"
             )
     lines.extend(["", "## Nearest Direct Changes", ""])
-    for heading, items in (("benchmark", nearest_benchmark_changes), ("tool", nearest_tool_changes), ("compliance", nearest_compliance_changes)):
+    for heading, items in (
+        ("benchmark", nearest_benchmark_changes),
+        ("tool", nearest_tool_changes),
+        ("compliance", nearest_compliance_changes),
+    ):
         lines.append(f"- {heading}: `{len(items)}` changed rows")
         for item in items[:6]:
             lines.append(
@@ -1525,9 +1603,17 @@ def memory_transfer_session(
     support_manifest = _corpus_manifest(support_corpus)
     write_json(session_dir / "results" / "environment.json", environment)
     write_json(session_dir / "results" / "support_corpus.json", support_manifest)
-    write_json(session_dir / "results" / "transfer_benchmark.json", transfer_benchmark_as_dicts(suite))
-    write_json(session_dir / "results" / "transfer_tool_benchmark.json", transfer_tool_benchmark_as_dicts(suite))
-    write_json(session_dir / "results" / "transfer_compliance_benchmark.json", transfer_compliance_benchmark_as_dicts(suite))
+    write_json(
+        session_dir / "results" / "transfer_benchmark.json", transfer_benchmark_as_dicts(suite)
+    )
+    write_json(
+        session_dir / "results" / "transfer_tool_benchmark.json",
+        transfer_tool_benchmark_as_dicts(suite),
+    )
+    write_json(
+        session_dir / "results" / "transfer_compliance_benchmark.json",
+        transfer_compliance_benchmark_as_dicts(suite),
+    )
 
     baseline = evaluate_transfer_suite_checkpoint(
         checkpoint_path,
@@ -1578,10 +1664,16 @@ def memory_transfer_session(
     write_json(session_dir / "results" / "nearest_transfer.json", nearest)
     write_json(session_dir / "results" / "direct_benchmark_changes.json", direct_benchmark_changes)
     write_json(session_dir / "results" / "direct_tool_changes.json", direct_tool_changes)
-    write_json(session_dir / "results" / "direct_compliance_changes.json", direct_compliance_changes)
-    write_json(session_dir / "results" / "nearest_benchmark_changes.json", nearest_benchmark_changes)
+    write_json(
+        session_dir / "results" / "direct_compliance_changes.json", direct_compliance_changes
+    )
+    write_json(
+        session_dir / "results" / "nearest_benchmark_changes.json", nearest_benchmark_changes
+    )
     write_json(session_dir / "results" / "nearest_tool_changes.json", nearest_tool_changes)
-    write_json(session_dir / "results" / "nearest_compliance_changes.json", nearest_compliance_changes)
+    write_json(
+        session_dir / "results" / "nearest_compliance_changes.json", nearest_compliance_changes
+    )
     write_json(session_dir / "results" / "winner.json", {"winner": winner, "scores": scores})
 
     (session_dir / "notes.md").write_text(

@@ -163,7 +163,15 @@ def test_ignore_index_minus_100() -> None:
 
 
 def test_cosine_lr_schedule() -> None:
-    from ava.config import ExperimentConfig, TrainingConfig, TokenizerConfig, ModelConfig as MC, MemoryConfig, ToolConfig
+    from ava.config import (
+        ExperimentConfig,
+        MemoryConfig,
+        TokenizerConfig,
+        ToolConfig,
+        TrainingConfig,
+    )
+    from ava.config import ModelConfig as MC
+
     config = ExperimentConfig(
         name="test-cosine",
         tokenizer=TokenizerConfig(),
@@ -179,6 +187,7 @@ def test_cosine_lr_schedule() -> None:
         tools=ToolConfig(),
     )
     from ava.train import _lr_for_step
+
     lr_0 = _lr_for_step(config, 0)
     assert lr_0 < 1e-3
     lr_10 = _lr_for_step(config, 10)

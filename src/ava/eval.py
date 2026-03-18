@@ -7,7 +7,12 @@ from typing import Any
 
 from ava.config import ExperimentConfig
 from ava.model import TORCH_AVAILABLE, build_model, torch
-from ava.retrieval import SupportExample, load_support_examples, lookup_support_answer, prepare_retrieval_prompt
+from ava.retrieval import (
+    SupportExample,
+    load_support_examples,
+    lookup_support_answer,
+    prepare_retrieval_prompt,
+)
 from ava.tokenizer import load_tokenizer
 
 
@@ -181,7 +186,9 @@ def _normalize_text(text: str) -> str:
 def _resolve_device(requested_device: str) -> tuple[str, list[str]]:
     warnings: list[str] = []
     if requested_device.startswith("cuda") and not torch.cuda.is_available():
-        warnings.append("CUDA was requested for evaluation but is unavailable; evaluation ran on CPU.")
+        warnings.append(
+            "CUDA was requested for evaluation but is unavailable; evaluation ran on CPU."
+        )
         return "cpu", warnings
     return requested_device, warnings
 
@@ -197,7 +204,9 @@ def _contains_normalized_phrase(text: str, phrase: str) -> bool:
 def _matches_expected(expected: str, completion: str) -> bool:
     normalized_expected = _normalize_text(expected)
     normalized_completion = _normalize_text(completion)
-    return normalized_completion == normalized_expected or normalized_completion.startswith(normalized_expected + " ")
+    return normalized_completion == normalized_expected or normalized_completion.startswith(
+        normalized_expected + " "
+    )
 
 
 def _rule_failures(
@@ -307,7 +316,9 @@ def _generate_completion(
             category_hint=category_hint,
             category_gated=category_gated,
         )
-        base_prompt = prepare_retrieval_prompt(prompt, tokenizer=tokenizer, block_size=model.config.block_size)
+        base_prompt = prepare_retrieval_prompt(
+            prompt, tokenizer=tokenizer, block_size=model.config.block_size
+        )
         if direct is not None:
             retrieval = {
                 **base_prompt,

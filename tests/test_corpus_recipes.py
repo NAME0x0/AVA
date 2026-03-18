@@ -24,19 +24,27 @@ def test_join_records_uses_visible_separator() -> None:
 def test_row_formatters_keep_domain_structure() -> None:
     assert _tiny_stories_to_text([{"text": "A short story."}]) == ["A short story."]
     math_rows = _gsm8k_to_text([{"question": "2 + 2?", "answer": "4"}])
-    science_rows = _sciq_to_text([
-        {"support": "Plants use sunlight.", "question": "What do plants use?", "correct_answer": "sunlight"}
-    ])
-    mc_rows = _openbookqa_to_text([
-        {
-            "question_stem": "Which force keeps planets in orbit?",
-            "choices": {"label": ["A", "B"], "text": ["sound", "gravity"]},
-            "answerKey": "B",
-        }
-    ])
-    code_rows = _mbpp_to_text([
-        {"text": "Return the sum.", "code": "def add(a, b):\n    return a + b"}
-    ])
+    science_rows = _sciq_to_text(
+        [
+            {
+                "support": "Plants use sunlight.",
+                "question": "What do plants use?",
+                "correct_answer": "sunlight",
+            }
+        ]
+    )
+    mc_rows = _openbookqa_to_text(
+        [
+            {
+                "question_stem": "Which force keeps planets in orbit?",
+                "choices": {"label": ["A", "B"], "text": ["sound", "gravity"]},
+                "answerKey": "B",
+            }
+        ]
+    )
+    code_rows = _mbpp_to_text(
+        [{"text": "Return the sum.", "code": "def add(a, b):\n    return a + b"}]
+    )
 
     assert math_rows[0].startswith("Math problem:\n2 + 2?")
     assert "Worked solution:\n4" in math_rows[0]
@@ -55,13 +63,24 @@ def test_materialize_open_mix_corpus_writes_expected_files(monkeypatch) -> None:
         if name == "gsm8k":
             return [{"question": "3 + 4?", "answer": "7"}]
         if name == "sciq":
-            return [{"support": "Water boils at 100C.", "question": "When does water boil?", "correct_answer": "100C"}]
+            return [
+                {
+                    "support": "Water boils at 100C.",
+                    "question": "When does water boil?",
+                    "correct_answer": "100C",
+                }
+            ]
         if name == "allenai/openbookqa":
-            return [{
-                "question_stem": "Which star is at the center of the solar system?",
-                "choices": {"label": ["A", "B", "C", "D"], "text": ["Moon", "Sun", "Mars", "Earth"]},
-                "answerKey": "B",
-            }]
+            return [
+                {
+                    "question_stem": "Which star is at the center of the solar system?",
+                    "choices": {
+                        "label": ["A", "B", "C", "D"],
+                        "text": ["Moon", "Sun", "Mars", "Earth"],
+                    },
+                    "answerKey": "B",
+                }
+            ]
         if name == "mbpp":
             return [{"text": "Square a number.", "code": "def square(x):\n    return x * x"}]
         raise AssertionError(f"unexpected dataset: {name} {args} {split}")
@@ -74,7 +93,9 @@ def test_materialize_open_mix_corpus_writes_expected_files(monkeypatch) -> None:
         shutil.rmtree(root)
     root.mkdir(parents=True, exist_ok=True)
 
-    manifest = materialize_open_mix_corpus(root, english_limit=2, math_limit=1, science_limit=2, code_limit=1)
+    manifest = materialize_open_mix_corpus(
+        root, english_limit=2, math_limit=1, science_limit=2, code_limit=1
+    )
 
     assert manifest["english_records"] == 2
     assert manifest["math_records"] == 1
@@ -106,7 +127,11 @@ def test_materialize_posttrain_mix_corpus_samples_sources_deterministically(monk
         source_dir.mkdir(parents=True, exist_ok=True)
         source_path = source_dir / "examples.jsonl"
         rows = [
-            {"prompt": f"{source_name} prompt {row}" + ("\u2028wrapped" if row == 0 else ""), "response": f"answer {row}", "kind": f"kind_{index}"}
+            {
+                "prompt": f"{source_name} prompt {row}" + ("\u2028wrapped" if row == 0 else ""),
+                "response": f"answer {row}",
+                "kind": f"kind_{index}",
+            }
             for row in range(4)
         ]
         source_path.write_text("\n".join(json.dumps(row) for row in rows) + "\n", encoding="utf-8")

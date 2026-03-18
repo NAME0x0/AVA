@@ -39,16 +39,16 @@ class SupportReranker:
             filtered = list(examples)
         if not filtered:
             return [], {
-                'model_name': self.model_name,
-                'device': self.device,
-                'candidate_count': 0,
-                'top_k': top_k,
-                'matches': [],
+                "model_name": self.model_name,
+                "device": self.device,
+                "candidate_count": 0,
+                "top_k": top_k,
+                "matches": [],
             }
         query = _unwrap_prompt(prompt).strip()
         pairs = [(query, _support_rerank_text(example)) for example in filtered]
         scores = self.backend.predict(pairs, show_progress_bar=False)
-        if hasattr(scores, 'tolist'):
+        if hasattr(scores, "tolist"):
             scores = scores.tolist()
         normalized_scores: list[float] = []
         for value in scores:
@@ -63,21 +63,21 @@ class SupportReranker:
         )[: max(top_k, 0)]
         matches = [
             {
-                'score': round(float(score), 6),
-                'prompt': example.prompt,
-                'response': example.response,
-                'category': example.category,
-                'kind': example.kind,
-                'source_path': example.source_path,
+                "score": round(float(score), 6),
+                "prompt": example.prompt,
+                "response": example.response,
+                "category": example.category,
+                "kind": example.kind,
+                "source_path": example.source_path,
             }
             for example, score in ranked
         ]
         return [example for example, _score in ranked], {
-            'model_name': self.model_name,
-            'device': self.device,
-            'candidate_count': len(filtered),
-            'top_k': top_k,
-            'matches': matches,
+            "model_name": self.model_name,
+            "device": self.device,
+            "candidate_count": len(filtered),
+            "top_k": top_k,
+            "matches": matches,
         }
 
 
@@ -87,12 +87,12 @@ def _support_rerank_text(example: SupportExample) -> str:
 
 def build_support_reranker(
     *,
-    model_name: str = 'cross-encoder/ms-marco-MiniLM-L-6-v2',
-    device: str = 'cpu',
+    model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    device: str = "cpu",
     trust_remote_code: bool = False,
 ) -> SupportReranker:
     if not CROSS_ENCODER_AVAILABLE:
-        raise RuntimeError('sentence-transformers is required for support reranking')
+        raise RuntimeError("sentence-transformers is required for support reranking")
     load_project_env()
     token = huggingface_token()
     try:

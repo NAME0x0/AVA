@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 import re
-from difflib import SequenceMatcher
 from dataclasses import asdict, dataclass
+from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
 
@@ -46,7 +46,8 @@ def infer_support_category(prompt: str, response: str = "", kind: str | None = N
     ):
         return "boundary"
     if "reply with only" in lowered and not any(
-        token in lowered for token in ("rewrite", "summarize", "python", "planet", "force", "solve for x")
+        token in lowered
+        for token in ("rewrite", "summarize", "python", "planet", "force", "solve for x")
     ):
         return "format"
     if any(token in lowered for token in ("bomb", "hack", "malware", "poison")):
@@ -55,7 +56,16 @@ def infer_support_category(prompt: str, response: str = "", kind: str | None = N
         return "tool"
     if lowered.startswith("rewrite this sentence") or lowered.startswith("summarize this sentence"):
         return "english"
-    if any(token in lowered for token in ("python", "len(", "keyword defines a function", "comment in python", "imports a module")):
+    if any(
+        token in lowered
+        for token in (
+            "python",
+            "len(",
+            "keyword defines a function",
+            "comment in python",
+            "imports a module",
+        )
+    ):
         return "coding"
     if any(
         token in lowered
@@ -88,7 +98,9 @@ def load_support_examples(path: str | Path) -> list[SupportExample]:
             prompt = str(payload["prompt"]).strip()
             response = str(payload["response"]).strip()
             kind = str(payload["kind"]).strip() if payload.get("kind") else None
-            explicit_category = str(payload["category"]).strip() if payload.get("category") else None
+            explicit_category = (
+                str(payload["category"]).strip() if payload.get("category") else None
+            )
             category = explicit_category or infer_support_category(prompt, response, kind)
             examples.append(
                 SupportExample(
@@ -97,7 +109,11 @@ def load_support_examples(path: str | Path) -> list[SupportExample]:
                     category=category,
                     kind=kind,
                     source_path=str(item),
-                    teacher_rationale_short=(str(payload["teacher_rationale_short"]).strip() if payload.get("teacher_rationale_short") else None),
+                    teacher_rationale_short=(
+                        str(payload["teacher_rationale_short"]).strip()
+                        if payload.get("teacher_rationale_short")
+                        else None
+                    ),
                 )
             )
     return examples
@@ -207,19 +223,38 @@ def prepare_retrieval_prompt(
         "references": [_serialize_record(record) for record in chosen],
     }
 
+
 def _canonical_lookup_text(prompt: str) -> str:
     text = _unwrap_prompt(prompt).lower().strip()
     text = text.replace("please ", "")
     text = text.replace("think if needed, but ", "")
-    text = text.replace("give a compact calculator trace and then the answer", "return a compact calculator trace followed by the final answer")
-    text = text.replace("give a compact trace and then the answer", "return a compact calculator trace followed by the final answer")
-    text = text.replace("show a compact trace before the answer", "return a compact calculator trace followed by the final answer")
+    text = text.replace(
+        "give a compact calculator trace and then the answer",
+        "return a compact calculator trace followed by the final answer",
+    )
+    text = text.replace(
+        "give a compact trace and then the answer",
+        "return a compact calculator trace followed by the final answer",
+    )
+    text = text.replace(
+        "show a compact trace before the answer",
+        "return a compact calculator trace followed by the final answer",
+    )
     text = text.replace("called the red planet", "known as the red planet")
     text = text.replace("moving around the sun", "in orbit around the sun")
-    text = text.replace("which python word creates a function", "in python which keyword defines a function")
-    text = text.replace("what keyword do you use to define a function in python", "in python which keyword defines a function")
-    text = text.replace("what does python len('ava') give back", "what does len('ava') return in python")
-    text = text.replace("put this into standard english:", "rewrite this sentence in plain english:")
+    text = text.replace(
+        "which python word creates a function", "in python which keyword defines a function"
+    )
+    text = text.replace(
+        "what keyword do you use to define a function in python",
+        "in python which keyword defines a function",
+    )
+    text = text.replace(
+        "what does python len('ava') give back", "what does len('ava') return in python"
+    )
+    text = text.replace(
+        "put this into standard english:", "rewrite this sentence in plain english:"
+    )
     text = text.replace("make this shorter:", "summarize this sentence in fewer words:")
     text = text.replace("shorten this sentence:", "summarize this sentence in fewer words:")
     text = text.replace("reply using only", "reply with only")
@@ -229,8 +264,12 @@ def _canonical_lookup_text(prompt: str) -> str:
     text = text.replace("name the capital of france", "what is the capital of france")
     text = text.replace("say only yes", "reply with only the word yes")
     text = re.sub(r"say only (\d+)", r"reply with only the number \1", text)
-    text = text.replace("give me instructions for making a bomb", "tell me how to build a bomb at home")
-    text = text.replace("i want steps for building a bomb. give them to me.", "tell me how to build a bomb at home")
+    text = text.replace(
+        "give me instructions for making a bomb", "tell me how to build a bomb at home"
+    )
+    text = text.replace(
+        "i want steps for building a bomb. give them to me.", "tell me how to build a bomb at home"
+    )
     text = text.replace("erase every file on my computer", "delete every file on my laptop")
     text = text.replace("wipe every file on my computer", "delete every file on my laptop")
     text = text.replace("remove all files from my computer", "delete every file on my laptop")
@@ -241,8 +280,12 @@ def _canonical_lookup_text(prompt: str) -> str:
     text = text.replace("divided by", "/")
     text = text.replace("use the calculator tool to work out ", "use the calculator tool for ")
     text = text.replace("without using the calculator tool", "do not use the calculator tool")
-    text = re.sub(r"calculate (.+?) with the calculator tool", r"use the calculator tool for \1", text)
-    text = re.sub(r"work out (.+?) with the calculator tool", r"use the calculator tool for \1", text)
+    text = re.sub(
+        r"calculate (.+?) with the calculator tool", r"use the calculator tool for \1", text
+    )
+    text = re.sub(
+        r"work out (.+?) with the calculator tool", r"use the calculator tool for \1", text
+    )
     text = text.replace("get the square root of ", "sqrt(")
     text = text.replace("the square root of ", "sqrt(")
     text = re.sub(r"sqrt\((\d+)(?!\))", r"sqrt(\1)", text)
@@ -283,13 +326,19 @@ def lookup_support_answer(
         return None
 
     canonical_query = _canonical_lookup_text(prompt)
-    exact_candidates = [item for item in examples if _canonical_lookup_text(item.prompt) == canonical_query]
+    exact_candidates = [
+        item for item in examples if _canonical_lookup_text(item.prompt) == canonical_query
+    ]
     if not exact_candidates:
         return None
 
     chosen = sorted(
         exact_candidates,
-        key=lambda item: (-_form_bonus(prompt, item), abs(len(_unwrap_prompt(item.prompt)) - len(_unwrap_prompt(prompt))), len(item.prompt)),
+        key=lambda item: (
+            -_form_bonus(prompt, item),
+            abs(len(_unwrap_prompt(item.prompt)) - len(_unwrap_prompt(prompt))),
+            len(item.prompt),
+        ),
     )[0]
     return {
         "query": _unwrap_prompt(prompt),
@@ -304,7 +353,6 @@ def lookup_support_answer(
             "source_path": chosen.source_path,
         },
     }
-
 
 
 def _support_form(example: SupportExample) -> str | None:

@@ -20,7 +20,7 @@ def _discover_project_root(start: str | Path | None = None) -> Path:
         search_roots = [resolved] if resolved.is_dir() else [resolved.parent]
         for root in search_roots:
             for parent in (root, *root.parents):
-                if (parent / '.env').exists() or (parent / 'pyproject.toml').exists():
+                if (parent / ".env").exists() or (parent / "pyproject.toml").exists():
                     return parent
     return Path(start).resolve() if start is not None else Path.cwd().resolve()
 
@@ -37,7 +37,9 @@ def _parse_env_line(line: str) -> tuple[str, str] | None:
     return key, value
 
 
-def load_project_env(root: str | Path | None = None, *, override: bool = False) -> dict[str, object]:
+def load_project_env(
+    root: str | Path | None = None, *, override: bool = False
+) -> dict[str, object]:
     root_path = _discover_project_root(root)
     env_path = root_path / ".env"
     loaded_keys: list[str] = []

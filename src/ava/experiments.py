@@ -58,7 +58,10 @@ MEMORY_CASES = (
         "query": "How do I handle square roots?",
         "expected": "square roots",
         "records": (
-            ("The calculator can evaluate square roots and powers exactly for small problems.", 0.52),
+            (
+                "The calculator can evaluate square roots and powers exactly for small problems.",
+                0.52,
+            ),
             ("Use external memory to retain long-horizon preferences.", 0.33),
             ("Avoid long answers unless the user asks for detail.", 0.27),
         ),
@@ -76,7 +79,10 @@ MEMORY_CASES = (
         "query": "How should AVA remember user preferences?",
         "expected": "preferences",
         "records": (
-            ("Write user preferences into external memory only when they are stable and surprising enough.", 0.58),
+            (
+                "Write user preferences into external memory only when they are stable and surprising enough.",
+                0.58,
+            ),
             ("Do not overuse memory for transient requests.", 0.41),
             ("The calculator is for math only.", 0.2),
         ),
@@ -189,7 +195,9 @@ def run_memory_sweep(tokenizer: ByteTokenizer | None = None) -> list[MemorySweep
     tokenizer = tokenizer or ByteTokenizer()
     thresholds = (0.25, 0.45, 0.65)
     with ThreadPoolExecutor(max_workers=len(thresholds)) as pool:
-        results = list(pool.map(lambda threshold: estimate_memory_threshold(threshold, tokenizer), thresholds))
+        results = list(
+            pool.map(lambda threshold: estimate_memory_threshold(threshold, tokenizer), thresholds)
+        )
     return sorted(results, key=lambda item: (-(item.recall_at_1), item.average_context_tokens))
 
 
@@ -279,5 +287,3 @@ def serialize_memory_sweep(results: list[MemorySweepEstimate]) -> list[dict[str,
 
 def serialize_test_time_sweep(results: list[TestTimeStrategyEstimate]) -> list[dict[str, object]]:
     return [asdict(result) for result in results]
-
-

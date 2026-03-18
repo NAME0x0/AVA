@@ -34,8 +34,8 @@ class TitansMemory:
         return vector
 
     def _token_overlap(self, left: str, right: str) -> float:
-        left_tokens = set(left.lower().replace('.', ' ').replace(',', ' ').split())
-        right_tokens = set(right.lower().replace('.', ' ').replace(',', ' ').split())
+        left_tokens = set(left.lower().replace(".", " ").replace(",", " ").split())
+        right_tokens = set(right.lower().replace(".", " ").replace(",", " ").split())
         if not left_tokens or not right_tokens:
             return 0.0
         return len(left_tokens & right_tokens) / len(left_tokens | right_tokens)

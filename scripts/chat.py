@@ -13,6 +13,7 @@ Usage:
     # Adjust generation parameters:
     python scripts/chat.py --max-tokens 1024 --temperature 0.6
 """
+
 from __future__ import annotations
 
 import argparse
@@ -22,8 +23,10 @@ import sys
 # Triton CC auto-detect (Windows)
 if sys.platform == "win32" and not os.environ.get("CC"):
     _candidates = [
-        r"C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36014\bin\Hostx64\x64\cl.exe",
-        r"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\cl.exe",
+        r"C:\Program Files\Microsoft Visual Studio\18\Community"
+        r"\VC\Tools\MSVC\14.51.36014\bin\Hostx64\x64\cl.exe",
+        r"C:\Program Files\Microsoft Visual Studio\2022\Community"
+        r"\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\cl.exe",
     ]
     for _cc in _candidates:
         if os.path.exists(_cc):
@@ -92,9 +95,7 @@ def generate(
             do_sample=temperature > 0,
         )
 
-    response = tokenizer.decode(
-        output[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True
-    )
+    response = tokenizer.decode(output[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True)
     return response.strip()
 
 
@@ -117,8 +118,11 @@ def interactive_loop(model, tokenizer, *, max_new_tokens: int, temperature: floa
             break
 
         response = generate(
-            model, tokenizer, prompt,
-            max_new_tokens=max_new_tokens, temperature=temperature,
+            model,
+            tokenizer,
+            prompt,
+            max_new_tokens=max_new_tokens,
+            temperature=temperature,
         )
         print(f"\nAVA: {response}\n")
 
@@ -126,11 +130,13 @@ def interactive_loop(model, tokenizer, *, max_new_tokens: int, temperature: floa
 def main() -> None:
     parser = argparse.ArgumentParser(description="Chat with AVA v2")
     parser.add_argument(
-        "--adapter", default=HF_REPO,
+        "--adapter",
+        default=HF_REPO,
         help=f"HuggingFace repo ID or local adapter path (default: {HF_REPO})",
     )
     parser.add_argument(
-        "--prompt", default=None,
+        "--prompt",
+        default=None,
         help="Single prompt (non-interactive mode)",
     )
     parser.add_argument("--max-tokens", type=int, default=512)
@@ -141,14 +147,19 @@ def main() -> None:
 
     if args.prompt:
         response = generate(
-            model, tokenizer, args.prompt,
-            max_new_tokens=args.max_tokens, temperature=args.temperature,
+            model,
+            tokenizer,
+            args.prompt,
+            max_new_tokens=args.max_tokens,
+            temperature=args.temperature,
         )
         print(response)
     else:
         interactive_loop(
-            model, tokenizer,
-            max_new_tokens=args.max_tokens, temperature=args.temperature,
+            model,
+            tokenizer,
+            max_new_tokens=args.max_tokens,
+            temperature=args.temperature,
         )
 
 

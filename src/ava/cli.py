@@ -15,13 +15,6 @@ from ava.env import load_project_env
 from ava.external_benchmarks import evaluate_external_benchmark, summarize_external_benchmark
 from ava.inspect import trace_checkpoint
 from ava.rl import rl_dry_run_summary, run_verifiable_rl
-from ava.tokenizer_artifacts import (
-    build_byte_bpe_artifact,
-    build_greedy_byte_piece_artifact,
-    build_hf_bpe_artifact,
-    build_hf_remote_artifact,
-    build_hf_unigram_artifact,
-)
 from ava.sessions import (
     bootstrap_session,
     create_session,
@@ -32,6 +25,13 @@ from ava.sessions import (
     retrieval_session,
     sota_session,
     training_session,
+)
+from ava.tokenizer_artifacts import (
+    build_byte_bpe_artifact,
+    build_greedy_byte_piece_artifact,
+    build_hf_bpe_artifact,
+    build_hf_remote_artifact,
+    build_hf_unigram_artifact,
 )
 from ava.train import dry_run_summary, run_training
 
@@ -101,7 +101,9 @@ def build_parser() -> argparse.ArgumentParser:
     session_memory_transfer.add_argument("--max-new-tokens", type=int, default=48)
     session_memory_transfer.add_argument("--nearest-threshold", type=float, default=0.58)
     session_memory_transfer.add_argument("--nearest-margin", type=float, default=0.03)
-    session_memory_transfer.add_argument("--suite", choices=("small", "expanded", "stress"), default="small")
+    session_memory_transfer.add_argument(
+        "--suite", choices=("small", "expanded", "stress"), default="small"
+    )
     session_memory_transfer.add_argument("--no-category-gating", action="store_true")
 
     corpus_parser = subparsers.add_parser("corpus")
@@ -148,7 +150,11 @@ def build_parser() -> argparse.ArgumentParser:
     tokenizer_build = tokenizer_subparsers.add_parser("build")
     tokenizer_build.add_argument("corpus_root")
     tokenizer_build.add_argument("output")
-    tokenizer_build.add_argument("--kind", choices=("greedy_bytes", "byte_bpe", "hf_bpe", "hf_unigram"), default="greedy_bytes")
+    tokenizer_build.add_argument(
+        "--kind",
+        choices=("greedy_bytes", "byte_bpe", "hf_bpe", "hf_unigram"),
+        default="greedy_bytes",
+    )
     tokenizer_build.add_argument("--target-vocab-size", type=int, default=512)
     tokenizer_build.add_argument("--max-piece-length", type=int, default=12)
     tokenizer_build.add_argument("--min-frequency", type=int, default=2)
@@ -192,14 +198,33 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark_external.add_argument("--device", default="cuda")
     benchmark_external.add_argument("--support-corpus")
     benchmark_external.add_argument("--dense-support-corpus")
-    benchmark_external.add_argument("--retrieval-mode", choices=("baseline", "direct", "nearest", "prompt_support", "support_mc", "hybrid_support_mc", "hybrid_support_ensemble", "model_retrieval_ensemble", "dense_hybrid_support_mc", "dense_rerank_support_mc", "sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"), default="baseline")
+    benchmark_external.add_argument(
+        "--retrieval-mode",
+        choices=(
+            "baseline",
+            "direct",
+            "nearest",
+            "prompt_support",
+            "support_mc",
+            "hybrid_support_mc",
+            "hybrid_support_ensemble",
+            "model_retrieval_ensemble",
+            "dense_hybrid_support_mc",
+            "dense_rerank_support_mc",
+            "sparse_dense_router_support_mc",
+            "sparse_dense_rerank_router_support_mc",
+        ),
+        default="baseline",
+    )
     benchmark_external.add_argument("--nearest-threshold", type=float, default=0.45)
     benchmark_external.add_argument("--nearest-margin", type=float, default=0.0)
     benchmark_external.add_argument("--support-top-k", type=int, default=2)
     benchmark_external.add_argument("--dense-encoder-model", default="BAAI/bge-small-en-v1.5")
     benchmark_external.add_argument("--dense-encoder-device", default="cpu")
     benchmark_external.add_argument("--dense-candidate-top-k", type=int, default=64)
-    benchmark_external.add_argument("--reranker-model", default="cross-encoder/ms-marco-MiniLM-L-6-v2")
+    benchmark_external.add_argument(
+        "--reranker-model", default="cross-encoder/ms-marco-MiniLM-L-6-v2"
+    )
     benchmark_external.add_argument("--reranker-device", default="cpu")
     benchmark_external.add_argument("--rerank-top-k", type=int, default=12)
     benchmark_external.add_argument("--router-dense-score-min", type=float, default=0.7)
@@ -409,14 +434,16 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
         if args.profile == "generalist":
             source_limits["public_benchmark"] = min(args.public_benchmark_limit, 1200)
             source_limits["public_science"] = min(args.public_science_limit, 800)
-            source_repeats.update({
-                "teacher_distill": 6,
-                "math_reasoning": 4,
-                "general_sft": 4,
-                "guardrails": 6,
-                "tool_repair": 12,
-                "public_reasoning": 4,
-            })
+            source_repeats.update(
+                {
+                    "teacher_distill": 6,
+                    "math_reasoning": 4,
+                    "general_sft": 4,
+                    "guardrails": 6,
+                    "tool_repair": 12,
+                    "public_reasoning": 4,
+                }
+            )
         payload = materialize_posttrain_mix_corpus(
             args.output,
             source_limits=source_limits,
@@ -674,4 +701,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
