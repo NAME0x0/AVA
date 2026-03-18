@@ -20,7 +20,7 @@ env:
 
 jobs:
   quality:
-    name: Quality / Python ${{ matrix.python-version }}
+    name: Lint & Type Check / Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -40,7 +40,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .[dev,bench]
 
-      - name: Ruff
+      - name: Ruff lint
         run: ruff check .
 
       - name: Ruff format
@@ -67,14 +67,33 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .[dev,train,bench]
 
-      - name: Pytest
-        run: pytest -q
+      - name: Pytest (full suite)
+        run: pytest -q --tb=short
 
-      - name: CLI smoke
+      - name: CLI smoke tests
         run: |
           python -m ava.cli train dry-run configs/base.yaml
           python -m ava.cli benchmark registry --stage foundation
           python -m ava.cli benchmark registry --modality vision
+
+      - name: Experiment config validation
+        run: |
+          python -c "
+          import yaml, glob, sys
+          errors = []
+          for f in sorted(glob.glob('configs/experiments/*.yaml')):
+              try:
+                  with open(f) as fh:
+                      cfg = yaml.safe_load(fh)
+                  assert isinstance(cfg, dict), f'{f}: not a dict'
+                  assert 'model' in cfg or 'base_model' in cfg, f'{f}: missing model key'
+              except Exception as e:
+                  errors.append(f'{f}: {e}')
+          if errors:
+              print('\n'.join(errors), file=sys.stderr)
+              sys.exit(1)
+          print(f'Validated {len(glob.glob(\"configs/experiments/*.yaml\"))} experiment configs')
+          "
 
   windows-smoke:
     name: Windows Smoke / Python 3.13
@@ -95,13 +114,78 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .[dev,train,bench]
 
-      - name: Targeted pytest smoke
+      - name: Pytest (targeted)
         shell: pwsh
         run: |
-          pytest tests/test_env.py tests/test_external_benchmarks.py tests/test_retrieval.py -q
+          pytest tests/test_env.py tests/test_external_benchmarks.py tests/test_retrieval.py tests/test_experiments.py tests/test_model.py -q --tb=short
 
       - name: CLI smoke
         shell: pwsh
         run: |
           python -m ava.cli benchmark registry --stage foundation
           python -m ava.cli benchmark registry --modality vision
+
+  adapter-integrity:
+    name: Adapter Integrity Check
+    runs-on: ubuntu-latest
+    needs: quality
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install minimal dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install safetensors
+
+      - name: Validate adapter files
+        run: |
+          python -c "
+          import json
+          from pathlib import Path
+
+          adapter_dir = Path('experiments/exp4_finetune/models/AVA-v2')
+
+          # Check required files exist
+          required = ['adapter_config.json', 'adapter_model.safetensors', 'README.md']
+          for f in required:
+              p = adapter_dir / f
+              assert p.exists(), f'Missing: {p}'
+              assert p.stat().st_size > 0, f'Empty: {p}'
+              print(f'  {f}: {p.stat().st_size / 1e6:.1f} MB')
+
+          # Validate adapter config
+          cfg = json.loads((adapter_dir / 'adapter_config.json').read_text())
+          assert cfg['peft_type'] == 'LORA', f'Expected LORA, got {cfg[\"peft_type\"]}'
+          assert cfg['base_model_name_or_path'] == 'Qwen/Qwen3.5-2B'
+          assert cfg['r'] == 16
+          assert cfg['lora_alpha'] == 32
+          assert set(cfg['target_modules']) == {'q_proj','k_proj','v_proj','o_proj','gate_proj','up_proj','down_proj'}
+          print('Adapter config: valid')
+
+          # Validate safetensors can be loaded
+          from safetensors import safe_open
+          with safe_open(str(adapter_dir / 'adapter_model.safetensors'), framework='pt') as f:
+              keys = f.keys()
+              print(f'Adapter tensors: {len(keys)} parameters')
+              assert len(keys) > 0, 'No tensors in safetensors file'
+          print('Adapter integrity: PASS')
+          "
+
+      - name: Validate training report
+        run: |
+          python -c "
+          import json
+          from pathlib import Path
+          report = json.loads(Path('experiments/exp4_finetune/models/AVA-v2/training_report.json').read_text())
+          assert report['train_loss'] < 1.0, f'Loss too high: {report[\"train_loss\"]}'
+          assert report['train_examples'] > 10000
+          print(f'Training report: loss={report[\"train_loss\"]:.4f}, examples={report[\"train_examples\"]}')
+          "

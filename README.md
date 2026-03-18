@@ -4,6 +4,53 @@ AVA is a high-quality AI assistant built under extreme hardware constraints: a s
 
 The entire training pipeline, evaluation harness, and model weights are open. This README documents what was built, how it was built, and how to reproduce the results from scratch.
 
+## Try AVA v2
+
+The fastest way to use AVA v2 is the interactive chat script:
+
+```bash
+# Install
+pip install -e .[bench]
+pip install peft
+
+# Chat (downloads from HuggingFace automatically)
+python scripts/chat.py
+
+# Single question
+python scripts/chat.py --prompt "Explain why ice floats on water."
+
+# Use a local adapter
+python scripts/chat.py --adapter ./experiments/exp4_finetune/models/AVA-v2
+```
+
+Or load it directly in Python:
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from peft import PeftModel
+import torch
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True, bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16, bnb_4bit_use_double_quant=True,
+)
+model = AutoModelForCausalLM.from_pretrained(
+    "Qwen/Qwen3.5-2B", quantization_config=bnb_config,
+    device_map="auto", dtype=torch.bfloat16, attn_implementation="sdpa",
+)
+tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen3.5-2B")
+model = PeftModel.from_pretrained(model, "NAME0x0/AVA-v2")
+model = model.merge_and_unload()
+
+messages = [{"role": "user", "content": "Explain why ice floats on water."}]
+text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True, enable_thinking=False)
+inputs = tokenizer(text, return_tensors="pt").to(model.device)
+output = model.generate(**inputs, max_new_tokens=512, temperature=0.7, do_sample=True)
+print(tokenizer.decode(output[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True))
+```
+
+Requires: Python 3.10+, NVIDIA GPU with 4+ GB VRAM, CUDA support.
+
 ## Results
 
 ### AVA v2 Benchmark Scores
@@ -32,25 +79,41 @@ The entire training pipeline, evaluation harness, and model weights are open. Th
 
 AVA v2 trained **10.7x faster** than v1 per step thanks to Triton kernel compilation for SDPA attention. The 4x larger corpus with augmented science and reasoning data was the key driver behind the ARC breakthrough (v1 showed zero ARC improvement over base).
 
-### Comparison to Other Small Models
+### Comparison to Other Models
 
 All scores from official model cards and technical reports. Evaluation protocols vary by source (shot count, prompting). AVA v2 scores are 0-shot.
 
-| Model | Params | ARC-Challenge | GSM8K | Notes |
-|---|---|---|---|---|
-| TinyLlama-1.1B | 1.1B | 30.1% | ~2% | Pre-2024 baseline |
-| Gemma 2 2B | 2.0B | 55.7% | 24.3% | Google, base |
-| Gemma 3 1B-IT | 1.0B | -- | 62.8% | Google, instruct |
-| SmolLM2-1.7B-Instruct | 1.7B | ~52% | 48.2% | HuggingFace |
-| Qwen2.5-1.5B | 1.5B | 54.7% | 68.5% | Alibaba, base |
-| Llama 3.2 1B-Instruct | 1.0B | 59.4% | 44.4% | Meta |
-| Llama 3.2 3B | 3.0B | 69.1% | 77.7% | Meta, base |
-| **AVA v2** | **2.0B** | **79.0%** | **48.0%** | **This work, 4GB VRAM** |
-| Llama 3.2 3B-Instruct | 3.0B | 78.6% | 77.7% | Meta |
-| Qwen2.5-3B | 3.0B | 56.5% | 79.1% | Alibaba, base |
-| Phi-3.5-mini-Instruct | 3.8B | 84.6% | 86.2% | Microsoft |
-| Phi-4-mini-Instruct | 3.8B | 83.7% | 88.6% | Microsoft |
-| Mistral-7B | 7.0B | 55.5% | 52.2% | Mistral AI, base |
+#### ARC-Challenge (Science Reasoning)
+
+```mermaid
+---
+config:
+    xyChart:
+        width: 800
+        height: 400
+---
+xychart-beta
+    title "ARC-Challenge Accuracy by Model"
+    x-axis ["TinyLlama 1.1B", "SmolLM2 1.7B", "Gemma2 2B", "Qwen2.5 1.5B", "Mistral 7B", "Llama3.2 1B-IT", "Llama3.2 3B", "Llama3.2 3B-IT", "AVA v2 2B", "Phi-4-mini 3.8B", "Phi-3.5-mini 3.8B"]
+    y-axis "Accuracy (%)" 0 --> 100
+    bar [30.1, 52, 55.7, 54.7, 55.5, 59.4, 69.1, 78.6, 79, 83.7, 84.6]
+```
+
+#### GSM8K (Math Reasoning)
+
+```mermaid
+---
+config:
+    xyChart:
+        width: 800
+        height: 400
+---
+xychart-beta
+    title "GSM8K Accuracy by Model"
+    x-axis ["TinyLlama 1.1B", "Gemma2 2B", "Qwen3.5 2B Base", "Llama3.2 1B-IT", "AVA v2 2B", "SmolLM2 1.7B", "Mistral 7B", "Qwen2.5 1.5B", "Llama3.2 3B-IT", "Qwen2.5 3B", "Phi-3.5 3.8B", "Phi-4 3.8B"]
+    y-axis "Accuracy (%)" 0 --> 100
+    bar [2, 24.3, 28, 44.4, 48, 48.2, 52.2, 68.5, 77.7, 79.1, 86.2, 88.6]
+```
 
 **Key takeaways:**
 
@@ -76,6 +139,28 @@ Step     Loss     LR
 2500     0.971    5.17e-7
 2593     0.414    0.00e+0  <- final (epoch average)
 ```
+
+## Why This Matters
+
+Most AI progress in 2025-2026 happens on clusters with hundreds or thousands of GPUs. AVA asks a different question: **what can you build with a single laptop GPU and no budget?**
+
+The answer is more than most people expect:
+
+- **79% ARC-Challenge at 2B params** beats Llama 3.2 3B-Instruct (78.6% at 3B) and Mistral 7B (55.5%) -- models that required orders of magnitude more compute to train
+- The entire adapter is **42 MB**. The full training run uses **1.81 GB VRAM** and finishes in **100 minutes**
+- Nothing here requires special hardware, cloud access, or corporate resources. Anyone with a modern laptop can reproduce these results
+
+This matters because:
+
+1. **Democratization is real, not theoretical.** Most "democratize AI" projects still require cloud GPUs. AVA trains and runs on hardware that students, researchers in developing countries, and hobbyists already own.
+
+2. **Data quality dominates compute.** AVA v1 (5K examples) showed zero ARC improvement. AVA v2 (20K curated examples) jumped +13pp. The difference was not more compute -- it was better data. This validates the emerging consensus from Phi-4, LIMO, and DeepSeek that careful data curation can substitute for scale.
+
+3. **QLoRA makes fine-tuning accessible.** Training 0.58% of parameters in 4-bit precision means a 2B model fits in under 2 GB. This opens a path where anyone can specialize a frontier-class base model for their domain without touching a cloud console.
+
+4. **The research is reproducible.** Every script, corpus recipe, config file, and evaluation harness is in this repo. The model card has exact versions of every dependency. Run the scripts, get the numbers.
+
+AVA is not trying to compete with GPT-4 or Claude. It is proving that meaningful AI capability -- strong science reasoning, solid math, reliable tool use -- can emerge from constraints that would have been considered impossible two years ago.
 
 ## How It Works
 
@@ -241,50 +326,18 @@ python -u experiments/exp4_finetune/scripts/benchmark_full.py \
 
 ### LoRA Adapter (42 MB)
 
-The AVA v2 adapter is stored in the standard PEFT format:
+Available on HuggingFace: [NAME0x0/AVA-v2](https://huggingface.co/NAME0x0/AVA-v2)
+
+The adapter is also stored in this repo in standard PEFT format:
 
 ```
-experiments/exp4_finetune/models/Qwen3.5-2B-AVA-v2/
-  adapter_config.json      # LoRA configuration
-  adapter_model.safetensors  # 42 MB adapter weights
-  tokenizer.json            # Qwen3.5 tokenizer
+experiments/exp4_finetune/models/AVA-v2/
+  adapter_config.json       # LoRA configuration
+  adapter_model.safetensors # 42 MB adapter weights (Git LFS)
+  tokenizer.json            # Qwen3.5 tokenizer (Git LFS)
   tokenizer_config.json
   training_report.json      # Training metrics
-```
-
-### Loading the Model
-
-```python
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-from peft import PeftModel
-import torch
-
-# Load base model in 4-bit
-bnb_config = BitsAndBytesConfig(
-    load_in_4bit=True,
-    bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.bfloat16,
-    bnb_4bit_use_double_quant=True,
-)
-model = AutoModelForCausalLM.from_pretrained(
-    "Qwen/Qwen3.5-2B",
-    quantization_config=bnb_config,
-    device_map="auto",
-    dtype=torch.bfloat16,
-    attn_implementation="sdpa",
-)
-tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen3.5-2B")
-
-# Load and merge AVA v2 adapter
-model = PeftModel.from_pretrained(model, "NAME0x0/AVA-v2")
-model = model.merge_and_unload()
-
-# Generate
-messages = [{"role": "user", "content": "Explain why ice floats on water."}]
-text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True, enable_thinking=False)
-inputs = tokenizer(text, return_tensors="pt").to(model.device)
-output = model.generate(**inputs, max_new_tokens=512, temperature=0.7, do_sample=True)
-print(tokenizer.decode(output[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True))
+  README.md                 # HuggingFace model card
 ```
 
 ## Software Stack
@@ -304,13 +357,95 @@ print(tokenizer.decode(output[0][inputs["input_ids"].shape[1]:], skip_special_to
 
 ## Repository Layout
 
-- `src/ava/` -- model code, tokenizers, training loop, evaluation, tools, memory, retrieval, and public benchmark runners
-- `experiments/exp4_finetune/` -- fine-tuning scripts, corpora, models, and results
-- `configs/` -- experiment configs, tokenizer configs, and support-bank manifests
-- `corpora/` -- tracked corpora and support banks
-- `docs/` -- architecture, data, benchmark, experiment, and roadmap notes
-- `sessions/` -- experiment packets, metrics, notes, and activity logs
-- `tests/` -- regression and validation coverage for the research core
+```
+AVA/
+├── src/ava/                    # Core research library (installed as `ava` package)
+│   ├── model.py                #   AVA v3 scratch model (14M param GPT-2 variant)
+│   ├── train.py                #   Training loop for scratch models
+│   ├── rl.py                   #   Verifiable reinforcement learning (REINFORCE)
+│   ├── config.py               #   Experiment config loader (YAML-based)
+│   ├── cli.py                  #   CLI entry point (`python -m ava.cli`)
+│   ├── external_benchmarks.py  #   ARC-Challenge, GSM8K, PIQA evaluation harness
+│   ├── corpus_recipes.py       #   Corpus materialization from HuggingFace datasets
+│   ├── retrieval.py            #   Sparse retrieval for support-bank ensembles
+│   ├── dense_retrieval.py      #   Dense (embedding-based) retrieval
+│   ├── memory.py               #   External memory with surprise-gated writes
+│   ├── tokenizer.py            #   Byte-level tokenizer + HF tokenizer imports
+│   └── ...                     #   Sessions, activity logging, tools, inspection
+│
+├── experiments/
+│   └── exp4_finetune/          # Experiment 4: QLoRA fine-tuning (current focus)
+│       ├── scripts/            #   Training, benchmarking, corpus building scripts
+│       │   ├── finetune_v2_full.py     # AVA v2 training script
+│       │   ├── benchmark_full.py       # ARC + GSM8K evaluation
+│       │   ├── upload_to_hf.py         # Push adapter to HuggingFace
+│       │   └── ...                     # Corpus builders, older experiment scripts
+│       ├── models/AVA-v2/      #   Released adapter weights (42 MB)
+│       └── results/            #   Pipeline state and evaluation outputs
+│
+├── scripts/
+│   ├── chat.py                 # Interactive chat with AVA v2
+│   └── generate_*.py           # Corpus generation utilities
+│
+├── configs/
+│   ├── base.yaml               # Base model configuration
+│   └── experiments/            # YAML configs for each experiment variant
+│
+├── corpora/                    # Training corpora (JSONL format)
+│   ├── ava_v2_*/               #   v2 fine-tuning data (open mix, post-train, repair)
+│   └── ava_v3_*/               #   v3 scratch training data
+│
+├── sessions/                   # Experiment tracking (timestamped packets)
+│   ├── YYYY-MM-DD-*/           #   Session directories with notes, metrics, configs
+│   └── activity/               #   CLI command logs and benchmark result JSONs
+│
+├── docs/                       # Research documentation
+│   ├── ARCHITECTURE.md         #   System architecture and module design
+│   └── RESEARCH_ROADMAP.md     #   arXiv paper survey mapped to AVA experiments
+│
+├── tests/                      # Test suite (pytest)
+│   ├── test_model.py           #   Model architecture tests
+│   ├── test_train.py           #   Training pipeline tests
+│   ├── test_experiments.py     #   Experiment config validation
+│   ├── test_external_benchmarks.py  # Benchmark harness tests
+│   └── ...                     #   Retrieval, memory, tokenizer, corpus tests
+│
+└── .github/workflows/ci.yml   # CI: lint, test, adapter integrity checks
+```
+
+## Roadmap
+
+AVA is a research project exploring how far a single-GPU setup can push AI capability. The roadmap reflects real constraints: everything must train and run on 4 GB VRAM.
+
+### Completed
+
+- [x] Scratch-trained 14M model (experiments 1-3): established baselines, proved architectural ideas
+- [x] QLoRA fine-tuning pipeline on Qwen3.5-2B (experiment 4)
+- [x] AVA v2: 79% ARC-Challenge, 48% GSM8K with 20K curated examples
+- [x] Sparse retrieval ensemble for science reasoning (91/299 ARC with support banks)
+- [x] Full reproducibility: open weights, open data, open code
+
+### In Progress
+
+- [ ] Extended sequence length training (384 -> 1024+ tokens) for longer reasoning chains
+- [ ] Post-training with verifiable RL (math and science verification rewards)
+- [ ] Improved GSM8K through chain-of-thought curriculum
+
+### Planned
+
+- [ ] DPO/RLHF alignment for instruction following quality
+- [ ] Tool use specialization (calculator, code interpreter)
+- [ ] Multimodal extension via compact vision encoder (following Penguin-VL approach)
+- [ ] Structured external memory for continual learning
+- [ ] Multi-benchmark evaluation: MMLU, HumanEval, TruthfulQA
+- [ ] Model distillation: compress AVA gains into a smaller student
+
+### Long-Term Vision
+
+- [ ] A general-purpose assistant that runs entirely on consumer hardware
+- [ ] Multilingual support starting with Urdu and Arabic
+- [ ] On-device deployment (mobile/edge) through further quantization
+- [ ] Community-driven corpus contributions and benchmark extensions
 
 ## Prior Work
 
@@ -332,6 +467,9 @@ python -m pip install -e .[dev,bench]
 # Run tests
 python -m pytest tests/ -q
 
+# Chat with AVA v2
+python scripts/chat.py
+
 # Run benchmarks
 python -u experiments/exp4_finetune/scripts/benchmark_full.py \
     --adapter experiments/exp4_finetune/models/Qwen3.5-2B-AVA-v2
@@ -340,3 +478,14 @@ python -u experiments/exp4_finetune/scripts/benchmark_full.py \
 ## License
 
 This project is open source. The AVA v2 adapter weights are released under the same license as the base model ([Qwen License](https://huggingface.co/Qwen/Qwen3.5-2B/blob/main/LICENSE)).
+
+## Citation
+
+```bibtex
+@misc{ava-v2-2026,
+  title={AVA v2: QLoRA Fine-tuning Under Extreme VRAM Constraints},
+  author={Muhammad Afsah Mumtaz},
+  year={2026},
+  url={https://github.com/NAME0x0/AVA}
+}
+```
