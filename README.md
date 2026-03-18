@@ -6,7 +6,18 @@ The entire training pipeline, evaluation harness, and model weights are open. Th
 
 ## Try AVA v2
 
-The fastest way to use AVA v2 is the interactive chat script:
+### Option 1: Ollama (easiest — no Python needed)
+
+Download a GGUF file from [Releases](https://github.com/NAME0x0/AVA/releases) or [HuggingFace](https://huggingface.co/NAME0x0/AVA-v2-GGUF), then:
+
+```bash
+ollama create ava-v2 -f Modelfile
+ollama run ava-v2
+```
+
+Works on CPU, Apple Silicon, AMD GPUs, and NVIDIA GPUs. No Python environment required.
+
+### Option 2: Python chat script
 
 ```bash
 # Install
@@ -23,7 +34,7 @@ python scripts/chat.py --prompt "Explain why ice floats on water."
 python scripts/chat.py --adapter ./experiments/exp4_finetune/models/AVA-v2
 ```
 
-Or load it directly in Python:
+### Option 3: Python API
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
@@ -324,6 +335,33 @@ python -u experiments/exp4_finetune/scripts/benchmark_full.py \
 
 ## Model Weights
 
+### GGUF for Ollama / llama.cpp
+
+Pre-built GGUF files are available from [GitHub Releases](https://github.com/NAME0x0/AVA/releases) and [HuggingFace](https://huggingface.co/NAME0x0/AVA-v2-GGUF).
+
+| File | Quantization | Size | Quality |
+|---|---|---|---|
+| AVA-v2-Q4_K_M.gguf | Q4_K_M | ~1.5 GB | Recommended — best size/quality balance |
+| AVA-v2-Q8_0.gguf | Q8_0 | ~2.0 GB | Near-lossless |
+
+To build GGUF locally:
+
+```bash
+# Merge adapter and save merged model
+python scripts/convert_to_gguf.py --merge-only
+
+# Full pipeline (requires llama.cpp):
+git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp && cmake -B build && cmake --build build --config Release -j$(nproc) && cd ..
+python scripts/convert_to_gguf.py --llama-cpp ./llama.cpp --quants Q4_K_M Q8_0
+
+# Use with Ollama:
+ollama create ava-v2 -f Modelfile
+ollama run ava-v2
+```
+
+The GGUF build also runs automatically in CI — trigger it from Actions or publish a GitHub Release.
+
 ### LoRA Adapter (42 MB)
 
 Available on HuggingFace: [NAME0x0/AVA-v2](https://huggingface.co/NAME0x0/AVA-v2)
@@ -385,7 +423,10 @@ AVA/
 │
 ├── scripts/
 │   ├── chat.py                 # Interactive chat with AVA v2
+│   ├── convert_to_gguf.py      # Merge adapter + convert to GGUF for Ollama
 │   └── generate_*.py           # Corpus generation utilities
+│
+├── Modelfile                   # Ollama model definition (use with GGUF)
 │
 ├── configs/
 │   ├── base.yaml               # Base model configuration
@@ -410,7 +451,8 @@ AVA/
 │   ├── test_external_benchmarks.py  # Benchmark harness tests
 │   └── ...                     #   Retrieval, memory, tokenizer, corpus tests
 │
-└── .github/workflows/ci.yml   # CI: lint, test, adapter integrity checks
+├── .github/workflows/ci.yml   # CI: lint, test, adapter integrity checks
+└── .github/workflows/gguf.yml # CI: build GGUF, quantize, upload to HF + releases
 ```
 
 ## Roadmap

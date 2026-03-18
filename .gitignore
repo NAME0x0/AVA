@@ -53,6 +53,8 @@ build/
 dist/
 *.egg-info/
 unsloth_compiled_cache/
+gguf_build/
+*.gguf
 
 # Base and intermediate model weights (too large for git)
 experiments/exp4_finetune/models/Qwen3.5-2B/

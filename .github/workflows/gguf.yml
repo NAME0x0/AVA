@@ -1,0 +1,211 @@
+name: Build GGUF
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      quantizations:
+        description: "Quantization formats (space-separated)"
+        required: false
+        default: "Q4_K_M Q8_0"
+      upload_hf:
+        description: "Upload to HuggingFace"
+        required: false
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+
+permissions:
+  contents: write
+
+env:
+  BASE_MODEL: "Qwen/Qwen3.5-2B"
+  ADAPTER: "NAME0x0/AVA-v2"
+  HF_GGUF_REPO: "NAME0x0/AVA-v2-GGUF"
+
+jobs:
+  build-gguf:
+    name: Merge + Convert + Quantize
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential cmake
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install transformers peft safetensors huggingface-hub sentencepiece
+
+      - name: Clone and build llama.cpp
+        run: |
+          git clone --depth 1 https://github.com/ggerganov/llama.cpp
+          cd llama.cpp
+          pip install -r requirements/requirements-convert_hf_to_gguf.txt
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release -j$(nproc) --target llama-quantize
+
+      - name: Merge LoRA adapter into base model
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python scripts/convert_to_gguf.py \
+            --adapter "${{ env.ADAPTER }}" \
+            --merged-dir ./gguf_build/merged \
+            --merge-only
+
+      - name: Convert to F16 GGUF
+        run: |
+          mkdir -p ./gguf_build/gguf
+          python llama.cpp/convert_hf_to_gguf.py \
+            ./gguf_build/merged \
+            --outfile ./gguf_build/gguf/AVA-v2-f16.gguf \
+            --outtype f16
+
+      - name: Quantize GGUF
+        run: |
+          QUANTIZE_BIN="$(find llama.cpp/build -name 'llama-quantize' -type f | head -1)"
+          QUANTS="${{ github.event.inputs.quantizations || 'Q4_K_M Q8_0' }}"
+          for Q in $QUANTS; do
+            echo "Quantizing to $Q..."
+            "$QUANTIZE_BIN" \
+              ./gguf_build/gguf/AVA-v2-f16.gguf \
+              ./gguf_build/gguf/AVA-v2-${Q}.gguf \
+              ${Q}
+            echo "$Q: $(du -h ./gguf_build/gguf/AVA-v2-${Q}.gguf | cut -f1)"
+          done
+
+      - name: Remove F16 intermediate
+        run: rm -f ./gguf_build/gguf/AVA-v2-f16.gguf
+
+      - name: Generate Modelfile
+        run: |
+          QUANTS="${{ github.event.inputs.quantizations || 'Q4_K_M Q8_0' }}"
+          FIRST_Q=$(echo "$QUANTS" | awk '{print $1}')
+          cp Modelfile ./gguf_build/gguf/Modelfile
+          sed -i "s|./gguf_build/gguf/AVA-v2-Q4_K_M.gguf|./AVA-v2-${FIRST_Q}.gguf|" ./gguf_build/gguf/Modelfile
+
+      - name: List outputs
+        run: |
+          echo "=== GGUF Build Outputs ==="
+          ls -lh ./gguf_build/gguf/
+          echo ""
+          echo "To use locally with Ollama:"
+          echo "  ollama create ava-v2 -f Modelfile"
+          echo "  ollama run ava-v2"
+
+      - name: Upload GGUF as GitHub artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AVA-v2-GGUF
+          path: |
+            ./gguf_build/gguf/AVA-v2-*.gguf
+            ./gguf_build/gguf/Modelfile
+          retention-days: 90
+
+      - name: Attach to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for f in ./gguf_build/gguf/AVA-v2-*.gguf; do
+            echo "Uploading $(basename $f) to release..."
+            gh release upload "${{ github.event.release.tag_name }}" "$f" --clobber
+          done
+          gh release upload "${{ github.event.release.tag_name }}" ./gguf_build/gguf/Modelfile --clobber
+
+      - name: Upload to HuggingFace
+        if: github.event.inputs.upload_hf != 'false'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python - <<'PYEOF'
+          import os
+          from pathlib import Path
+          from huggingface_hub import HfApi, login
+
+          token = os.environ.get("HF_TOKEN", "")
+          if not token:
+              print("HF_TOKEN not set, skipping HuggingFace upload")
+              exit(0)
+
+          login(token=token)
+          api = HfApi()
+          repo_id = os.environ["HF_GGUF_REPO"]
+
+          api.create_repo(repo_id, exist_ok=True, repo_type="model")
+
+          gguf_dir = Path("./gguf_build/gguf")
+          for f in sorted(gguf_dir.glob("AVA-v2-*.gguf")):
+              print(f"Uploading {f.name} ({f.stat().st_size / 1e6:.0f} MB)...")
+              api.upload_file(
+                  path_or_fileobj=str(f),
+                  path_in_repo=f.name,
+                  repo_id=repo_id,
+              )
+
+          modelfile = gguf_dir / "Modelfile"
+          if modelfile.exists():
+              api.upload_file(
+                  path_or_fileobj=str(modelfile),
+                  path_in_repo="Modelfile",
+                  repo_id=repo_id,
+              )
+
+          readme = (
+              "---\n"
+              "library_name: llama.cpp\n"
+              "base_model: Qwen/Qwen3.5-2B\n"
+              "license: apache-2.0\n"
+              "tags:\n"
+              "  - gguf\n"
+              "  - ollama\n"
+              "  - qwen\n"
+              "  - qlora\n"
+              "  - low-resource\n"
+              "language:\n"
+              "  - en\n"
+              "pipeline_tag: text-generation\n"
+              "---\n\n"
+              "# AVA v2 — GGUF\n\n"
+              "GGUF quantizations of [AVA v2](https://huggingface.co/NAME0x0/AVA-v2), "
+              "a QLoRA fine-tune of Qwen3.5-2B achieving **79% ARC-Challenge** and "
+              "**48% GSM8K** on a 4 GB VRAM laptop GPU.\n\n"
+              "## Available Quantizations\n\n"
+              "| File | Quant | Size | Notes |\n"
+              "|---|---|---|---|\n"
+              "| AVA-v2-Q4_K_M.gguf | Q4_K_M | ~1.5 GB | Recommended |\n"
+              "| AVA-v2-Q8_0.gguf | Q8_0 | ~2.0 GB | Near-lossless |\n\n"
+              "## Usage with Ollama\n\n"
+              "```bash\n"
+              "# Download the GGUF and Modelfile, then:\n"
+              "ollama create ava-v2 -f Modelfile\n"
+              "ollama run ava-v2\n"
+              "```\n\n"
+              "## Usage with llama.cpp\n\n"
+              "```bash\n"
+              "./llama-cli -m AVA-v2-Q4_K_M.gguf -p \"Explain why ice floats on water.\" -n 512\n"
+              "```\n\n"
+              "## Source\n\n"
+              "- Original adapter: [NAME0x0/AVA-v2](https://huggingface.co/NAME0x0/AVA-v2)\n"
+              "- Training code: [github.com/NAME0x0/AVA](https://github.com/NAME0x0/AVA)\n"
+          )
+          api.upload_file(
+              path_or_fileobj=readme.encode(),
+              path_in_repo="README.md",
+              repo_id=repo_id,
+          )
+          print(f"\nUploaded to https://huggingface.co/{repo_id}")
+          PYEOF
