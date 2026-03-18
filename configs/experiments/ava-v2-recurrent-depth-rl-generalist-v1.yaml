@@ -1,0 +1,50 @@
+name: ava-v2-recurrent-depth-rl-generalist-v1
+tokenizer:
+  kind: byte
+  vocab_size: 260
+
+model:
+  block_size: 384
+  n_layer: 6
+  n_head: 6
+  n_embd: 384
+  dropout: 0.0
+  bias: false
+  architecture: recurrent_depth
+  loop_repeats: 4
+  recurrent_prelude_layers: 1
+  recurrent_coda_layers: 1
+
+training:
+  device: cuda
+  dtype: bfloat16
+  micro_batch_size: 1
+  gradient_accumulation_steps: 1
+  learning_rate: 0.00002
+  weight_decay: 0.0
+  max_steps: 256
+  warmup_steps: 16
+  grad_clip: 1.0
+  loss_mode: verifiable_rl
+  init_checkpoint: sessions/2026-03-16-091506-ava-v2-posttrain-assistant-v1-1024/checkpoints/ava-v2-recurrent-depth-posttrain-mix-v2-stable.pt
+  trainable_patterns:
+    - prelude.
+    - blocks.
+    - coda.
+    - loop_step_embeddings
+    - ln_f
+  rl_group_size: 4
+  rl_temperature: 0.8
+  rl_max_new_tokens: 24
+  rl_kl_beta: 0.0
+  rl_task_count: 160
+
+memory:
+  enabled: true
+  max_items: 256
+  write_surprise_threshold: 0.45
+  top_k: 4
+
+tools:
+  calculator: true
+  prompt_protocol: compact_tags

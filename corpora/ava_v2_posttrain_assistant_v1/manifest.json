@@ -1,0 +1,52 @@
+{
+  "curriculum": "ava_v2_posttrain_mix",
+  "seed": 1337,
+  "total_examples": 2106,
+  "source_limits": {
+    "teacher_distill": 103,
+    "public_benchmark": 0,
+    "public_science": 0,
+    "math_reasoning": 102,
+    "general_sft": 59,
+    "guardrails": 26,
+    "tool_repair": 23,
+    "public_reasoning": 103
+  },
+  "source_repeats": {
+    "teacher_distill": 6,
+    "public_benchmark": 1,
+    "public_science": 1,
+    "math_reasoning": 4,
+    "general_sft": 4,
+    "guardrails": 6,
+    "tool_repair": 12,
+    "public_reasoning": 4
+  },
+  "source_counts": {
+    "teacher_distill": 618,
+    "public_benchmark": 0,
+    "public_science": 0,
+    "math_reasoning": 408,
+    "general_sft": 236,
+    "guardrails": 156,
+    "tool_repair": 276,
+    "public_reasoning": 412
+  },
+  "by_kind": {
+    "science_mc": 160,
+    "commonsense_mc": 80,
+    "math_word": 310,
+    "trace": 58,
+    "tool_direct": 58,
+    "tool_direct_variant": 128,
+    "general": 188,
+    "no_tool": 172,
+    "boundary": 96,
+    "refusal": 64,
+    "format": 88,
+    "math_reasoning_support": 408,
+    "unknown": 236,
+    "trace_variant": 60
+  },
+  "examples_path": "corpora\\ava_v2_posttrain_assistant_v1\\examples.jsonl"
+}

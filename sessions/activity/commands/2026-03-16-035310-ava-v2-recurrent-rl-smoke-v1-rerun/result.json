@@ -1,0 +1,17 @@
+{
+  "label": "ava-v2-recurrent-rl-smoke-v1-rerun",
+  "command": "python -m ava.cli rl run configs/experiments/ava-v2-recurrent-depth-rl-smoke.yaml --checkpoint-root sessions/2026-03-16-ava-v2-recurrent-rl-smoke-v1/checkpoints",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "rl",
+    "run",
+    "configs/experiments/ava-v2-recurrent-depth-rl-smoke.yaml",
+    "--checkpoint-root",
+    "sessions/2026-03-16-ava-v2-recurrent-rl-smoke-v1/checkpoints"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 12770
+}

@@ -110,3 +110,38 @@ def test_budget_uses_tokenizer_artifact_vocab_size() -> None:
     estimate = estimate_budget(config)
     assert estimate.parameters == config.model.estimated_parameters(int(artifact["vocab_size"]))
     shutil.rmtree(root)
+
+
+def test_recurrent_depth_budget_trades_parameters_for_compute() -> None:
+    base = ExperimentConfig.from_dict(
+        {
+            "name": "base",
+            "tokenizer": {"kind": "byte", "vocab_size": 260},
+            "model": {"block_size": 64, "n_layer": 8, "n_head": 2, "n_embd": 64, "dropout": 0.0, "bias": False},
+            "training": {"device": "cpu", "dtype": "float32", "micro_batch_size": 1, "gradient_accumulation_steps": 1},
+        }
+    )
+    recurrent = ExperimentConfig.from_dict(
+        {
+            "name": "recurrent",
+            "tokenizer": {"kind": "byte", "vocab_size": 260},
+            "model": {
+                "block_size": 64,
+                "n_layer": 2,
+                "n_head": 2,
+                "n_embd": 64,
+                "dropout": 0.0,
+                "bias": False,
+                "architecture": "recurrent_depth",
+                "loop_repeats": 4,
+                "recurrent_prelude_layers": 1,
+                "recurrent_coda_layers": 1,
+            },
+            "training": {"device": "cpu", "dtype": "float32", "micro_batch_size": 1, "gradient_accumulation_steps": 1},
+        }
+    )
+    base_budget = estimate_budget(base)
+    recurrent_budget = estimate_budget(recurrent)
+    assert recurrent.model.effective_layers() > base.model.effective_layers()
+    assert recurrent_budget.parameters < base_budget.parameters
+    assert recurrent_budget.fits_4gb is True

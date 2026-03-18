@@ -1,0 +1,463 @@
+{
+  "model": "Qwen3.5-2B",
+  "quantization": "4bit-nf4-double",
+  "benchmark": "gsm8k",
+  "mode": "no_think",
+  "limit": 50,
+  "accuracy": 0.04,
+  "correct": 2,
+  "total": 50,
+  "elapsed_seconds": 960.3,
+  "results": [
+    {
+      "task_id": "0",
+      "expected": "18",
+      "expected_number": "18",
+      "pred_number": "1",
+      "matched": false,
+      "generated": "To find out how much Janet makes at the farmers' market, we need to calculate the number of eggs remaining after her morning consumption and the total revenue from selling them.\n\n1.  **Calculate total",
+      "time": 20.3
+    },
+    {
+      "task_id": "1",
+      "expected": "3",
+      "expected_number": "3",
+      "pred_number": "3.",
+      "matched": false,
+      "generated": "To find the total number of bolts the robe takes, we need to calculate the sum of the blue fiber bolts and the white fiber bolts.\n\n1.  **Identify the number of blue fiber bolts:** The problem states t",
+      "time": 20.1
+    },
+    {
+      "task_id": "2",
+      "expected": "70000",
+      "expected_number": "70000",
+      "pred_number": "2",
+      "matched": false,
+      "generated": "To find the profit Josh made, we need to calculate the total cost of the house and the total value of the house after the repairs, then find the difference.\n\n**Step 1: Calculate the total initial cost",
+      "time": 18.9
+    },
+    {
+      "task_id": "3",
+      "expected": "540",
+      "expected_number": "540",
+      "pred_number": "180",
+      "matched": false,
+      "generated": "To find the total number of meters James runs in a week, we need to multiply the number of sprints by the distance of each sprint.\n\n1.  **Identify the number of sprints per week:** James runs 3 sprint",
+      "time": 18.7
+    },
+    {
+      "task_id": "4",
+      "expected": "20",
+      "expected_number": "20",
+      "pred_number": "4.",
+      "matched": false,
+      "generated": "To find the total amount of feed Wendi needs for the final meal of the day, we can break down the problem into logical steps:\n\n1.  **Identify the daily schedule**: The problem states that Wendi feeds ",
+      "time": 18.8
+    },
+    {
+      "task_id": "5",
+      "expected": "64",
+      "expected_number": "64",
+      "pred_number": "3.00",
+      "matched": false,
+      "generated": "To find the total cost Kylar needs to pay, we need to calculate the cost of the first glass and the cost of the remaining glasses based on the pricing rule provided.\n\n**Step 1: Calculate the cost of t",
+      "time": 21.1
+    },
+    {
+      "task_id": "6",
+      "expected": "260",
+      "expected_number": "260",
+      "pred_number": "2",
+      "matched": false,
+      "generated": "Let $S$ be the number of sheep in Seattle.\nLet $C$ be the number of sheep in Charleston.\nLet $T$ be the number of sheep in Toulouse.\n\nFrom the problem statement, we have the following relationships:\n1",
+      "time": 21.9
+    },
+    {
+      "task_id": "7",
+      "expected": "160",
+      "expected_number": "160",
+      "pred_number": "2",
+      "matched": false,
+      "generated": "To find the total time Carla takes to download the file, we need to break the process into two phases: the initial download and the restart phase.\n\n**Step 1: Calculate the time for the first download.",
+      "time": 21.1
+    },
+    {
+      "task_id": "8",
+      "expected": "45",
+      "expected_number": "45",
+      "pred_number": "180",
+      "matched": false,
+      "generated": "To find the distance John is from home at the end of the 4 hours, we need to calculate the total distance traveled by breaking the trip down into segments based on the given speeds and time intervals.",
+      "time": 20.8
+    },
+    {
+      "task_id": "9",
+      "expected": "460",
+      "expected_number": "460",
+      "pred_number": "45",
+      "matched": false,
+      "generated": "To find Eliza's total earnings for the week, we need to calculate her earnings for the regular hours and the overtime hours separately, then sum them up.\n\n**Step 1: Calculate earnings for the regular ",
+      "time": 18.8
+    },
+    {
+      "task_id": "10",
+      "expected": "366",
+      "expected_number": "366",
+      "pred_number": "3",
+      "matched": false,
+      "generated": "To find the total number of downloads over the three months, we need to calculate the downloads for each month and then sum them up.\n\n**Step 1: Calculate downloads for the first month.**\nThe problem s",
+      "time": 20.5
+    },
+    {
+      "task_id": "11",
+      "expected": "694",
+      "expected_number": "694",
+      "pred_number": "3",
+      "matched": false,
+      "generated": "To find the total cost, we need to calculate the cost for each type of pastry and then sum them up.\n\n1.  **Donuts**:\n    *   Quantity: 3 dozen\n    *   Price per dozen: $68\n    *   Total cost for donut",
+      "time": 21.3
+    },
+    {
+      "task_id": "12",
+      "expected": "13",
+      "expected_number": "13",
+      "pred_number": "2",
+      "matched": false,
+      "generated": "To determine how many years it will take before Carlos starts earning money, we need to calculate the break-even point. This occurs when the total cost of planting and maintenance equals the total rev",
+      "time": 19.2
+    },
+    {
+      "task_id": "13",
+      "expected": "18",
+      "expected_number": "18",
+      "pred_number": "3",
+      "matched": false,
+      "generated": "Let $x$ be the total number of vacuum cleaners Melanie started with.\n\n1.  **Green House Sales**: She sold $\\frac{1}{3}$ of her vacuum cleaners.\n    *   Remaining after Green House: $x - \\frac{1}{3}x =",
+      "time": 18.4
+    },
+    {
+      "task_id": "14",
+      "expected": "60",
+      "expected_number": "60",
+      "pred_number": "16",
+      "matched": false,
+      "generated": "To find the percentage of students enrolled in hip-hop dance, we will break down the problem step by step:\n\n1.  **Total number of students**: 20.\n2.  **Contemporary dance enrollment**: 20% of the tota",
+      "time": 18.9
+    },
+    {
+      "task_id": "15",
+      "expected": "125",
+      "expected_number": "125",
+      "pred_number": "0.025",
+      "matched": false,
+      "generated": "To find the profit for each purchase plan, we need to calculate the percentage increase for each item and then determine the profit based on the initial investment.\n\n**Step 1: Calculate the profit for",
+      "time": 20.0
+    },
+    {
+      "task_id": "16",
+      "expected": "230",
+      "expected_number": "230",
+      "pred_number": "3",
+      "matched": false,
+      "generated": "To find the total distance covered by each train over the two days, we need to sum the distances traveled in each day.\n\n**Step 1: Calculate the distance traveled on the first day.**\nThe problem states",
+      "time": 19.1
+    },
+    {
+      "task_id": "17",
+      "expected": "57500",
+      "expected_number": "57500",
+      "pred_number": "15",
+      "matched": false,
+      "generated": "To calculate Jill's annual salary, we need to determine her total earnings from both her teaching job and her cheerleading coaching job, then multiply by the number of weeks in a year.\n\n**Step 1: Calc",
+      "time": 18.9
+    },
+    {
+      "task_id": "18",
+      "expected": "7",
+      "expected_number": "7",
+      "pred_number": "3.",
+      "matched": false,
+      "generated": "To find the total number of dozens of eggs Claire eats in 4 weeks, we need to break down the problem into steps:\n\n1.  **Calculate the number of eggs per week:**\n    Claire makes 3 egg omelets every mo",
+      "time": 18.5
+    },
+    {
+      "task_id": "19",
+      "expected": "6",
+      "expected_number": "6",
+      "pred_number": "4",
+      "matched": false,
+      "generated": "To find the required speed for the remaining distance, we need to determine the total time required to complete the entire trail and the time already spent.\n\n1.  **Calculate the total distance:**\n    ",
+      "time": 19.0
+    },
+    {
+      "task_id": "20",
+      "expected": "15",
+      "expected_number": "15",
+      "pred_number": "2",
+      "matched": false,
+      "generated": "To find the amount of water in the remaining mixture, we need to calculate the initial amount of water in each drink, subtract the spilled amount, and then sum the remaining water.\n\n**Step 1: Calculat",
+      "time": 19.2
+    },
+    {
+      "task_id": "21",
+      "expected": "14",
+      "expected_number": "14",
+      "pred_number": "23.",
+      "matched": false,
+      "generated": "To find out how many years ago Raymond's son was born, we can set up an equation based on the ages of the individuals involved.\n\n1.  **Identify the current ages:**\n    *   Samantha is currently 31 yea",
+      "time": 18.7
+    },
+    {
+      "task_id": "22",
+      "expected": "7",
+      "expected_number": "7",
+      "pred_number": "3",
+      "matched": false,
+      "generated": "To find the total number of DVDs Billy sold on Tuesday, we need to calculate the sales for each group of customers and sum them up.\n\n1.  **First 3 customers**: The problem states that \"His first 3 cus",
+      "time": 19.4
+    },
+    {
+      "task_id": "23",
+      "expected": "8",
+      "expected_number": "8",
+      "pred_number": "2",
+      "matched": false,
+      "generated": "To find the total length of the candle that has melted, we first need to determine the total duration of the burning period.\n\n1.  **Calculate the duration:**\n    The time period starts at 1:00 PM and ",
+      "time": 19.0
+    },
+    {
+      "task_id": "24",
+      "expected": "26",
+      "expected_number": "26",
+      "pred_number": "25",
+      "matched": false,
+      "generated": "To find the original price of the book, we can set up an equation where the discount amount is 25% of the original price.\n\n1.  **Identify the given values:**\n    *   Discounted Price = $19.50\n    *   ",
+      "time": 18.8
+    },
+    {
+      "task_id": "25",
+      "expected": "2",
+      "expected_number": "2",
+      "pred_number": "1",
+      "matched": false,
+      "generated": "To find the number of boxes of pizza Marie ordered, we need to subtract the cost of the other items from the total amount paid.\n\n1.  **Calculate the cost of the chicken meal:**\n    $12\n\n2.  **Calculat",
+      "time": 18.4
+    },
+    {
+      "task_id": "26",
+      "expected": "243",
+      "expected_number": "243",
+      "pred_number": "3",
+      "matched": false,
+      "generated": "To find the total amount Mishka spent, we need to calculate the cost of each category of clothing and then sum them up.\n\n1.  **Shorts**: Mishka bought 3 pairs.\n    *   Cost per pair: $16.50\n    *   To",
+      "time": 18.5
+    },
+    {
+      "task_id": "27",
+      "expected": "16",
+      "expected_number": "16",
+      "pred_number": "60",
+      "matched": false,
+      "generated": "To find the total cost Cynthia spends on ice cream after 60 days, we can break down the problem into the following steps:\n\n1.  **Identify the daily consumption rate**: Cynthia eats one serving of ice ",
+      "time": 18.9
+    },
+    {
+      "task_id": "28",
+      "expected": "25",
+      "expected_number": "25",
+      "pred_number": "60",
+      "matched": false,
+      "generated": "To find the distance between Henry's first and second stops, we can set up a simple equation based on the total distance of the trip.\n\n1.  **Identify the total distance:** The trip is 60 miles long.\n2",
+      "time": 18.6
+    },
+    {
+      "task_id": "29",
+      "expected": "104",
+      "expected_number": "104",
+      "pred_number": "33.",
+      "matched": false,
+      "generated": "Let $B$ be the cost of the boots.\nLet $H_1$ be the cost of the first pair of heels.\nLet $H_2$ be the cost of the second pair of heels.\n\nWe are given the following information:\n1.  Gloria has to choose",
+      "time": 18.9
+    },
+    {
+      "task_id": "30",
+      "expected": "109",
+      "expected_number": "109",
+      "pred_number": "3.",
+      "matched": false,
+      "generated": "1. **Define the variables:**\n   Let $D$ be Darrell's current age.\n   Let $A$ be Allen's current age.\n\n2. **Set up the ratio equation:**\n   The problem states that the ratio of their ages is $7:11$.\n  ",
+      "time": 19.1
+    },
+    {
+      "task_id": "31",
+      "expected": "80",
+      "expected_number": "80",
+      "pred_number": "3.",
+      "matched": false,
+      "generated": "To find the average guess, we first need to determine the specific number of jelly beans each friend suggests.\n\n1.  **First guess**: Gunter's friend says **80**.\n2.  **Second guess**: This friend says",
+      "time": 18.4
+    },
+    {
+      "task_id": "32",
+      "expected": "35",
+      "expected_number": "35",
+      "pred_number": "5",
+      "matched": false,
+      "generated": "To find the total number of hours John spends taking care of dogs per week, we can break down the problem into two steps:\n\n1.  **Calculate the daily time spent:**\n    John takes care of 10 dogs.\n    E",
+      "time": 19.1
+    },
+    {
+      "task_id": "33",
+      "expected": "70",
+      "expected_number": "70",
+      "pred_number": "30",
+      "matched": false,
+      "generated": "Let $S$ be the number of silver coins and $G$ be the number of gold coins.\nWe are given two equations based on the problem statement:\n1.  $S + G = 110$ (Total number of coins)\n2.  $G = S + 30$ (There ",
+      "time": 19.8
+    },
+    {
+      "task_id": "34",
+      "expected": "23",
+      "expected_number": "23",
+      "pred_number": "40",
+      "matched": false,
+      "generated": "Let $R$ be the number of jewels Raymond has.\nLet $A$ be the number of jewels Aaron has.\nLet $S$ be the number of jewels Siobhan has.\n\nFrom the problem statement, we have the following equations:\n1.  \"",
+      "time": 18.5
+    },
+    {
+      "task_id": "35",
+      "expected": "9",
+      "expected_number": "9",
+      "pred_number": "25",
+      "matched": false,
+      "generated": "To find the total number of points Mike scored, we need to calculate the points scored in each time period and sum them up.\n\n**Step 1: Calculate points scored in the first 20 minutes.**\nThe problem st",
+      "time": 19.3
+    },
+    {
+      "task_id": "36",
+      "expected": "75",
+      "expected_number": "75",
+      "pred_number": "1",
+      "matched": false,
+      "generated": "To find out how much Terry spends on yogurt over 30 days, we can follow these steps:\n\n1.  **Calculate the cost per yogurt:**\n    Terry buys 4 yogurts for $5.00.\n    $$ \\text{Cost per yogurt} = \\frac{5",
+      "time": 20.4
+    },
+    {
+      "task_id": "37",
+      "expected": "2",
+      "expected_number": "2",
+      "pred_number": "160",
+      "matched": false,
+      "generated": "1. **Calculate the total money John earned from selling the Lego sets:**\n   He has 13 Lego sets, and each sells for $15.\n   $$13 \\times \\$15 = \\$195$$\n\n2. **Calculate the total money John spent on vid",
+      "time": 18.8
+    },
+    {
+      "task_id": "38",
+      "expected": "10",
+      "expected_number": "10",
+      "pred_number": "1.5",
+      "matched": false,
+      "generated": "To find John's average speed, we need to calculate the total distance he runs and divide it by the total time he spends running.\n\n**Step 1: Calculate the total distance.**\nJohn runs 60 miles every wee",
+      "time": 18.4
+    },
+    {
+      "task_id": "39",
+      "expected": "18",
+      "expected_number": "18",
+      "pred_number": "2",
+      "matched": false,
+      "generated": "To find the total distance Dana can travel, we need to calculate the distance covered during the running portion and the walking portion separately, then sum them up.\n\n**Step 1: Determine the speed of",
+      "time": 18.6
+    },
+    {
+      "task_id": "40",
+      "expected": "8",
+      "expected_number": "8",
+      "pred_number": "2",
+      "matched": false,
+      "generated": "Let $B$ be the age of Brandon's iPhone, $S$ be the age of Suzy's iPhone, and $Bn$ be the age of Ben's iPhone.\n\nFrom the problem, we have the following relationships:\n1.  $B = 4S$\n2.  $Bn = 2S$\n3.  $S ",
+      "time": 18.5
+    },
+    {
+      "task_id": "41",
+      "expected": "200",
+      "expected_number": "200",
+      "pred_number": "2.",
+      "matched": false,
+      "generated": "To find the maximum distance Polly can stand and still hit the dragon with the gold javelin while holding the sapphire gemstone, we need to compare the reach of the javelin with and without the gemsto",
+      "time": 19.8
+    },
+    {
+      "task_id": "42",
+      "expected": "26",
+      "expected_number": "26",
+      "pred_number": "26",
+      "matched": true,
+      "generated": "To find the number of pieces taken by the guests, we can set up a simple algebraic equation based on the information provided:\n\n1.  **Total pieces baked**: 5 pies $\\times$ 8 pieces per pie = 40 pieces",
+      "time": 18.2
+    },
+    {
+      "task_id": "43",
+      "expected": "48",
+      "expected_number": "48",
+      "pred_number": "2.",
+      "matched": false,
+      "generated": "To find out how many grams you can eat, we first need to determine the calorie content per gram of the chips.\n\n1.  **Calculate calories per gram:**\n    *   Total calories in the bag: 250 calories\n    ",
+      "time": 18.4
+    },
+    {
+      "task_id": "44",
+      "expected": "20",
+      "expected_number": "20",
+      "pred_number": "20",
+      "matched": true,
+      "generated": "To calculate Charlie's net profit, we need to determine the total cost and the total revenue, then subtract the cost from the revenue.\n\n**Step 1: Calculate the total cost.**\n*   **Beeswax:** 20 candle",
+      "time": 18.3
+    },
+    {
+      "task_id": "45",
+      "expected": "104",
+      "expected_number": "104",
+      "pred_number": "5",
+      "matched": false,
+      "generated": "To find the total number of hours Meredith spent writing articles, we need to calculate the number of articles written each day and multiply by the time it takes to write one article.\n\n**Step 1: Calcu",
+      "time": 19.2
+    },
+    {
+      "task_id": "46",
+      "expected": "163",
+      "expected_number": "163",
+      "pred_number": "4.",
+      "matched": false,
+      "generated": "To find the number of Post-it notes in the package, we can set up a simple algebraic equation based on the information provided.\n\n1.  **Identify the initial amount**: Candice started with 80 post-it n",
+      "time": 18.7
+    },
+    {
+      "task_id": "47",
+      "expected": "800",
+      "expected_number": "800",
+      "pred_number": "60.",
+      "matched": false,
+      "generated": "Step 1: Calculate the cost of the blue ties.\nJohn spent $200 on blue ties, and each cost $40.\nNumber of blue ties = $200 / $40 = 5 ties.\n\nStep 2: Calculate the cost of the red ties.\nThe red ties cost ",
+      "time": 18.5
+    },
+    {
+      "task_id": "48",
+      "expected": "8",
+      "expected_number": "8",
+      "pred_number": "12",
+      "matched": false,
+      "generated": "To find the number of pieces Tracy obtained, we need to convert the total length of the wire into the same unit as the length of each piece.\n\n1.  **Identify the given values:**\n    *   Total length of",
+      "time": 18.5
+    },
+    {
+      "task_id": "49",
+      "expected": "30",
+      "expected_number": "30",
+      "pred_number": "4",
+      "matched": false,
+      "generated": "To find the total number of unoccupied units, we first need to determine the total number of units in the building and then subtract the number of occupied units.\n\n1.  **Calculate the total number of ",
+      "time": 18.9
+    }
+  ]
+}

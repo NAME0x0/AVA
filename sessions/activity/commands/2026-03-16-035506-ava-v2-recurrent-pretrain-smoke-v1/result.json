@@ -1,0 +1,18 @@
+{
+  "label": "ava-v2-recurrent-pretrain-smoke-v1",
+  "command": "python -m ava.cli train run configs/experiments/ava-v2-recurrent-depth-smoke.yaml corpora/smoke --max-steps 32",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "train",
+    "run",
+    "configs/experiments/ava-v2-recurrent-depth-smoke.yaml",
+    "corpora/smoke",
+    "--max-steps",
+    "32"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 11522
+}

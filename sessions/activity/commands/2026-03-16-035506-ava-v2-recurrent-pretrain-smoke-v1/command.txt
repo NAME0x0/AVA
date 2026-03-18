@@ -1,0 +1,1 @@
+python -m ava.cli train run configs/experiments/ava-v2-recurrent-depth-smoke.yaml corpora/smoke --max-steps 32

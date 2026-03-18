@@ -10,9 +10,11 @@ from time import monotonic
 from ava.activity import record_activity, render_command, run_logged_command, snapshot_repo_state
 from ava.benchmarks import serialize_benchmark_registry
 from ava.config import load_experiment_config
+from ava.corpus_recipes import materialize_open_mix_corpus, materialize_posttrain_mix_corpus
 from ava.env import load_project_env
 from ava.external_benchmarks import evaluate_external_benchmark, summarize_external_benchmark
 from ava.inspect import trace_checkpoint
+from ava.rl import rl_dry_run_summary, run_verifiable_rl
 from ava.tokenizer_artifacts import (
     build_byte_bpe_artifact,
     build_greedy_byte_piece_artifact,
@@ -102,6 +104,23 @@ def build_parser() -> argparse.ArgumentParser:
     session_memory_transfer.add_argument("--suite", choices=("small", "expanded", "stress"), default="small")
     session_memory_transfer.add_argument("--no-category-gating", action="store_true")
 
+    corpus_parser = subparsers.add_parser("corpus")
+    corpus_subparsers = corpus_parser.add_subparsers(dest="corpus_command", required=True)
+
+    corpus_open_mix = corpus_subparsers.add_parser("materialize-open-mix")
+    corpus_open_mix.add_argument("output")
+    corpus_open_mix.add_argument("--english-limit", type=int, default=20000)
+    corpus_open_mix.add_argument("--math-limit", type=int, default=4000)
+    corpus_open_mix.add_argument("--science-limit", type=int, default=4000)
+    corpus_open_mix.add_argument("--code-limit", type=int, default=374)
+
+    corpus_posttrain = corpus_subparsers.add_parser("materialize-posttrain-mix")
+    corpus_posttrain.add_argument("output")
+    corpus_posttrain.add_argument("--profile", choices=("default", "generalist"), default="default")
+    corpus_posttrain.add_argument("--public-benchmark-limit", type=int, default=6000)
+    corpus_posttrain.add_argument("--public-science-limit", type=int, default=6000)
+    corpus_posttrain.add_argument("--seed", type=int, default=1337)
+
     train_parser = subparsers.add_parser("train")
     train_subparsers = train_parser.add_subparsers(dest="train_command", required=True)
 
@@ -112,6 +131,16 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("config")
     run.add_argument("corpus_root")
     run.add_argument("--max-steps", type=int, default=1000)
+
+    rl_parser = subparsers.add_parser("rl")
+    rl_subparsers = rl_parser.add_subparsers(dest="rl_command", required=True)
+
+    rl_dry_run = rl_subparsers.add_parser("dry-run")
+    rl_dry_run.add_argument("config")
+
+    rl_run = rl_subparsers.add_parser("run")
+    rl_run.add_argument("config")
+    rl_run.add_argument("--checkpoint-root", default="checkpoints")
 
     tokenizer_parser = subparsers.add_parser("tokenizer")
     tokenizer_subparsers = tokenizer_parser.add_subparsers(dest="tokenizer_command", required=True)
@@ -163,7 +192,7 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark_external.add_argument("--device", default="cuda")
     benchmark_external.add_argument("--support-corpus")
     benchmark_external.add_argument("--dense-support-corpus")
-    benchmark_external.add_argument("--retrieval-mode", choices=("baseline", "direct", "nearest", "prompt_support", "support_mc", "hybrid_support_mc", "hybrid_support_ensemble", "dense_hybrid_support_mc", "dense_rerank_support_mc", "sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"), default="baseline")
+    benchmark_external.add_argument("--retrieval-mode", choices=("baseline", "direct", "nearest", "prompt_support", "support_mc", "hybrid_support_mc", "hybrid_support_ensemble", "model_retrieval_ensemble", "dense_hybrid_support_mc", "dense_rerank_support_mc", "sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"), default="baseline")
     benchmark_external.add_argument("--nearest-threshold", type=float, default=0.45)
     benchmark_external.add_argument("--nearest-margin", type=float, default=0.0)
     benchmark_external.add_argument("--support-top-k", type=int, default=2)
@@ -178,6 +207,7 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark_external.add_argument("--router-sparse-margin-max", type=float, default=0.015)
     benchmark_external.add_argument("--router-margin-gap-min", type=float, default=0.0)
     benchmark_external.add_argument("--no-category-gating", action="store_true")
+    benchmark_external.add_argument("--repeat-override", type=int, default=None)
     benchmark_external.add_argument("--output")
 
     activity_parser = subparsers.add_parser("activity")
@@ -342,6 +372,68 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
             "suite": args.suite,
         }
 
+    if args.command == "corpus" and args.corpus_command == "materialize-open-mix":
+        payload = materialize_open_mix_corpus(
+            args.output,
+            english_limit=args.english_limit,
+            math_limit=args.math_limit,
+            science_limit=args.science_limit,
+            code_limit=args.code_limit,
+        )
+        print(json.dumps(payload, indent=2))
+        return 0, {
+            "corpus_command": "materialize-open-mix",
+            "output": args.output,
+            "english_limit": args.english_limit,
+            "math_limit": args.math_limit,
+            "science_limit": args.science_limit,
+            "code_limit": args.code_limit,
+            "english_records": payload.get("english_records"),
+            "math_records": payload.get("math_records"),
+            "science_records": payload.get("science_records"),
+            "code_records": payload.get("code_records"),
+        }
+
+    if args.command == "corpus" and args.corpus_command == "materialize-posttrain-mix":
+        source_limits = {
+            "teacher_distill": 103,
+            "public_benchmark": args.public_benchmark_limit,
+            "public_science": args.public_science_limit,
+            "math_reasoning": 102,
+            "general_sft": 59,
+            "guardrails": 26,
+            "tool_repair": 23,
+            "public_reasoning": 103,
+        }
+        source_repeats = {name: 1 for name in source_limits}
+        if args.profile == "generalist":
+            source_limits["public_benchmark"] = min(args.public_benchmark_limit, 1200)
+            source_limits["public_science"] = min(args.public_science_limit, 800)
+            source_repeats.update({
+                "teacher_distill": 6,
+                "math_reasoning": 4,
+                "general_sft": 4,
+                "guardrails": 6,
+                "tool_repair": 12,
+                "public_reasoning": 4,
+            })
+        payload = materialize_posttrain_mix_corpus(
+            args.output,
+            source_limits=source_limits,
+            source_repeats=source_repeats,
+            seed_value=args.seed,
+        )
+        print(json.dumps(payload, indent=2))
+        return 0, {
+            "corpus_command": "materialize-posttrain-mix",
+            "output": args.output,
+            "profile": args.profile,
+            "public_benchmark_limit": source_limits["public_benchmark"],
+            "public_science_limit": source_limits["public_science"],
+            "seed": args.seed,
+            "total_examples": payload.get("total_examples"),
+        }
+
     if args.command == "train" and args.train_command == "dry-run":
         payload = dry_run_summary(load_experiment_config(args.config))
         print(json.dumps(payload, indent=2))
@@ -354,6 +446,21 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
             "train_command": "run",
             "config": args.config,
             "corpus_root": args.corpus_root,
+            "checkpoint": result.get("checkpoint"),
+        }
+
+    if args.command == "rl" and args.rl_command == "dry-run":
+        payload = rl_dry_run_summary(load_experiment_config(args.config))
+        print(json.dumps(payload, indent=2))
+        return 0, {"rl_command": "dry-run", "config": args.config}
+
+    if args.command == "rl" and args.rl_command == "run":
+        result = run_verifiable_rl(args.config, checkpoint_root=args.checkpoint_root)
+        print(json.dumps(result, indent=2))
+        return 0, {
+            "rl_command": "run",
+            "config": args.config,
+            "checkpoint_root": args.checkpoint_root,
             "checkpoint": result.get("checkpoint"),
         }
 
@@ -468,6 +575,7 @@ def _dispatch(args: argparse.Namespace) -> tuple[int, dict[str, object]]:
             router_dense_margin_min=args.router_dense_margin_min,
             router_sparse_margin_max=args.router_sparse_margin_max,
             router_margin_gap_min=args.router_margin_gap_min,
+            repeat_override=args.repeat_override,
         )
         if args.output:
             Path(args.output).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")

@@ -1,0 +1,19 @@
+{
+  "engine": "sdpa_qlora",
+  "version": "v2_full",
+  "model": "D:/AVA/experiments/exp4_finetune/models/Qwen3.5-2B",
+  "corpus": "D:/AVA/experiments/exp4_finetune/corpora/ava_exp4_finetune_v2_augmented.jsonl",
+  "output": "D:/AVA/experiments/exp4_finetune/models/Qwen3.5-2B-AVA-v2",
+  "trainable_params": 10911744,
+  "total_params": 1892736832,
+  "train_loss": 0.4145159039127749,
+  "train_examples": 20741,
+  "epochs": 1,
+  "elapsed_seconds": 6027.5,
+  "elapsed_minutes": 100.5,
+  "steps_per_second": 0.43,
+  "lora_r": 16,
+  "learning_rate": 0.00015,
+  "max_seq_length": 384,
+  "gpu_memory_gb": 1.81
+}

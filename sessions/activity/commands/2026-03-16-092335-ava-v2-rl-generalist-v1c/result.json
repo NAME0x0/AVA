@@ -1,0 +1,17 @@
+{
+  "label": "ava-v2-rl-generalist-v1c",
+  "command": "python -m ava.cli rl run configs/experiments/ava-v2-recurrent-depth-rl-generalist-v1.yaml --checkpoint-root sessions/2026-03-16-rl-generalist-v1c/checkpoints",
+  "argv": [
+    "python",
+    "-m",
+    "ava.cli",
+    "rl",
+    "run",
+    "configs/experiments/ava-v2-recurrent-depth-rl-generalist-v1.yaml",
+    "--checkpoint-root",
+    "sessions/2026-03-16-rl-generalist-v1c/checkpoints"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 134474
+}

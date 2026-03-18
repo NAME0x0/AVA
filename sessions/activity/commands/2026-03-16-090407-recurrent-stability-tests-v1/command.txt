@@ -1,0 +1,1 @@
+python -m pytest tests/test_model.py tests/test_train.py tests/test_rl.py tests/test_corpus_recipes.py -q

@@ -1,0 +1,6 @@
+python -c "from datasets import load_dataset; specs=[('roneneldan/TinyStories',None,'train[:1]'),('gsm8k','main','train[:1]'),('sciq',None,'train[:1]'),('allenai/openbookqa',None,'train[:1]'),('mbpp',None,'train[:1]')]; import json; rows={};
+for name,subset,split in specs:
+    ds=load_dataset(name, subset, split=split) if subset else load_dataset(name, split=split)
+    row=dict(ds[0])
+    rows[name]={k:type(v).__name__ for k,v in row.items()}
+print(json.dumps(rows, indent=2))"

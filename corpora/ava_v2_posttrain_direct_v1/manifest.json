@@ -1,0 +1,27 @@
+{
+  "curriculum": "ava_v2_posttrain_direct",
+  "total_examples": 2700,
+  "source_counts": {
+    "general_sft": 472,
+    "math_reasoning": 612,
+    "guardrails": 208,
+    "tool_repair": 460,
+    "teacher_direct": 474,
+    "public_reasoning_direct": 474
+  },
+  "by_kind": {
+    "unknown": 472,
+    "math_reasoning_support": 612,
+    "refusal": 80,
+    "tool_direct": 72,
+    "trace": 72,
+    "general": 260,
+    "no_tool": 236,
+    "format": 124,
+    "boundary": 124,
+    "trace_variant": 100,
+    "tool_direct_variant": 176,
+    "math_word": 372
+  },
+  "examples_path": "corpora\\ava_v2_posttrain_direct_v1\\examples.jsonl"
+}

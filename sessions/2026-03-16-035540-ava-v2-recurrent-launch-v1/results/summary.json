@@ -1,0 +1,51 @@
+{
+  "objective": "Stop incremental support-bank tuning and launch AVA-v2 as a recurrent-depth plus verifier-RL architecture branch.",
+  "research_basis": [
+    {
+      "paper": "Scaling up Test-Time Compute with Latent Reasoning: A Recurrent Depth Approach",
+      "url": "https://arxiv.org/abs/2502.05171"
+    },
+    {
+      "paper": "From RAG to Memory: Non-Parametric Continual Learning for Large Language Models",
+      "url": "https://arxiv.org/abs/2502.14802"
+    },
+    {
+      "paper": "RAFT: Adapting Language Model to Domain Specific RAG",
+      "url": "https://arxiv.org/abs/2403.10131"
+    },
+    {
+      "paper": "In-Context Reinforcement Learning for Tool Use in Large Language Models",
+      "url": "https://arxiv.org/abs/2603.08068"
+    },
+    {
+      "paper": "Qwen3 Technical Report",
+      "url": "https://arxiv.org/abs/2505.09388"
+    }
+  ],
+  "implemented": {
+    "recurrent_depth_architecture": "shared recurrent block with prelude/coda scaffold, step embeddings, config support, and budget estimation",
+    "warm_start": "transformer-to-recurrent checkpoint remap",
+    "verifiable_rl": "grouped REINFORCE/GRPO-style scaffold for math/tool tasks with transparent reward logs"
+  },
+  "runs": {
+    "recurrent_pretrain_smoke": "sessions/activity/commands/2026-03-16-035445-ava-v2-recurrent-pretrain-smoke-v1/result.json",
+    "recurrent_rl_smoke": "sessions/activity/commands/2026-03-16-035405-ava-v2-recurrent-rl-smoke-v2/result.json"
+  },
+  "key_results": {
+    "pretrain_smoke": {
+      "parameters": 10847232,
+      "final_loss": 40.0314,
+      "train_eval_loss": 31.8714,
+      "val_loss": 36.284,
+      "tokens_seen": 8192
+    },
+    "rl_smoke": {
+      "optimizer_steps": 16,
+      "best_reward_seen": 1.0,
+      "final_reward_mean": 0.0,
+      "trainable_parameter_count": 7086336
+    }
+  },
+  "decision": "Promote AVA-v2 recurrent-depth plus verifier RL as the new architecture branch. Stop treating support-bank point gains as the mainline research path.",
+  "next_step": "Run a longer recurrent-depth unsupervised pretraining job on a real mixed corpus, then warm-start verifier RL from that checkpoint instead of from the old transformer checkpoint."
+}

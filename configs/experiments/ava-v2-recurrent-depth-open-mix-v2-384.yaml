@@ -1,0 +1,39 @@
+name: ava-v2-recurrent-depth-open-mix-v2-384
+tokenizer:
+  kind: byte
+  vocab_size: 260
+
+model:
+  block_size: 384
+  n_layer: 6
+  n_head: 6
+  n_embd: 384
+  dropout: 0.0
+  bias: false
+  architecture: recurrent_depth
+  loop_repeats: 4
+  recurrent_prelude_layers: 1
+  recurrent_coda_layers: 1
+
+training:
+  device: cuda
+  dtype: bfloat16
+  micro_batch_size: 1
+  gradient_accumulation_steps: 8
+  learning_rate: 0.00012
+  weight_decay: 0.1
+  max_steps: 4096
+  warmup_steps: 64
+  grad_clip: 1.0
+  loss_mode: raw_lm
+  init_checkpoint: sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt
+
+memory:
+  enabled: true
+  max_items: 256
+  write_surprise_threshold: 0.45
+  top_k: 4
+
+tools:
+  calculator: true
+  prompt_protocol: compact_tags

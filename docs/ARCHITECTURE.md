@@ -29,9 +29,11 @@ That distinction matters. The current model code is still text-first, but the be
 - `ava.tokenizer`
   A byte-level baseline tokenizer plus artifact-backed open-tokenizer imports. The byte path is still the stable control; the best compression result so far comes from a Qwen-family tokenizer.
 - `ava.model`
-  A minimal GPT-2 style decoder-only Transformer plus an early looped branch. The current looped implementation is only a scaffold, not yet a faithful recurrent-depth architecture.
+  A minimal GPT-2 style decoder-only Transformer plus a recurrent-depth AVA-v2 branch with shared recurrent blocks and prelude/coda scaffolding. The recurrent branch is now executable, but it still needs longer training before it can claim capability gains.
 - `ava.train`
-  Dry-run sizing plus a simple from-scratch training loop for raw text corpora.
+  Dry-run sizing plus a simple from-scratch training loop for raw text corpora and supervised packets.
+- `ava.rl`
+  A transparent verifier-RL scaffold for grouped math/tool rollouts with reward logging and checkpoint export.
 - `ava.eval`
   Internal smoke eval plus compliance eval.
 - `ava.benchmarks`
@@ -100,7 +102,7 @@ The current evidence points toward three coordinated upgrades:
 - open tokenizer first
   The best measured tokenizer on AVA's real corpora is a Qwen-family tokenizer, cutting token counts to roughly one quarter of the byte baseline on the largest tracked corpus.
 - recurrent-depth student core
-  The strongest recent architecture lead for “more reasoning without more parameters” is latent recurrent depth: a prelude, a shared recurrent block, and a coda. AVA's current looped path is only a rough placeholder and should not be confused with that paper's design.
+  The strongest recent architecture lead for “more reasoning without more parameters” is latent recurrent depth: a prelude, a shared recurrent block, and a coda. AVA now has an executable recurrent-depth branch with transformer-to-recurrent warm-start support, but it still needs longer unsupervised pretraining before it can replace the v1 checkpoint.
 - structured retrieval and memory
   AVA's public benchmark wins are coming faster from better retrieval than from checkpoint surgery. The next retrieval target is not another flat nearest-neighbor tweak, but a more structured memory layer that can combine sparse, dense, and graph-style propagation.
 
@@ -108,4 +110,5 @@ The current evidence points toward three coordinated upgrades:
 
 - Late tokenizer migration is not working on the current byte-trained checkpoint. Tokenizer improvement belongs early in AVA-v2, not late in AVA-v1.
 - Naive loop repetition is not enough. The failed looped runs show that AVA needs a cleaner recurrent design and curriculum if loops are going to matter.
-- Retrieval quality matters more than small weight patches on public science MCQ. That is why the best current public path is a routed sparse+dense system rather than a newly fine-tuned checkpoint.
+- Retrieval quality matters more than small weight patches on public science MCQ. The strongest current public ARC path is now a science-first sparse ensemble, and that should be treated as the retrieval control while AVA-v2 retrains the student core.
+- Verifier RL needs interface discipline. The first recurrent RL smoke only became non-degenerate after aligning prompts with the checkpoint's learned `Question:` / `Answer:` format.

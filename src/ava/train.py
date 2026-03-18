@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import time
 from contextlib import nullcontext
 from pathlib import Path
@@ -159,6 +160,11 @@ def _sample_supervised_batch(samples: list[dict[str, list[int]]], batch_size: in
 def _lr_for_step(config: ExperimentConfig, step: int) -> float:
     if step < config.training.warmup_steps:
         return config.training.learning_rate * ((step + 1) / max(config.training.warmup_steps, 1))
+    if config.training.lr_schedule == "cosine":
+        decay_steps = max(config.training.max_steps - config.training.warmup_steps, 1)
+        progress = (step - config.training.warmup_steps) / decay_steps
+        min_lr = config.training.learning_rate * config.training.min_lr_ratio
+        return min_lr + 0.5 * (config.training.learning_rate - min_lr) * (1.0 + math.cos(math.pi * progress))
     return config.training.learning_rate
 
 
@@ -243,21 +249,105 @@ def _resize_state_dict_for_block_size(state_dict: dict[str, Any], block_size: in
     return updated
 
 
+def _source_block_indices(state_dict: dict[str, Any]) -> list[int]:
+    indices: set[int] = set()
+    for key in state_dict:
+        if not key.startswith("blocks."):
+            continue
+        parts = key.split(".", 2)
+        if len(parts) < 3:
+            continue
+        if parts[1].isdigit():
+            indices.add(int(parts[1]))
+    return sorted(indices)
+
+
+def _pick_recurrent_source_indices(indices: list[int], count: int) -> list[int]:
+    if count <= 0:
+        return []
+    if not indices:
+        raise RuntimeError("no source transformer blocks available for recurrent warm-start")
+    if count == 1:
+        return [indices[len(indices) // 2]]
+    if len(indices) == count:
+        return list(indices)
+    picks: list[int] = []
+    last_position = len(indices) - 1
+    for slot in range(count):
+        position = round(slot * last_position / max(count - 1, 1))
+        picks.append(indices[position])
+    return picks
+
+
+def _remap_state_dict_for_recurrent_depth(model: Any, state_dict: dict[str, Any], init_model_config: dict[str, Any]) -> dict[str, Any]:
+    if getattr(model.config, "architecture", "transformer") != "recurrent_depth":
+        return state_dict
+    source_architecture = str(init_model_config.get("architecture", "transformer"))
+    if source_architecture not in {"transformer", "looped"}:
+        return state_dict
+    source_indices = _source_block_indices(state_dict)
+    if not source_indices:
+        return state_dict
+    prelude_count = model.config.recurrent_prelude_layers
+    recurrent_count = model.config.n_layer
+    coda_count = model.config.recurrent_coda_layers
+    if len(source_indices) < prelude_count + coda_count + 1:
+        return state_dict
+
+    prelude_sources = source_indices[:prelude_count]
+    coda_sources = source_indices[-coda_count:] if coda_count else []
+    middle_end = len(source_indices) - coda_count if coda_count else len(source_indices)
+    middle_sources = source_indices[prelude_count:middle_end] or source_indices
+    recurrent_sources = _pick_recurrent_source_indices(middle_sources, recurrent_count)
+
+    remapped = {key: value for key, value in state_dict.items() if not key.startswith("blocks.")}
+
+    def copy_block(source_index: int, target_prefix: str) -> None:
+        prefix = f"blocks.{source_index}."
+        for key, value in state_dict.items():
+            if key.startswith(prefix):
+                remapped[target_prefix + key[len(prefix):]] = value
+
+    for target_index, source_index in enumerate(prelude_sources):
+        copy_block(source_index, f"prelude.{target_index}.")
+    for target_index, source_index in enumerate(recurrent_sources):
+        copy_block(source_index, f"blocks.{target_index}.")
+    for target_index, source_index in enumerate(coda_sources):
+        copy_block(source_index, f"coda.{target_index}.")
+    return remapped
+
+
 def _load_init_checkpoint(model: Any, tokenizer: Any, init_checkpoint_path: Path) -> str | None:
     init_payload = torch.load(init_checkpoint_path, map_location="cpu")
     init_state = init_payload["model"]
     init_config = init_payload.get("config", {})
     tokenizer_config = init_config.get("tokenizer", {}) if isinstance(init_config, dict) else {}
+    init_model_config = init_config.get("model", {}) if isinstance(init_config, dict) else {}
     init_tokenizer_kind = str(tokenizer_config.get("kind", "byte"))
     current_tokenizer_kind = getattr(tokenizer, "kind", "byte")
     if model.wte.weight.shape != init_state["wte.weight"].shape or init_tokenizer_kind != current_tokenizer_kind:
         init_state = _expand_state_dict_for_tokenizer(init_state, tokenizer)
-    if "wpe.weight" in init_state and model.wpe.weight.shape != init_state["wpe.weight"].shape:
+    if model.wpe is not None and "wpe.weight" in init_state and model.wpe.weight.shape != init_state["wpe.weight"].shape:
         init_state = _resize_state_dict_for_block_size(init_state, model.config.block_size)
+    if model.wpe is None and "wpe.weight" in init_state:
+        del init_state["wpe.weight"]
+    init_state = _remap_state_dict_for_recurrent_depth(model, init_state, init_model_config)
     missing_keys, unexpected_keys = model.load_state_dict(init_state, strict=False)
-    allowed_missing = {"loop_step_embeddings.weight"} if getattr(model, "loop_step_embeddings", None) is not None else set()
+    allowed_missing: set[str] = set()
+    if getattr(model, "loop_step_embeddings", None) is not None:
+        allowed_missing.add("loop_step_embeddings.weight")
+    if getattr(model, "recurrent_gate_proj", None) is not None:
+        allowed_missing.add("recurrent_gate_proj.weight")
+        allowed_missing.add("recurrent_gate_proj.bias")
+    if getattr(model, "rope_cos", None) is not None:
+        allowed_missing.update(k for k in missing_keys if k.startswith("rope_"))
     disallowed_missing = set(missing_keys) - allowed_missing
-    allowed_unexpected = {"loop_step_embeddings.weight"} if getattr(model, "loop_step_embeddings", None) is None else set()
+    allowed_unexpected: set[str] = set()
+    if getattr(model, "loop_step_embeddings", None) is None:
+        allowed_unexpected.add("loop_step_embeddings.weight")
+    if getattr(model, "recurrent_gate_proj", None) is None:
+        allowed_unexpected.add("recurrent_gate_proj.weight")
+        allowed_unexpected.add("recurrent_gate_proj.bias")
     disallowed_unexpected = set(unexpected_keys) - allowed_unexpected
     if disallowed_missing or disallowed_unexpected:
         raise RuntimeError(

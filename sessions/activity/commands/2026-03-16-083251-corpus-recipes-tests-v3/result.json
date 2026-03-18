@@ -1,0 +1,19 @@
+{
+  "label": "corpus-recipes-tests-v3",
+  "command": "python -m pytest tests/test_corpus_recipes.py tests/test_model.py tests/test_rl.py tests/test_train.py -q --basetemp C:\\Users\\Afsah\\AppData\\Local\\Temp\\ava-pytest-corpus-v3",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_corpus_recipes.py",
+    "tests/test_model.py",
+    "tests/test_rl.py",
+    "tests/test_train.py",
+    "-q",
+    "--basetemp",
+    "C:\\Users\\Afsah\\AppData\\Local\\Temp\\ava-pytest-corpus-v3"
+  ],
+  "returncode": 1,
+  "cwd": "D:\\AVA",
+  "duration_ms": 10385
+}

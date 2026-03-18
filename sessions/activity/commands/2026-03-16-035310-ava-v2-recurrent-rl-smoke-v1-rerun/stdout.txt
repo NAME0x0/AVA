@@ -1,0 +1,203 @@
+{
+  "name": "ava-v2-recurrent-depth-rl-smoke",
+  "device_requested": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "task_count": 48,
+  "task_mix": {
+    "math_final": 16,
+    "tool_direct": 16,
+    "tool_trace": 16
+  },
+  "optimizer_steps": 16,
+  "final_reward_mean": 0.0,
+  "best_reward_seen": 0.0,
+  "trainable_parameter_count": 7086336,
+  "trainable_names": [
+    "prelude.0.ln_1.weight",
+    "prelude.0.ln_1.bias",
+    "prelude.0.attn.c_attn.weight",
+    "prelude.0.attn.c_proj.weight",
+    "prelude.0.ln_2.weight",
+    "prelude.0.ln_2.bias",
+    "prelude.0.mlp.c_fc.weight",
+    "prelude.0.mlp.c_proj.weight",
+    "blocks.0.ln_1.weight",
+    "blocks.0.ln_1.bias",
+    "blocks.0.attn.c_attn.weight",
+    "blocks.0.attn.c_proj.weight",
+    "blocks.0.ln_2.weight",
+    "blocks.0.ln_2.bias",
+    "blocks.0.mlp.c_fc.weight",
+    "blocks.0.mlp.c_proj.weight",
+    "blocks.1.ln_1.weight",
+    "blocks.1.ln_1.bias",
+    "blocks.1.attn.c_attn.weight",
+    "blocks.1.attn.c_proj.weight",
+    "blocks.1.ln_2.weight",
+    "blocks.1.ln_2.bias",
+    "blocks.1.mlp.c_fc.weight",
+    "blocks.1.mlp.c_proj.weight",
+    "coda.0.ln_1.weight",
+    "coda.0.ln_1.bias",
+    "coda.0.attn.c_attn.weight",
+    "coda.0.attn.c_proj.weight",
+    "coda.0.ln_2.weight",
+    "coda.0.ln_2.bias",
+    "coda.0.mlp.c_fc.weight",
+    "coda.0.mlp.c_proj.weight",
+    "loop_step_embeddings.weight",
+    "ln_f.weight",
+    "ln_f.bias"
+  ],
+  "checkpoint": "sessions\\2026-03-16-ava-v2-recurrent-rl-smoke-v1\\checkpoints\\ava-v2-recurrent-depth-rl-smoke.pt",
+  "init_checkpoint": "sessions/2026-03-14-184859-failure-patch-v2-rerun-11m-96/checkpoints/ava-11m-failure-patch-v2.pt",
+  "init_tokenizer_kind": "byte",
+  "elapsed_seconds": 2.59,
+  "history": [
+    {
+      "step": 1,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "49"
+    },
+    {
+      "step": 2,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "37"
+    },
+    {
+      "step": 3,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "38"
+    },
+    {
+      "step": 4,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "12"
+    },
+    {
+      "step": 5,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "19"
+    },
+    {
+      "step": 6,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "19"
+    },
+    {
+      "step": 7,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "38"
+    },
+    {
+      "step": 8,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "24"
+    },
+    {
+      "step": 9,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "12"
+    },
+    {
+      "step": 10,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "24"
+    },
+    {
+      "step": 11,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "49"
+    },
+    {
+      "step": 12,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "12"
+    },
+    {
+      "step": 13,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "9"
+    },
+    {
+      "step": 14,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "24"
+    },
+    {
+      "step": 15,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "54"
+    },
+    {
+      "step": 16,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "",
+      "expected": "33"
+    }
+  ]
+}

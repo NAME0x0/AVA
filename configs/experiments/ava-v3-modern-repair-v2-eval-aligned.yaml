@@ -1,0 +1,46 @@
+name: ava-v3-modern-repair-v2-eval-aligned
+tokenizer:
+  kind: byte
+  vocab_size: 260
+
+model:
+  block_size: 384
+  n_layer: 6
+  n_head: 6
+  n_embd: 384
+  dropout: 0.0
+  bias: false
+  architecture: recurrent_depth
+  loop_repeats: 4
+  recurrent_prelude_layers: 1
+  recurrent_coda_layers: 1
+  norm_type: rmsnorm
+  activation: swiglu
+  position_encoding: rope
+  rope_theta: 10000.0
+  recurrent_gate: true
+
+training:
+  device: cuda
+  dtype: bfloat16
+  micro_batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 0.00001
+  weight_decay: 0.0
+  max_steps: 768
+  warmup_steps: 16
+  grad_clip: 1.0
+  loss_mode: supervised
+  lr_schedule: cosine
+  min_lr_ratio: 0.1
+  init_checkpoint: checkpoints/ava-v3-modern-posttrain-v2-rich.pt
+
+memory:
+  enabled: true
+  max_items: 256
+  write_surprise_threshold: 0.45
+  top_k: 4
+
+tools:
+  calculator: true
+  prompt_protocol: compact_tags

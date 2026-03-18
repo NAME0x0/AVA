@@ -1,0 +1,6 @@
+{
+  "curriculum": "ava_v2_direct_repair",
+  "total_examples": 176,
+  "base_examples": 22,
+  "examples_path": "corpora\\ava_v2_direct_repair_v1\\examples.jsonl"
+}

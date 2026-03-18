@@ -1,0 +1,58 @@
+{
+  "protocol": "compact_tags",
+  "curriculum": "ava_v3_breakthrough_distill",
+  "teacher_model": "claude-opus",
+  "seed": 42,
+  "total_examples": 900,
+  "by_kind": {
+    "boundary": 10,
+    "coding": 50,
+    "english_antonym": 15,
+    "english_grammar": 30,
+    "english_rewrite": 35,
+    "english_summarize": 20,
+    "format_obey": 20,
+    "general_knowledge": 50,
+    "math_direct": 100,
+    "math_word": 200,
+    "no_tool": 10,
+    "reasoning": 50,
+    "refusal": 20,
+    "science_factual": 150,
+    "science_mc": 100,
+    "tool_boundary": 15,
+    "tool_direct": 15,
+    "tool_trace": 10
+  },
+  "by_category": {
+    "coding": 50,
+    "compliance": 65,
+    "general": 50,
+    "language": 100,
+    "math": 300,
+    "reasoning": 50,
+    "science": 250,
+    "tool": 35
+  },
+  "by_difficulty": {
+    "easy": 571,
+    "hard": 51,
+    "medium": 278
+  },
+  "by_format_contract": {
+    "direct_tool_answer": 15,
+    "final_answer_only": 710,
+    "format_exact": 20,
+    "label_only": 100,
+    "refusal_short": 45,
+    "tool_trace_then_answer": 10
+  },
+  "mcq_label_distribution": {
+    "A": 25,
+    "B": 25,
+    "C": 25,
+    "D": 25
+  },
+  "examples_path": "corpora\\ava_v3_breakthrough_distill_v1\\examples.jsonl",
+  "verification_errors": 0
+}

@@ -87,7 +87,7 @@ Current AVA remains a hybrid product stack: compact checkpoint plus transparent 
 
 Sparse MoE remains a research branch for later because the main 4 GB problem is total weight residency, bandwidth, KV/runtime overhead, and training budget, not just FLOPs per token.
 
-Tool RL is also a later branch. Recent HF papers make it more attractive, not more immediate. AVA still needs stable compact tool supervision first.
+Tool RL is no longer just a paper watch item. AVA now has a first verifier-RL scaffold, but it is still a smoke path and should be treated as AVA-v2 infrastructure, not as a solved post-training recipe.
 
 ## Near-Term Experiments
 
@@ -98,11 +98,11 @@ Tool RL is also a later branch. Recent HF papers make it more attractive, not mo
 - `exp-003`
   Distill compact calculator traces with iterative ToolACE-R style filtering.
 - `exp-004`
-  Add verifiable RL only after the model can already solve easy arithmetic, short science QA, and simple code tasks.
+  Turn the new verifier-RL scaffold into a serious branch by warm-starting from a recurrent-depth checkpoint and expanding rewards beyond arithmetic into science, code, and tool-policy verification.
 - `exp-005`
   Enable budget forcing only on hard reasoning prompts.
 - `exp-013`
-  Replace the naive looped baseline with a real recurrent-depth AVA-v2 branch inspired by latent reasoning in shared recurrent blocks.
+  Extend the new recurrent-depth AVA-v2 scaffold into a real training line: longer unsupervised pretraining, warm-start transfer, and recurrent-vs-transformer ablations on public benchmarks.
 - `exp-014`
   Reboot AVA-v2 around a strong open tokenizer, with Qwen-style segmentation as the current lead candidate.
 - `exp-015`

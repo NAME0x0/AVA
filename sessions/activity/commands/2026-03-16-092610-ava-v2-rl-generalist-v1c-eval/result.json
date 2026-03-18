@@ -1,0 +1,12 @@
+{
+  "label": "ava-v2-rl-generalist-v1c-eval",
+  "command": "python -c \"import json; from ava.eval import evaluate_checkpoint, evaluate_tool_use_checkpoint, evaluate_compliance_checkpoint; ckpt=r'sessions/2026-03-16-rl-generalist-v1c/checkpoints/ava-v2-recurrent-depth-rl-generalist-v1.pt'; payload={'benchmark': evaluate_checkpoint(ckpt, requested_device='cuda', max_new_tokens=24), 'tool': evaluate_tool_use_checkpoint(ckpt, requested_device='cuda', max_new_tokens=24), 'compliance': evaluate_compliance_checkpoint(ckpt, requested_device='cuda', max_new_tokens=24)}; print(json.dumps({'benchmark': {'correct': payload['benchmark']['correct'], 'total': payload['benchmark']['total'], 'accuracy': payload['benchmark']['accuracy']}, 'tool': {'correct': payload['tool']['correct'], 'total': payload['tool']['total'], 'accuracy': payload['tool']['accuracy']}, 'compliance': {'correct': payload['compliance']['correct'], 'total': payload['compliance']['total'], 'accuracy': payload['compliance']['accuracy']}}))\"",
+  "argv": [
+    "python",
+    "-c",
+    "import json; from ava.eval import evaluate_checkpoint, evaluate_tool_use_checkpoint, evaluate_compliance_checkpoint; ckpt=r'sessions/2026-03-16-rl-generalist-v1c/checkpoints/ava-v2-recurrent-depth-rl-generalist-v1.pt'; payload={'benchmark': evaluate_checkpoint(ckpt, requested_device='cuda', max_new_tokens=24), 'tool': evaluate_tool_use_checkpoint(ckpt, requested_device='cuda', max_new_tokens=24), 'compliance': evaluate_compliance_checkpoint(ckpt, requested_device='cuda', max_new_tokens=24)}; print(json.dumps({'benchmark': {'correct': payload['benchmark']['correct'], 'total': payload['benchmark']['total'], 'accuracy': payload['benchmark']['accuracy']}, 'tool': {'correct': payload['tool']['correct'], 'total': payload['tool']['total'], 'accuracy': payload['tool']['accuracy']}, 'compliance': {'correct': payload['compliance']['correct'], 'total': payload['compliance']['total'], 'accuracy': payload['compliance']['accuracy']}}))"
+  ],
+  "returncode": 0,
+  "cwd": "D:\\AVA",
+  "duration_ms": 3668
+}

@@ -1,0 +1,11 @@
+{
+  "name": "ava_v3_enhanced_repair_v1",
+  "version": "1.0",
+  "total_examples": 369,
+  "arc_mcq_count": 164,
+  "gsm8k_count": 80,
+  "tool_trace_count": 60,
+  "tool_return_count": 20,
+  "direct_answer_count": 30,
+  "format_compliance_count": 15
+}

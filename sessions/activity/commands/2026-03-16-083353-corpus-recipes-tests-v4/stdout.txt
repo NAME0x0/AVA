@@ -1,0 +1,140 @@
+..F................                                                      [100%]
+================================== FAILURES ===================================
+___________ test_materialize_open_mix_corpus_writes_expected_files ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000016E5F9FA780>
+
+    def test_materialize_open_mix_corpus_writes_expected_files(monkeypatch) -> None:
+        fake = types.ModuleType("datasets")
+    
+        def load_dataset(name: str, *args, split: str):
+            if name == "roneneldan/TinyStories":
+                return [{"text": "Story one."}, {"text": "Story two."}]
+            if name == "gsm8k":
+                return [{"question": "3 + 4?", "answer": "7"}]
+            if name == "sciq":
+                return [{"support": "Water boils at 100C.", "question": "When does water boil?", "correct_answer": "100C"}]
+            if name == "allenai/openbookqa":
+                return [{
+                    "question_stem": "Which star is at the center of the solar system?",
+                    "choices": {"label": ["A", "B", "C", "D"], "text": ["Moon", "Sun", "Mars", "Earth"]},
+                    "answerKey": "B",
+                }]
+            if name == "mbpp":
+                return [{"text": "Square a number.", "code": "def square(x):\n    return x * x"}]
+            raise AssertionError(f"unexpected dataset: {name} {args} {split}")
+    
+        fake.load_dataset = load_dataset
+        monkeypatch.setitem(sys.modules, "datasets", fake)
+    
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+>           manifest = materialize_open_mix_corpus(root, english_limit=2, math_limit=1, science_limit=2, code_limit=1)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_corpus_recipes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\ava\corpus_recipes.py:111: in materialize_open_mix_corpus
+    (root_path / name).write_text(content, encoding="utf-8")
+C:\Program Files\Python313\Lib\pathlib\_local.py:555: in write_text
+    return PathBase.write_text(self, data, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python313\Lib\pathlib\_abc.py:651: in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/Afsah/AppData/Local/Temp/tmprh57i490/english.txt')
+mode = 'w', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       PermissionError: [Errno 13] Permission denied: 'C:\\Users\\Afsah\\AppData\\Local\\Temp\\tmprh57i490\\english.txt'
+
+C:\Program Files\Python313\Lib\pathlib\_local.py:537: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+top = 'C:\\Users\\Afsah\\AppData\\Local\\Temp\\tmprh57i490', topdown = False
+onerror = <function _rmtree_unsafe.<locals>.onerror at 0x0000016E3C003600>
+followlinks = <object object at 0x0000016E5CB101F0>
+
+>   ???
+E   PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Afsah\\AppData\\Local\\Temp\\tmprh57i490'
+
+<frozen os>:369: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000016E5F9FA780>
+
+    def test_materialize_open_mix_corpus_writes_expected_files(monkeypatch) -> None:
+        fake = types.ModuleType("datasets")
+    
+        def load_dataset(name: str, *args, split: str):
+            if name == "roneneldan/TinyStories":
+                return [{"text": "Story one."}, {"text": "Story two."}]
+            if name == "gsm8k":
+                return [{"question": "3 + 4?", "answer": "7"}]
+            if name == "sciq":
+                return [{"support": "Water boils at 100C.", "question": "When does water boil?", "correct_answer": "100C"}]
+            if name == "allenai/openbookqa":
+                return [{
+                    "question_stem": "Which star is at the center of the solar system?",
+                    "choices": {"label": ["A", "B", "C", "D"], "text": ["Moon", "Sun", "Mars", "Earth"]},
+                    "answerKey": "B",
+                }]
+            if name == "mbpp":
+                return [{"text": "Square a number.", "code": "def square(x):\n    return x * x"}]
+            raise AssertionError(f"unexpected dataset: {name} {args} {split}")
+    
+        fake.load_dataset = load_dataset
+        monkeypatch.setitem(sys.modules, "datasets", fake)
+    
+>       with tempfile.TemporaryDirectory() as tmpdir:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_corpus_recipes.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Program Files\Python313\Lib\tempfile.py:950: in __exit__
+    self.cleanup()
+C:\Program Files\Python313\Lib\tempfile.py:954: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+C:\Program Files\Python313\Lib\tempfile.py:934: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+C:\Program Files\Python313\Lib\shutil.py:790: in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python313\Lib\shutil.py:613: in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+<frozen os>:372: in walk
+    ???
+C:\Program Files\Python313\Lib\shutil.py:611: in onerror
+    onexc(os.scandir, err.filename, err)
+C:\Program Files\Python313\Lib\tempfile.py:906: in onexc
+    _resetperms(path)
+C:\Program Files\Python313\Lib\tempfile.py:286: in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = <built-in function chmod>
+path = 'C:\\Users\\Afsah\\AppData\\Local\\Temp\\tmprh57i490', args = (448,)
+
+    def _dont_follow_symlinks(func, path, *args):
+        # Pass follow_symlinks=False, unless not supported on this platform.
+        if func in _os.supports_follow_symlinks:
+>           func(path, *args, follow_symlinks=False)
+E           PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Afsah\\AppData\\Local\\Temp\\tmprh57i490'
+
+C:\Program Files\Python313\Lib\tempfile.py:275: PermissionError
+=========================== short test summary info ===========================
+FAILED tests/test_corpus_recipes.py::test_materialize_open_mix_corpus_writes_expected_files

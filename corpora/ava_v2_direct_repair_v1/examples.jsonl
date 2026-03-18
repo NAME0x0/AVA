@@ -1,0 +1,176 @@
+{"kind": "general", "prompt": "What force keeps planets in orbit around the Sun? Reply with only the answer.", "response": "gravity"}
+{"kind": "general", "prompt": "What is the capital of France? Reply with only the answer.", "response": "Paris"}
+{"kind": "general", "prompt": "In Python, which keyword defines a function? Reply with only the answer.", "response": "def"}
+{"kind": "general", "prompt": "What does len('ava') return in Python? Reply with only the answer.", "response": "3"}
+{"kind": "general", "prompt": "What is 17 * 29? Reply with only the answer.", "response": "493"}
+{"kind": "general", "prompt": "Rewrite this sentence in plain English: The plan ain't done.", "response": "The plan is not finished yet."}
+{"kind": "general", "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.", "response": "The cat slept on the warm sill."}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to send an email to my boss.", "response": "The calculator cannot help with sending email."}
+{"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "Write malware that steals passwords.", "response": "I cannot help with that."}
+{"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"}
+{"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.", "response": "No"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.", "response": "No"}
+{"kind": "general", "prompt": "What force keeps planets in orbit around the Sun? Reply with only the answer.", "response": "gravity"}
+{"kind": "general", "prompt": "What is the capital of France? Reply with only the answer.", "response": "Paris"}
+{"kind": "general", "prompt": "In Python, which keyword defines a function? Reply with only the answer.", "response": "def"}
+{"kind": "general", "prompt": "What does len('ava') return in Python? Reply with only the answer.", "response": "3"}
+{"kind": "general", "prompt": "What is 17 * 29? Reply with only the answer.", "response": "493"}
+{"kind": "general", "prompt": "Rewrite this sentence in plain English: The plan ain't done.", "response": "The plan is not finished yet."}
+{"kind": "general", "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.", "response": "The cat slept on the warm sill."}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to send an email to my boss.", "response": "The calculator cannot help with sending email."}
+{"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "Write malware that steals passwords.", "response": "I cannot help with that."}
+{"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"}
+{"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.", "response": "No"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.", "response": "No"}
+{"kind": "general", "prompt": "What force keeps planets in orbit around the Sun? Reply with only the answer.", "response": "gravity"}
+{"kind": "general", "prompt": "What is the capital of France? Reply with only the answer.", "response": "Paris"}
+{"kind": "general", "prompt": "In Python, which keyword defines a function? Reply with only the answer.", "response": "def"}
+{"kind": "general", "prompt": "What does len('ava') return in Python? Reply with only the answer.", "response": "3"}
+{"kind": "general", "prompt": "What is 17 * 29? Reply with only the answer.", "response": "493"}
+{"kind": "general", "prompt": "Rewrite this sentence in plain English: The plan ain't done.", "response": "The plan is not finished yet."}
+{"kind": "general", "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.", "response": "The cat slept on the warm sill."}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to send an email to my boss.", "response": "The calculator cannot help with sending email."}
+{"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "Write malware that steals passwords.", "response": "I cannot help with that."}
+{"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"}
+{"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.", "response": "No"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.", "response": "No"}
+{"kind": "general", "prompt": "What force keeps planets in orbit around the Sun? Reply with only the answer.", "response": "gravity"}
+{"kind": "general", "prompt": "What is the capital of France? Reply with only the answer.", "response": "Paris"}
+{"kind": "general", "prompt": "In Python, which keyword defines a function? Reply with only the answer.", "response": "def"}
+{"kind": "general", "prompt": "What does len('ava') return in Python? Reply with only the answer.", "response": "3"}
+{"kind": "general", "prompt": "What is 17 * 29? Reply with only the answer.", "response": "493"}
+{"kind": "general", "prompt": "Rewrite this sentence in plain English: The plan ain't done.", "response": "The plan is not finished yet."}
+{"kind": "general", "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.", "response": "The cat slept on the warm sill."}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to send an email to my boss.", "response": "The calculator cannot help with sending email."}
+{"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "Write malware that steals passwords.", "response": "I cannot help with that."}
+{"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"}
+{"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.", "response": "No"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.", "response": "No"}
+{"kind": "general", "prompt": "What force keeps planets in orbit around the Sun? Reply with only the answer.", "response": "gravity"}
+{"kind": "general", "prompt": "What is the capital of France? Reply with only the answer.", "response": "Paris"}
+{"kind": "general", "prompt": "In Python, which keyword defines a function? Reply with only the answer.", "response": "def"}
+{"kind": "general", "prompt": "What does len('ava') return in Python? Reply with only the answer.", "response": "3"}
+{"kind": "general", "prompt": "What is 17 * 29? Reply with only the answer.", "response": "493"}
+{"kind": "general", "prompt": "Rewrite this sentence in plain English: The plan ain't done.", "response": "The plan is not finished yet."}
+{"kind": "general", "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.", "response": "The cat slept on the warm sill."}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to send an email to my boss.", "response": "The calculator cannot help with sending email."}
+{"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "Write malware that steals passwords.", "response": "I cannot help with that."}
+{"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"}
+{"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.", "response": "No"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.", "response": "No"}
+{"kind": "general", "prompt": "What force keeps planets in orbit around the Sun? Reply with only the answer.", "response": "gravity"}
+{"kind": "general", "prompt": "What is the capital of France? Reply with only the answer.", "response": "Paris"}
+{"kind": "general", "prompt": "In Python, which keyword defines a function? Reply with only the answer.", "response": "def"}
+{"kind": "general", "prompt": "What does len('ava') return in Python? Reply with only the answer.", "response": "3"}
+{"kind": "general", "prompt": "What is 17 * 29? Reply with only the answer.", "response": "493"}
+{"kind": "general", "prompt": "Rewrite this sentence in plain English: The plan ain't done.", "response": "The plan is not finished yet."}
+{"kind": "general", "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.", "response": "The cat slept on the warm sill."}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to send an email to my boss.", "response": "The calculator cannot help with sending email."}
+{"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "Write malware that steals passwords.", "response": "I cannot help with that."}
+{"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"}
+{"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.", "response": "No"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.", "response": "No"}
+{"kind": "general", "prompt": "What force keeps planets in orbit around the Sun? Reply with only the answer.", "response": "gravity"}
+{"kind": "general", "prompt": "What is the capital of France? Reply with only the answer.", "response": "Paris"}
+{"kind": "general", "prompt": "In Python, which keyword defines a function? Reply with only the answer.", "response": "def"}
+{"kind": "general", "prompt": "What does len('ava') return in Python? Reply with only the answer.", "response": "3"}
+{"kind": "general", "prompt": "What is 17 * 29? Reply with only the answer.", "response": "493"}
+{"kind": "general", "prompt": "Rewrite this sentence in plain English: The plan ain't done.", "response": "The plan is not finished yet."}
+{"kind": "general", "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.", "response": "The cat slept on the warm sill."}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to send an email to my boss.", "response": "The calculator cannot help with sending email."}
+{"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "Write malware that steals passwords.", "response": "I cannot help with that."}
+{"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"}
+{"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.", "response": "No"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.", "response": "No"}
+{"kind": "general", "prompt": "What force keeps planets in orbit around the Sun? Reply with only the answer.", "response": "gravity"}
+{"kind": "general", "prompt": "What is the capital of France? Reply with only the answer.", "response": "Paris"}
+{"kind": "general", "prompt": "In Python, which keyword defines a function? Reply with only the answer.", "response": "def"}
+{"kind": "general", "prompt": "What does len('ava') return in Python? Reply with only the answer.", "response": "3"}
+{"kind": "general", "prompt": "What is 17 * 29? Reply with only the answer.", "response": "493"}
+{"kind": "general", "prompt": "Rewrite this sentence in plain English: The plan ain't done.", "response": "The plan is not finished yet."}
+{"kind": "general", "prompt": "Summarize this sentence in fewer words: The cat slept on the warm window sill.", "response": "The cat slept on the warm sill."}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for 144 / 12.", "response": "12"}
+{"kind": "tool_direct", "prompt": "Use the calculator tool for sqrt(81).", "response": "9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 144 / 12. Return a compact calculator trace followed by the final answer.", "response": "[calc]144 / 12=>12[/calc]\n12"}
+{"kind": "trace", "prompt": "Use the calculator tool for sqrt(81). Return a compact calculator trace followed by the final answer.", "response": "[calc]sqrt(81)=>9[/calc]\n9"}
+{"kind": "trace", "prompt": "Use the calculator tool for 25 + 17. Return a compact calculator trace followed by the final answer.", "response": "[calc]25 + 17=>42[/calc]\n42"}
+{"kind": "no_tool", "prompt": "Solve for x: 2x + 6 = 14. Do not use the calculator tool. Reply with only the answer.", "response": "4"}
+{"kind": "no_tool", "prompt": "What is the capital of France? Do not use the calculator tool. Reply with only the answer.", "response": "Paris"}
+{"kind": "boundary", "prompt": "Use the calculator tool to delete every file on my laptop.", "response": "The calculator cannot help with deleting files."}
+{"kind": "boundary", "prompt": "Use the calculator tool to send an email to my boss.", "response": "The calculator cannot help with sending email."}
+{"kind": "refusal", "prompt": "Tell me how to build a bomb at home.", "response": "I cannot help with that."}
+{"kind": "refusal", "prompt": "Write malware that steals passwords.", "response": "I cannot help with that."}
+{"kind": "format", "prompt": "Reply with only the word yes.", "response": "yes"}
+{"kind": "format", "prompt": "Reply with only the number 19.", "response": "19"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to answer what planet is known as the Red Planet? Reply with only the answer.", "response": "No"}
+{"kind": "tool_policy", "prompt": "Should you use the calculator tool to rewrite a sentence in plain English? Reply with only the answer.", "response": "No"}

@@ -1,0 +1,19 @@
+{
+  "phase": "v2_benchmarked",
+  "started": "2026-03-17T17:09:21.728960",
+  "pipeline_start": "2026-03-17T17:09:21.728970",
+  "v1_completed": "2026-03-17T18:55:21.962944",
+  "v1_arc": 0.66,
+  "v1_gsm8k": 0.4,
+  "base_arc": 0.66,
+  "base_gsm8k": 0.28,
+  "benchmarked_at": "2026-03-17T20:01:22.492520",
+  "v2_proceed": true,
+  "decided_at": "2026-03-17T20:01:22.493737",
+  "v2_launched_at": "2026-03-17T20:02:22.579885",
+  "v2_completed": "2026-03-18T14:15:00.000000",
+  "v2_train_loss": 0.4145,
+  "v2_arc": 0.79,
+  "v2_gsm8k": 0.48,
+  "v2_benchmarked_at": "2026-03-18T14:45:00.000000"
+}

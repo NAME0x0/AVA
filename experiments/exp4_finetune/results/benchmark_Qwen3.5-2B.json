@@ -1,0 +1,1121 @@
+{
+  "model": "Qwen3.5-2B",
+  "benchmarks": {
+    "arc_challenge": {
+      "accuracy": 0.66,
+      "correct": 66,
+      "total": 100,
+      "elapsed_seconds": 72.8,
+      "results": [
+        {
+          "task_id": "Mercury_SC_407695",
+          "category": "science",
+          "expected": "D",
+          "predicted": "C",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7103565",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "MDSA_2009_5_16",
+          "category": "science",
+          "expected": "D",
+          "predicted": "D",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7027230",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_SC_405487",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7032743",
+          "category": "science",
+          "expected": "C",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7205135",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "MDSA_2007_4_52",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7103215",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_192168",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_SC_412337",
+          "category": "science",
+          "expected": "D",
+          "predicted": "C",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7162838",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7159775",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7195440",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7017990",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "TIMSS_2007_4_pg90",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7198380",
+          "category": "science",
+          "expected": "D",
+          "predicted": "B",
+          "matched": false
+        },
+        {
+          "task_id": "NAEP_2005_8_S11+14",
+          "category": "science",
+          "expected": "B",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_192290",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7192990",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7217053",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7179358",
+          "category": "science",
+          "expected": "B",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "MCAS_2005_8_5",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "MCAS_2000_8_10",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7187915",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7189823",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_405454",
+          "category": "science",
+          "expected": "D",
+          "predicted": "C",
+          "matched": false
+        },
+        {
+          "task_id": "MCAS_2012_5_8",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_SC_LBS10040",
+          "category": "science",
+          "expected": "D",
+          "predicted": "D",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7115063",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "MCAS_2015_8_7",
+          "category": "science",
+          "expected": "B",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_184765",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "ACTAAP_2013_7_17",
+          "category": "science",
+          "expected": "D",
+          "predicted": "D",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7248238",
+          "category": "science",
+          "expected": "D",
+          "predicted": "D",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_SC_410964",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "NYSEDREGENTS_2014_4_4",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "MCAS_8_2015_11",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7183733",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "MDSA_2010_5_18",
+          "category": "science",
+          "expected": "D",
+          "predicted": "D",
+          "matched": true
+        },
+        {
+          "task_id": "LEAP__7_10354",
+          "category": "science",
+          "expected": "D",
+          "predicted": "D",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7282608",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7071365",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_SC_407169",
+          "category": "science",
+          "expected": "D",
+          "predicted": "D",
+          "matched": true
+        },
+        {
+          "task_id": "ACTAAP_2007_7_5",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7207358",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7245893",
+          "category": "science",
+          "expected": "B",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7223038",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_SC_415541",
+          "category": "science",
+          "expected": "D",
+          "predicted": "D",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7236023",
+          "category": "science",
+          "expected": "B",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_417146",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7128695",
+          "category": "science",
+          "expected": "C",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7270008",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7242743",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_SC_400655",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7100695",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "MSA_2013_8_3",
+          "category": "science",
+          "expected": "D",
+          "predicted": "D",
+          "matched": true
+        },
+        {
+          "task_id": "NYSEDREGENTS_2014_4_19",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "MCAS_2013_8_29432",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7042700",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7201705",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "MCAS_1998_8_13",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7138513",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_SC_401663",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "NCEOGA_2013_8_4",
+          "category": "science",
+          "expected": "D",
+          "predicted": "D",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7235813",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7011270",
+          "category": "science",
+          "expected": "B",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7228603",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_SC_400339",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_SC_406705",
+          "category": "science",
+          "expected": "B",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "MCAS_2010_5_11998",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7029505",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_SC_401286",
+          "category": "science",
+          "expected": "B",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7120908",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "MCAS_2010_8_12010",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7008138",
+          "category": "science",
+          "expected": "B",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7018148",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "MCAS_2004_8_28",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_176015",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7189035",
+          "category": "science",
+          "expected": "D",
+          "predicted": "D",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7207410",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7233678",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_SC_402101",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_SC_402104",
+          "category": "science",
+          "expected": "D",
+          "predicted": "D",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7183015",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7238963",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "NYSEDREGENTS_2014_4_14",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7004410",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_SC_406939",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7270200",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "NYSEDREGENTS_2014_8_20",
+          "category": "science",
+          "expected": "2",
+          "predicted": "1",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7135310",
+          "category": "science",
+          "expected": "C",
+          "predicted": "D",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_400885",
+          "category": "science",
+          "expected": "D",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_412551",
+          "category": "science",
+          "expected": "D",
+          "predicted": "B",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7193043",
+          "category": "science",
+          "expected": "B",
+          "predicted": "A",
+          "matched": false
+        },
+        {
+          "task_id": "Mercury_7181685",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        },
+        {
+          "task_id": "LEAP_2006_8_10412",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7215180",
+          "category": "science",
+          "expected": "C",
+          "predicted": "C",
+          "matched": true
+        },
+        {
+          "task_id": "NYSEDREGENTS_2014_8_38",
+          "category": "science",
+          "expected": "1",
+          "predicted": "1",
+          "matched": true
+        },
+        {
+          "task_id": "Mercury_7145513",
+          "category": "science",
+          "expected": "B",
+          "predicted": "B",
+          "matched": true
+        },
+        {
+          "task_id": "MEA_2010_8_11",
+          "category": "science",
+          "expected": "A",
+          "predicted": "A",
+          "matched": true
+        }
+      ]
+    },
+    "gsm8k": {
+      "accuracy": 0.28,
+      "correct": 14,
+      "total": 50,
+      "elapsed_seconds": 2208.9,
+      "results": [
+        {
+          "task_id": "0",
+          "category": "math",
+          "expected": "18",
+          "predicted": "18",
+          "response_snippet": "To find out how much Janet makes at the farmers' market, we need to calculate the number of eggs remaining after her morning consumption and the sales price per egg.\n\n1.  **Calculate total eggs produc",
+          "matched": true
+        },
+        {
+          "task_id": "1",
+          "category": "math",
+          "expected": "3",
+          "predicted": "3",
+          "response_snippet": "1. The problem states that the robe takes 2 bolts of blue fiber.\n2. It also states that it takes half that much white fiber.\n3. To find the amount of white fiber, we calculate half of 2: $2 / 2 = 1$ b",
+          "matched": true
+        },
+        {
+          "task_id": "2",
+          "category": "math",
+          "expected": "70000",
+          "predicted": "195000",
+          "response_snippet": "To find the profit Josh made, we need to calculate the total cost of the house and the total value of the house after the repairs, then find the difference.\n\n**Step 1: Calculate the total initial cost",
+          "matched": false
+        },
+        {
+          "task_id": "3",
+          "category": "math",
+          "expected": "540",
+          "predicted": "180",
+          "response_snippet": "To find the total number of meters James runs in a week, we need to multiply the number of sprints by the distance of each sprint.\n\n1.  **Identify the number of sprints per week:** James runs 3 sprint",
+          "matched": false
+        },
+        {
+          "task_id": "4",
+          "category": "math",
+          "expected": "20",
+          "predicted": "800",
+          "response_snippet": "To find the total amount of feed Wendi needs for the final meal of the day, we can break down the problem into the following steps:\n\n1.  **Identify the daily feeding schedule**: The problem states tha",
+          "matched": false
+        },
+        {
+          "task_id": "5",
+          "category": "math",
+          "expected": "64",
+          "predicted": "5",
+          "response_snippet": "To find the total cost Kylar needs to pay, we need to calculate the cost of the first glass and then the cost of the remaining glasses based on the discount rule.\n\n**Step 1: Calculate the cost of the ",
+          "matched": false
+        },
+        {
+          "task_id": "6",
+          "category": "math",
+          "expected": "260",
+          "predicted": "320",
+          "response_snippet": "Let $S$ be the number of sheep in Seattle.\nLet $C$ be the number of sheep in Charleston.\nLet $T$ be the number of sheep in Toulouse.\n\nFrom the problem statement, we have the following relationships:\n1",
+          "matched": false
+        },
+        {
+          "task_id": "7",
+          "category": "math",
+          "expected": "160",
+          "predicted": "200",
+          "response_snippet": "To find the total time Carla takes to download the file, we need to break the process into two distinct phases: the initial download and the restart phase.\n\n**Phase 1: Initial Download**\n*   **File Si",
+          "matched": false
+        },
+        {
+          "task_id": "8",
+          "category": "math",
+          "expected": "45",
+          "predicted": "2.5",
+          "response_snippet": "To find the total distance John is from home at the end of the 4 hours, we need to calculate the distance covered during each segment of his trip.\n\n**Step 1: Calculate the distance traveled in the fir",
+          "matched": false
+        },
+        {
+          "task_id": "9",
+          "category": "math",
+          "expected": "460",
+          "predicted": "10",
+          "response_snippet": "To find Eliza's total earnings for the week, we need to calculate her earnings for the regular hours and the overtime hours separately, then sum them up.\n\n**Step 1: Calculate earnings for regular hour",
+          "matched": false
+        },
+        {
+          "task_id": "10",
+          "category": "math",
+          "expected": "366",
+          "predicted": "366",
+          "response_snippet": "1. **Calculate the number of downloads in the second month:**\n   The problem states the second month had three times as many downloads as the first month.\n   $60 \\times 3 = 180$ downloads.\n\n2. **Calcu",
+          "matched": true
+        },
+        {
+          "task_id": "11",
+          "category": "math",
+          "expected": "694",
+          "predicted": "68",
+          "response_snippet": "To find the total cost, we need to calculate the cost for each type of pastry and then sum them up.\n\n1.  **Donuts**:\n    *   Quantity: 3 dozen\n    *   Price per dozen: $68\n    *   Total cost for donut",
+          "matched": false
+        },
+        {
+          "task_id": "12",
+          "category": "math",
+          "expected": "13",
+          "predicted": "93",
+          "response_snippet": "To determine how many years it will take before Carlos starts earning money, we need to calculate the break-even point where the total cost of planting and maintenance equals the total revenue from th",
+          "matched": false
+        },
+        {
+          "task_id": "13",
+          "category": "math",
+          "expected": "18",
+          "predicted": "2",
+          "response_snippet": "Let $x$ be the total number of vacuum cleaners Melanie started with.\n\n1.  **Green House Sales**: She sold $\\frac{1}{3}$ of her vacuum cleaners.\n    *   Remaining after Green House: $x - \\frac{1}{3}x =",
+          "matched": false
+        },
+        {
+          "task_id": "14",
+          "category": "math",
+          "expected": "60",
+          "predicted": "60",
+          "response_snippet": "To find the percentage of students enrolled in hip-hop dance, we will break down the problem step by step:\n\n1.  **Total Students**: There are 20 students in the class.\n2.  **Contemporary Dance Enrollm",
+          "matched": true
+        },
+        {
+          "task_id": "15",
+          "category": "math",
+          "expected": "125",
+          "predicted": "125",
+          "response_snippet": "To determine the profit for each purchase plan, we need to calculate the percentage increase in the value of each item based on the given market growth rates. The profit is the difference between the ",
+          "matched": true
+        },
+        {
+          "task_id": "16",
+          "category": "math",
+          "expected": "230",
+          "predicted": "80",
+          "response_snippet": "To find the total distance covered by each train over the two days, we need to sum the distances traveled in each day.\n\n**Step 1: Calculate the distance traveled on the first day.**\nThe problem states",
+          "matched": false
+        },
+        {
+          "task_id": "17",
+          "category": "math",
+          "expected": "57500",
+          "predicted": "20",
+          "response_snippet": "To calculate Jill's annual salary, we need to determine her total earnings from both her teaching job and her cheerleading coaching job, then multiply by the number of weeks in a year.\n\n**Step 1: Calc",
+          "matched": false
+        },
+        {
+          "task_id": "18",
+          "category": "math",
+          "expected": "7",
+          "predicted": "7",
+          "response_snippet": "1.  **Calculate the total number of eggs in one week:**\n    Claire makes 3 eggs per day.\n    There are 7 days in one week.\n    $3 \\text{ eggs/day} \\times 7 \\text{ days} = 21 \\text{ eggs}$.\n\n2.  **Calc",
+          "matched": true
+        },
+        {
+          "task_id": "19",
+          "category": "math",
+          "expected": "6",
+          "predicted": "12",
+          "response_snippet": "To find the required speed for the remaining distance, we need to determine the total distance, the total time required to achieve the target average speed, and then calculate the speed for the specif",
+          "matched": false
+        },
+        {
+          "task_id": "20",
+          "category": "math",
+          "expected": "15",
+          "predicted": "14.67",
+          "response_snippet": "To find the amount of water in the remaining mixture, we need to calculate the initial water content in each drink, subtract the spilled liquid, and sum the remaining water.\n\n**Step 1: Calculate the i",
+          "matched": false
+        },
+        {
+          "task_id": "21",
+          "category": "math",
+          "expected": "14",
+          "predicted": "23",
+          "response_snippet": "Let $S$ be Samantha's current age and $R$ be Raymond's current age.\nWe are given:\n1.  $S = 31$\n2.  $R = S - 6$\n    So, $R = 31 - 6 = 25$.\n\nRaymond had a son at the age of 23.\nThe age of the son at tha",
+          "matched": false
+        },
+        {
+          "task_id": "22",
+          "category": "math",
+          "expected": "7",
+          "predicted": "7",
+          "response_snippet": "To find out how many DVDs Billy sold on Tuesday, we need to calculate the total number of DVDs sold based on the number of customers and the number of DVDs each customer bought.\n\n**Step 1: Calculate t",
+          "matched": true
+        },
+        {
+          "task_id": "23",
+          "category": "math",
+          "expected": "8",
+          "predicted": "4",
+          "response_snippet": "1. Determine the duration of the burning period:\n   From 1:00 PM to 5:00 PM is a duration of 4 hours.\n\n2. Calculate the total amount of the candle that melts:\n   The candle melts 2 centimeters every h",
+          "matched": false
+        },
+        {
+          "task_id": "24",
+          "category": "math",
+          "expected": "26",
+          "predicted": "19.50",
+          "response_snippet": "To find the original price of the book, we can set up an equation where the discount amount is 25% of the original price.\n\n1.  **Identify the given values:**\n    *   Discounted Price = $19.50\n    *   ",
+          "matched": false
+        },
+        {
+          "task_id": "25",
+          "category": "math",
+          "expected": "2",
+          "predicted": "15",
+          "response_snippet": "To find the number of boxes of pizza Marie ordered, we need to subtract the cost of the known items from the total amount paid and then divide by the cost of one box of pizza.\n\n**Step 1: Calculate the",
+          "matched": false
+        },
+        {
+          "task_id": "26",
+          "category": "math",
+          "expected": "243",
+          "predicted": "16.50",
+          "response_snippet": "To find the total amount Mishka spent, we need to calculate the cost of each category of clothing and then sum them up.\n\n1.  **Shorts**: Mishka bought 3 pairs.\n    *   Cost per pair: $16.50\n    *   To",
+          "matched": false
+        },
+        {
+          "task_id": "27",
+          "category": "math",
+          "expected": "16",
+          "predicted": "16.00",
+          "response_snippet": "To find the total cost Cynthia spends on ice cream after 60 days, we can break down the problem into the following steps:\n\n1.  **Identify the daily consumption**: Cynthia eats one serving of ice cream",
+          "matched": true
+        },
+        {
+          "task_id": "28",
+          "category": "math",
+          "expected": "25",
+          "predicted": "20",
+          "response_snippet": "To find the distance between Henry's first and second stops, we can break down the trip into segments based on the given information.\n\n1.  **Identify the total distance:** The total length of the bike",
+          "matched": false
+        },
+        {
+          "task_id": "29",
+          "category": "math",
+          "expected": "104",
+          "predicted": "99",
+          "response_snippet": "Let $B$ be the cost of the boots in dollars.\nLet $H_1$ be the cost of the first pair of high heels.\nLet $H_2$ be the cost of the second pair of high heels.\n\nAccording to the problem, the two pairs of ",
+          "matched": false
+        },
+        {
+          "task_id": "30",
+          "category": "math",
+          "expected": "109",
+          "predicted": "99",
+          "response_snippet": "1.  **Define the variables:** Let $D$ be Darrell's age and $A$ be Allen's age.\n2.  **Set up the ratio equation:** The problem states the ratio of their ages is $7:11$. Therefore, $\\frac{D}{A} = \\frac{",
+          "matched": false
+        },
+        {
+          "task_id": "31",
+          "category": "math",
+          "expected": "80",
+          "predicted": "100",
+          "response_snippet": "To find the average guess, we first need to determine the specific number of jelly beans each friend suggests based on the information provided.\n\n**Step 1: Determine the first guess.**\nThe first frien",
+          "matched": false
+        },
+        {
+          "task_id": "32",
+          "category": "math",
+          "expected": "35",
+          "predicted": "35",
+          "response_snippet": "1.  **Calculate the daily time spent per dog:**\n    The problem states that each dog takes 0.5 hours a day to walk and take care of their business.\n    $$0.5 \\text{ hours/day}$$\n\n2.  **Calculate the t",
+          "matched": true
+        },
+        {
+          "task_id": "33",
+          "category": "math",
+          "expected": "70",
+          "predicted": "30",
+          "response_snippet": "Let $S$ be the number of silver coins and $G$ be the number of gold coins.\nWe are given two equations based on the problem statement:\n1.  $S + G = 110$ (Total number of coins)\n2.  $G = S + 30$ (There ",
+          "matched": false
+        },
+        {
+          "task_id": "34",
+          "category": "math",
+          "expected": "23",
+          "predicted": "23",
+          "response_snippet": "1.  **Identify Raymond's jewels:**\n    The problem states that Raymond has 40 jewels.\n    $R = 40$\n\n2.  **Calculate Aaron's jewels:**\n    Aaron has 5 more jewels than half of Raymond's jewels.\n    Hal",
+          "matched": true
+        },
+        {
+          "task_id": "35",
+          "category": "math",
+          "expected": "9",
+          "predicted": "4",
+          "response_snippet": "Step 1: Calculate the points scored in the first 20 minutes.\nThe problem states that in the first 20 minutes, Mike scores 4 points.\nPoints (First 20 mins) = 4.\n\nStep 2: Calculate the points scored in ",
+          "matched": false
+        },
+        {
+          "task_id": "36",
+          "category": "math",
+          "expected": "75",
+          "predicted": "5.00",
+          "response_snippet": "Step 1: Determine the cost per yogurt.\nTerry buys 4 yogurts for $5.00.\nCost per yogurt = $5.00 / 4 = $1.25 per yogurt.\n\nStep 2: Calculate the cost for one day.\nTerry eats 2 yogurts a day.\nDaily cost =",
+          "matched": false
+        },
+        {
+          "task_id": "37",
+          "category": "math",
+          "expected": "2",
+          "predicted": "5",
+          "response_snippet": "1.  **Calculate the total money John earned from selling the Lego sets:**\n    He has 13 Lego sets, and each sells for $15.\n    $13 \\times \\$15 = \\$195$.\n\n2.  **Calculate the total money John spent on ",
+          "matched": false
+        },
+        {
+          "task_id": "38",
+          "category": "math",
+          "expected": "10",
+          "predicted": "60",
+          "response_snippet": "To find John's average speed, we need to calculate the total distance he runs and divide it by the total time he spends running.\n\n**Step 1: Calculate the total distance.**\nJohn runs 60 miles every wee",
+          "matched": false
+        },
+        {
+          "task_id": "39",
+          "category": "math",
+          "expected": "18",
+          "predicted": "6",
+          "response_snippet": "To find the total distance Dana can travel, we need to calculate the distance covered during the running portion and the walking portion separately, then sum them up.\n\n**Step 1: Determine the speed of",
+          "matched": false
+        },
+        {
+          "task_id": "40",
+          "category": "math",
+          "expected": "8",
+          "predicted": "8",
+          "response_snippet": "Let $B$ be the age of Brandon's iPhone, $E_B$ be the age of Ben's iPhone, and $E_S$ be the age of Suzy's iPhone.\n\n1.  **Given**: Suzy's iPhone is 1 year old.\n    $$E_S = 1$$\n\n2.  **Given**: Ben's iPho",
+          "matched": true
+        },
+        {
+          "task_id": "41",
+          "category": "math",
+          "expected": "200",
+          "predicted": "200",
+          "response_snippet": "To find the maximum distance Polly can stand and still hit the dragon with the gold javelin while holding the sapphire gemstone, we need to compare the reach of the javelin with and without the gemsto",
+          "matched": true
+        },
+        {
+          "task_id": "42",
+          "category": "math",
+          "expected": "26",
+          "predicted": "8",
+          "response_snippet": "To find the number of pieces taken by the guests, we can set up a simple algebraic equation based on the information provided:\n\n1.  **Total Pies**: Grandma Jones baked 5 pies.\n2.  **Pieces per Pie**: ",
+          "matched": false
+        },
+        {
+          "task_id": "43",
+          "category": "math",
+          "expected": "48",
+          "predicted": "240",
+          "response_snippet": "To find out how many grams you can eat, we first need to determine the calorie content per gram of the chips.\n\n1.  **Calculate the calories per gram:**\n    *   Total calories in the bag: 250 calories\n",
+          "matched": false
+        },
+        {
+          "task_id": "44",
+          "category": "math",
+          "expected": "20",
+          "predicted": "10.00",
+          "response_snippet": "To calculate Charlie's net profit, we need to determine the total cost of supplies and the total revenue from the sales, then subtract the total cost from the total revenue.\n\n**Step 1: Calculate the t",
+          "matched": false
+        },
+        {
+          "task_id": "45",
+          "category": "math",
+          "expected": "104",
+          "predicted": "5",
+          "response_snippet": "To find the total number of hours Meredith spent writing articles, we need to calculate the number of articles written each day and multiply by the time it takes to write one article.\n\n**Step 1: Calcu",
+          "matched": false
+        },
+        {
+          "task_id": "46",
+          "category": "math",
+          "expected": "163",
+          "predicted": "163",
+          "response_snippet": "To find the number of Post-it notes in the package, we can break down the problem into logical steps:\n\n1.  **Calculate the total number of Post-it notes used:**\n    Candice started with 80 notes. She ",
+          "matched": true
+        },
+        {
+          "task_id": "47",
+          "category": "math",
+          "expected": "800",
+          "predicted": "60",
+          "response_snippet": "Step 1: Calculate the cost of the blue ties.\nJohn spent $200 on blue ties, and each cost $40.\nNumber of blue ties = $200 / $40 = 5 ties.\n\nStep 2: Calculate the cost of the red ties.\nThe red ties cost ",
+          "matched": false
+        },
+        {
+          "task_id": "48",
+          "category": "math",
+          "expected": "8",
+          "predicted": "12",
+          "response_snippet": "To find the number of pieces Tracy obtained, we need to convert the total length of the wire into the same unit as the length of each piece.\n\n1.  **Identify the given values:**\n    *   Total length of",
+          "matched": false
+        },
+        {
+          "task_id": "49",
+          "category": "math",
+          "expected": "30",
+          "predicted": "30",
+          "response_snippet": "To find the total number of unoccupied units, we first need to determine the total number of units in the building and then subtract the number of occupied units.\n\n1.  **Calculate the total number of ",
+          "matched": true
+        }
+      ]
+    }
+  }
+}

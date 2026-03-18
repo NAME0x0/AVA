@@ -1,0 +1,84 @@
+'[WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions' thrown while requesting HEAD https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/README.md
+Retrying in 1s [Retry 1/5].
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+    ds=load_dataset(name, subset, split=split) if subset else load_dataset(name, split=split)
+                                                              ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\datasets\load.py", line 1485, in load_dataset
+    builder_instance = load_dataset_builder(
+        path=path,
+    ...<10 lines>...
+        **config_kwargs,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\datasets\load.py", line 1130, in load_dataset_builder
+    dataset_module = dataset_module_factory(
+        path,
+    ...<5 lines>...
+        cache_dir=cache_dir,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\datasets\load.py", line 1029, in dataset_module_factory
+    raise e1 from None
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\datasets\load.py", line 936, in dataset_module_factory
+    dataset_readme_path = api.hf_hub_download(
+        repo_id=path,
+    ...<3 lines>...
+        proxies=download_config.proxies,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\hf_api.py", line 5771, in hf_hub_download
+    return hf_hub_download(
+        repo_id=repo_id,
+    ...<16 lines>...
+        dry_run=dry_run,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\file_download.py", line 986, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+        # Destination
+    ...<15 lines>...
+        dry_run=dry_run,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\file_download.py", line 1119, in _hf_hub_download_to_cache_dir
+    _get_metadata_or_catch_error(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        repo_id=repo_id,
+        ^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+        retry_on_errors=True,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\file_download.py", line 1653, in _get_metadata_or_catch_error
+    metadata = get_hf_file_metadata(
+        url=url,
+    ...<4 lines>...
+        retry_on_errors=retry_on_errors,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\file_download.py", line 1576, in get_hf_file_metadata
+    response = _httpx_follow_relative_redirects_with_backoff(
+        method="HEAD", url=url, headers=hf_headers, timeout=timeout, retry_on_errors=retry_on_errors
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_http.py", line 685, in _httpx_follow_relative_redirects_with_backoff
+    response = http_backoff(
+        method=method,
+    ...<3 lines>...
+        **no_retry_kwargs,
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_http.py", line 559, in http_backoff
+    return next(
+        _http_backoff_base(
+    ...<9 lines>...
+        )
+    )
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\huggingface_hub\utils\_http.py", line 467, in _http_backoff_base
+    response = client.request(method=method, url=url, **kwargs)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 901, in send
+    raise RuntimeError("Cannot send a request, as the client has been closed.")
+RuntimeError: Cannot send a request, as the client has been closed.

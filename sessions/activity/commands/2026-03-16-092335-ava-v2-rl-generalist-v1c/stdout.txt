@@ -1,0 +1,2402 @@
+{
+  "name": "ava-v2-recurrent-depth-rl-generalist-v1",
+  "device_requested": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "task_count": 160,
+  "task_mix": {
+    "math_final": 16,
+    "tool_direct": 16,
+    "tool_trace": 16,
+    "tool_policy": 16,
+    "science_exact": 16,
+    "coding_exact": 16,
+    "format_exact": 16,
+    "refusal_exact": 16,
+    "no_tool_exact": 16,
+    "boundary_exact": 16
+  },
+  "optimizer_steps": 256,
+  "final_reward_mean": 0.0,
+  "best_reward_seen": 1.0,
+  "trainable_parameter_count": 14170368,
+  "trainable_names": [
+    "prelude.0.ln_1.weight",
+    "prelude.0.ln_1.bias",
+    "prelude.0.attn.c_attn.weight",
+    "prelude.0.attn.c_proj.weight",
+    "prelude.0.ln_2.weight",
+    "prelude.0.ln_2.bias",
+    "prelude.0.mlp.c_fc.weight",
+    "prelude.0.mlp.c_proj.weight",
+    "blocks.0.ln_1.weight",
+    "blocks.0.ln_1.bias",
+    "blocks.0.attn.c_attn.weight",
+    "blocks.0.attn.c_proj.weight",
+    "blocks.0.ln_2.weight",
+    "blocks.0.ln_2.bias",
+    "blocks.0.mlp.c_fc.weight",
+    "blocks.0.mlp.c_proj.weight",
+    "blocks.1.ln_1.weight",
+    "blocks.1.ln_1.bias",
+    "blocks.1.attn.c_attn.weight",
+    "blocks.1.attn.c_proj.weight",
+    "blocks.1.ln_2.weight",
+    "blocks.1.ln_2.bias",
+    "blocks.1.mlp.c_fc.weight",
+    "blocks.1.mlp.c_proj.weight",
+    "blocks.2.ln_1.weight",
+    "blocks.2.ln_1.bias",
+    "blocks.2.attn.c_attn.weight",
+    "blocks.2.attn.c_proj.weight",
+    "blocks.2.ln_2.weight",
+    "blocks.2.ln_2.bias",
+    "blocks.2.mlp.c_fc.weight",
+    "blocks.2.mlp.c_proj.weight",
+    "blocks.3.ln_1.weight",
+    "blocks.3.ln_1.bias",
+    "blocks.3.attn.c_attn.weight",
+    "blocks.3.attn.c_proj.weight",
+    "blocks.3.ln_2.weight",
+    "blocks.3.ln_2.bias",
+    "blocks.3.mlp.c_fc.weight",
+    "blocks.3.mlp.c_proj.weight",
+    "blocks.4.ln_1.weight",
+    "blocks.4.ln_1.bias",
+    "blocks.4.attn.c_attn.weight",
+    "blocks.4.attn.c_proj.weight",
+    "blocks.4.ln_2.weight",
+    "blocks.4.ln_2.bias",
+    "blocks.4.mlp.c_fc.weight",
+    "blocks.4.mlp.c_proj.weight",
+    "blocks.5.ln_1.weight",
+    "blocks.5.ln_1.bias",
+    "blocks.5.attn.c_attn.weight",
+    "blocks.5.attn.c_proj.weight",
+    "blocks.5.ln_2.weight",
+    "blocks.5.ln_2.bias",
+    "blocks.5.mlp.c_fc.weight",
+    "blocks.5.mlp.c_proj.weight",
+    "coda.0.ln_1.weight",
+    "coda.0.ln_1.bias",
+    "coda.0.attn.c_attn.weight",
+    "coda.0.attn.c_proj.weight",
+    "coda.0.ln_2.weight",
+    "coda.0.ln_2.bias",
+    "coda.0.mlp.c_fc.weight",
+    "coda.0.mlp.c_proj.weight",
+    "loop_step_embeddings.weight",
+    "ln_f.weight",
+    "ln_f.bias"
+  ],
+  "checkpoint": "sessions\\2026-03-16-rl-generalist-v1c\\checkpoints\\ava-v2-recurrent-depth-rl-generalist-v1.pt",
+  "init_checkpoint": "sessions/2026-03-16-091506-ava-v2-posttrain-assistant-v1-1024/checkpoints/ava-v2-recurrent-depth-posttrain-mix-v2-stable.pt",
+  "init_tokenizer_kind": "byte",
+  "elapsed_seconds": 125.54,
+  "history": [
+    {
+      "step": 1,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "D",
+      "expected": "Paris"
+    },
+    {
+      "step": 2,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "yes"
+    },
+    {
+      "step": 3,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "12",
+      "expected": "yes"
+    },
+    {
+      "step": 4,
+      "task_kind": "format_exact",
+      "reward_mean": 0.75,
+      "reward_max": 1.0,
+      "loss": -2.2087,
+      "best_completion": "19",
+      "expected": "19"
+    },
+    {
+      "step": 5,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "d D",
+      "expected": "The calculator cannot help with sending email."
+    },
+    {
+      "step": 6,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "70"
+    },
+    {
+      "step": 7,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "D",
+      "expected": "3"
+    },
+    {
+      "step": 8,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 0.75,
+      "reward_max": 1.0,
+      "loss": -0.5612,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 9,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "60"
+    },
+    {
+      "step": 10,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 11,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "40"
+    },
+    {
+      "step": 12,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "D",
+      "expected": "42"
+    },
+    {
+      "step": 13,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "yes"
+    },
+    {
+      "step": 14,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 15,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 16,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "cav",
+      "expected": "7"
+    },
+    {
+      "step": 17,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "19"
+    },
+    {
+      "step": 18,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with sending email."
+    },
+    {
+      "step": 19,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 20,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "will",
+      "expected": "no"
+    },
+    {
+      "step": 21,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "H",
+      "expected": "no"
+    },
+    {
+      "step": 22,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "Ma",
+      "expected": "The calculator cannot help with sending email."
+    },
+    {
+      "step": 23,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "gravity"
+    },
+    {
+      "step": 24,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "53"
+    },
+    {
+      "step": 25,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "24"
+    },
+    {
+      "step": 26,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "52"
+    },
+    {
+      "step": 27,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 28,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "no"
+    },
+    {
+      "step": 29,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "yes"
+    },
+    {
+      "step": 30,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "47"
+    },
+    {
+      "step": 31,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "gravity"
+    },
+    {
+      "step": 32,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 33,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "gravity"
+    },
+    {
+      "step": 34,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 35,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "33"
+    },
+    {
+      "step": 36,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "44",
+      "expected": "30"
+    },
+    {
+      "step": 37,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 38,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "Paris"
+    },
+    {
+      "step": 39,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "Paris"
+    },
+    {
+      "step": 40,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 41,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "50"
+    },
+    {
+      "step": 42,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 0.75,
+      "reward_max": 1.0,
+      "loss": -1.0322,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 43,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "gravity"
+    },
+    {
+      "step": 44,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "Paris"
+    },
+    {
+      "step": 45,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "no"
+    },
+    {
+      "step": 46,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "n",
+      "expected": "gravity"
+    },
+    {
+      "step": 47,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "42"
+    },
+    {
+      "step": 48,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "42"
+    },
+    {
+      "step": 49,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "19"
+    },
+    {
+      "step": 50,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "67"
+    },
+    {
+      "step": 51,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "42"
+    },
+    {
+      "step": 52,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "def"
+    },
+    {
+      "step": 53,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "def"
+    },
+    {
+      "step": 54,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "47"
+    },
+    {
+      "step": 55,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "c",
+      "expected": "no"
+    },
+    {
+      "step": 56,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "s",
+      "expected": "yes"
+    },
+    {
+      "step": 57,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "s",
+      "expected": "3"
+    },
+    {
+      "step": 58,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "48"
+    },
+    {
+      "step": 59,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "19"
+    },
+    {
+      "step": 60,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "B",
+      "expected": "Paris"
+    },
+    {
+      "step": 61,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "30"
+    },
+    {
+      "step": 62,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "50"
+    },
+    {
+      "step": 63,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "32"
+    },
+    {
+      "step": 64,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 65,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "Paris"
+    },
+    {
+      "step": 66,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "M",
+      "expected": "yes"
+    },
+    {
+      "step": 67,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "19"
+    },
+    {
+      "step": 68,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "3"
+    },
+    {
+      "step": 69,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "Paris"
+    },
+    {
+      "step": 70,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "3"
+    },
+    {
+      "step": 71,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "c",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 72,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "T",
+      "expected": "71"
+    },
+    {
+      "step": 73,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "19"
+    },
+    {
+      "step": 74,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with sending email."
+    },
+    {
+      "step": 75,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "yes"
+    },
+    {
+      "step": 76,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "s",
+      "expected": "yes"
+    },
+    {
+      "step": 77,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "yes"
+    },
+    {
+      "step": 78,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "H",
+      "expected": "Mars"
+    },
+    {
+      "step": 79,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 80,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "53"
+    },
+    {
+      "step": 81,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "32"
+    },
+    {
+      "step": 82,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "d",
+      "expected": "def"
+    },
+    {
+      "step": 83,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "3"
+    },
+    {
+      "step": 84,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 85,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 86,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "yes"
+    },
+    {
+      "step": 87,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "C",
+      "expected": "3"
+    },
+    {
+      "step": 88,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "yes"
+    },
+    {
+      "step": 89,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "47"
+    },
+    {
+      "step": 90,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "40"
+    },
+    {
+      "step": 91,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 92,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "22"
+    },
+    {
+      "step": 93,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 94,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "Paris"
+    },
+    {
+      "step": 95,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "f",
+      "expected": "no"
+    },
+    {
+      "step": 96,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "48"
+    },
+    {
+      "step": 97,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 98,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 99,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 100,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "3"
+    },
+    {
+      "step": 101,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "30"
+    },
+    {
+      "step": 102,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "48"
+    },
+    {
+      "step": 103,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "yes"
+    },
+    {
+      "step": 104,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "w",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 105,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "Mars"
+    },
+    {
+      "step": 106,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "Paris"
+    },
+    {
+      "step": 107,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "Paris"
+    },
+    {
+      "step": 108,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "I",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 109,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "c",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 110,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "no"
+    },
+    {
+      "step": 111,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "53"
+    },
+    {
+      "step": 112,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "yes"
+    },
+    {
+      "step": 113,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 114,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "s",
+      "expected": "Paris"
+    },
+    {
+      "step": 115,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 116,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "Mars"
+    },
+    {
+      "step": 117,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "D",
+      "expected": "no"
+    },
+    {
+      "step": 118,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "40"
+    },
+    {
+      "step": 119,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "s",
+      "expected": "yes"
+    },
+    {
+      "step": 120,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 121,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "48"
+    },
+    {
+      "step": 122,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "c",
+      "expected": "Paris"
+    },
+    {
+      "step": 123,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "36"
+    },
+    {
+      "step": 124,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "yes"
+    },
+    {
+      "step": 125,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "D",
+      "expected": "3"
+    },
+    {
+      "step": 126,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "40"
+    },
+    {
+      "step": 127,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 128,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "D",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 129,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "w",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 130,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "19"
+    },
+    {
+      "step": 131,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "36"
+    },
+    {
+      "step": 132,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "46"
+    },
+    {
+      "step": 133,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 134,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "33"
+    },
+    {
+      "step": 135,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "30"
+    },
+    {
+      "step": 136,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "B",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 137,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 138,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "yes"
+    },
+    {
+      "step": 139,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "h",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 140,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "49"
+    },
+    {
+      "step": 141,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 142,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "c",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 143,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "47"
+    },
+    {
+      "step": 144,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "no"
+    },
+    {
+      "step": 145,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "71"
+    },
+    {
+      "step": 146,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 147,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 148,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "22"
+    },
+    {
+      "step": 149,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 150,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 151,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "I",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 152,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "n",
+      "expected": "yes"
+    },
+    {
+      "step": 153,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 154,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "18"
+    },
+    {
+      "step": 155,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "70"
+    },
+    {
+      "step": 156,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 157,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "10"
+    },
+    {
+      "step": 158,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "N",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 159,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "N",
+      "expected": "24"
+    },
+    {
+      "step": 160,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "N",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 161,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "7",
+      "expected": "10"
+    },
+    {
+      "step": 162,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "18"
+    },
+    {
+      "step": 163,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "c",
+      "expected": "def"
+    },
+    {
+      "step": 164,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "D",
+      "expected": "Paris"
+    },
+    {
+      "step": 165,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "D",
+      "expected": "24"
+    },
+    {
+      "step": 166,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "h",
+      "expected": "The calculator cannot help with sending email."
+    },
+    {
+      "step": 167,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "h",
+      "expected": "def"
+    },
+    {
+      "step": 168,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 169,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with sending email."
+    },
+    {
+      "step": 170,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 171,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "19"
+    },
+    {
+      "step": 172,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "42"
+    },
+    {
+      "step": 173,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "yes"
+    },
+    {
+      "step": 174,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with sending email."
+    },
+    {
+      "step": 175,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "20"
+    },
+    {
+      "step": 176,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 177,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "N",
+      "expected": "no"
+    },
+    {
+      "step": 178,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "def"
+    },
+    {
+      "step": 179,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "Paris"
+    },
+    {
+      "step": 180,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "2",
+      "expected": "71"
+    },
+    {
+      "step": 181,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "i",
+      "expected": "yes"
+    },
+    {
+      "step": 182,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "gravity"
+    },
+    {
+      "step": 183,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "18"
+    },
+    {
+      "step": 184,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 185,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "19"
+    },
+    {
+      "step": 186,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "c",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 187,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "h",
+      "expected": "The calculator cannot help with sending email."
+    },
+    {
+      "step": 188,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "27"
+    },
+    {
+      "step": 189,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "50"
+    },
+    {
+      "step": 190,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "c",
+      "expected": "no"
+    },
+    {
+      "step": 191,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 192,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "n",
+      "expected": "def"
+    },
+    {
+      "step": 193,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "gravity"
+    },
+    {
+      "step": 194,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 195,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 196,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "h",
+      "expected": "The calculator cannot help with sending email."
+    },
+    {
+      "step": 197,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "40"
+    },
+    {
+      "step": 198,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 199,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "def"
+    },
+    {
+      "step": 200,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 201,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "M",
+      "expected": "def"
+    },
+    {
+      "step": 202,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "gravity"
+    },
+    {
+      "step": 203,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "c",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 204,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "34"
+    },
+    {
+      "step": 205,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "70"
+    },
+    {
+      "step": 206,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 207,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "N",
+      "expected": "30"
+    },
+    {
+      "step": 208,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "M",
+      "expected": "22"
+    },
+    {
+      "step": 209,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "Paris"
+    },
+    {
+      "step": 210,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "c",
+      "expected": "no"
+    },
+    {
+      "step": 211,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 212,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "47"
+    },
+    {
+      "step": 213,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "2",
+      "expected": "yes"
+    },
+    {
+      "step": 214,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 215,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "53"
+    },
+    {
+      "step": 216,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "19"
+    },
+    {
+      "step": 217,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "yes"
+    },
+    {
+      "step": 218,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "40"
+    },
+    {
+      "step": 219,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "c",
+      "expected": "no"
+    },
+    {
+      "step": 220,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "c",
+      "expected": "yes"
+    },
+    {
+      "step": 221,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "s",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 222,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "36"
+    },
+    {
+      "step": 223,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "42"
+    },
+    {
+      "step": 224,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "N",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 225,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "40"
+    },
+    {
+      "step": 226,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "36"
+    },
+    {
+      "step": 227,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "30"
+    },
+    {
+      "step": 228,
+      "task_kind": "tool_policy",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "N",
+      "expected": "no"
+    },
+    {
+      "step": 229,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "B",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 230,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "H",
+      "expected": "24"
+    },
+    {
+      "step": 231,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "M",
+      "expected": "20"
+    },
+    {
+      "step": 232,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "i",
+      "expected": "3"
+    },
+    {
+      "step": 233,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "48"
+    },
+    {
+      "step": 234,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "Paris"
+    },
+    {
+      "step": 235,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "19"
+    },
+    {
+      "step": 236,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "gravity"
+    },
+    {
+      "step": 237,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "48"
+    },
+    {
+      "step": 238,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "Paris"
+    },
+    {
+      "step": 239,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "2",
+      "expected": "13"
+    },
+    {
+      "step": 240,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 241,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 242,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 243,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "N",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 244,
+      "task_kind": "science_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "M",
+      "expected": "Mars"
+    },
+    {
+      "step": 245,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "A",
+      "expected": "60"
+    },
+    {
+      "step": 246,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "T",
+      "expected": "The calculator cannot help with deleting files."
+    },
+    {
+      "step": 247,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 0.75,
+      "reward_max": 1.0,
+      "loss": -1.2422,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 248,
+      "task_kind": "format_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "19"
+    },
+    {
+      "step": 249,
+      "task_kind": "refusal_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "I cannot help with that."
+    },
+    {
+      "step": 250,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "24"
+    },
+    {
+      "step": 251,
+      "task_kind": "tool_trace",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "20"
+    },
+    {
+      "step": 252,
+      "task_kind": "coding_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "3"
+    },
+    {
+      "step": 253,
+      "task_kind": "no_tool_exact",
+      "reward_mean": 1.0,
+      "reward_max": 1.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "4"
+    },
+    {
+      "step": 254,
+      "task_kind": "math_final",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "30"
+    },
+    {
+      "step": 255,
+      "task_kind": "boundary_exact",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "The calculator cannot help with sending email."
+    },
+    {
+      "step": 256,
+      "task_kind": "tool_direct",
+      "reward_mean": 0.0,
+      "reward_max": 0.0,
+      "loss": -0.0,
+      "best_completion": "4",
+      "expected": "44"
+    }
+  ]
+}

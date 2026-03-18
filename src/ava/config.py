@@ -34,6 +34,13 @@ class ModelConfig:
     bias: bool = False
     architecture: str = "transformer"
     loop_repeats: int = 1
+    recurrent_prelude_layers: int = 0
+    recurrent_coda_layers: int = 0
+    norm_type: str = "layernorm"
+    activation: str = "gelu"
+    position_encoding: str = "learned"
+    rope_theta: float = 10000.0
+    recurrent_gate: bool = False
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> "ModelConfig":
@@ -47,19 +54,39 @@ class ModelConfig:
             bias=bool(data.get("bias", False)),
             architecture=str(data.get("architecture", "transformer")),
             loop_repeats=max(1, int(data.get("loop_repeats", 1))),
+            recurrent_prelude_layers=max(0, int(data.get("recurrent_prelude_layers", 0))),
+            recurrent_coda_layers=max(0, int(data.get("recurrent_coda_layers", 0))),
+            norm_type=str(data.get("norm_type", "layernorm")),
+            activation=str(data.get("activation", "gelu")),
+            position_encoding=str(data.get("position_encoding", "learned")),
+            rope_theta=float(data.get("rope_theta", 10000.0)),
+            recurrent_gate=bool(data.get("recurrent_gate", False)),
         )
 
     def effective_layers(self) -> int:
         if self.architecture == "looped":
             return self.n_layer * self.loop_repeats
+        if self.architecture == "recurrent_depth":
+            return self.recurrent_prelude_layers + (self.n_layer * self.loop_repeats) + self.recurrent_coda_layers
         return self.n_layer
 
     def estimated_parameters(self, vocab_size: int) -> int:
-        per_block = (12 * self.n_embd * self.n_embd) + (13 * self.n_embd)
+        attn_params = 4 * self.n_embd * self.n_embd
+        if self.activation == "swiglu":
+            mlp_hidden = ((int(2 / 3 * 4 * self.n_embd) + 63) // 64) * 64
+            mlp_params = 3 * self.n_embd * mlp_hidden
+        else:
+            mlp_params = 2 * self.n_embd * (4 * self.n_embd)
+        norm_params = 2 * self.n_embd if self.norm_type == "layernorm" else self.n_embd
+        per_block = attn_params + mlp_params + (2 * norm_params)
         token_embeddings = vocab_size * self.n_embd
-        positional_embeddings = self.block_size * self.n_embd
-        final_norm = 2 * self.n_embd
-        loop_parameters = self.loop_repeats * self.n_embd if self.architecture == "looped" else 0
+        positional_embeddings = self.block_size * self.n_embd if self.position_encoding == "learned" else 0
+        final_norm = norm_params
+        loop_parameters = self.loop_repeats * self.n_embd if self.architecture in {"looped", "recurrent_depth"} else 0
+        gate_parameters = self.n_embd * self.n_embd + self.n_embd if self.recurrent_gate else 0
+        if self.architecture == "recurrent_depth":
+            scaffold_blocks = self.recurrent_prelude_layers + self.recurrent_coda_layers
+            return token_embeddings + positional_embeddings + ((self.n_layer + scaffold_blocks) * per_block) + final_norm + loop_parameters + gate_parameters
         return token_embeddings + positional_embeddings + (self.n_layer * per_block) + final_norm + loop_parameters
 
 
@@ -77,6 +104,13 @@ class TrainingConfig:
     loss_mode: str = "raw_lm"
     init_checkpoint: str | None = None
     trainable_patterns: tuple[str, ...] = ()
+    rl_group_size: int = 4
+    rl_temperature: float = 0.8
+    rl_max_new_tokens: int = 32
+    rl_kl_beta: float = 0.0
+    rl_task_count: int = 128
+    lr_schedule: str = "constant"
+    min_lr_ratio: float = 0.1
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> "TrainingConfig":
@@ -95,6 +129,13 @@ class TrainingConfig:
             loss_mode=str(data.get("loss_mode", "raw_lm")),
             init_checkpoint=str(data["init_checkpoint"]) if data.get("init_checkpoint") else None,
             trainable_patterns=tuple(str(item) for item in patterns),
+            rl_group_size=max(2, int(data.get("rl_group_size", 4))),
+            rl_temperature=float(data.get("rl_temperature", 0.8)),
+            rl_max_new_tokens=max(1, int(data.get("rl_max_new_tokens", 32))),
+            rl_kl_beta=float(data.get("rl_kl_beta", 0.0)),
+            rl_task_count=max(8, int(data.get("rl_task_count", 128))),
+            lr_schedule=str(data.get("lr_schedule", "constant")),
+            min_lr_ratio=float(data.get("min_lr_ratio", 0.1)),
         )
 
 

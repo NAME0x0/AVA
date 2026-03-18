@@ -508,6 +508,86 @@ def _predict_multiple_choice_hybrid_from_support(
 
 
 
+def _predict_model_retrieval_ensemble(
+    model: Any,
+    tokenizer: Any,
+    device: str,
+    *,
+    prompt: str,
+    choices: tuple[tuple[str, str], ...],
+    support_examples: list[SupportExample] | None,
+    support_index: SparseSupportIndex | None = None,
+    category_hint: str | None,
+    category_gated: bool,
+    top_k: int = 8,
+    model_weight: float = 0.4,
+) -> tuple[str, dict[str, object]] | None:
+    """True weighted ensemble of model logprobs and retrieval scores."""
+    # Get model logprob scores
+    _, model_scores = _predict_multiple_choice_label(
+        model, tokenizer, device, prompt=prompt, choices=choices,
+    )
+    # Get retrieval scores
+    retrieval_result = _predict_multiple_choice_hybrid_from_support(
+        prompt=prompt,
+        choices=choices,
+        support_examples=support_examples,
+        support_index=support_index,
+        category_hint=category_hint,
+        category_gated=category_gated,
+        top_k=top_k,
+    )
+    if retrieval_result is None:
+        # No retrieval available, use model only
+        best_label = max(model_scores.items(), key=lambda item: item[1])[0]
+        return best_label, {
+            'mode': 'model_retrieval_ensemble',
+            'model_scores': model_scores,
+            'retrieval_scores': None,
+            'combined_scores': model_scores,
+            'selected': best_label,
+            'model_weight': model_weight,
+        }
+
+    _retrieval_label, retrieval_scoring = retrieval_result
+    retrieval_scores = dict(retrieval_scoring.get('scores', {}))
+
+    # Normalize model logprobs to probabilities
+    import math as _math
+    model_vals = [float(model_scores.get(label, -100.0)) for label, _ in choices]
+    max_logp = max(model_vals)
+    model_probs = [_math.exp(v - max_logp) for v in model_vals]
+    model_sum = sum(model_probs) or 1.0
+    model_probs = [p / model_sum for p in model_probs]
+
+    # Normalize retrieval scores to probabilities
+    retrieval_vals = [float(retrieval_scores.get(label, 0.0)) for label, _ in choices]
+    retrieval_sum = sum(retrieval_vals) or 1.0
+    retrieval_probs = [v / retrieval_sum for v in retrieval_vals]
+
+    # Weighted combination
+    combined = {}
+    for i, (label, _) in enumerate(choices):
+        combined[label] = round(
+            model_weight * model_probs[i] + (1.0 - model_weight) * retrieval_probs[i],
+            6,
+        )
+
+    best_label = max(combined.items(), key=lambda item: item[1])[0]
+    return best_label, {
+        'mode': 'model_retrieval_ensemble',
+        'model_scores': model_scores,
+        'retrieval_scores': {label: round(float(retrieval_scores.get(label, 0.0)), 6) for label, _ in choices},
+        'model_probs': {choices[i][0]: round(model_probs[i], 6) for i in range(len(choices))},
+        'retrieval_probs': {choices[i][0]: round(retrieval_probs[i], 6) for i in range(len(choices))},
+        'combined_scores': combined,
+        'selected': best_label,
+        'model_weight': model_weight,
+        'supports': retrieval_scoring.get('supports', []),
+        'candidate_count': retrieval_scoring.get('candidate_count'),
+    }
+
+
 def _predict_multiple_choice_dense_hybrid_from_support(
     *,
     prompt: str,
@@ -1154,6 +1234,7 @@ def evaluate_external_benchmark(
     router_dense_margin_min: float = 0.0,
     router_sparse_margin_max: float = 0.015,
     router_margin_gap_min: float = 0.0,
+    repeat_override: int | None = None,
 ) -> dict[str, object]:
     if not TORCH_AVAILABLE:
         raise RuntimeError("PyTorch is required for evaluation.")
@@ -1167,6 +1248,10 @@ def evaluate_external_benchmark(
     device, warnings = _resolve_device(requested_device)
     model = model.to(device)
     model.eval()
+
+    # Test-time compute scaling: override recurrent loop count
+    if repeat_override is not None:
+        model._inference_repeat_override = repeat_override
 
     tasks = load_external_benchmark_tasks(benchmark, split=split, limit=limit, offset=offset)
     support_resource = _load_support_resource(support_corpus) if support_corpus else None
@@ -1209,7 +1294,33 @@ def evaluate_external_benchmark(
     for task in tasks:
         scoring: dict[str, object] | None = None
         if task.metric == "multiple_choice":
-            if retrieval_mode in {"support_mc", "hybrid_support_mc", "hybrid_support_ensemble", "dense_hybrid_support_mc", "dense_rerank_support_mc", "sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"}:
+            if retrieval_mode == "model_retrieval_ensemble":
+                support_prediction = _predict_model_retrieval_ensemble(
+                    model,
+                    tokenizer,
+                    device,
+                    prompt=task.prompt,
+                    choices=task.choices,
+                    support_examples=support_examples,
+                    support_index=support_index,
+                    category_hint=task.category,
+                    category_gated=category_gated,
+                )
+                if support_prediction is not None:
+                    completion, scoring = support_prediction
+                    retrieval = {
+                        "enabled": True,
+                        "mode": retrieval_mode,
+                        "references": list(scoring.get("supports", [])),
+                        "category_hint": task.category,
+                    }
+                else:
+                    retrieval = {"enabled": False, "mode": retrieval_mode, "references": [], "category_hint": task.category}
+                    completion, label_scores = _predict_multiple_choice_label(
+                        model, tokenizer, device, prompt=task.prompt, choices=task.choices,
+                    )
+                    scoring = {"mode": "label_logprob", "scores": label_scores, "selected": completion}
+            elif retrieval_mode in {"support_mc", "hybrid_support_mc", "hybrid_support_ensemble", "dense_hybrid_support_mc", "dense_rerank_support_mc", "sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"}:
                 if retrieval_mode == "sparse_dense_rerank_router_support_mc":
                     support_prediction = _predict_multiple_choice_sparse_dense_router(
                         prompt=task.prompt,
@@ -1408,6 +1519,7 @@ def evaluate_external_benchmark(
         "router_dense_margin_min": router_dense_margin_min if retrieval_mode in {"sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
         "router_sparse_margin_max": router_sparse_margin_max if retrieval_mode in {"sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
         "router_margin_gap_min": router_margin_gap_min if retrieval_mode in {"sparse_dense_router_support_mc", "sparse_dense_rerank_router_support_mc"} else None,
+        "repeat_override": repeat_override,
         "correct": correct,
         "total": total,
         "accuracy": round(correct / max(total, 1), 3),

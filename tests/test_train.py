@@ -190,6 +190,7 @@ def test_load_init_checkpoint_allows_transformer_to_looped_warm_start() -> None:
     init_kind = _load_init_checkpoint(looped_model, tokenizer, checkpoint_path)
     assert init_kind == "byte"
     assert looped_model.loop_step_embeddings is not None
+    assert torch.count_nonzero(looped_model.loop_step_embeddings.weight).item() == 0
     shutil.rmtree(workspace)
 
 
@@ -217,3 +218,48 @@ def test_expand_state_dict_for_hf_tokenizer_neutralizes_special_tokens() -> None
         token_id = tokenizer.token_to_id[token_name]
         assert torch.allclose(expanded["wte.weight"][token_id], fallback)
     shutil.rmtree(root)
+
+
+def test_load_init_checkpoint_allows_transformer_to_recurrent_depth_warm_start() -> None:
+    tokenizer = load_tokenizer()
+    workspace = Path("sessions") / "test-recurrent-depth-init"
+    checkpoint_path = workspace / "base.pt"
+    if workspace.exists():
+        shutil.rmtree(workspace)
+    workspace.mkdir(parents=True, exist_ok=True)
+
+    base_model = build_model(
+        ModelConfig(block_size=32, n_layer=4, n_head=2, n_embd=8, dropout=0.0, bias=False),
+        tokenizer.vocab_size,
+    )
+    torch = __import__("torch")
+    torch.save(
+        {
+            "model": base_model.state_dict(),
+            "config": {"tokenizer": {"kind": "byte"}, "model": {"architecture": "transformer"}},
+        },
+        checkpoint_path,
+    )
+
+    recurrent_model = build_model(
+        ModelConfig(
+            block_size=32,
+            n_layer=2,
+            n_head=2,
+            n_embd=8,
+            dropout=0.0,
+            bias=False,
+            architecture="recurrent_depth",
+            loop_repeats=3,
+            recurrent_prelude_layers=1,
+            recurrent_coda_layers=1,
+        ),
+        tokenizer.vocab_size,
+    )
+    init_kind = _load_init_checkpoint(recurrent_model, tokenizer, checkpoint_path)
+    assert init_kind == "byte"
+    assert len(recurrent_model.prelude) == 1
+    assert len(recurrent_model.coda) == 1
+    assert recurrent_model.loop_step_embeddings is not None
+    assert torch.count_nonzero(recurrent_model.loop_step_embeddings.weight).item() == 0
+    shutil.rmtree(workspace)

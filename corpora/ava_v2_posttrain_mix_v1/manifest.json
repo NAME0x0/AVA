@@ -1,0 +1,49 @@
+{
+  "curriculum": "ava_v2_posttrain_mix",
+  "seed": 1337,
+  "total_examples": 12416,
+  "source_limits": {
+    "teacher_distill": 103,
+    "public_benchmark": 6000,
+    "public_science": 6000,
+    "math_reasoning": 102,
+    "general_sft": 59,
+    "guardrails": 26,
+    "tool_repair": 23,
+    "public_reasoning": 103
+  },
+  "source_counts": {
+    "teacher_distill": 103,
+    "public_benchmark": 6000,
+    "public_science": 6000,
+    "math_reasoning": 102,
+    "general_sft": 59,
+    "guardrails": 26,
+    "tool_repair": 23,
+    "public_reasoning": 103
+  },
+  "by_kind": {
+    "science_mc": 32,
+    "commonsense_mc": 16,
+    "math_word": 62,
+    "trace": 34,
+    "tool_direct": 32,
+    "tool_direct_variant": 20,
+    "general": 79,
+    "no_tool": 74,
+    "boundary": 52,
+    "refusal": 36,
+    "format": 39,
+    "arc_mc": 566,
+    "arc_mc_aug": 1624,
+    "gsm8k_train": 3584,
+    "sciq_mc": 2080,
+    "sciq_mc_aug": 2105,
+    "openbookqa_mc": 947,
+    "openbookqa_mc_aug": 868,
+    "math_reasoning_support": 102,
+    "unknown": 59,
+    "trace_variant": 5
+  },
+  "examples_path": "corpora\\ava_v2_posttrain_mix_v1\\examples.jsonl"
+}

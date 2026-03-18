@@ -1,0 +1,20 @@
+{
+  "curriculum": "ava_v3_posttrain_combined",
+  "total_examples": 1316,
+  "by_category": {
+    "coding": 50,
+    "science": 266,
+    "math": 433,
+    "format": 3,
+    "compliance": 79,
+    "language": 116,
+    "unknown": 188,
+    "tool": 61,
+    "general": 55,
+    "reasoning": 50,
+    "tool_direct_variant": 4,
+    "no_tool": 5,
+    "trace_variant": 5,
+    "boundary": 1
+  }
+}

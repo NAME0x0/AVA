@@ -35,6 +35,7 @@ checkpoints/
 *.pth
 *.bin
 *.safetensors
+!experiments/exp4_finetune/models/AVA-v2/adapter_model.safetensors
 *.onnx
 
 # Session-local heavyweight outputs

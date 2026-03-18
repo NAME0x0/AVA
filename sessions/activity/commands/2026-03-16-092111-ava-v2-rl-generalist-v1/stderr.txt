@@ -1,0 +1,44 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\AVA\src\ava\cli.py", line 674, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "D:\AVA\src\ava\cli.py", line 646, in main
+    exit_code, metadata = _dispatch(args)
+                          ~~~~~~~~~^^^^^^
+  File "D:\AVA\src\ava\cli.py", line 457, in _dispatch
+    result = run_verifiable_rl(args.config, checkpoint_root=args.checkpoint_root)
+  File "D:\AVA\src\ava\rl.py", line 290, in run_verifiable_rl
+    _sample_rollout(
+    ~~~~~~~~~~~~~~~^
+        model,
+        ^^^^^^
+    ...<4 lines>...
+        temperature=config.training.rl_temperature,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\AVA\src\ava\rl.py", line 234, in _sample_rollout
+    logits, _ = model(idx[:, -model.config.block_size :])
+                ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\torch\nn\modules\module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\torch\nn\modules\module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "D:\AVA\src\ava\model.py", line 133, in forward
+    x = self._run_recurrent_depth(x)
+  File "D:\AVA\src\ava\model.py", line 120, in _run_recurrent_depth
+    candidate = self._run_blocks(loop_input, self.blocks)
+  File "D:\AVA\src\ava\model.py", line 113, in _run_blocks
+    x = block(x)
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\torch\nn\modules\module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\Afsah\AppData\Roaming\Python\Python313\site-packages\torch\nn\modules\module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "D:\AVA\src\ava\model.py", line 71, in forward
+    x = x + self.attn(self.ln_1(x))
+        ~~^~~~~~~~~~~~~~~~~~~~~~~~~
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.00 MiB. GPU 0 has a total capacity of 4.00 GiB of which 0 bytes is free. Of the allocated memory 3.31 GiB is allocated by PyTorch, and 153.62 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

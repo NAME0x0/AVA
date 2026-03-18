@@ -1,0 +1,31 @@
+{
+  "roneneldan/TinyStories": {
+    "text": "str"
+  },
+  "gsm8k": {
+    "question": "str",
+    "answer": "str"
+  },
+  "sciq": {
+    "question": "str",
+    "distractor3": "str",
+    "distractor1": "str",
+    "distractor2": "str",
+    "correct_answer": "str",
+    "support": "str"
+  },
+  "allenai/openbookqa": {
+    "id": "str",
+    "question_stem": "str",
+    "choices": "dict",
+    "answerKey": "str"
+  },
+  "mbpp": {
+    "task_id": "int",
+    "text": "str",
+    "code": "str",
+    "test_list": "list",
+    "test_setup_code": "str",
+    "challenge_test_list": "list"
+  }
+}

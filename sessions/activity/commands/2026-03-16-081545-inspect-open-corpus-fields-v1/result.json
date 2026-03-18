@@ -1,0 +1,12 @@
+{
+  "label": "inspect-open-corpus-fields-v1",
+  "command": "python -c \"from datasets import load_dataset; specs=[('roneneldan/TinyStories',None,'train[:1]'),('gsm8k','main','train[:1]'),('sciq',None,'train[:1]'),('allenai/openbookqa',None,'train[:1]'),('mbpp',None,'train[:1]')]; import json; rows={};\nfor name,subset,split in specs:\n    ds=load_dataset(name, subset, split=split) if subset else load_dataset(name, split=split)\n    row=dict(ds[0])\n    rows[name]={k:type(v).__name__ for k,v in row.items()}\nprint(json.dumps(rows, indent=2))\"",
+  "argv": [
+    "python",
+    "-c",
+    "from datasets import load_dataset; specs=[('roneneldan/TinyStories',None,'train[:1]'),('gsm8k','main','train[:1]'),('sciq',None,'train[:1]'),('allenai/openbookqa',None,'train[:1]'),('mbpp',None,'train[:1]')]; import json; rows={};\nfor name,subset,split in specs:\n    ds=load_dataset(name, subset, split=split) if subset else load_dataset(name, split=split)\n    row=dict(ds[0])\n    rows[name]={k:type(v).__name__ for k,v in row.items()}\nprint(json.dumps(rows, indent=2))"
+  ],
+  "returncode": 1,
+  "cwd": "D:\\AVA",
+  "duration_ms": 3263
+}

@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\AVA\src\ava\cli.py", line 594, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "D:\AVA\src\ava\cli.py", line 566, in main
+    exit_code, metadata = _dispatch(args)
+                          ~~~~~~~~~^^^^^^
+  File "D:\AVA\src\ava\cli.py", line 377, in _dispatch
+    result = run_verifiable_rl(args.config, checkpoint_root=args.checkpoint_root)
+  File "D:\AVA\src\ava\rl.py", line 207, in run_verifiable_rl
+    start_time = time.time()
+                 ^^^^
+NameError: name 'time' is not defined. Did you forget to import 'time'?
