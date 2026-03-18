@@ -1,0 +1,8 @@
+{
+  "name": "ava-v2-recurrent-depth-open-mix-v1",
+  "parameters": 14396160,
+  "train_vram_gb": 1.063,
+  "infer_vram_gb": 0.793,
+  "tokens_per_optimizer_step": 2048,
+  "fits_4gb": true
+}

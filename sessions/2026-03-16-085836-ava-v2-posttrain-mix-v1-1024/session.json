@@ -1,0 +1,10 @@
+{
+  "name": "ava-v2-posttrain-mix-v1-1024",
+  "slug": "ava-v2-posttrain-mix-v1-1024",
+  "kind": "training",
+  "created_at_utc": "2026-03-16T08:58:36.523124+00:00",
+  "sources": [
+    "configs\\experiments\\ava-v2-recurrent-depth-posttrain-mix-v1.yaml",
+    "corpora\\ava_v2_posttrain_mix_v1"
+  ]
+}

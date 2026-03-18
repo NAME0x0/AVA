@@ -1,0 +1,46 @@
+{
+  "corpus_root": "corpora\\ava_v2_open_mix_v1",
+  "file_count": 6,
+  "text_count": 5,
+  "character_count": 43865244,
+  "token_count": 43920640,
+  "supervised_example_count": 0,
+  "files": [
+    {
+      "path": "corpora\\ava_v2_open_mix_v1\\code.txt",
+      "size_bytes": 118164,
+      "sha256": "68ec185435eb4838393adbb6870f9d608c3fc5fbfa11c195d77b11eefb3b1359",
+      "relative_path": "code.txt"
+    },
+    {
+      "path": "corpora\\ava_v2_open_mix_v1\\english.txt",
+      "size_bytes": 36877831,
+      "sha256": "5e3befb109bcb523f7db38abb6fc498fae1bc96d6e30f6b2dd53c2712f66a638",
+      "relative_path": "english.txt"
+    },
+    {
+      "path": "corpora\\ava_v2_open_mix_v1\\manifest.json",
+      "size_bytes": 339,
+      "sha256": "0425a6d59dd12885c8fcb82e7264d0dcfe9f115a3af6950bcf0cf4426c3cd5e7",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\ava_v2_open_mix_v1\\math.txt",
+      "size_bytes": 3457824,
+      "sha256": "8f4e0574c022523e41474ab45643c199801761f3f38a65d96cf7f22f8e02f20b",
+      "relative_path": "math.txt"
+    },
+    {
+      "path": "corpora\\ava_v2_open_mix_v1\\README.md",
+      "size_bytes": 149,
+      "sha256": "b8b3c7bf22c5378b61ced8920416d47e926fba28996f603b87c6eb6613f8591d",
+      "relative_path": "README.md"
+    },
+    {
+      "path": "corpora\\ava_v2_open_mix_v1\\science.txt",
+      "size_bytes": 4158729,
+      "sha256": "35a57ad227c24f7a7954bb6a38db47011542230b06bf1d052c3ef671bf5b3aaf",
+      "relative_path": "science.txt"
+    }
+  ]
+}

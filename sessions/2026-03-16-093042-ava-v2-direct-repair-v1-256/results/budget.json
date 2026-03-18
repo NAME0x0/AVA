@@ -1,0 +1,8 @@
+{
+  "name": "ava-v2-recurrent-depth-direct-repair-v1",
+  "parameters": 14445312,
+  "train_vram_gb": 1.883,
+  "infer_vram_gb": 0.877,
+  "tokens_per_optimizer_step": 6144,
+  "fits_4gb": true
+}

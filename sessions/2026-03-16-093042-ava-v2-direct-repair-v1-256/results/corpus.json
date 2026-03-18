@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\ava_v2_direct_repair_v1",
+  "file_count": 3,
+  "text_count": 177,
+  "character_count": 14497,
+  "token_count": 14851,
+  "supervised_example_count": 176,
+  "files": [
+    {
+      "path": "corpora\\ava_v2_direct_repair_v1\\examples.jsonl",
+      "size_bytes": 23320,
+      "sha256": "194c7533adfc4f2652cd154c8544690727a27c0b9a092913a4d6a21134c2acfe",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\ava_v2_direct_repair_v1\\manifest.json",
+      "size_bytes": 168,
+      "sha256": "b01ec68f2504fb7a8dd5c3f2ea2b2818133f7ab9117d030ac928e512023d2ec9",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\ava_v2_direct_repair_v1\\README.md",
+      "size_bytes": 84,
+      "sha256": "0a05e7ac42ecd7640457c6456fadd5ce3086ba76069738dd7143f3f24e3a2062",
+      "relative_path": "README.md"
+    }
+  ]
+}

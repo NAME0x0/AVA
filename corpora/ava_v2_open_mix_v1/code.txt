@@ -1,0 +1,5061 @@
+Programming task:
+Write a function to find the longest chain which can be formed from the given set of pairs.
+
+Python solution:
+class Pair(object): 
+	def __init__(self, a, b): 
+		self.a = a 
+		self.b = b 
+def max_chain_length(arr, n): 
+	max = 0
+	mcl = [1 for i in range(n)] 
+	for i in range(1, n): 
+		for j in range(0, i): 
+			if (arr[i].a > arr[j].b and
+				mcl[i] < mcl[j] + 1): 
+				mcl[i] = mcl[j] + 1
+	for i in range(n): 
+		if (max < mcl[i]): 
+			max = mcl[i] 
+	return max
+
+<sep>
+
+Programming task:
+Write a python function to find the first repeated character in a given string.
+
+Python solution:
+def first_repeated_char(str1):
+  for index,c in enumerate(str1):
+    if str1[:index+1].count(c) > 1:
+      return c 
+  return "None"
+
+<sep>
+
+Programming task:
+Write a function to get a lucid number smaller than or equal to n.
+
+Python solution:
+def get_ludic(n):
+	ludics = []
+	for i in range(1, n + 1):
+		ludics.append(i)
+	index = 1
+	while(index != len(ludics)):
+		first_ludic = ludics[index]
+		remove_index = index + first_ludic
+		while(remove_index < len(ludics)):
+			ludics.remove(ludics[remove_index])
+			remove_index = remove_index + first_ludic - 1
+		index += 1
+	return ludics
+
+<sep>
+
+Programming task:
+Write a function to reverse words in a given string.
+
+Python solution:
+def reverse_words(s):
+        return ' '.join(reversed(s.split()))
+
+<sep>
+
+Programming task:
+Write a function to check if the given integer is a prime number.
+
+Python solution:
+def prime_num(num):
+  if num >=1:
+   for i in range(2, num//2):
+     if (num % i) == 0:
+                return False
+     else:
+                return True
+  else:
+          return False
+
+<sep>
+
+Programming task:
+Write a function to convert degrees to radians.
+
+Python solution:
+import math
+def radian_degree(degree):
+ radian = degree*(math.pi/180)
+ return radian
+
+<sep>
+
+Programming task:
+Write a function to search a literals string in a string and also find the location within the original string where the pattern occurs by using regex.
+
+Python solution:
+import re
+pattern = 'fox'
+text = 'The quick brown fox jumps over the lazy dog.'
+def find_literals(text, pattern):
+  match = re.search(pattern, text)
+  s = match.start()
+  e = match.end()
+  return (match.re.pattern, s, e)
+
+<sep>
+
+Programming task:
+Write a python function to find nth bell number.
+
+Python solution:
+def bell_Number(n): 
+    bell = [[0 for i in range(n+1)] for j in range(n+1)] 
+    bell[0][0] = 1
+    for i in range(1, n+1):
+        bell[i][0] = bell[i-1][i-1]
+        for j in range(1, i+1): 
+            bell[i][j] = bell[i-1][j-1] + bell[i][j-1] 
+    return bell[n][0]
+
+<sep>
+
+Programming task:
+Write a python function to find minimum possible value for the given periodic function.
+
+Python solution:
+def floor_Min(A,B,N):
+    x = max(B - 1,N)
+    return (A*x) // B
+
+<sep>
+
+Programming task:
+Write a python function to remove the k'th element from a given list.
+
+Python solution:
+def remove_kth_element(list1, L):
+    return  list1[:L-1] + list1[L:]
+
+<sep>
+
+Programming task:
+Write a function to find the maximum of nth column from the given tuple list.
+
+Python solution:
+def max_of_nth(test_list, N):
+  res = max([sub[N] for sub in test_list])
+  return (res)
+
+<sep>
+
+Programming task:
+Write a python function to merge the first and last elements separately in a list of lists.
+
+Python solution:
+def merge(lst):  
+    return [list(ele) for ele in list(zip(*lst))]
+
+<sep>
+
+Programming task:
+Write a function to find the maximum value in record list as tuple attribute in the given tuple list.
+
+Python solution:
+def maximum_value(test_list):
+  res = [(key, max(lst)) for key, lst in test_list]
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to find the cumulative sum of all the values that are present in the given tuple list.
+
+Python solution:
+def cummulative_sum(test_list):
+  res = sum(map(sum, test_list))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to find average value of the numbers in a given tuple of tuples.
+
+Python solution:
+def average_tuple(nums):
+    result = [sum(x) / len(x) for x in zip(*nums)]
+    return result
+
+<sep>
+
+Programming task:
+Write a function to perfom the modulo of tuple elements in the given two tuples.
+
+Python solution:
+def tuple_modulo(test_tup1, test_tup2):
+  res = tuple(ele1 % ele2 for ele1, ele2 in zip(test_tup1, test_tup2)) 
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to check for the number of jumps required of given length to reach a point of form (d, 0) from origin in a 2d plane.
+
+Python solution:
+def min_Jumps(a, b, d): 
+    temp = a 
+    a = min(a, b) 
+    b = max(temp, b) 
+    if (d >= b): 
+        return (d + b - 1) / b 
+    if (d == 0): 
+        return 0
+    if (d == a): 
+        return 1
+    else:
+        return 2
+
+<sep>
+
+Programming task:
+Write a function to divide two lists using map and lambda function.
+
+Python solution:
+def div_list(nums1,nums2):
+  result = map(lambda x, y: x / y, nums1, nums2)
+  return list(result)
+
+<sep>
+
+Programming task:
+Write a function to move all the numbers in it to the given string.
+
+Python solution:
+def move_num(test_str):
+  res = ''
+  dig = ''
+  for ele in test_str:
+    if ele.isdigit():
+      dig += ele
+    else:
+      res += ele
+  res += dig
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to find the largest subset where each pair is divisible.
+
+Python solution:
+def largest_subset(a, n):
+	dp = [0 for i in range(n)]
+	dp[n - 1] = 1; 
+	for i in range(n - 2, -1, -1):
+		mxm = 0;
+		for j in range(i + 1, n):
+			if a[j] % a[i] == 0 or a[i] % a[j] == 0:
+				mxm = max(mxm, dp[j])
+		dp[i] = 1 + mxm
+	return max(dp)
+
+<sep>
+
+Programming task:
+Write a function to increment the numeric values in the given strings by k.
+
+Python solution:
+def increment_numerics(test_list, K):
+  res = [str(int(ele) + K) if ele.isdigit() else ele for ele in test_list]
+  return res
+
+<sep>
+
+Programming task:
+Write a function to find the median of two sorted arrays of same size.
+
+Python solution:
+def get_median(arr1, arr2, n):
+  i = 0
+  j = 0
+  m1 = -1
+  m2 = -1
+  count = 0
+  while count < n + 1:
+    count += 1
+    if i == n:
+      m1 = m2
+      m2 = arr2[0]
+      break
+    elif j == n:
+      m1 = m2
+      m2 = arr1[0]
+      break
+    if arr1[i] <= arr2[j]:
+      m1 = m2
+      m2 = arr1[i]
+      i += 1
+    else:
+      m1 = m2
+      m2 = arr2[j]
+      j += 1
+  return (m1 + m2)/2
+
+<sep>
+
+Programming task:
+Write a function to find the n-th power of individual elements in a list using lambda function.
+
+Python solution:
+def nth_nums(nums,n):
+ nth_nums = list(map(lambda x: x ** n, nums))
+ return nth_nums
+
+<sep>
+
+Programming task:
+Write a python function to convert the given string to upper case.
+
+Python solution:
+def is_upper(string):
+  return (string.upper())
+
+<sep>
+
+Programming task:
+Write a python function to interchange first and last elements in a given list.
+
+Python solution:
+def swap_List(newList): 
+    size = len(newList) 
+    temp = newList[0] 
+    newList[0] = newList[size - 1] 
+    newList[size - 1] = temp   
+    return newList
+
+<sep>
+
+Programming task:
+Write a python function to find the largest triangle that can be inscribed in the semicircle.
+
+Python solution:
+def triangle_area(r) :  
+    if r < 0 : 
+        return -1
+    return r * r
+
+<sep>
+
+Programming task:
+Write a python function to find the smallest missing number from the given array.
+
+Python solution:
+def find_First_Missing(array,start,end): 
+    if (start > end): 
+        return end + 1
+    if (start != array[start]): 
+        return start; 
+    mid = int((start + end) / 2) 
+    if (array[mid] == mid): 
+        return find_First_Missing(array,mid+1,end) 
+    return find_First_Missing(array,start,mid)
+
+<sep>
+
+Programming task:
+Write a function to replace all spaces in the given string with character * list item * list item * list item * list item '%20'.
+
+Python solution:
+MAX=1000;
+def replace_spaces(string):
+  string=string.strip()
+  i=len(string)
+  space_count=string.count(' ')
+  new_length = i + space_count*2
+  if new_length > MAX:
+    return -1
+  index = new_length-1
+  string=list(string)
+  for f in range(i-2, new_length-2):
+    string.append('0')
+  for j in range(i-1, 0, -1):
+    if string[j] == ' ':
+      string[index] = '0'
+      string[index-1] = '2'
+      string[index-2] = '%'
+      index=index-3
+    else:
+      string[index] = string[j]
+      index -= 1
+  return ''.join(string)
+
+<sep>
+
+Programming task:
+Write a python function to find even numbers from a mixed list.
+
+Python solution:
+def Split(list): 
+    ev_li = [] 
+    for i in list: 
+        if (i % 2 == 0): 
+            ev_li.append(i)  
+    return ev_li
+
+<sep>
+
+Programming task:
+Write a function to extract all the adjacent coordinates of the given coordinate tuple.
+
+Python solution:
+def adjac(ele, sub = []): 
+  if not ele: 
+     yield sub 
+  else: 
+     yield from [idx for j in range(ele[0] - 1, ele[0] + 2) 
+                for idx in adjac(ele[1:], sub + [j])] 
+def get_coordinates(test_tup):
+  res = list(adjac(test_tup))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to replace whitespaces with an underscore and vice versa in a given string by using regex.
+
+Python solution:
+import re
+text = 'Python Exercises'
+def replace_spaces(text):
+  text =text.replace (" ", "_")
+  return (text)
+  text =text.replace ("_", " ")
+  return (text)
+
+<sep>
+
+Programming task:
+Write a python function to move all zeroes to the end of the given list.
+
+Python solution:
+def move_zero(num_list):
+    a = [0 for i in range(num_list.count(0))]
+    x = [ i for i in num_list if i != 0]
+    x.extend(a)
+    return (x)
+
+<sep>
+
+Programming task:
+Write a python function to find the sum of xor of all pairs of numbers in the given array.
+
+Python solution:
+def pair_OR_Sum(arr,n) : 
+    ans = 0 
+    for i in range(0,n) :    
+        for j in range(i + 1,n) :   
+            ans = ans + (arr[i] ^ arr[j])          
+    return ans
+
+<sep>
+
+Programming task:
+Write a python function to find the sum of fourth power of first n even natural numbers.
+
+Python solution:
+def even_Power_Sum(n): 
+    sum = 0; 
+    for i in range(1,n + 1): 
+        j = 2*i; 
+        sum = sum + (j*j*j*j); 
+    return sum;
+
+<sep>
+
+Programming task:
+Write a function to push all values into a heap and then pop off the smallest values one at a time.
+
+Python solution:
+import heapq as hq
+def heap_sort(iterable):
+    h = []
+    for value in iterable:
+        hq.heappush(h, value)
+    return [hq.heappop(h) for i in range(len(h))]
+
+<sep>
+
+Programming task:
+Write a python function to check if roots of a quadratic equation are reciprocal of each other or not.
+
+Python solution:
+def Check_Solution(a,b,c): 
+    if (a == c): 
+        return ("Yes"); 
+    else: 
+        return ("No");
+
+<sep>
+
+Programming task:
+Write a function to check whether the given amount has no profit and no loss
+
+Python solution:
+def noprofit_noloss(actual_cost,sale_amount): 
+  if(sale_amount == actual_cost):
+    return True
+  else:
+    return False
+
+<sep>
+
+Programming task:
+Write a function to calculate wind chill index.
+
+Python solution:
+import math
+def wind_chill(v,t):
+ windchill = 13.12 + 0.6215*t -  11.37*math.pow(v, 0.16) + 0.3965*t*math.pow(v, 0.16)
+ return int(round(windchill, 0))
+
+<sep>
+
+Programming task:
+Write a function to sum the length of the names of a given list of names after removing the names that start with a lowercase letter.
+
+Python solution:
+def sample_nam(sample_names):
+  sample_names=list(filter(lambda el:el[0].isupper() and el[1:].islower(),sample_names))
+  return len(''.join(sample_names))
+
+<sep>
+
+Programming task:
+Write a function to remove the parenthesis area in a string.
+
+Python solution:
+import re
+def remove_parenthesis(items):
+ for item in items:
+    return (re.sub(r" ?\([^)]+\)", "", item))
+
+<sep>
+
+Programming task:
+Write a function to find the nth nonagonal number.
+
+Python solution:
+def is_nonagonal(n): 
+	return int(n * (7 * n - 5) / 2)
+
+<sep>
+
+Programming task:
+Write a function to remove similar rows from the given tuple matrix.
+
+Python solution:
+def remove_similar_row(test_list):
+  res = set(sorted([tuple(sorted(set(sub))) for sub in test_list]))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function that matches a word containing 'z', not at the start or end of the word.
+
+Python solution:
+import re
+def text_match_wordz_middle(text):
+        patterns = '\Bz\B'
+        if re.search(patterns,  text):
+                return 'Found a match!'
+        else:
+                return('Not matched!')
+
+<sep>
+
+Programming task:
+Write a python function to reverse an array upto a given position.
+
+Python solution:
+def reverse_Array_Upto_K(input, k): 
+  return (input[k-1::-1] + input[k:])
+
+<sep>
+
+Programming task:
+Write a function to find the product of it’s kth index in the given tuples.
+
+Python solution:
+def get_product(val) : 
+	res = 1
+	for ele in val: 
+		res *= ele 
+	return res 
+def find_k_product(test_list, K):
+  res = get_product([sub[K] for sub in test_list])
+  return (res)
+
+<sep>
+
+Programming task:
+Write a python function to count number of cubes of size k in a cube of size n.
+
+Python solution:
+def No_of_cubes(N,K):
+    No = 0
+    No = (N - K + 1)
+    No = pow(No, 3)
+    return No
+
+<sep>
+
+Programming task:
+Write a function to split a string at uppercase letters.
+
+Python solution:
+import re
+def split_upperstring(text):
+ return (re.findall('[A-Z][^A-Z]*', text))
+
+<sep>
+
+Programming task:
+Write a function to exchange the position of every n-th value with (n+1)th value and (n+1)th value with n-th value in a given list.
+
+Python solution:
+from itertools import zip_longest, chain, tee
+def exchange_elements(lst):
+    lst1, lst2 = tee(iter(lst), 2)
+    return list(chain.from_iterable(zip_longest(lst[1::2], lst[::2])))
+
+<sep>
+
+Programming task:
+Write a python function to calculate the sum of the numbers in a list between the indices of a specified range.
+
+Python solution:
+def sum_Range_list(nums, m, n):                                                                                                                                                                                                
+    sum_range = 0                                                                                                                                                                                                         
+    for i in range(m, n+1, 1):                                                                                                                                                                                        
+        sum_range += nums[i]                                                                                                                                                                                                  
+    return sum_range
+
+<sep>
+
+Programming task:
+Write a python function to check whether the given two arrays are equal or not.
+
+Python solution:
+def are_Equal(arr1,arr2,n,m):
+    if (n != m):
+        return False
+    arr1.sort()
+    arr2.sort()
+    for i in range(0,n - 1):
+        if (arr1[i] != arr2[i]):
+            return False
+    return True
+
+<sep>
+
+Programming task:
+Write a function to check if one tuple is a subset of another tuple.
+
+Python solution:
+def check_subset(test_tup1, test_tup2):
+  res = set(test_tup2).issubset(test_tup1)
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to flatten the given tuple matrix into the tuple list with each tuple representing each column.
+
+Python solution:
+def matrix_to_list(test_list):
+  temp = [ele for sub in test_list for ele in sub]
+  res = list(zip(*temp))
+  return (str(res))
+
+<sep>
+
+Programming task:
+Write a function to group a sequence of key-value pairs into a dictionary of lists using collections module.
+
+Python solution:
+from collections import defaultdict
+def grouping_dictionary(l):
+    d = defaultdict(list)
+    for k, v in l:
+        d[k].append(v)
+    return d
+
+<sep>
+
+Programming task:
+Write a function to find the perimeter of a rectangle.
+
+Python solution:
+def rectangle_perimeter(l,b):
+  perimeter=2*(l+b)
+  return perimeter
+
+<sep>
+
+Programming task:
+Write a python function to find the sum of fifth power of n natural numbers.
+
+Python solution:
+def fifth_Power_Sum(n) : 
+    sm = 0 
+    for i in range(1,n+1) : 
+        sm = sm + (i*i*i*i*i) 
+    return sm
+
+<sep>
+
+Programming task:
+Write a python function to find the minimum sum of absolute differences of two arrays.
+
+Python solution:
+def find_Min_Sum(a,b,n): 
+    a.sort() 
+    b.sort() 
+    sum = 0  
+    for i in range(n): 
+        sum = sum + abs(a[i] - b[i]) 
+    return sum
+
+<sep>
+
+Programming task:
+Write a python function to find the first digit in factorial of a given number.
+
+Python solution:
+import math 
+def first_Digit(n) : 
+    fact = 1
+    for i in range(2,n + 1) : 
+        fact = fact * i 
+        while (fact % 10 == 0) :  
+            fact = int(fact / 10) 
+    while (fact >= 10) : 
+        fact = int(fact / 10) 
+    return math.floor(fact)
+
+<sep>
+
+Programming task:
+Write a function to find the item with maximum occurrences in a given list.
+
+Python solution:
+def max_occurrences(list1):
+    max_val = 0
+    result = list1[0] 
+    for i in list1:
+        occu = list1.count(i)
+        if occu > max_val:
+            max_val = occu
+            result = i 
+    return result
+
+<sep>
+
+Programming task:
+Write a python function to print duplicants from a list of integers.
+
+Python solution:
+def Repeat(x): 
+    _size = len(x) 
+    repeated = [] 
+    for i in range(_size): 
+        k = i + 1
+        for j in range(k, _size): 
+            if x[i] == x[j] and x[i] not in repeated: 
+                repeated.append(x[i]) 
+    return repeated
+
+<sep>
+
+Programming task:
+Write a python function to choose points from two ranges such that no point lies in both the ranges.
+
+Python solution:
+def find_Points(l1,r1,l2,r2): 
+    x = min(l1,l2) if (l1 != l2) else -1
+    y = max(r1,r2) if (r1 != r2) else -1
+    return (x,y)
+
+<sep>
+
+Programming task:
+Write a function to find the maximum sum that can be formed which has no three consecutive elements present.
+
+Python solution:
+def max_sum_of_three_consecutive(arr, n): 
+	sum = [0 for k in range(n)] 
+	if n >= 1: 
+		sum[0] = arr[0] 
+	if n >= 2: 
+		sum[1] = arr[0] + arr[1] 
+	if n > 2: 
+		sum[2] = max(sum[1], max(arr[1] + arr[2], arr[0] + arr[2])) 
+	for i in range(3, n): 
+		sum[i] = max(max(sum[i-1], sum[i-2] + arr[i]), arr[i] + arr[i-1] + sum[i-3]) 
+	return sum[n-1]
+
+<sep>
+
+Programming task:
+Write a function to sort a list in a dictionary.
+
+Python solution:
+def sorted_dict(dict1):
+  sorted_dict = {x: sorted(y) for x, y in dict1.items()}
+  return sorted_dict
+
+<sep>
+
+Programming task:
+Write a function to find the largest possible value of k such that k modulo x is y.
+
+Python solution:
+import sys 
+def find_max_val(n, x, y): 
+	ans = -sys.maxsize 
+	for k in range(n + 1): 
+		if (k % x == y): 
+			ans = max(ans, k) 
+	return (ans if (ans >= 0 and
+					ans <= n) else -1)
+
+<sep>
+
+Programming task:
+Write a python function to find the average of even numbers till a given even number.
+
+Python solution:
+def average_Even(n) : 
+    if (n% 2!= 0) : 
+        return ("Invalid Input") 
+        return -1  
+    sm = 0
+    count = 0
+    while (n>= 2) : 
+        count = count+1
+        sm = sm+n 
+        n = n-2
+    return sm // count
+
+<sep>
+
+Programming task:
+Write a python function to shift first element to the end of given list.
+
+Python solution:
+def move_last(num_list):
+    a = [num_list[0] for i in range(num_list.count(num_list[0]))]
+    x = [ i for i in num_list if i != num_list[0]]
+    x.extend(a)
+    return (x)
+
+<sep>
+
+Programming task:
+Write a function to count occurrence of a character in a string.
+
+Python solution:
+def count_char(string,char):
+ count = 0
+ for i in range(len(string)):
+    if(string[i] == char):
+        count = count + 1
+ return count
+
+<sep>
+
+Programming task:
+Write a python function to count number of vowels in the string.
+
+Python solution:
+def Check_Vow(string, vowels): 
+    final = [each for each in string if each in vowels] 
+    return(len(final))
+
+<sep>
+
+Programming task:
+Write a python function to replace multiple occurence of character by single.
+
+Python solution:
+import re 
+def replace(string, char): 
+    pattern = char + '{2,}'
+    string = re.sub(pattern, char, string) 
+    return string
+
+<sep>
+
+Programming task:
+Write a function to check whether the given ip address is valid or not using regex.
+
+Python solution:
+import re 
+regex = '''^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
+			25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
+			25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
+			25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$'''
+def check_IP(Ip): 
+	if(re.search(regex, Ip)): 
+		return ("Valid IP address") 
+	else: 
+		return ("Invalid IP address")
+
+<sep>
+
+Programming task:
+Write a python function to check whether a sequence of numbers has a decreasing trend or not.
+
+Python solution:
+def decreasing_trend(nums):
+    if (sorted(nums)== nums):
+        return True
+    else:
+        return False
+
+<sep>
+
+Programming task:
+Write a python function to set the right most unset bit.
+
+Python solution:
+import math 
+def get_Pos_Of_Right_most_Set_Bit(n): 
+    return int(math.log2(n&-n)+1)   
+def set_Right_most_Unset_Bit(n): 
+    if (n == 0): 
+        return 1
+    if ((n & (n + 1)) == 0):     
+        return n 
+    pos = get_Pos_Of_Right_most_Set_Bit(~n)      
+    return ((1 << (pos - 1)) | n)
+
+<sep>
+
+Programming task:
+Write a function to find maximum of three numbers.
+
+Python solution:
+def max_of_three(num1,num2,num3): 
+    if (num1 >= num2) and (num1 >= num3):
+       lnum = num1
+    elif (num2 >= num1) and (num2 >= num3):
+       lnum = num2
+    else:
+       lnum = num3
+    return lnum
+
+<sep>
+
+Programming task:
+Write a python function to convert a list of multiple integers into a single integer.
+
+Python solution:
+def convert(list): 
+    s = [str(i) for i in list] 
+    res = int("".join(s))  
+    return (res)
+
+<sep>
+
+Programming task:
+Write a function to remove duplicate words from a given string using collections module.
+
+Python solution:
+from collections import OrderedDict
+def remove_duplicate(string):
+  result = ' '.join(OrderedDict((w,w) for w in string.split()).keys())
+  return result
+
+<sep>
+
+Programming task:
+Write a function to add two integers. however, if the sum is between the given range it will return 20.
+
+Python solution:
+def sum_nums(x, y,m,n):
+    sum_nums= x + y
+    if sum_nums in range(m, n):
+        return 20
+    else:
+        return sum_nums
+
+<sep>
+
+Programming task:
+Write a function to remove everything except alphanumeric characters from the given string by using regex.
+
+Python solution:
+import re
+def remove_extra_char(text1):
+  pattern = re.compile('[\W_]+')
+  return (pattern.sub('', text1))
+
+<sep>
+
+Programming task:
+Write a function to check if the triangle is valid or not.
+
+Python solution:
+def validity_triangle(a,b,c):
+ total = a + b + c
+ if total == 180:
+    return True
+ else:
+    return False
+
+<sep>
+
+Programming task:
+Write a python function to remove spaces from a given string.
+
+Python solution:
+def remove_spaces(str1):
+  str1 = str1.replace(' ','')
+  return str1
+
+<sep>
+
+Programming task:
+Write a function to access dictionary key’s element by index.
+
+Python solution:
+def access_key(ditionary,key):
+  return list(ditionary)[key]
+
+<sep>
+
+Programming task:
+Write a python function to check whether a sequence of numbers has an increasing trend or not.
+
+Python solution:
+def increasing_trend(nums):
+    if (sorted(nums)== nums):
+        return True
+    else:
+        return False
+
+<sep>
+
+Programming task:
+Write a python function to find the smallest prime divisor of a number.
+
+Python solution:
+def smallest_Divisor(n): 
+    if (n % 2 == 0): 
+        return 2; 
+    i = 3;  
+    while (i*i <= n): 
+        if (n % i == 0): 
+            return i; 
+        i += 2; 
+    return n;
+
+<sep>
+
+Programming task:
+Write a function to multiply two lists using map and lambda function.
+
+Python solution:
+def mul_list(nums1,nums2):
+  result = map(lambda x, y: x * y, nums1, nums2)
+  return list(result)
+
+<sep>
+
+Programming task:
+Write a python function to check whether the given number can be represented by sum of two squares or not.
+
+Python solution:
+def sum_Square(n) : 
+    i = 1 
+    while i*i <= n : 
+        j = 1
+        while (j*j <= n) : 
+            if (i*i+j*j == n) : 
+                return True
+            j = j+1
+        i = i+1     
+    return False
+
+<sep>
+
+Programming task:
+Write a python function to count occurences of a character in a repeated string.
+
+Python solution:
+def count_Char(str,x): 
+    count = 0
+    for i in range(len(str)):  
+        if (str[i] == x) : 
+            count += 1
+    n = 10
+    repititions = n // len(str)  
+    count = count * repititions  
+    l = n % len(str)  
+    for i in range(l): 
+        if (str[i] == x):  
+            count += 1
+    return count
+
+<sep>
+
+Programming task:
+Write a python function to find sum of prime numbers between 1 to n.
+
+Python solution:
+def sum_Of_Primes(n): 
+    prime = [True] * (n + 1)  
+    p = 2
+    while p * p <= n: 
+        if prime[p] == True:  
+            i = p * 2
+            while i <= n: 
+                prime[i] = False
+                i += p 
+        p += 1    
+    sum = 0
+    for i in range (2,n + 1): 
+        if(prime[i]): 
+            sum += i 
+    return sum
+
+<sep>
+
+Programming task:
+Write a function to find the frequency of each element in the given list.
+
+Python solution:
+from collections import defaultdict 
+def freq_element(test_tup):
+  res = defaultdict(int)
+  for ele in test_tup:
+    res[ele] += 1
+  return (str(dict(res)))
+
+<sep>
+
+Programming task:
+Write a function to find the greatest common divisor (gcd) of two integers by using recursion.
+
+Python solution:
+def recur_gcd(a, b):
+	low = min(a, b)
+	high = max(a, b)
+	if low == 0:
+		return high
+	elif low == 1:
+		return 1
+	else:
+		return recur_gcd(low, high%low)
+
+<sep>
+
+Programming task:
+Write a function to get the length of a complex number.
+
+Python solution:
+import cmath
+def len_complex(a,b):
+  cn=complex(a,b)
+  length=abs(cn)
+  return length
+
+<sep>
+
+Programming task:
+## write a function to find the minimum number of jumps to reach the end of the array for the given array of integers where each element represents the max number of steps that can be made forward from that element. > indented block > indented block
+
+Python solution:
+def min_jumps(arr, n):
+	jumps = [0 for i in range(n)]
+	if (n == 0) or (arr[0] == 0):
+		return float('inf')
+	jumps[0] = 0
+	for i in range(1, n):
+		jumps[i] = float('inf')
+		for j in range(i):
+			if (i <= j + arr[j]) and (jumps[j] != float('inf')):
+				jumps[i] = min(jumps[i], jumps[j] + 1)
+				break
+	return jumps[n-1]
+
+<sep>
+
+Programming task:
+Write a function to multiply consecutive numbers of a given list.
+
+Python solution:
+def mul_consecutive_nums(nums):
+    result = [b*a for a, b in zip(nums[:-1], nums[1:])]
+    return result
+
+<sep>
+
+Programming task:
+Write a function to group the 1st elements on the basis of 2nd elements in the given tuple list.
+
+Python solution:
+from itertools import groupby 
+def group_element(test_list):
+  res = dict()
+  for key, val in groupby(sorted(test_list, key = lambda ele: ele[1]), key = lambda ele: ele[1]):
+    res[key] = [ele[0] for ele in val] 
+  return (res)
+
+<sep>
+
+Programming task:
+Write a python function to find the last two digits in factorial of a given number.
+
+Python solution:
+def last_Two_Digits(N): 
+    if (N >= 10): 
+        return
+    fac = 1
+    for i in range(1,N + 1): 
+        fac = (fac * i) % 100
+    return (fac)
+
+<sep>
+
+Programming task:
+Write a function to remove multiple spaces in a string by using regex.
+
+Python solution:
+import re
+def remove_multiple_spaces(text1):
+  return (re.sub(' +',' ',text1))
+
+<sep>
+
+Programming task:
+Write a function to extract unique values from the given dictionary values.
+
+Python solution:
+def extract_unique(test_dict):
+  res = list(sorted({ele for val in test_dict.values() for ele in val}))
+  return res
+
+<sep>
+
+Programming task:
+Write a function to check if each element of the second tuple is greater than its corresponding index in the first tuple.
+
+Python solution:
+def check_greater(test_tup1, test_tup2):
+  res = all(x < y for x, y in zip(test_tup1, test_tup2))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to zip two given lists of lists.
+
+Python solution:
+def zip_list(list1,list2):  
+ result = list(map(list.__add__, list1, list2)) 
+ return result
+
+<sep>
+
+Programming task:
+Write a function to find number of even elements in the given list using lambda function.
+
+Python solution:
+def count_even(array_nums):
+   count_even = len(list(filter(lambda x: (x%2 == 0) , array_nums)))
+   return count_even
+
+<sep>
+
+Programming task:
+Write a function to sort dictionary items by tuple product of keys for the given dictionary with tuple keys.
+
+Python solution:
+def sort_dict_item(test_dict):
+  res = {key: test_dict[key] for key in sorted(test_dict.keys(), key = lambda ele: ele[1] * ele[0])}
+  return  (res)
+
+<sep>
+
+Programming task:
+Write a python function to find the minimum number of swaps required to convert one binary string to another.
+
+Python solution:
+def min_Swaps(str1,str2) : 
+    count = 0
+    for i in range(len(str1)) : 
+        if str1[i] != str2[i] : 
+            count += 1
+    if count % 2 == 0 : 
+        return (count // 2) 
+    else : 
+        return ("Not Possible")
+
+<sep>
+
+Programming task:
+Write a function to count the number of elements in a list which are within a specific range.
+
+Python solution:
+def count_range_in_list(li, min, max):
+	ctr = 0
+	for x in li:
+		if min <= x <= max:
+			ctr += 1
+	return ctr
+
+<sep>
+
+Programming task:
+Write a function to find the equilibrium index of the given array.
+
+Python solution:
+def equilibrium_index(arr):
+  total_sum = sum(arr)
+  left_sum=0
+  for i, num in enumerate(arr):
+    total_sum -= num
+    if left_sum == total_sum:
+      return i
+    left_sum += num
+  return -1
+
+<sep>
+
+Programming task:
+Write a function to find the minimum number of elements that should be removed such that amax-amin<=k.
+
+Python solution:
+def find_ind(key, i, n, 
+			k, arr):
+	ind = -1
+	start = i + 1
+	end = n - 1;
+	while (start < end):
+		mid = int(start +
+				(end - start) / 2)
+		if (arr[mid] - key <= k):
+			ind = mid
+			start = mid + 1
+		else:
+			end = mid
+	return ind
+def removals(arr, n, k):
+	ans = n - 1
+	arr.sort()
+	for i in range(0, n):
+		j = find_ind(arr[i], i, 
+					n, k, arr)
+		if (j != -1):
+			ans = min(ans, n -
+						(j - i + 1))
+	return ans
+
+<sep>
+
+Programming task:
+Write a function to check whether the given key is present in the dictionary or not.
+
+Python solution:
+def is_key_present(d,x):
+  if x in d:
+    return True
+  else:
+     return False
+
+<sep>
+
+Programming task:
+Write a function to calculate the harmonic sum of n-1.
+
+Python solution:
+def harmonic_sum(n):
+  if n < 2:
+    return 1
+  else:
+    return 1 / n + (harmonic_sum(n - 1))
+
+<sep>
+
+Programming task:
+Write a function to sort a list of lists by length and value.
+
+Python solution:
+def sort_sublists(list1):
+      list1.sort()  
+      list1.sort(key=len)
+      return  list1
+
+<sep>
+
+Programming task:
+Write a function to find whether an array is subset of another array.
+
+Python solution:
+def is_subset(arr1, m, arr2, n): 
+	hashset = set() 
+	for i in range(0, m): 
+		hashset.add(arr1[i]) 
+	for i in range(0, n): 
+		if arr2[i] in hashset: 
+			continue
+		else: 
+			return False
+	return True
+
+<sep>
+
+Programming task:
+Write a python function to count the total set bits from 1 to n.
+
+Python solution:
+def count_Set_Bits(n) :  
+    n += 1; 
+    powerOf2 = 2;   
+    cnt = n // 2;  
+    while (powerOf2 <= n) : 
+        totalPairs = n // powerOf2;  
+        cnt += (totalPairs // 2) * powerOf2;  
+        if (totalPairs & 1) : 
+            cnt += (n % powerOf2) 
+        else : 
+            cnt += 0
+        powerOf2 <<= 1;    
+    return cnt;
+
+<sep>
+
+Programming task:
+Write a python function to convert a string to a list.
+
+Python solution:
+def Convert(string): 
+    li = list(string.split(" ")) 
+    return li
+
+<sep>
+
+Programming task:
+Write a function to count unique keys for each value present in the tuple.
+
+Python solution:
+from collections import defaultdict 
+def get_unique(test_list):
+  res = defaultdict(list)
+  for sub in test_list:
+    res[sub[1]].append(sub[0])
+  res = dict(res)
+  res_dict = dict()
+  for key in res:
+    res_dict[key] = len(list(set(res[key])))
+  return (str(res_dict))
+
+<sep>
+
+Programming task:
+Write a function to access the initial and last data of the given tuple record.
+
+Python solution:
+def front_and_rear(test_tup):
+  res = (test_tup[0], test_tup[-1])
+  return (res)
+
+<sep>
+
+Programming task:
+Write a python function to check whether the product of digits of a number at even and odd places is equal or not.
+
+Python solution:
+def product_Equal(n): 
+    if n < 10: 
+        return False
+    prodOdd = 1; prodEven = 1
+    while n > 0: 
+        digit = n % 10
+        prodOdd *= digit 
+        n = n//10
+        if n == 0: 
+            break; 
+        digit = n % 10
+        prodEven *= digit 
+        n = n//10
+    if prodOdd == prodEven: 
+        return True
+    return False
+
+<sep>
+
+Programming task:
+Write a function to remove duplicates from a list of lists.
+
+Python solution:
+import itertools
+def remove_duplicate(list1):
+ list.sort(list1)
+ remove_duplicate = list(list1 for list1,_ in itertools.groupby(list1))
+ return remove_duplicate
+
+<sep>
+
+Programming task:
+Write a function to check if the given tuple contains all valid values or not.
+
+Python solution:
+def check_valid(test_tup):
+  res = not any(map(lambda ele: not ele, test_tup))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a python function to count the number of distinct power of prime factor of given number.
+
+Python solution:
+def count_Fac(n):  
+    m = n 
+    count = 0
+    i = 2
+    while((i * i) <= m): 
+        total = 0
+        while (n % i == 0): 
+            n /= i 
+            total += 1 
+        temp = 0
+        j = 1
+        while((temp + j) <= total): 
+            temp += j 
+            count += 1
+            j += 1 
+        i += 1
+    if (n != 1): 
+        count += 1 
+    return count
+
+<sep>
+
+Programming task:
+Write a function to convert the given string of integers into a tuple.
+
+Python solution:
+def str_to_tuple(test_str):
+  res = tuple(map(int, test_str.split(', ')))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to find the perimeter of a rombus.
+
+Python solution:
+def rombus_perimeter(a):
+  perimeter=4*a
+  return perimeter
+
+<sep>
+
+Programming task:
+Write a function to calculate the standard deviation.
+
+Python solution:
+import math
+import sys
+def sd_calc(data):
+    n = len(data)
+    if n <= 1:
+        return 0.0
+    mean, sd = avg_calc(data), 0.0
+    for el in data:
+        sd += (float(el) - mean)**2
+    sd = math.sqrt(sd / float(n-1))
+    return sd
+def avg_calc(ls):
+    n, mean = len(ls), 0.0
+    if n <= 1:
+        return ls[0]
+    for el in ls:
+        mean = mean + float(el)
+    mean = mean / float(n)
+    return mean
+
+<sep>
+
+Programming task:
+Write a function to create a list taking alternate elements from another given list.
+
+Python solution:
+def alternate_elements(list1):
+    result=[]
+    for item in list1[::2]:
+        result.append(item)
+    return result
+
+<sep>
+
+Programming task:
+Write a function that matches a string that has an a followed by zero or more b's.
+
+Python solution:
+import re
+def text_match(text):
+        patterns = 'ab*?'
+        if re.search(patterns,  text):
+                return 'Found a match!'
+        else:
+                return('Not matched!')
+
+<sep>
+
+Programming task:
+Write a function to add a dictionary to the tuple.
+
+Python solution:
+def add_dict_to_tuple(test_tup, test_dict):
+  test_tup = list(test_tup)
+  test_tup.append(test_dict)
+  test_tup = tuple(test_tup)
+  return (test_tup)
+
+<sep>
+
+Programming task:
+Write a function to find a path with the maximum average over all existing paths for the given square matrix of size n*n.
+
+Python solution:
+M = 100
+def maxAverageOfPath(cost, N): 
+	dp = [[0 for i in range(N + 1)] for j in range(N + 1)] 
+	dp[0][0] = cost[0][0] 
+	for i in range(1, N): 
+		dp[i][0] = dp[i - 1][0] + cost[i][0] 
+	for j in range(1, N): 
+		dp[0][j] = dp[0][j - 1] + cost[0][j] 
+	for i in range(1, N): 
+		for j in range(1, N): 
+			dp[i][j] = max(dp[i - 1][j], 
+						dp[i][j - 1]) + cost[i][j] 
+	return dp[N - 1][N - 1] / (2 * N - 1)
+
+<sep>
+
+Programming task:
+Write a function to filter the height and width of students which are stored in a dictionary.
+
+Python solution:
+def filter_data(students,h,w):
+    result = {k: s for k, s in students.items() if s[0] >=h and s[1] >=w}
+    return result
+
+<sep>
+
+Programming task:
+Write a function to count the same pair in two given lists using map function.
+
+Python solution:
+from operator import eq
+def count_same_pair(nums1, nums2):
+    result = sum(map(eq, nums1, nums2))
+    return result
+
+<sep>
+
+Programming task:
+Write a function to calculate the sum of all digits of the base to the specified power.
+
+Python solution:
+def power_base_sum(base, power):
+    return sum([int(i) for i in str(pow(base, power))])
+
+<sep>
+
+Programming task:
+Write a function to extract values between quotation marks of the given string by using regex.
+
+Python solution:
+import re
+def extract_quotation(text1):
+  return (re.findall(r'"(.*?)"', text1))
+
+<sep>
+
+Programming task:
+Write a function to multiply the adjacent elements of the given tuple.
+
+Python solution:
+def multiply_elements(test_tup):
+  res = tuple(i * j for i, j in zip(test_tup, test_tup[1:]))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to remove all characters except letters and numbers using regex
+
+Python solution:
+import re 
+def remove_char(S):
+  result = re.sub('[\W_]+', '', S) 
+  return result
+
+<sep>
+
+Programming task:
+Write a function to sum elements in two lists.
+
+Python solution:
+def sum_list(lst1,lst2):
+  res_list = [lst1[i] + lst2[i] for i in range(len(lst1))] 
+  return res_list
+
+<sep>
+
+Programming task:
+Write a function to add two lists using map and lambda function.
+
+Python solution:
+def add_list(nums1,nums2):
+  result = map(lambda x, y: x + y, nums1, nums2)
+  return list(result)
+
+<sep>
+
+Programming task:
+Write a function to remove consecutive duplicates of a given list.
+
+Python solution:
+from itertools import groupby
+def consecutive_duplicates(nums):
+    return [key for key, group in groupby(nums)]
+
+<sep>
+
+Programming task:
+Write a function to find the lateral surface area of a cone.
+
+Python solution:
+import math
+def lateralsurface_cone(r,h):
+  l = math.sqrt(r * r + h * h)
+  LSA = math.pi * r  * l
+  return LSA
+
+<sep>
+
+Programming task:
+Write a function to replace all occurrences of spaces, commas, or dots with a colon.
+
+Python solution:
+import re
+def replace_specialchar(text):
+ return (re.sub("[ ,.]", ":", text))
+
+<sep>
+
+Programming task:
+Write a function to find the index of the first occurrence of a given number in a sorted array.
+
+Python solution:
+def find_first_occurrence(A, x):
+    (left, right) = (0, len(A) - 1)
+    result = -1
+    while left <= right:
+        mid = (left + right) // 2
+        if x == A[mid]:
+            result = mid
+            right = mid - 1
+        elif x < A[mid]:
+            right = mid - 1
+        else:
+            left = mid + 1
+    return result
+
+<sep>
+
+Programming task:
+Write a python function to find sum of products of all possible subarrays.
+
+Python solution:
+def sum_Of_Subarray_Prod(arr,n):
+    ans = 0
+    res = 0
+    i = n - 1
+    while (i >= 0):
+        incr = arr[i]*(1 + res)
+        ans += incr
+        res = incr
+        i -= 1
+    return (ans)
+
+<sep>
+
+Programming task:
+Write a python function to toggle bits of the number except the first and the last bit.
+
+Python solution:
+def set_middle_bits(n):  
+    n |= n >> 1; 
+    n |= n >> 2; 
+    n |= n >> 4; 
+    n |= n >> 8; 
+    n |= n >> 16;  
+    return (n >> 1) ^ 1
+def toggle_middle_bits(n): 
+    if (n == 1): 
+        return 1
+    return n ^ set_middle_bits(n)
+
+<sep>
+
+Programming task:
+Write a function to locate the left insertion point for a specified value in sorted order.
+
+Python solution:
+import bisect
+def left_insertion(a, x):
+    i = bisect.bisect_left(a, x)
+    return i
+
+<sep>
+
+Programming task:
+Write a function to check whether the given string is starting with a vowel or not using regex.
+
+Python solution:
+import re 
+regex = '^[aeiouAEIOU][A-Za-z0-9_]*'
+def check_str(string): 
+	if(re.search(regex, string)): 
+		return ("Valid") 
+	else: 
+		return ("Invalid")
+
+<sep>
+
+Programming task:
+Write a function to calculate the geometric sum of n-1.
+
+Python solution:
+def geometric_sum(n):
+  if n < 0:
+    return 0
+  else:
+    return 1 / (pow(2, n)) + geometric_sum(n - 1)
+
+<sep>
+
+Programming task:
+Write a python function to find the index of smallest triangular number with n digits.
+
+Python solution:
+import math 
+def find_Index(n): 
+    x = math.sqrt(2 * math.pow(10,(n - 1))); 
+    return round(x);
+
+<sep>
+
+Programming task:
+Write a function to convert the given tuple to a key-value dictionary using adjacent elements.
+
+Python solution:
+def tuple_to_dict(test_tup):
+  res = dict(test_tup[idx : idx + 2] for idx in range(0, len(test_tup), 2))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a python function to check whether all the characters are same or not.
+
+Python solution:
+def all_Characters_Same(s) :
+    n = len(s)
+    for i in range(1,n) :
+        if s[i] != s[0] :
+            return False
+    return True
+
+<sep>
+
+Programming task:
+Write a function to caluclate the area of a tetrahedron.
+
+Python solution:
+import math
+def area_tetrahedron(side):
+  area = math.sqrt(3)*(side*side)
+  return area
+
+<sep>
+
+Programming task:
+Write a function to rotate a given list by specified number of items to the right direction.
+
+Python solution:
+def rotate_right(list1,m,n):
+  result =  list1[-(m):]+list1[:-(n)]
+  return result
+
+<sep>
+
+Programming task:
+Write a function to check if the given tuple has any none value or not.
+
+Python solution:
+def check_none(test_tup):
+  res = any(map(lambda ele: ele is None, test_tup))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to find numbers within a given range where every number is divisible by every digit it contains.
+
+Python solution:
+def divisible_by_digits(startnum, endnum):
+    return [n for n in range(startnum, endnum+1) \
+                if not any(map(lambda x: int(x) == 0 or n%int(x) != 0, str(n)))]
+
+<sep>
+
+Programming task:
+Write a function to find area of a sector.
+
+Python solution:
+def sector_area(r,a):
+    pi=22/7
+    if a >= 360:
+        return None
+    sectorarea = (pi*r**2) * (a/360)
+    return sectorarea
+
+<sep>
+
+Programming task:
+Write a function to find the longest common subsequence for the given three string sequence.
+
+Python solution:
+def lcs_of_three(X, Y, Z, m, n, o): 
+	L = [[[0 for i in range(o+1)] for j in range(n+1)] 
+		for k in range(m+1)] 
+	for i in range(m+1): 
+		for j in range(n+1): 
+			for k in range(o+1): 
+				if (i == 0 or j == 0 or k == 0): 
+					L[i][j][k] = 0
+				elif (X[i-1] == Y[j-1] and
+					X[i-1] == Z[k-1]): 
+					L[i][j][k] = L[i-1][j-1][k-1] + 1
+				else: 
+					L[i][j][k] = max(max(L[i-1][j][k], 
+					L[i][j-1][k]), 
+									L[i][j][k-1]) 
+	return L[m][n][o]
+
+<sep>
+
+Programming task:
+Write a function to put spaces between words starting with capital letters in a given string by using regex.
+
+Python solution:
+import re
+def capital_words_spaces(str1):
+  return re.sub(r"(\w)([A-Z])", r"\1 \2", str1)
+
+<sep>
+
+Programming task:
+Write a function to sort a given list of strings of numbers numerically.
+
+Python solution:
+def sort_numeric_strings(nums_str):
+    result = [int(x) for x in nums_str]
+    result.sort()
+    return result
+
+<sep>
+
+Programming task:
+Write a function to add the given tuple to the given list.
+
+Python solution:
+def add_tuple(test_list, test_tup):
+  test_list += test_tup
+  return (test_list)
+
+<sep>
+
+Programming task:
+Write a function to check if the given array represents min heap or not.
+
+Python solution:
+def check_min_heap(arr, i):
+    if 2 * i + 2 > len(arr):
+        return True
+    left_child = (arr[i] <= arr[2 * i + 1]) and check_min_heap(arr, 2 * i + 1)
+    right_child = (2 * i + 2 == len(arr)) or (arr[i] <= arr[2 * i + 2] 
+                                      and check_min_heap(arr, 2 * i + 2))
+    return left_child and right_child
+
+<sep>
+
+Programming task:
+Write a function to find the nth jacobsthal number.
+
+Python solution:
+def jacobsthal_num(n): 
+	dp = [0] * (n + 1) 
+	dp[0] = 0
+	dp[1] = 1
+	for i in range(2, n+1): 
+		dp[i] = dp[i - 1] + 2 * dp[i - 2] 
+	return dp[n]
+
+<sep>
+
+Programming task:
+Write a function to find minimum k records from tuple list.
+
+Python solution:
+def min_k(test_list, K):
+  res = sorted(test_list, key = lambda x: x[1])[:K]
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to find common index elements from three lists.
+
+Python solution:
+def extract_index_list(l1, l2, l3):
+    result = []
+    for m, n, o in zip(l1, l2, l3):
+        if (m == n == o):
+            result.append(m)
+    return result
+
+<sep>
+
+Programming task:
+Write a function to find the second smallest number in a list.
+
+Python solution:
+def second_smallest(numbers):
+  if (len(numbers)<2):
+    return
+  if ((len(numbers)==2)  and (numbers[0] == numbers[1]) ):
+    return
+  dup_items = set()
+  uniq_items = []
+  for x in numbers:
+    if x not in dup_items:
+      uniq_items.append(x)
+      dup_items.add(x)
+  uniq_items.sort()    
+  return  uniq_items[1]
+
+<sep>
+
+Programming task:
+Write a function that matches a string that has an a followed by zero or one 'b'.
+
+Python solution:
+import re
+def text_match_zero_one(text):
+        patterns = 'ab?'
+        if re.search(patterns,  text):
+                return 'Found a match!'
+        else:
+                return('Not matched!')
+
+<sep>
+
+Programming task:
+Write a function to count the pairs of reverse strings in the given string list.
+
+Python solution:
+def count_reverse_pairs(test_list):
+  res = sum([1 for idx in range(0, len(test_list)) for idxn in range(idx, len( 
+	test_list)) if test_list[idxn] == str(''.join(list(reversed(test_list[idx]))))]) 
+  return str(res)
+
+<sep>
+
+Programming task:
+Write a function to count number of unique lists within a list.
+
+Python solution:
+def unique_sublists(list1):
+    result ={}
+    for l in  list1: 
+        result.setdefault(tuple(l), list()).append(1) 
+    for a, b in result.items(): 
+        result[a] = sum(b)
+    return result
+
+<sep>
+
+Programming task:
+Write a function to check a decimal with a precision of 2.
+
+Python solution:
+def is_decimal(num):
+    import re
+    dnumre = re.compile(r"""^[0-9]+(\.[0-9]{1,2})?$""")
+    result = dnumre.search(num)
+    return bool(result)
+
+<sep>
+
+Programming task:
+Write a python function to check whether an array contains only one distinct element or not.
+
+Python solution:
+def unique_Element(arr,n):
+    s = set(arr)
+    if (len(s) == 1):
+        return ('YES')
+    else:
+        return ('NO')
+
+<sep>
+
+Programming task:
+Write a function to caluclate arc length of an angle.
+
+Python solution:
+def arc_length(d,a):
+    pi=22/7
+    if a >= 360:
+        return None
+    arclength = (pi*d) * (a/360)
+    return arclength
+
+<sep>
+
+Programming task:
+Write a function to check whether the given month number contains 30 days or not.
+
+Python solution:
+def check_monthnumber_number(monthnum3):
+  if(monthnum3==4 or monthnum3==6 or monthnum3==9 or monthnum3==11):
+    return True
+  else:
+    return False
+
+<sep>
+
+Programming task:
+Write a python function to find the minimum difference between any two elements in a given array.
+
+Python solution:
+def find_Min_Diff(arr,n): 
+    arr = sorted(arr) 
+    diff = 10**20 
+    for i in range(n-1): 
+        if arr[i+1] - arr[i] < diff: 
+            diff = arr[i+1] - arr[i]  
+    return diff
+
+<sep>
+
+Programming task:
+Write a python function to count numeric values in a given string.
+
+Python solution:
+def number_ctr(str):
+      number_ctr= 0
+      for i in range(len(str)):
+          if str[i] >= '0' and str[i] <= '9': number_ctr += 1     
+      return  number_ctr
+
+<sep>
+
+Programming task:
+Write a function to find nth polite number.
+
+Python solution:
+import math 
+def is_polite(n): 
+	n = n + 1
+	return (int)(n+(math.log((n + math.log(n, 2)), 2)))
+
+<sep>
+
+Programming task:
+Write a function to iterate over all pairs of consecutive items in a given list.
+
+Python solution:
+def pair_wise(l1):
+    temp = []
+    for i in range(len(l1) - 1):
+        current_element, next_element = l1[i], l1[i + 1]
+        x = (current_element, next_element)
+        temp.append(x)
+    return temp
+
+<sep>
+
+Programming task:
+Write a python function to count the number of pairs whose sum is equal to ‘sum’.
+
+Python solution:
+def get_Pairs_Count(arr,n,sum):
+    count = 0  
+    for i in range(0,n):
+        for j in range(i + 1,n):
+            if arr[i] + arr[j] == sum:
+                count += 1
+    return count
+
+<sep>
+
+Programming task:
+Write a python function to check for odd parity of a given number.
+
+Python solution:
+def check_Odd_Parity(x): 
+    parity = 0
+    while (x != 0): 
+        x = x & (x - 1) 
+        parity += 1
+    if (parity % 2 == 1): 
+        return True
+    else: 
+        return False
+
+<sep>
+
+Programming task:
+Write a python function to get the difference between two lists.
+
+Python solution:
+def Diff(li1,li2):
+    return (list(list(set(li1)-set(li2)) + list(set(li2)-set(li1))))
+
+<sep>
+
+Programming task:
+Write a python function to find the sum of fourth power of first n odd natural numbers.
+
+Python solution:
+def odd_Num_Sum(n) : 
+    j = 0
+    sm = 0
+    for i in range(1,n + 1) : 
+        j = (2*i-1) 
+        sm = sm + (j*j*j*j)   
+    return sm
+
+<sep>
+
+Programming task:
+Write a function to check if the given expression is balanced or not.
+
+Python solution:
+from collections import deque
+def check_expression(exp):
+    if len(exp) & 1:
+        return False
+    stack = deque()
+    for ch in exp:
+        if ch == '(' or ch == '{' or ch == '[':
+            stack.append(ch)
+        if ch == ')' or ch == '}' or ch == ']':
+            if not stack:
+                return False
+            top = stack.pop()
+            if (top == '(' and ch != ')') or (top == '{' and ch != '}' or (top == '[' and ch != ']')):
+                return False
+    return not stack
+
+<sep>
+
+Programming task:
+Write a function to remove all the words with k length in the given string.
+
+Python solution:
+def remove_length(test_str, K):
+  temp = test_str.split()
+  res = [ele for ele in temp if len(ele) != K]
+  res = ' '.join(res)
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to find the occurrence and position of the substrings within a string.
+
+Python solution:
+import re
+def occurance_substring(text,pattern):
+ for match in re.finditer(pattern, text):
+    s = match.start()
+    e = match.end()
+    return (text[s:e], s, e)
+
+<sep>
+
+Programming task:
+Write a function to check if the string is a valid email address or not using regex.
+
+Python solution:
+import re 
+regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+def check_email(email): 
+	if(re.search(regex,email)): 
+		return ("Valid Email") 
+	else: 
+		return ("Invalid Email")
+
+<sep>
+
+Programming task:
+Write a python function to check whether every odd index contains odd numbers of a given list.
+
+Python solution:
+def odd_position(nums):
+	return all(nums[i]%2==i%2 for i in range(len(nums)))
+
+<sep>
+
+Programming task:
+Write a function to count those characters which have vowels as their neighbors in the given string.
+
+Python solution:
+def count_vowels(test_str):
+  res = 0
+  vow_list = ['a', 'e', 'i', 'o', 'u']
+  for idx in range(1, len(test_str) - 1):
+    if test_str[idx] not in vow_list and (test_str[idx - 1] in vow_list or test_str[idx + 1] in vow_list):
+      res += 1
+  if test_str[0] not in vow_list and test_str[1] in vow_list:
+    res += 1
+  if test_str[-1] not in vow_list and test_str[-2] in vow_list:
+    res += 1
+  return (res)
+
+<sep>
+
+Programming task:
+Write a python function to find the sum of non-repeated elements in a given array.
+
+Python solution:
+def find_Sum(arr,n): 
+    arr.sort() 
+    sum = arr[0] 
+    for i in range(0,n-1): 
+        if (arr[i] != arr[i+1]): 
+            sum = sum + arr[i+1]   
+    return sum
+
+<sep>
+
+Programming task:
+Write a function to pack consecutive duplicates of a given list elements into sublists.
+
+Python solution:
+from itertools import groupby
+def pack_consecutive_duplicates(list1):
+    return [list(group) for key, group in groupby(list1)]
+
+<sep>
+
+Programming task:
+Write a function to count the number of unique lists within a list.
+
+Python solution:
+def unique_sublists(list1):
+    result ={}
+    for l in list1: 
+        result.setdefault(tuple(l), list()).append(1) 
+    for a, b in result.items(): 
+        result[a] = sum(b)
+    return result
+
+<sep>
+
+Programming task:
+Write a function to find the combinations of sums with tuples in the given tuple list.
+
+Python solution:
+from itertools import combinations 
+def find_combinations(test_list):
+  res = [(b1 + a1, b2 + a2) for (a1, a2), (b1, b2) in combinations(test_list, 2)]
+  return (res)
+
+<sep>
+
+Programming task:
+Write a python function to check whether the count of divisors is even or odd.
+
+Python solution:
+import math 
+def count_Divisors(n) : 
+    count = 0
+    for i in range(1, (int)(math.sqrt(n)) + 2) : 
+        if (n % i == 0) : 
+            if( n // i == i) : 
+                count = count + 1
+            else : 
+                count = count + 2
+    if (count % 2 == 0) : 
+        return ("Even") 
+    else : 
+        return ("Odd")
+
+<sep>
+
+Programming task:
+Write a python function to find the sum of all odd length subarrays.
+
+Python solution:
+def Odd_Length_Sum(arr):
+    Sum = 0
+    l = len(arr)
+    for i in range(l):
+        Sum += ((((i + 1) *(l - i) + 1) // 2) * arr[i])
+    return Sum
+
+<sep>
+
+Programming task:
+Write a function to convert rgb color to hsv color.
+
+Python solution:
+def rgb_to_hsv(r, g, b):
+    r, g, b = r/255.0, g/255.0, b/255.0
+    mx = max(r, g, b)
+    mn = min(r, g, b)
+    df = mx-mn
+    if mx == mn:
+        h = 0
+    elif mx == r:
+        h = (60 * ((g-b)/df) + 360) % 360
+    elif mx == g:
+        h = (60 * ((b-r)/df) + 120) % 360
+    elif mx == b:
+        h = (60 * ((r-g)/df) + 240) % 360
+    if mx == 0:
+        s = 0
+    else:
+        s = (df/mx)*100
+    v = mx*100
+    return h, s, v
+
+<sep>
+
+Programming task:
+Write a function to find the product of first even and odd number of a given list.
+
+Python solution:
+def mul_even_odd(list1):
+    first_even = next((el for el in list1 if el%2==0),-1)
+    first_odd = next((el for el in list1 if el%2!=0),-1)
+    return (first_even*first_odd)
+
+<sep>
+
+Programming task:
+Write a function to convert tuple string to integer tuple.
+
+Python solution:
+def tuple_str_int(test_str):
+  res = tuple(int(num) for num in test_str.replace('(', '').replace(')', '').replace('...', '').split(', '))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to locate the right insertion point for a specified value in sorted order.
+
+Python solution:
+import bisect
+def right_insertion(a, x):
+    i = bisect.bisect_right(a, x)
+    return i
+
+<sep>
+
+Programming task:
+Write a function that matches a string that has an a followed by three 'b'.
+
+Python solution:
+import re
+def text_match_three(text):
+        patterns = 'ab{3}?'
+        if re.search(patterns,  text):
+                return 'Found a match!'
+        else:
+                return('Not matched!')
+
+<sep>
+
+Programming task:
+Write a function to create a new tuple from the given string and list.
+
+Python solution:
+def new_tuple(test_list, test_str):
+  res = tuple(test_list + [test_str])
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to calculate the perimeter of a regular polygon.
+
+Python solution:
+from math import tan, pi
+def perimeter_polygon(s,l):
+  perimeter = s*l
+  return perimeter
+
+<sep>
+
+Programming task:
+Write a python function to check whether every even index contains even numbers of a given list.
+
+Python solution:
+def even_position(nums):
+	return all(nums[i]%2==i%2 for i in range(len(nums)))
+
+<sep>
+
+Programming task:
+Write a function to remove the nested record from the given tuple.
+
+Python solution:
+def remove_nested(test_tup):
+  res = tuple()
+  for count, ele in enumerate(test_tup):
+    if not isinstance(ele, tuple):
+      res = res + (ele, )
+  return (res)
+
+<sep>
+
+Programming task:
+Write a python function to count the number of lists in a given number of lists.
+
+Python solution:
+def count_list(input_list): 
+    return len(input_list)
+
+<sep>
+
+Programming task:
+Write a python function to find the last position of an element in a sorted array.
+
+Python solution:
+def last(arr,x,n):
+    low = 0
+    high = n - 1
+    res = -1  
+    while (low <= high):
+        mid = (low + high) // 2 
+        if arr[mid] > x:
+            high = mid - 1
+        elif arr[mid] < x:
+            low = mid + 1
+        else:
+            res = mid
+            low = mid + 1
+    return res
+
+<sep>
+
+Programming task:
+Write a function that matches a string that has an 'a' followed by anything, ending in 'b'.
+
+Python solution:
+import re
+def text_starta_endb(text):
+        patterns = 'a.*?b$'
+        if re.search(patterns,  text):
+                return 'Found a match!'
+        else:
+                return('Not matched!')
+
+<sep>
+
+Programming task:
+Write a function to find the n - cheap price items from a given dataset using heap queue algorithm.
+
+Python solution:
+import heapq
+def cheap_items(items,n):
+  cheap_items = heapq.nsmallest(n, items, key=lambda s: s['price'])
+  return cheap_items
+
+<sep>
+
+Programming task:
+Write function to find the sum of all items in the given dictionary.
+
+Python solution:
+def return_sum(dict):
+  sum = 0
+  for i in dict.values():
+    sum = sum + i
+  return sum
+
+<sep>
+
+Programming task:
+Write a python function to find the sum of all odd natural numbers within the range l and r.
+
+Python solution:
+def sum_Odd(n): 
+    terms = (n + 1)//2
+    sum1 = terms * terms 
+    return sum1  
+def sum_in_Range(l,r): 
+    return sum_Odd(r) - sum_Odd(l - 1)
+
+<sep>
+
+Programming task:
+Write a python function to find the sum of an array.
+
+Python solution:
+def _sum(arr):  
+    sum=0
+    for i in arr: 
+        sum = sum + i      
+    return(sum)
+
+<sep>
+
+Programming task:
+Write a python function to left rotate the bits of a given number.
+
+Python solution:
+INT_BITS = 32
+def left_Rotate(n,d):   
+    return (n << d)|(n >> (INT_BITS - d))
+
+<sep>
+
+Programming task:
+Write a function to remove all whitespaces from a string.
+
+Python solution:
+import re
+def remove_all_spaces(text):
+ return (re.sub(r'\s+', '',text))
+
+<sep>
+
+Programming task:
+Write a python function to count the number of equal numbers from three given integers.
+
+Python solution:
+def test_three_equal(x,y,z):
+  result= set([x,y,z])
+  if len(result)==3:
+    return 0
+  else:
+    return (4-len(result))
+
+<sep>
+
+Programming task:
+Write a python function to count the number of rotations required to generate a sorted array.
+
+Python solution:
+def count_Rotation(arr,n):   
+    for i in range (1,n): 
+        if (arr[i] < arr[i - 1]): 
+            return i  
+    return 0
+
+<sep>
+
+Programming task:
+Write a python function to check whether the given number is a perfect square or not.
+
+Python solution:
+def is_Perfect_Square(n) :
+    i = 1
+    while (i * i<= n):
+        if ((n % i == 0) and (n / i == i)):
+            return True     
+        i = i + 1
+    return False
+
+<sep>
+
+Programming task:
+Write a python function to check whether the product of numbers is even or not.
+
+Python solution:
+def is_Product_Even(arr,n): 
+    for i in range(0,n): 
+        if ((arr[i] & 1) == 0): 
+            return True
+    return False
+
+<sep>
+
+Programming task:
+Write a function to find the list in a list of lists whose sum of elements is the highest.
+
+Python solution:
+def max_sum_list(lists):
+ return max(lists, key=sum)
+
+<sep>
+
+Programming task:
+Write a function to find maximum run of uppercase characters in the given string.
+
+Python solution:
+def max_run_uppercase(test_str):
+  cnt = 0
+  res = 0
+  for idx in range(0, len(test_str)):
+    if test_str[idx].isupper():
+      cnt += 1
+    else:
+      res = cnt
+      cnt = 0
+  if test_str[len(test_str) - 1].isupper():
+    res = cnt
+  return (res)
+
+<sep>
+
+Programming task:
+Write a python function to find the first odd number in a given list of numbers.
+
+Python solution:
+def first_odd(nums):
+  first_odd = next((el for el in nums if el%2!=0),-1)
+  return first_odd
+
+<sep>
+
+Programming task:
+Write a function to check if the given tuples contain the k or not.
+
+Python solution:
+def check_K(test_tup, K):
+  res = False
+  for ele in test_tup:
+    if ele == K:
+      res = True
+      break
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to check if each element of second tuple is smaller than its corresponding index in first tuple.
+
+Python solution:
+def check_smaller(test_tup1, test_tup2):
+  res = all(x > y for x, y in zip(test_tup1, test_tup2))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to iterate over elements repeating each as many times as its count.
+
+Python solution:
+from collections import Counter
+def count_variable(a,b,c,d):
+  c = Counter(p=a, q=b, r=c, s=d)
+  return list(c.elements())
+
+<sep>
+
+Programming task:
+Write a function to check if two lists of tuples are identical or not.
+
+Python solution:
+def check_identical(test_list1, test_list2):
+  res = test_list1 == test_list2
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to abbreviate 'road' as 'rd.' in a given string.
+
+Python solution:
+import re
+def road_rd(street):
+  return (re.sub('Road$', 'Rd.', street))
+
+<sep>
+
+Programming task:
+Write a function to find length of the string.
+
+Python solution:
+def string_length(str1):
+    count = 0
+    for char in str1:
+        count += 1
+    return count
+
+<sep>
+
+Programming task:
+Write a function to find the area of a rombus.
+
+Python solution:
+def rombus_area(p,q):
+  area=(p*q)/2
+  return area
+
+<sep>
+
+Programming task:
+Write a function to sort the given array without using any sorting algorithm. the given array consists of only 0, 1, and 2.
+
+Python solution:
+def sort_by_dnf(arr, n):
+  low=0
+  mid=0
+  high=n-1
+  while mid <= high:
+    if arr[mid] == 0:
+      arr[low], arr[mid] = arr[mid], arr[low]
+      low = low + 1
+      mid = mid + 1
+    elif arr[mid] == 1:
+      mid = mid + 1
+    else:
+      arr[mid], arr[high] = arr[high], arr[mid]
+      high = high - 1
+  return arr
+
+<sep>
+
+Programming task:
+Write a function to clear the values of the given tuples.
+
+Python solution:
+def clear_tuple(test_tup):
+  temp = list(test_tup)
+  temp.clear()
+  test_tup = tuple(temp)
+  return (test_tup)
+
+<sep>
+
+Programming task:
+Write a function to find numbers divisible by m or n from a list of numbers using lambda function.
+
+Python solution:
+def div_of_nums(nums,m,n):
+ result = list(filter(lambda x: (x % m == 0 or x % n == 0), nums)) 
+ return result
+
+<sep>
+
+Programming task:
+Write a python function to count lower case letters in a given string.
+
+Python solution:
+def lower_ctr(str):
+      lower_ctr= 0
+      for i in range(len(str)):
+          if str[i] >= 'a' and str[i] <= 'z': lower_ctr += 1     
+      return  lower_ctr
+
+<sep>
+
+Programming task:
+Write a function to count the frequency of consecutive duplicate elements in a given list of numbers.
+
+Python solution:
+def count_duplic(lists):
+    element = []
+    frequency = []
+    if not lists:
+        return element
+    running_count = 1
+    for i in range(len(lists)-1):
+        if lists[i] == lists[i+1]:
+            running_count += 1
+        else:
+            frequency.append(running_count)
+            element.append(lists[i])
+            running_count = 1
+    frequency.append(running_count)
+    element.append(lists[i+1])
+    return element,frequency
+
+<sep>
+
+Programming task:
+Write a function to check whether the given month number contains 28 days or not.
+
+Python solution:
+def check_monthnum_number(monthnum1):
+  if monthnum1 == 2:
+    return True
+  else:
+    return False
+
+<sep>
+
+Programming task:
+Write a function to merge two dictionaries into a single expression.
+
+Python solution:
+import collections as ct
+def merge_dictionaries(dict1,dict2):
+    merged_dict = dict(ct.ChainMap({}, dict1, dict2))
+    return merged_dict
+
+<sep>
+
+Programming task:
+Write a function to return true if the password is valid.
+
+Python solution:
+import re
+def pass_validity(p):
+ x = True
+ while x:  
+    if (len(p)<6 or len(p)>12):
+        break
+    elif not re.search("[a-z]",p):
+        break
+    elif not re.search("[0-9]",p):
+        break
+    elif not re.search("[A-Z]",p):
+        break
+    elif not re.search("[$#@]",p):
+        break
+    elif re.search("\s",p):
+        break
+    else:
+        return True
+        x=False
+        break
+
+ if x:
+    return False
+
+<sep>
+
+Programming task:
+Write a function to check if the given string starts with a substring using regex.
+
+Python solution:
+import re 
+def check_substring(string, sample) : 
+  if (sample in string): 
+      y = "\A" + sample 
+      x = re.search(y, string) 
+      if x : 
+          return ("string starts with the given substring") 
+      else : 
+          return ("string doesnt start with the given substring") 
+  else : 
+      return ("entered string isnt a substring")
+
+<sep>
+
+Programming task:
+Write a python function to remove even numbers from a given list.
+
+Python solution:
+def remove_even(l):
+    for i in l:
+        if i % 2 == 0:
+            l.remove(i)
+    return l
+
+<sep>
+
+Programming task:
+Write a python function to access multiple elements of specified index from a given list.
+
+Python solution:
+def access_elements(nums, list_index):
+    result = [nums[i] for i in list_index]
+    return result
+
+<sep>
+
+Programming task:
+Write a python function to find the type of triangle from the given sides.
+
+Python solution:
+def check_Type_Of_Triangle(a,b,c): 
+    sqa = pow(a,2) 
+    sqb = pow(b,2) 
+    sqc = pow(c,2) 
+    if (sqa == sqa + sqb or sqb == sqa + sqc or sqc == sqa + sqb): 
+        return ("Right-angled Triangle") 
+    elif (sqa > sqc + sqb or sqb > sqa + sqc or sqc > sqa + sqb): 
+        return ("Obtuse-angled Triangle") 
+    else: 
+        return ("Acute-angled Triangle")
+
+<sep>
+
+Programming task:
+Write a function to sum a specific column of a list in a given list of lists.
+
+Python solution:
+def sum_column(list1, C):
+    result = sum(row[C] for row in list1)
+    return result
+
+<sep>
+
+Programming task:
+Write a function to count alphabets,digits and special charactes in a given string.
+
+Python solution:
+def count_alpha_dig_spl(string):
+  alphabets=digits = special = 0
+  for i in range(len(string)):
+    if(string[i].isalpha()):
+        alphabets = alphabets + 1
+    elif(string[i].isdigit()):
+        digits = digits + 1
+    else:
+        special = special + 1
+  return (alphabets,digits,special)
+
+<sep>
+
+Programming task:
+Write a function to find out the second most repeated (or frequent) string in the given sequence.
+
+Python solution:
+from collections import Counter 
+	
+def second_frequent(input): 
+	dict = Counter(input) 
+	value = sorted(dict.values(), reverse=True)  
+	second_large = value[1] 
+	for (key, val) in dict.items(): 
+		if val == second_large: 
+			return (key)
+
+<sep>
+
+Programming task:
+Write a function to round up a number to specific digits.
+
+Python solution:
+import math
+def round_up(a, digits):
+    n = 10**-digits
+    return round(math.ceil(a / n) * n, digits)
+
+<sep>
+
+Programming task:
+Write a python function to count equal element pairs from the given array.
+
+Python solution:
+def count_Pairs(arr,n): 
+    cnt = 0; 
+    for i in range(n): 
+        for j in range(i + 1,n): 
+            if (arr[i] == arr[j]): 
+                cnt += 1; 
+    return cnt;
+
+<sep>
+
+Programming task:
+Write a function to extract the maximum numeric value from a string by using regex.
+
+Python solution:
+import re 
+def extract_max(input): 
+	numbers = re.findall('\d+',input) 
+	numbers = map(int,numbers) 
+	return max(numbers)
+
+<sep>
+
+Programming task:
+Write a function to get dictionary keys as a list.
+
+Python solution:
+def get_key(dict): 
+    list = [] 
+    for key in dict.keys(): 
+        list.append(key)           
+    return list
+
+<sep>
+
+Programming task:
+Write a function to generate a square matrix filled with elements from 1 to n raised to the power of 2 in spiral order.
+
+Python solution:
+def generate_matrix(n):
+        if n<=0:
+            return [] 
+        matrix=[row[:] for row in [[0]*n]*n]        
+        row_st=0
+        row_ed=n-1        
+        col_st=0
+        col_ed=n-1
+        current=1        
+        while (True):
+            if current>n*n:
+                break
+            for c in range (col_st, col_ed+1):
+                matrix[row_st][c]=current
+                current+=1
+            row_st+=1
+            for r in range (row_st, row_ed+1):
+                matrix[r][col_ed]=current
+                current+=1
+            col_ed-=1
+            for c in range (col_ed, col_st-1, -1):
+                matrix[row_ed][c]=current
+                current+=1
+            row_ed-=1
+            for r in range (row_ed, row_st-1, -1):
+                matrix[r][col_st]=current
+                current+=1
+            col_st+=1
+        return matrix
+
+<sep>
+
+Programming task:
+Write a python function to find the slope of a line.
+
+Python solution:
+def slope(x1,y1,x2,y2): 
+    return (float)(y2-y1)/(x2-x1)
+
+<sep>
+
+Programming task:
+Write a function to find length of the subarray having maximum sum.
+
+Python solution:
+from sys import maxsize 
+def max_sub_array_sum(a,size): 
+	max_so_far = -maxsize - 1
+	max_ending_here = 0
+	start = 0
+	end = 0
+	s = 0
+	for i in range(0,size): 
+		max_ending_here += a[i] 
+		if max_so_far < max_ending_here: 
+			max_so_far = max_ending_here 
+			start = s 
+			end = i 
+		if max_ending_here < 0: 
+			max_ending_here = 0
+			s = i+1
+	return (end - start + 1)
+
+<sep>
+
+Programming task:
+Write a python function to find the cube sum of first n odd natural numbers.
+
+Python solution:
+def cube_Sum(n): 
+    sum = 0   
+    for i in range(0,n) : 
+        sum += (2*i+1)*(2*i+1)*(2*i+1) 
+    return sum
+
+<sep>
+
+Programming task:
+Write a python function to find minimum number swaps required to make two binary strings equal.
+
+Python solution:
+def min_Swaps(s1,s2) :  
+    c0 = 0; c1 = 0;  
+    for i in range(len(s1)) :  
+        if (s1[i] == '0' and s2[i] == '1') : 
+            c0 += 1;    
+        elif (s1[i] == '1' and s2[i] == '0') : 
+            c1 += 1;  
+    result = c0 // 2 + c1 // 2;  
+    if (c0 % 2 == 0 and c1 % 2 == 0) : 
+        return result;  
+    elif ((c0 + c1) % 2 == 0) : 
+        return result + 2;  
+    else : 
+        return -1;
+
+<sep>
+
+Programming task:
+Write a function to sort the tuples alphabetically by the first item of each tuple.
+
+Python solution:
+def sort_tuple(tup): 
+	n = len(tup) 
+	for i in range(n): 
+		for j in range(n-i-1): 
+			if tup[j][0] > tup[j + 1][0]: 
+				tup[j], tup[j + 1] = tup[j + 1], tup[j] 
+	return tup
+
+<sep>
+
+Programming task:
+Write a python function to check whether the roots of a quadratic equation are numerically equal but opposite in sign or not.
+
+Python solution:
+def Check_Solution(a,b,c):  
+    if b == 0:  
+        return ("Yes")  
+    else: 
+        return ("No")
+
+<sep>
+
+Programming task:
+Write a function to count the number of inversions in the given array.
+
+Python solution:
+def get_inv_count(arr, n): 
+	inv_count = 0
+	for i in range(n): 
+		for j in range(i + 1, n): 
+			if (arr[i] > arr[j]): 
+				inv_count += 1
+	return inv_count
+
+<sep>
+
+Programming task:
+Write a function to find the number which occurs for odd number of times in the given array.
+
+Python solution:
+def get_odd_occurence(arr, arr_size):
+  for i in range(0, arr_size):
+    count = 0
+    for j in range(0, arr_size):
+      if arr[i] == arr[j]:
+        count += 1
+    if (count % 2 != 0):
+      return arr[i]
+  return -1
+
+<sep>
+
+Programming task:
+Write a function to find the nth super ugly number from a given prime list of size k using heap queue algorithm.
+
+Python solution:
+import heapq
+def nth_super_ugly_number(n, primes):
+    uglies = [1]
+    def gen(prime):
+        for ugly in uglies:
+            yield ugly * prime
+    merged = heapq.merge(*map(gen, primes))
+    while len(uglies) < n:
+        ugly = next(merged)
+        if ugly != uglies[-1]:
+            uglies.append(ugly)
+    return uglies[-1]
+
+<sep>
+
+Programming task:
+Write a python function to find the kth element in an array containing odd elements first and then even elements.
+
+Python solution:
+def get_Number(n, k): 
+    arr = [0] * n; 
+    i = 0; 
+    odd = 1; 
+    while (odd <= n):   
+        arr[i] = odd; 
+        i += 1; 
+        odd += 2;
+    even = 2; 
+    while (even <= n): 
+        arr[i] = even; 
+        i += 1;
+        even += 2; 
+    return arr[k - 1];
+
+<sep>
+
+Programming task:
+Write a python function to count the number of digits in factorial of a given number.
+
+Python solution:
+import math 
+def find_Digits(n): 
+    if (n < 0): 
+        return 0;
+    if (n <= 1): 
+        return 1; 
+    x = ((n * math.log10(n / math.e) + math.log10(2 * math.pi * n) /2.0)); 
+    return math.floor(x) + 1;
+
+<sep>
+
+Programming task:
+Write a function to find the minimum number of platforms required for a railway/bus station.
+
+Python solution:
+def find_platform(arr, dep, n): 
+    arr.sort() 
+    dep.sort() 
+    plat_needed = 1
+    result = 1
+    i = 1
+    j = 0
+    while (i < n and j < n): 
+        if (arr[i] <= dep[j]):           
+            plat_needed+= 1
+            i+= 1
+        elif (arr[i] > dep[j]):           
+            plat_needed-= 1
+            j+= 1
+        if (plat_needed > result):  
+            result = plat_needed           
+    return result
+
+<sep>
+
+Programming task:
+Write a python function to copy a list from a singleton tuple.
+
+Python solution:
+def lcopy(xs):
+  return xs[:]
+
+<sep>
+
+Programming task:
+Write a function to find the area of a trapezium.
+
+Python solution:
+def area_trapezium(base1,base2,height):
+ area = 0.5 * (base1 + base2) * height
+ return area
+
+<sep>
+
+Programming task:
+Write a python function to find sum of all prime divisors of a given number.
+
+Python solution:
+def Sum(N): 
+    SumOfPrimeDivisors = [0]*(N + 1)   
+    for i in range(2,N + 1) : 
+        if (SumOfPrimeDivisors[i] == 0) : 
+            for j in range(i,N + 1,i) : 
+                SumOfPrimeDivisors[j] += i           
+    return SumOfPrimeDivisors[N]
+
+<sep>
+
+Programming task:
+Write a function to check if a triangle of positive area is possible with the given angles.
+
+Python solution:
+def is_triangleexists(a,b,c): 
+    if(a != 0 and b != 0 and c != 0 and (a + b + c)== 180): 
+        if((a + b)>= c or (b + c)>= a or (a + c)>= b): 
+            return True 
+        else:
+            return False
+    else:
+        return False
+
+<sep>
+
+Programming task:
+Write a python function to find sum of inverse of divisors.
+
+Python solution:
+def Sum_of_Inverse_Divisors(N,Sum): 
+    ans = float(Sum)*1.0 /float(N);  
+    return round(ans,2);
+
+<sep>
+
+Programming task:
+Write a python function to remove negative numbers from a list.
+
+Python solution:
+def remove_negs(num_list): 
+    for item in num_list: 
+        if item < 0: 
+           num_list.remove(item) 
+    return num_list
+
+<sep>
+
+Programming task:
+Write a python function to find sum of odd factors of a number.
+
+Python solution:
+import math
+def sum_of_odd_Factors(n): 
+    res = 1
+    while n % 2 == 0: 
+        n = n // 2 
+    for i in range(3,int(math.sqrt(n) + 1)): 
+        count = 0
+        curr_sum = 1
+        curr_term = 1
+        while n % i == 0: 
+            count+=1 
+            n = n // i 
+            curr_term *= i 
+            curr_sum += curr_term    
+        res *= curr_sum  
+    if n >= 2: 
+        res *= (1 + n) 
+    return res
+
+<sep>
+
+Programming task:
+Write a function which accepts an arbitrary list and converts it to a heap using heap queue algorithm.
+
+Python solution:
+import heapq as hq
+def raw_heap(rawheap):
+  hq.heapify(rawheap)
+  return rawheap
+
+<sep>
+
+Programming task:
+Write a python function to check for even parity of a given number.
+
+Python solution:
+def check_Even_Parity(x): 
+    parity = 0
+    while (x != 0): 
+        x = x & (x - 1) 
+        parity += 1
+    if (parity % 2 == 0): 
+        return True
+    else: 
+        return False
+
+<sep>
+
+Programming task:
+Write a python function to find minimum adjacent swaps required to sort binary array.
+
+Python solution:
+def find_Min_Swaps(arr,n) : 
+    noOfZeroes = [0] * n 
+    count = 0 
+    noOfZeroes[n - 1] = 1 - arr[n - 1] 
+    for i in range(n-2,-1,-1) : 
+        noOfZeroes[i] = noOfZeroes[i + 1] 
+        if (arr[i] == 0) : 
+            noOfZeroes[i] = noOfZeroes[i] + 1
+    for i in range(0,n) : 
+        if (arr[i] == 1) : 
+            count = count + noOfZeroes[i] 
+    return count
+
+<sep>
+
+Programming task:
+Write a function to list out the list of given strings individually using map function.
+
+Python solution:
+def listify_list(list1):
+  result = list(map(list,list1)) 
+  return result
+
+<sep>
+
+Programming task:
+Write a function to count number of lists in a given list of lists and square the count.
+
+Python solution:
+def count_list(input_list): 
+    return (len(input_list))**2
+
+<sep>
+
+Programming task:
+Write a function to generate all sublists of a given list.
+
+Python solution:
+from itertools import combinations
+def sub_lists(my_list):
+	subs = []
+	for i in range(0, len(my_list)+1):
+	  temp = [list(x) for x in combinations(my_list, i)]
+	  if len(temp)>0:
+	    subs.extend(temp)
+	return subs
+
+<sep>
+
+Programming task:
+Write a function to check whether the given string is ending with only alphanumeric characters or not using regex.
+
+Python solution:
+import re 
+regex = '[a-zA-z0-9]$'
+def check_alphanumeric(string): 
+	if(re.search(regex, string)): 
+		return ("Accept") 
+	else: 
+		return ("Discard")
+
+<sep>
+
+Programming task:
+Write a function to find all anagrams of a string in a given list of strings using lambda function.
+
+Python solution:
+from collections import Counter 
+def anagram_lambda(texts,str):
+  result = list(filter(lambda x: (Counter(str) == Counter(x)), texts)) 
+  return result
+
+<sep>
+
+Programming task:
+Write a function to find the occurrences of n most common words in a given text.
+
+Python solution:
+from collections import Counter
+import re
+def n_common_words(text,n):
+  words = re.findall('\w+',text)
+  n_common_words= Counter(words).most_common(n)
+  return list(n_common_words)
+
+<sep>
+
+Programming task:
+Write a function to find the length of the longest sub-sequence such that elements in the subsequences are consecutive integers.
+
+Python solution:
+def find_longest_conseq_subseq(arr, n): 
+	ans = 0
+	count = 0
+	arr.sort() 
+	v = [] 
+	v.append(arr[0]) 
+	for i in range(1, n): 
+		if (arr[i] != arr[i - 1]): 
+			v.append(arr[i]) 
+	for i in range(len(v)): 
+		if (i > 0 and v[i] == v[i - 1] + 1): 
+			count += 1
+		else: 
+			count = 1
+		ans = max(ans, count) 
+	return ans
+
+<sep>
+
+Programming task:
+Write a function to find palindromes in a given list of strings using lambda function.
+
+Python solution:
+def palindrome_lambda(texts):
+  result = list(filter(lambda x: (x == "".join(reversed(x))), texts))
+  return result
+
+<sep>
+
+Programming task:
+Write a function to print n-times a list using map function.
+
+Python solution:
+def ntimes_list(nums,n):
+    result = map(lambda x:n*x, nums) 
+    return list(result)
+
+<sep>
+
+Programming task:
+Write a function to check whether the given month name contains 31 days or not.
+
+Python solution:
+def check_monthnumb(monthname2):
+  if(monthname2=="January" or monthname2=="March"or monthname2=="May" or monthname2=="July" or monthname2=="Augest" or monthname2=="October" or monthname2=="December"):
+    return True
+  else:
+    return False
+
+<sep>
+
+Programming task:
+Write a python function to add a minimum number such that the sum of array becomes even.
+
+Python solution:
+def min_Num(arr,n):  
+    odd = 0
+    for i in range(n): 
+        if (arr[i] % 2): 
+            odd += 1 
+    if (odd % 2): 
+        return 1
+    return 2
+
+<sep>
+
+Programming task:
+Write a python function to find the length of the last word in a given string.
+
+Python solution:
+def length_Of_Last_Word(a): 
+    l = 0
+    x = a.strip() 
+    for i in range(len(x)): 
+        if x[i] == " ": 
+            l = 0
+        else: 
+            l += 1
+    return l
+
+<sep>
+
+Programming task:
+Write a function to remove sublists from a given list of lists, which are outside a given range.
+
+Python solution:
+def remove_list_range(list1, leftrange, rigthrange):
+   result = [i for i in list1 if (min(i)>=leftrange and max(i)<=rigthrange)]
+   return result
+
+<sep>
+
+Programming task:
+Write a function to calculate the sum of the positive numbers of a given list of numbers using lambda function.
+
+Python solution:
+def sum_positivenum(nums):
+  sum_positivenum = list(filter(lambda nums:nums>0,nums))
+  return sum(sum_positivenum)
+
+<sep>
+
+Programming task:
+Write a python function to check whether the given strings are rotations of each other or not.
+
+Python solution:
+def are_Rotations(string1,string2): 
+    size1 = len(string1) 
+    size2 = len(string2) 
+    temp = '' 
+    if size1 != size2: 
+        return False
+    temp = string1 + string1 
+    if (temp.count(string2)> 0): 
+        return True
+    else: 
+        return False
+
+<sep>
+
+Programming task:
+Write a function to check if a nested list is a subset of another nested list.
+
+Python solution:
+def check_subset(list1,list2): 
+    return all(map(list1.__contains__,list2))
+
+<sep>
+
+Programming task:
+Write a function to solve the fibonacci sequence using recursion.
+
+Python solution:
+def fibonacci(n):
+  if n == 1 or n == 2:
+    return 1
+  else:
+    return (fibonacci(n - 1) + (fibonacci(n - 2)))
+
+<sep>
+
+Programming task:
+Write a python function to check if the string is a concatenation of another string.
+
+Python solution:
+def check_Concat(str1,str2):
+    N = len(str1)
+    M = len(str2)
+    if (N % M != 0):
+        return False
+    for i in range(N):
+        if (str1[i] != str2[i % M]):
+            return False         
+    return True
+
+<sep>
+
+Programming task:
+Write a function to find the minimum difference in the tuple pairs of given tuples.
+
+Python solution:
+def min_difference(test_list):
+  temp = [abs(b - a) for a, b in test_list]
+  res = min(temp)
+  return (res)
+
+<sep>
+
+Programming task:
+Write a python function to find lcm of two positive integers.
+
+Python solution:
+def lcm(x, y):
+   if x > y:
+       z = x
+   else:
+       z = y
+   while(True):
+       if((z % x == 0) and (z % y == 0)):
+           lcm = z
+           break
+       z += 1
+   return lcm
+
+<sep>
+
+Programming task:
+Write a python function to sort the given string.
+
+Python solution:
+def sort_String(str) : 
+    str = ''.join(sorted(str)) 
+    return (str)
+
+<sep>
+
+Programming task:
+Write a function to check if the given tuple contains only k elements.
+
+Python solution:
+def check_tuples(test_tuple, K):
+  res = all(ele in K for ele in test_tuple)
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function that matches a string that has an 'a' followed by anything, ending in 'b' by using regex.
+
+Python solution:
+import re
+def text_match(text):
+  patterns = 'a.*?b$'
+  if re.search(patterns,  text):
+    return ('Found a match!')
+  else:
+    return ('Not matched!')
+
+<sep>
+
+Programming task:
+Write a python function to find number of solutions in quadratic equation.
+
+Python solution:
+def Check_Solution(a,b,c) : 
+    if ((b*b) - (4*a*c)) > 0 : 
+        return ("2 solutions") 
+    elif ((b*b) - (4*a*c)) == 0 : 
+        return ("1 solution") 
+    else : 
+        return ("No solutions")
+
+<sep>
+
+Programming task:
+Write a function to find the sum of first even and odd number of a given list.
+
+Python solution:
+def sum_even_odd(list1):
+    first_even = next((el for el in list1 if el%2==0),-1)
+    first_odd = next((el for el in list1 if el%2!=0),-1)
+    return (first_even+first_odd)
+
+<sep>
+
+Programming task:
+Write a function to caluclate perimeter of a parallelogram.
+
+Python solution:
+def parallelogram_perimeter(b,h):
+  perimeter=2*(b*h)
+  return perimeter
+
+<sep>
+
+Programming task:
+Write a function to find numbers divisible by m and n from a list of numbers using lambda function.
+
+Python solution:
+def div_of_nums(nums,m,n):
+ result = list(filter(lambda x: (x % m == 0 and x % n == 0), nums)) 
+ return result
+
+<sep>
+
+Programming task:
+Write a python function to check whether all the bits are within a given range or not.
+
+Python solution:
+def all_Bits_Set_In_The_Given_Range(n,l,r): 
+    num = ((1 << r) - 1) ^ ((1 << (l - 1)) - 1) 
+    new_num = n & num 
+    if (num == new_num): 
+        return True
+    return False
+
+<sep>
+
+Programming task:
+Write a python function to check whether the two given strings are isomorphic to each other or not.
+
+Python solution:
+def is_Isomorphic(str1,str2):          
+    dict_str1 = {}
+    dict_str2 = {}
+    for i, value in enumerate(str1):
+        dict_str1[value] = dict_str1.get(value,[]) + [i]        
+    for j, value in enumerate(str2):
+        dict_str2[value] = dict_str2.get(value,[]) + [j]
+    if sorted(dict_str1.values()) == sorted(dict_str2.values()):
+        return True
+    else:
+        return False
+
+<sep>
+
+Programming task:
+Write a function to add all the numbers in a list and divide it with the length of the list.
+
+Python solution:
+def sum_num(numbers):
+    total = 0
+    for x in numbers:
+        total += x
+    return total/len(numbers)
+
+<sep>
+
+Programming task:
+Write a python function to check whether the given number is odd or not using bitwise operator.
+
+Python solution:
+def is_odd(n) : 
+    if (n^1 == n-1) :
+        return True; 
+    else :
+        return False;
+
+<sep>
+
+Programming task:
+Write a function to substract the elements of the given nested tuples.
+
+Python solution:
+def substract_elements(test_tup1, test_tup2):
+  res = tuple(tuple(a - b for a, b in zip(tup1, tup2))
+   for tup1, tup2 in zip(test_tup1, test_tup2))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to reverse each list in a given list of lists.
+
+Python solution:
+def reverse_list_lists(lists):
+    for l in lists:
+        l.sort(reverse = True)
+    return lists
+
+<sep>
+
+Programming task:
+Write a python function to find the index of an extra element present in one sorted array.
+
+Python solution:
+def find_Extra(arr1,arr2,n) : 
+    for i in range(0, n) : 
+        if (arr1[i] != arr2[i]) : 
+            return i 
+    return n
+
+<sep>
+
+Programming task:
+Write a python function to check whether the given two numbers have same number of digits or not.
+
+Python solution:
+def same_Length(A,B): 
+    while (A > 0 and B > 0): 
+        A = A / 10; 
+        B = B / 10; 
+    if (A == 0 and B == 0): 
+        return True; 
+    return False;
+
+<sep>
+
+Programming task:
+Write a function to remove multiple spaces in a string.
+
+Python solution:
+import re
+def remove_spaces(text):
+ return (re.sub(' +',' ',text))
+
+<sep>
+
+Programming task:
+Write a python function to get the last element of each sublist.
+
+Python solution:
+def Extract(lst): 
+    return [item[-1] for item in lst]
+
+<sep>
+
+Programming task:
+Write a function to convert the given string of float type into tuple.
+
+Python solution:
+def float_to_tuple(test_str):
+  res = tuple(map(float, test_str.split(', ')))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to find the maximum sum of subsequences of given array with no adjacent elements.
+
+Python solution:
+def max_sum_subseq(A):
+    n = len(A)
+    if n == 1:
+        return A[0]
+    look_up = [None] * n
+    look_up[0] = A[0]
+    look_up[1] = max(A[0], A[1])
+    for i in range(2, n):
+        look_up[i] = max(look_up[i - 1], look_up[i - 2] + A[i])
+        look_up[i] = max(look_up[i], A[i])
+    return look_up[n - 1]
+
+<sep>
+
+Programming task:
+Write a function to sort a list in increasing order by the last element in each tuple from a given list of non-empty tuples.
+
+Python solution:
+def last(n):
+   return n[-1]
+def sort_list_last(tuples):
+  return sorted(tuples, key=last)
+
+<sep>
+
+Programming task:
+Write a python function to check whether the word is present in a given sentence or not.
+
+Python solution:
+def is_Word_Present(sentence,word): 
+    s = sentence.split(" ") 
+    for i in s:  
+        if (i == word): 
+            return True
+    return False
+
+<sep>
+
+Programming task:
+Write a function to extract specified number of elements from a given list, which follow each other continuously.
+
+Python solution:
+from itertools import groupby 
+def extract_elements(numbers, n):
+    result = [i for i, j in groupby(numbers) if len(list(j)) == n] 
+    return result
+
+<sep>
+
+Programming task:
+Write a python function to check whether an array can be sorted or not by picking only the corner elements.
+
+Python solution:
+def check(arr,n): 
+    g = 0 
+    for i in range(1,n): 
+        if (arr[i] - arr[i - 1] > 0 and g == 1): 
+            return False
+        if (arr[i] - arr[i] < 0): 
+            g = 1
+    return True
+
+<sep>
+
+Programming task:
+Write a function where a string will start with a specific number.
+
+Python solution:
+import re
+def match_num(string):
+    text = re.compile(r"^5")
+    if text.match(string):
+        return True
+    else:
+        return False
+
+<sep>
+
+Programming task:
+Write a function to find the smallest multiple of the first n numbers.
+
+Python solution:
+def smallest_multiple(n):
+    if (n<=2):
+      return n
+    i = n * 2
+    factors = [number  for number in range(n, 1, -1) if number * 2 > n]
+    while True:
+        for a in factors:
+            if i % a != 0:
+                i += n
+                break
+            if (a == factors[-1] and i % a == 0):
+                return i
+
+<sep>
+
+Programming task:
+Write a function to combine two dictionaries by adding values for common keys.
+
+Python solution:
+from collections import Counter
+def add_dict(d1,d2):
+   add_dict = Counter(d1) + Counter(d2)
+   return add_dict
+
+<sep>
+
+Programming task:
+Write a python function to count the total unset bits from 1 to n.
+
+Python solution:
+def count_Unset_Bits(n) :  
+    cnt = 0;  
+    for i in range(1,n + 1) : 
+        temp = i;  
+        while (temp) :  
+            if (temp % 2 == 0) : 
+                cnt += 1;  
+            temp = temp // 2;  
+    return cnt;
+
+<sep>
+
+Programming task:
+Write a function to return true if the given number is even else return false.
+
+Python solution:
+def even_num(x):
+  if x%2==0:
+     return True
+  else:
+    return False
+
+<sep>
+
+Programming task:
+Write a python function to find the sum of squares of binomial co-efficients.
+
+Python solution:
+def factorial(start,end): 
+    res = 1 
+    for i in range(start,end + 1): 
+        res *= i      
+    return res 
+def sum_of_square(n): 
+   return int(factorial(n + 1, 2 * n)  /factorial(1, n))
+
+<sep>
+
+Programming task:
+Write a function to extract year, month and date from a url by using regex.
+
+Python solution:
+import re
+def extract_date(url):
+        return re.findall(r'/(\d{4})/(\d{1,2})/(\d{1,2})/', url)
+
+<sep>
+
+Programming task:
+Write a function to print the first n lucky numbers.
+
+Python solution:
+def lucky_num(n):
+ List=range(-1,n*n+9,2)
+ i=2
+ while List[i:]:List=sorted(set(List)-set(List[List[i]::List[i]]));i+=1
+ return List[1:n+1]
+
+<sep>
+
+Programming task:
+Write a function to find the fixed point in the given array.
+
+Python solution:
+def find_fixed_point(arr, n): 
+	for i in range(n): 
+		if arr[i] is i: 
+			return i 
+	return -1
+
+<sep>
+
+Programming task:
+Write a function to find the previous palindrome of a specified number.
+
+Python solution:
+def previous_palindrome(num):
+    for x in range(num-1,0,-1):
+        if str(x) == str(x)[::-1]:
+            return x
+
+<sep>
+
+Programming task:
+Write a function to validate a gregorian date.
+
+Python solution:
+import datetime
+def check_date(m, d, y):
+    try:
+        m, d, y = map(int, (m, d, y))
+        datetime.date(y, m, d)
+        return True
+    except ValueError:
+        return False
+
+<sep>
+
+Programming task:
+Write a function to compute maximum product of three numbers of a given array of integers using heap queue algorithm.
+
+Python solution:
+def maximum_product(nums):
+    import heapq
+    a, b = heapq.nlargest(3, nums), heapq.nsmallest(2, nums)
+    return max(a[0] * a[1] * a[2], a[0] * b[0] * b[1])
+
+<sep>
+
+Programming task:
+Write a function to find ln, m lobb number.
+
+Python solution:
+def binomial_coeff(n, k): 
+	C = [[0 for j in range(k + 1)] 
+			for i in range(n + 1)] 
+	for i in range(0, n + 1): 
+		for j in range(0, min(i, k) + 1): 
+			if (j == 0 or j == i): 
+				C[i][j] = 1
+			else: 
+				C[i][j] = (C[i - 1][j - 1] 
+							+ C[i - 1][j]) 
+	return C[n][k] 
+def lobb_num(n, m): 
+	return (((2 * m + 1) *
+		binomial_coeff(2 * n, m + n)) 
+					/ (m + n + 1))
+
+<sep>
+
+Programming task:
+Write a function to check for a number at the end of a string.
+
+Python solution:
+import re
+def end_num(string):
+    text = re.compile(r".*[0-9]$")
+    if text.match(string):
+        return True
+    else:
+        return False
+
+<sep>
+
+Programming task:
+Write a python function to check whether the given string is made up of two alternating characters or not.
+
+Python solution:
+def is_Two_Alter(s):  
+    for i in range (len( s) - 2) : 
+        if (s[i] != s[i + 2]) : 
+            return False
+    if (s[0] == s[1]): 
+        return False
+    return True
+
+<sep>
+
+Programming task:
+Write a function to rearrange positive and negative numbers in a given array using lambda function.
+
+Python solution:
+def rearrange_numbs(array_nums):
+  result = sorted(array_nums, key = lambda i: 0 if i == 0 else -1 / i)
+  return result
+
+<sep>
+
+Programming task:
+Write a function to find if there is a triplet in the array whose sum is equal to a given value.
+
+Python solution:
+def find_triplet_array(A, arr_size, sum): 
+	for i in range( 0, arr_size-2): 
+		for j in range(i + 1, arr_size-1): 
+			for k in range(j + 1, arr_size): 
+				if A[i] + A[j] + A[k] == sum: 
+					return  A[i],A[j],A[k] 
+					return True
+	return False
+
+<sep>
+
+Programming task:
+Write a function to find the sequences of one upper case letter followed by lower case letters.
+
+Python solution:
+import re
+def text_uppercase_lowercase(text):
+        patterns = '[A-Z]+[a-z]+$'
+        if re.search(patterns, text):
+                return 'Found a match!'
+        else:
+                return ('Not matched!')
+
+<sep>
+
+Programming task:
+Write a function to count coin change.
+
+Python solution:
+def coin_change(S, m, n): 
+    table = [[0 for x in range(m)] for x in range(n+1)] 
+    for i in range(m): 
+        table[0][i] = 1
+    for i in range(1, n+1): 
+        for j in range(m): 
+            x = table[i - S[j]][j] if i-S[j] >= 0 else 0
+            y = table[i][j-1] if j >= 1 else 0 
+            table[i][j] = x + y   
+    return table[n][m-1]
+
+<sep>
+
+Programming task:
+Write a python function to multiply all items in the list.
+
+Python solution:
+def multiply_list(items):
+    tot = 1
+    for x in items:
+        tot *= x
+    return tot
+
+<sep>
+
+Programming task:
+Write a function to remove all tuples with all none values in the given tuple list.
+
+Python solution:
+def remove_tuple(test_list):
+  res = [sub for sub in test_list if not all(ele == None for ele in sub)]
+  return (str(res))
+
+<sep>
+
+Programming task:
+Write a function to perform chunking of tuples each of size n.
+
+Python solution:
+def chunk_tuples(test_tup, N):
+  res = [test_tup[i : i + N] for i in range(0, len(test_tup), N)]
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to find a pair with the highest product from a given array of integers.
+
+Python solution:
+def max_product(arr): 
+    arr_len = len(arr) 
+    if (arr_len < 2): 
+        return None     
+    x = arr[0]; y = arr[1]    
+    for i in range(0, arr_len): 
+        for j in range(i + 1, arr_len): 
+            if (arr[i] * arr[j] > x * y): 
+                x = arr[i]; y = arr[j] 
+    return x,y
+
+<sep>
+
+Programming task:
+Write a function to find the length of the shortest string that has both str1 and str2 as subsequences.
+
+Python solution:
+def super_seq(X, Y, m, n):
+	if (not m):
+		return n
+	if (not n):
+		return m
+	if (X[m - 1] == Y[n - 1]):
+		return 1 + super_seq(X, Y, m - 1, n - 1)
+	return 1 + min(super_seq(X, Y, m - 1, n),	super_seq(X, Y, m, n - 1))
+
+<sep>
+
+Programming task:
+Write a function to find maximum of two numbers.
+
+Python solution:
+def max_of_two( x, y ):
+    if x > y:
+        return x
+    return y
+
+<sep>
+
+Programming task:
+Write a python function to calculate the product of all the numbers of a given tuple.
+
+Python solution:
+def mutiple_tuple(nums):
+    temp = list(nums)
+    product = 1 
+    for x in temp:
+        product *= x
+    return product
+
+<sep>
+
+Programming task:
+Write a function to find n-th rencontres number.
+
+Python solution:
+def binomial_coeffi(n, k): 
+	if (k == 0 or k == n): 
+		return 1
+	return (binomial_coeffi(n - 1, k - 1) 
+		+ binomial_coeffi(n - 1, k)) 
+def rencontres_number(n, m): 
+	if (n == 0 and m == 0): 
+		return 1
+	if (n == 1 and m == 0): 
+		return 0
+	if (m == 0): 
+		return ((n - 1) * (rencontres_number(n - 1, 0)+ rencontres_number(n - 2, 0))) 
+	return (binomial_coeffi(n, m) * rencontres_number(n - m, 0))
+
+<sep>
+
+Programming task:
+Write a function to calculate the height of the given binary tree.
+
+Python solution:
+class Node: 
+	def __init__(self, data): 
+		self.data = data 
+		self.left = None
+		self.right = None
+def max_height(node): 
+	if node is None: 
+		return 0 ; 
+	else : 
+		left_height = max_height(node.left) 
+		right_height = max_height(node.right) 
+		if (left_height > right_height): 
+			return left_height+1
+		else: 
+			return right_height+1
+
+<sep>
+
+Programming task:
+Write a function to convert a date of yyyy-mm-dd format to dd-mm-yyyy format.
+
+Python solution:
+import re
+def change_date_format(dt):
+        return re.sub(r'(\d{4})-(\d{1,2})-(\d{1,2})', '\\3-\\2-\\1', dt)
+        return change_date_format(dt)
+
+<sep>
+
+Programming task:
+Write a function to count repeated items of a tuple.
+
+Python solution:
+def count_tuplex(tuplex,value):  
+  count = tuplex.count(value)
+  return count
+
+<sep>
+
+Programming task:
+Write a function that matches a string that has an a followed by zero or more b's by using regex.
+
+Python solution:
+import re
+def text_match(text):
+        patterns = 'ab*?'
+        if re.search(patterns,  text):
+                return ('Found a match!')
+        else:
+                return ('Not matched!')
+
+<sep>
+
+Programming task:
+Write a function to calculate the sum of series 1³+2³+3³+….+n³.
+
+Python solution:
+import math 
+def sum_series(number):
+ total = 0
+ total = math.pow((number * (number + 1)) /2, 2)
+ return total
+
+<sep>
+
+Programming task:
+Write a function to remove duplicate words from a given list of strings.
+
+Python solution:
+def remove_duplic_list(l):
+    temp = []
+    for x in l:
+        if x not in temp:
+            temp.append(x)
+    return temp
+
+<sep>
+
+Programming task:
+Write a function to convert camel case string to snake case string by using regex.
+
+Python solution:
+import re
+def camel_to_snake(text):
+  str1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', text)
+  return re.sub('([a-z0-9])([A-Z])', r'\1_\2', str1).lower()
+
+<sep>
+
+Programming task:
+Write a function to find the nth delannoy number.
+
+Python solution:
+def dealnnoy_num(n, m): 
+	if (m == 0 or n == 0) : 
+		return 1
+	return dealnnoy_num(m - 1, n) + dealnnoy_num(m - 1, n - 1) + dealnnoy_num(m, n - 1)
+
+<sep>
+
+Programming task:
+Write a function to calculate the sum of series 1²+2²+3²+….+n².
+
+Python solution:
+def series_sum(number):
+ total = 0
+ total = (number * (number + 1) * (2 * number + 1)) / 6
+ return total
+
+<sep>
+
+Programming task:
+Write a function to re-arrange the given tuples based on the given ordered list.
+
+Python solution:
+def re_arrange_tuples(test_list, ord_list):
+  temp = dict(test_list)
+  res = [(key, temp[key]) for key in ord_list]
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to count the most common character in a given string.
+
+Python solution:
+from collections import Counter 
+def max_char(str1):
+    temp = Counter(str1) 
+    max_char = max(temp, key = temp.get)
+    return max_char
+
+<sep>
+
+Programming task:
+Write a function to find three closest elements from three sorted arrays.
+
+Python solution:
+import sys 
+
+def find_closet(A, B, C, p, q, r): 
+	diff = sys.maxsize 
+	res_i = 0
+	res_j = 0
+	res_k = 0
+	i = 0
+	j = 0
+	k = 0
+	while(i < p and j < q and k < r): 
+		minimum = min(A[i], min(B[j], C[k])) 
+		maximum = max(A[i], max(B[j], C[k])); 
+		if maximum-minimum < diff: 
+			res_i = i 
+			res_j = j 
+			res_k = k 
+			diff = maximum - minimum; 
+		if diff == 0: 
+			break
+		if A[i] == minimum: 
+			i = i+1
+		elif B[j] == minimum: 
+			j = j+1
+		else: 
+			k = k+1
+	return A[res_i],B[res_j],C[res_k]
+
+<sep>
+
+Programming task:
+Write a function to sort a list of dictionaries using lambda function.
+
+Python solution:
+def sorted_models(models):
+ sorted_models = sorted(models, key = lambda x: x['color'])
+ return sorted_models
+
+<sep>
+
+Programming task:
+Write a function to sort the given array by using heap sort.
+
+Python solution:
+def heap_sort(arr):
+    heapify(arr)  
+    end = len(arr) - 1
+    while end > 0:
+        arr[end], arr[0] = arr[0], arr[end]
+        shift_down(arr, 0, end - 1)
+        end -= 1
+    return arr
+
+def heapify(arr):
+    start = len(arr) // 2
+    while start >= 0:
+        shift_down(arr, start, len(arr) - 1)
+        start -= 1
+def shift_down(arr, start, end):
+    root = start
+    while root * 2 + 1 <= end:
+        child = root * 2 + 1
+        if child + 1 <= end and arr[child] < arr[child + 1]:
+            child += 1
+        if child <= end and arr[root] < arr[child]:
+            arr[root], arr[child] = arr[child], arr[root]
+            root = child
+        else:
+            return
+
+<sep>
+
+Programming task:
+Write a function to count the elements in a list until an element is a tuple.
+
+Python solution:
+def count_elim(num):
+  count_elim = 0
+  for n in num:
+    if isinstance(n, tuple):
+        break
+    count_elim += 1
+  return count_elim
+
+<sep>
+
+Programming task:
+Write a function to check if any list element is present in the given list.
+
+Python solution:
+def check_element(test_tup, check_list):
+  res = False
+  for ele in check_list:
+    if ele in test_tup:
+      res = True
+      break
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to combine two given sorted lists using heapq module.
+
+Python solution:
+from heapq import merge
+def combine_lists(num1,num2):
+  combine_lists=list(merge(num1, num2))
+  return combine_lists
+
+<sep>
+
+Programming task:
+Write a function to separate and print the numbers and their position of a given string.
+
+Python solution:
+import re
+def num_position(text):
+ for m in re.finditer("\d+", text):
+    return m.start()
+
+<sep>
+
+Programming task:
+Write a function to convert the given tuples into set.
+
+Python solution:
+def tuple_to_set(t):
+  s = set(t)
+  return (s)
+
+<sep>
+
+Programming task:
+Write a function to find the most common elements and their counts of a specified text.
+
+Python solution:
+from collections import Counter 
+def most_common_elem(s,a):
+  most_common_elem=Counter(s).most_common(a)
+  return most_common_elem
+
+<sep>
+
+Programming task:
+Write a python function to find the length of the shortest word.
+
+Python solution:
+def len_log(list1):
+    min=len(list1[0])
+    for i in list1:
+        if len(i)<min:
+            min=len(i)
+    return min
+
+<sep>
+
+Programming task:
+Write a function to get an item of a tuple.
+
+Python solution:
+def get_item(tup1,index):
+  item = tup1[index]
+  return item
+
+<sep>
+
+Programming task:
+Write a function to sort the given tuple list basis the total digits in tuple.
+
+Python solution:
+def count_digs(tup):
+  return sum([len(str(ele)) for ele in tup ]) 
+def sort_list(test_list):
+  test_list.sort(key = count_digs)
+  return (str(test_list))
+
+<sep>
+
+Programming task:
+Write a function to display sign of the chinese zodiac for given year.
+
+Python solution:
+def chinese_zodiac(year):
+ if (year - 2000) % 12 == 0:
+     sign = 'Dragon'
+ elif (year - 2000) % 12 == 1:
+     sign = 'Snake'
+ elif (year - 2000) % 12 == 2:
+     sign = 'Horse'
+ elif (year - 2000) % 12 == 3:
+     sign = 'sheep'
+ elif (year - 2000) % 12 == 4:
+     sign = 'Monkey'
+ elif (year - 2000) % 12 == 5:
+     sign = 'Rooster'
+ elif (year - 2000) % 12 == 6:
+     sign = 'Dog'
+ elif (year - 2000) % 12 == 7:
+     sign = 'Pig'
+ elif (year - 2000) % 12 == 8:
+     sign = 'Rat'
+ elif (year - 2000) % 12 == 9:
+     sign = 'Ox'
+ elif (year - 2000) % 12 == 10:
+     sign = 'Tiger'
+ else:
+     sign = 'Hare'
+ return sign
+
+<sep>
+
+Programming task:
+Write a function to find the maximum of similar indices in two lists of tuples.
+
+Python solution:
+def max_similar_indices(test_list1, test_list2):
+  res = [(max(x[0], y[0]), max(x[1], y[1]))
+   for x, y in zip(test_list1, test_list2)]
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to compute the value of ncr mod p.
+
+Python solution:
+def nCr_mod_p(n, r, p): 
+	if (r > n- r): 
+		r = n - r 
+	C = [0 for i in range(r + 1)] 
+	C[0] = 1 
+	for i in range(1, n + 1): 
+		for j in range(min(i, r), 0, -1): 
+			C[j] = (C[j] + C[j-1]) % p 
+	return C[r]
+
+<sep>
+
+Programming task:
+Write a python function to find the minimun number of subsets with distinct elements.
+
+Python solution:
+def subset(ar, n): 
+    res = 0
+    ar.sort() 
+    for i in range(0, n) : 
+        count = 1
+        for i in range(n - 1): 
+            if ar[i] == ar[i + 1]: 
+                count+=1
+            else: 
+                break 
+        res = max(res, count)  
+    return res
+
+<sep>
+
+Programming task:
+Write a function that gives profit amount if the given amount has profit else return none.
+
+Python solution:
+def profit_amount(actual_cost,sale_amount): 
+ if(actual_cost > sale_amount):
+    amount = actual_cost - sale_amount
+    return amount
+ else:
+    return None
+
+<sep>
+
+Programming task:
+Write a function to find out, if the given number is abundant.
+
+Python solution:
+def is_abundant(n):
+    fctrsum = sum([fctr for fctr in range(1, n) if n % fctr == 0])
+    return fctrsum > n
+
+<sep>
+
+Programming task:
+Write a function to split the given string at uppercase letters by using regex.
+
+Python solution:
+import re
+def split_list(text):
+  return (re.findall('[A-Z][^A-Z]*', text))
+
+<sep>
+
+Programming task:
+Write a python function to get the position of rightmost set bit.
+
+Python solution:
+import math
+def get_First_Set_Bit_Pos(n):
+     return math.log2(n&-n)+1
+
+<sep>
+
+Programming task:
+Write a function to convert an integer into a roman numeral.
+
+Python solution:
+def int_to_roman( num):
+        val = [1000, 900, 500, 400,100, 90, 50, 40,10, 9, 5, 4,1]
+        syb = ["M", "CM", "D", "CD","C", "XC", "L", "XL","X", "IX", "V", "IV","I"]
+        roman_num = ''
+        i = 0
+        while  num > 0:
+            for _ in range(num // val[i]):
+                roman_num += syb[i]
+                num -= val[i]
+            i += 1
+        return roman_num
+
+<sep>
+
+Programming task:
+Write a python function to find the average of a list.
+
+Python solution:
+def Average(lst): 
+    return sum(lst) / len(lst)
+
+<sep>
+
+Programming task:
+Write a function to solve tiling problem.
+
+Python solution:
+def get_noOfways(n):
+    if (n == 0):
+        return 0;
+    if (n == 1):
+        return 1; 
+    return get_noOfways(n - 1) + get_noOfways(n - 2);
+
+<sep>
+
+Programming task:
+Write a function to convert a roman numeral to an integer.
+
+Python solution:
+def roman_to_int(s):
+        rom_val = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
+        int_val = 0
+        for i in range(len(s)):
+            if i > 0 and rom_val[s[i]] > rom_val[s[i - 1]]:
+                int_val += rom_val[s[i]] - 2 * rom_val[s[i - 1]]
+            else:
+                int_val += rom_val[s[i]]
+        return int_val
+
+<sep>
+
+Programming task:
+Write a python function to find the sum of all even natural numbers within the range l and r.
+
+Python solution:
+def sum_Natural(n): 
+    sum = (n * (n + 1)) 
+    return int(sum) 
+def sum_Even(l,r): 
+    return (sum_Natural(int(r / 2)) - sum_Natural(int((l - 1) / 2)))
+
+<sep>
+
+Programming task:
+Write a function to calculate the discriminant value.
+
+Python solution:
+def discriminant_value(x,y,z):
+    discriminant = (y**2) - (4*x*z)
+    if discriminant > 0:
+        return ("Two solutions",discriminant)
+    elif discriminant == 0:
+        return ("one solution",discriminant)
+    elif discriminant < 0:
+        return ("no real solution",discriminant)
+
+<sep>
+
+Programming task:
+Write a python function to check whether the length of the word is even or not.
+
+Python solution:
+def word_len(s): 
+    s = s.split(' ')   
+    for word in s:    
+        if len(word)%2==0: 
+            return True  
+        else:
+          return False
+
+<sep>
+
+Programming task:
+Write a function to convert camel case string to snake case string.
+
+Python solution:
+def camel_to_snake(text):
+        import re
+        str1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', text)
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', str1).lower()
+
+<sep>
+
+Programming task:
+Write a function to remove an empty tuple from a list of tuples.
+
+Python solution:
+def remove_empty(tuple1): #L = [(), (), ('',), ('a', 'b'), ('a', 'b', 'c'), ('d')]
+   tuple1 = [t for t in tuple1 if t]
+   return tuple1
+
+<sep>
+
+Programming task:
+Write a python function to accept the strings which contains all vowels.
+
+Python solution:
+def check(string): 
+  if len(set(string).intersection("AEIOUaeiou"))>=5: 
+    return ('accepted') 
+  else: 
+    return ("not accepted")
+
+<sep>
+
+Programming task:
+Write a python function to find maximum possible value for the given periodic function.
+
+Python solution:
+def floor_Max(A,B,N):
+    x = min(B - 1,N)
+    return (A*x) // B
+
+<sep>
+
+Programming task:
+Write a function to join the tuples if they have similar initial elements.
+
+Python solution:
+def join_tuples(test_list):
+  res = []
+  for sub in test_list:
+    if res and res[-1][0] == sub[0]:
+      res[-1].extend(sub[1:])
+    else:
+      res.append([ele for ele in sub])
+  res = list(map(tuple, res))
+  return (res)
+
+<sep>
+
+Programming task:
+Write a function to find minimum of two numbers.
+
+Python solution:
+def min_of_two( x, y ):
+    if x < y:
+        return x
+    return y
+
+<sep>
+
+Programming task:
+Write a function to find the maximum number of segments of lengths a, b and c that can be formed from n.
+
+Python solution:
+def maximum_segments(n, a, b, c) : 
+	dp = [-1] * (n + 10) 
+	dp[0] = 0
+	for i in range(0, n) : 
+		if (dp[i] != -1) : 
+			if(i + a <= n ): 
+				dp[i + a] = max(dp[i] + 1, 
+							dp[i + a]) 
+			if(i + b <= n ): 
+				dp[i + b] = max(dp[i] + 1, 
+							dp[i + b]) 
+			if(i + c <= n ): 
+				dp[i + c] = max(dp[i] + 1, 
+							dp[i + c]) 
+	return dp[n]
+
+<sep>
+
+Programming task:
+Write a function to concatenate the given two tuples to a nested tuple.
+
+Python solution:
+def concatenate_nested(test_tup1, test_tup2):
+  res = test_tup1 + test_tup2
+  return (res)
+
+<sep>
+
+Programming task:
+Write a python function to left rotate the string.
+
+Python solution:
+def left_rotate(s,d):
+    tmp = s[d : ] + s[0 : d]
+    return tmp
+
+<sep>
+
+Programming task:
+Write a function to find the minimum total path sum in the given triangle.
+
+Python solution:
+def min_sum_path(A): 
+	memo = [None] * len(A) 
+	n = len(A) - 1
+	for i in range(len(A[n])): 
+		memo[i] = A[n][i] 
+	for i in range(len(A) - 2, -1,-1): 
+		for j in range( len(A[i])): 
+			memo[j] = A[i][j] + min(memo[j], 
+									memo[j + 1]) 
+	return memo[0]

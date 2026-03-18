@@ -1,0 +1,28 @@
+{
+  "corpus_root": "corpora\\ava_v2_posttrain_assistant_v1",
+  "file_count": 3,
+  "text_count": 2107,
+  "character_count": 228194,
+  "token_count": 232408,
+  "supervised_example_count": 2106,
+  "files": [
+    {
+      "path": "corpora\\ava_v2_posttrain_assistant_v1\\examples.jsonl",
+      "size_bytes": 596678,
+      "sha256": "69191f0214ca6a412be01502293a61f20882ef75af1d485f08b0df68ee12f48d",
+      "relative_path": "examples.jsonl"
+    },
+    {
+      "path": "corpora\\ava_v2_posttrain_assistant_v1\\manifest.json",
+      "size_bytes": 1236,
+      "sha256": "7973da301a697794383eb0e83e72bf118797435b34ddbfeb4da0965d140360e0",
+      "relative_path": "manifest.json"
+    },
+    {
+      "path": "corpora\\ava_v2_posttrain_assistant_v1\\README.md",
+      "size_bytes": 199,
+      "sha256": "49ca28fde36ec1500ada3b4790caf73cdd2c1c559e5904dbcdf98be8d71540dd",
+      "relative_path": "README.md"
+    }
+  ]
+}

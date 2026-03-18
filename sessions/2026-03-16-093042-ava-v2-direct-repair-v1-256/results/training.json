@@ -1,0 +1,428 @@
+{
+  "name": "ava-v2-recurrent-depth-direct-repair-v1",
+  "dataset_kind": "supervised",
+  "steps": 256,
+  "optimizer_steps": 64,
+  "final_loss": 0.8304,
+  "min_loss": 0.5074,
+  "train_eval_loss": 1.2781,
+  "val_loss": 0.8426,
+  "runtime_seconds": 21.28,
+  "tokens_per_optimizer_step": 6144,
+  "tokens_seen": 393216,
+  "corpus_tokens": 17936,
+  "supervised_stats": {
+    "total_examples": 176,
+    "kept_examples": 176,
+    "truncated_examples": 0,
+    "skipped_no_target_examples": 0,
+    "max_full_tokens": 150,
+    "avg_full_tokens": 101.91
+  },
+  "tokenizer_kind": "byte",
+  "tokenizer_path": null,
+  "tokenizer_vocab_size": 260,
+  "trainable_patterns": [],
+  "trainable_parameter_names": [
+    "wte.weight",
+    "wpe.weight",
+    "prelude.0.ln_1.weight",
+    "prelude.0.ln_1.bias",
+    "prelude.0.attn.c_attn.weight",
+    "prelude.0.attn.c_proj.weight",
+    "prelude.0.ln_2.weight",
+    "prelude.0.ln_2.bias",
+    "prelude.0.mlp.c_fc.weight",
+    "prelude.0.mlp.c_proj.weight",
+    "blocks.0.ln_1.weight",
+    "blocks.0.ln_1.bias",
+    "blocks.0.attn.c_attn.weight",
+    "blocks.0.attn.c_proj.weight",
+    "blocks.0.ln_2.weight",
+    "blocks.0.ln_2.bias",
+    "blocks.0.mlp.c_fc.weight",
+    "blocks.0.mlp.c_proj.weight",
+    "blocks.1.ln_1.weight",
+    "blocks.1.ln_1.bias",
+    "blocks.1.attn.c_attn.weight",
+    "blocks.1.attn.c_proj.weight",
+    "blocks.1.ln_2.weight",
+    "blocks.1.ln_2.bias",
+    "blocks.1.mlp.c_fc.weight",
+    "blocks.1.mlp.c_proj.weight",
+    "blocks.2.ln_1.weight",
+    "blocks.2.ln_1.bias",
+    "blocks.2.attn.c_attn.weight",
+    "blocks.2.attn.c_proj.weight",
+    "blocks.2.ln_2.weight",
+    "blocks.2.ln_2.bias",
+    "blocks.2.mlp.c_fc.weight",
+    "blocks.2.mlp.c_proj.weight",
+    "blocks.3.ln_1.weight",
+    "blocks.3.ln_1.bias",
+    "blocks.3.attn.c_attn.weight",
+    "blocks.3.attn.c_proj.weight",
+    "blocks.3.ln_2.weight",
+    "blocks.3.ln_2.bias",
+    "blocks.3.mlp.c_fc.weight",
+    "blocks.3.mlp.c_proj.weight",
+    "blocks.4.ln_1.weight",
+    "blocks.4.ln_1.bias",
+    "blocks.4.attn.c_attn.weight",
+    "blocks.4.attn.c_proj.weight",
+    "blocks.4.ln_2.weight",
+    "blocks.4.ln_2.bias",
+    "blocks.4.mlp.c_fc.weight",
+    "blocks.4.mlp.c_proj.weight",
+    "blocks.5.ln_1.weight",
+    "blocks.5.ln_1.bias",
+    "blocks.5.attn.c_attn.weight",
+    "blocks.5.attn.c_proj.weight",
+    "blocks.5.ln_2.weight",
+    "blocks.5.ln_2.bias",
+    "blocks.5.mlp.c_fc.weight",
+    "blocks.5.mlp.c_proj.weight",
+    "coda.0.ln_1.weight",
+    "coda.0.ln_1.bias",
+    "coda.0.attn.c_attn.weight",
+    "coda.0.attn.c_proj.weight",
+    "coda.0.ln_2.weight",
+    "coda.0.ln_2.bias",
+    "coda.0.mlp.c_fc.weight",
+    "coda.0.mlp.c_proj.weight",
+    "loop_step_embeddings.weight",
+    "ln_f.weight",
+    "ln_f.bias"
+  ],
+  "trainable_parameter_count": 14417664,
+  "init_tokenizer_kind": "byte",
+  "init_checkpoint": "sessions/2026-03-16-092750-ava-v2-posttrain-direct-v1-1024/checkpoints/ava-v2-recurrent-depth-posttrain-mix-v2-stable.pt",
+  "device_requested": "cuda",
+  "device_used": "cuda",
+  "warnings": [],
+  "checkpoint": "sessions\\2026-03-16-093042-ava-v2-direct-repair-v1-256\\checkpoints\\ava-v2-recurrent-depth-direct-repair-v1.pt",
+  "loss_history": [
+    {
+      "step": 4,
+      "loss": 2.0097,
+      "lr": 2.5e-06
+    },
+    {
+      "step": 8,
+      "loss": 1.931,
+      "lr": 5e-06
+    },
+    {
+      "step": 12,
+      "loss": 1.0564,
+      "lr": 7.5e-06
+    },
+    {
+      "step": 16,
+      "loss": 1.0638,
+      "lr": 1e-05
+    },
+    {
+      "step": 20,
+      "loss": 1.8836,
+      "lr": 1e-05
+    },
+    {
+      "step": 24,
+      "loss": 1.5022,
+      "lr": 1e-05
+    },
+    {
+      "step": 28,
+      "loss": 1.1999,
+      "lr": 1e-05
+    },
+    {
+      "step": 32,
+      "loss": 0.9489,
+      "lr": 1e-05
+    },
+    {
+      "step": 36,
+      "loss": 1.0762,
+      "lr": 1e-05
+    },
+    {
+      "step": 40,
+      "loss": 1.3399,
+      "lr": 1e-05
+    },
+    {
+      "step": 44,
+      "loss": 1.3636,
+      "lr": 1e-05
+    },
+    {
+      "step": 48,
+      "loss": 1.5533,
+      "lr": 1e-05
+    },
+    {
+      "step": 52,
+      "loss": 1.7235,
+      "lr": 1e-05
+    },
+    {
+      "step": 56,
+      "loss": 0.8432,
+      "lr": 1e-05
+    },
+    {
+      "step": 60,
+      "loss": 1.6185,
+      "lr": 1e-05
+    },
+    {
+      "step": 64,
+      "loss": 1.6693,
+      "lr": 1e-05
+    },
+    {
+      "step": 68,
+      "loss": 1.0351,
+      "lr": 1e-05
+    },
+    {
+      "step": 72,
+      "loss": 1.3712,
+      "lr": 1e-05
+    },
+    {
+      "step": 76,
+      "loss": 1.5072,
+      "lr": 1e-05
+    },
+    {
+      "step": 80,
+      "loss": 1.3204,
+      "lr": 1e-05
+    },
+    {
+      "step": 84,
+      "loss": 1.8389,
+      "lr": 1e-05
+    },
+    {
+      "step": 88,
+      "loss": 0.8302,
+      "lr": 1e-05
+    },
+    {
+      "step": 92,
+      "loss": 1.845,
+      "lr": 1e-05
+    },
+    {
+      "step": 96,
+      "loss": 1.5574,
+      "lr": 1e-05
+    },
+    {
+      "step": 100,
+      "loss": 1.9039,
+      "lr": 1e-05
+    },
+    {
+      "step": 104,
+      "loss": 1.7516,
+      "lr": 1e-05
+    },
+    {
+      "step": 108,
+      "loss": 0.7957,
+      "lr": 1e-05
+    },
+    {
+      "step": 112,
+      "loss": 1.5037,
+      "lr": 1e-05
+    },
+    {
+      "step": 116,
+      "loss": 1.5807,
+      "lr": 1e-05
+    },
+    {
+      "step": 120,
+      "loss": 1.4536,
+      "lr": 1e-05
+    },
+    {
+      "step": 124,
+      "loss": 1.0233,
+      "lr": 1e-05
+    },
+    {
+      "step": 128,
+      "loss": 1.5421,
+      "lr": 1e-05
+    },
+    {
+      "step": 132,
+      "loss": 1.0351,
+      "lr": 1e-05
+    },
+    {
+      "step": 136,
+      "loss": 1.4106,
+      "lr": 1e-05
+    },
+    {
+      "step": 140,
+      "loss": 1.5065,
+      "lr": 1e-05
+    },
+    {
+      "step": 144,
+      "loss": 0.7598,
+      "lr": 1e-05
+    },
+    {
+      "step": 148,
+      "loss": 1.1504,
+      "lr": 1e-05
+    },
+    {
+      "step": 152,
+      "loss": 1.326,
+      "lr": 1e-05
+    },
+    {
+      "step": 156,
+      "loss": 0.7187,
+      "lr": 1e-05
+    },
+    {
+      "step": 160,
+      "loss": 0.9085,
+      "lr": 1e-05
+    },
+    {
+      "step": 164,
+      "loss": 0.7593,
+      "lr": 1e-05
+    },
+    {
+      "step": 168,
+      "loss": 0.9777,
+      "lr": 1e-05
+    },
+    {
+      "step": 172,
+      "loss": 0.8642,
+      "lr": 1e-05
+    },
+    {
+      "step": 176,
+      "loss": 1.4401,
+      "lr": 1e-05
+    },
+    {
+      "step": 180,
+      "loss": 1.131,
+      "lr": 1e-05
+    },
+    {
+      "step": 184,
+      "loss": 0.9747,
+      "lr": 1e-05
+    },
+    {
+      "step": 188,
+      "loss": 1.4443,
+      "lr": 1e-05
+    },
+    {
+      "step": 192,
+      "loss": 1.1487,
+      "lr": 1e-05
+    },
+    {
+      "step": 196,
+      "loss": 1.141,
+      "lr": 1e-05
+    },
+    {
+      "step": 200,
+      "loss": 1.4192,
+      "lr": 1e-05
+    },
+    {
+      "step": 204,
+      "loss": 0.7274,
+      "lr": 1e-05
+    },
+    {
+      "step": 208,
+      "loss": 0.5074,
+      "lr": 1e-05
+    },
+    {
+      "step": 212,
+      "loss": 0.9393,
+      "lr": 1e-05
+    },
+    {
+      "step": 216,
+      "loss": 1.4946,
+      "lr": 1e-05
+    },
+    {
+      "step": 220,
+      "loss": 1.1593,
+      "lr": 1e-05
+    },
+    {
+      "step": 224,
+      "loss": 1.4395,
+      "lr": 1e-05
+    },
+    {
+      "step": 228,
+      "loss": 1.2442,
+      "lr": 1e-05
+    },
+    {
+      "step": 232,
+      "loss": 0.7433,
+      "lr": 1e-05
+    },
+    {
+      "step": 236,
+      "loss": 0.8529,
+      "lr": 1e-05
+    },
+    {
+      "step": 240,
+      "loss": 1.1578,
+      "lr": 1e-05
+    },
+    {
+      "step": 244,
+      "loss": 1.1584,
+      "lr": 1e-05
+    },
+    {
+      "step": 248,
+      "loss": 1.2366,
+      "lr": 1e-05
+    },
+    {
+      "step": 252,
+      "loss": 1.0517,
+      "lr": 1e-05
+    },
+    {
+      "step": 256,
+      "loss": 0.8304,
+      "lr": 1e-05
+    }
+  ],
+  "checkpoint_sha256": "1739175060cfaed711858024876ff46c66538429a827f9144d51280e007af010",
+  "checkpoint_size_bytes": 57700532
+}

@@ -1,0 +1,7 @@
+[
+  "Resolve the recorded warnings before treating this run as a meaningful baseline.",
+  "Tune learning rate or batch structure before scaling the model or corpus.",
+  "Do not infer product quality from the smoke benchmark; move next to a broader curated corpus.",
+  "Expand the compact tool SFT packet; trace generation, no-tool abstention, and tool boundaries are not stable yet.",
+  "Add compact supervised compliance data for refusals, terse formatting, and tool-boundary obedience before broader product claims."
+]

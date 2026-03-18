@@ -1,0 +1,17 @@
+{
+  "curriculum": "ava_v2_open_mix",
+  "english_limit": 40000,
+  "math_limit": 6000,
+  "science_limit": 6000,
+  "code_limit": 500,
+  "english_records": 39988,
+  "math_records": 6000,
+  "science_records": 14374,
+  "code_records": 374,
+  "files": [
+    "english.txt",
+    "math.txt",
+    "science.txt",
+    "code.txt"
+  ]
+}
