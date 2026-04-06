@@ -1,0 +1,50 @@
+experiment:
+  name: gemma4-26b-moe-compression
+  version: "0.1.0"
+  description: >
+    Gemma 4 26B MoE with extreme compression for 1M context on 4GB VRAM.
+    Baseline: 4-bit NF4 + CPU/GPU offloading.
+
+model:
+  model_id: google/gemma-4-26B-A4B-it
+  dtype: bfloat16
+  load_in_4bit: true
+  bnb_4bit_quant_type: nf4
+  bnb_4bit_use_double_quant: true
+  gpu_memory_gb: 3.5
+  cpu_memory_gb: 28.0
+
+# Gemma 4 26B A4B architecture reference:
+#   30 layers: 25 sliding (1024 window) + 5 global (layers 5,11,17,23,29)
+#   128 experts, 8 active + 1 shared per token
+#   hidden_size: 2816, head_dim: 256
+#   global: 2 KV heads, head_dim 512, k_eq_v (keys == values)
+#   vocab: 262144, max_pos: 262144
+
+offload:
+  enabled: true
+  expert_cache_size: 16
+  prefetch: true
+  pin_memory: true
+  double_buffer: true
+
+turboquant:
+  enabled: true
+  key_bits: 4
+  value_bits: 2
+  group_size: 128
+  protected_layers: 1  # protect first+last global layers
+  seed: 42
+
+yarn:
+  enabled: true
+  target_context: 1048576  # 1M
+  original_context: 262144  # 256K native
+  beta_fast: 32.0
+  beta_slow: 1.0
+
+generation:
+  max_new_tokens: 512
+  temperature: 0.7
+  top_p: 0.95
+  top_k: 64
