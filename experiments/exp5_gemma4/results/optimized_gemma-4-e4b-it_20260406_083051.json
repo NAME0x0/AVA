@@ -1,0 +1,181 @@
+{
+  "config": {
+    "model_id": "google/gemma-4-E4B-it",
+    "quantization": "none",
+    "quick": true,
+    "optimizations": {
+      "turboquant": true,
+      "yarn": true
+    },
+    "load_metadata": {
+      "model_id": "google/gemma-4-E4B-it",
+      "load_time_s": 11.6,
+      "quantization": "none",
+      "gpu_params_m": 0.0,
+      "cpu_params_m": 7996.2,
+      "gpu_weight_mb": 0.0,
+      "cpu_weight_mb": 15992.3,
+      "layers_on_gpu": 0,
+      "layers_on_cpu": 0,
+      "gpu_allocated_mb": 0.0,
+      "gpu_reserved_mb": 0.0
+    },
+    "architecture": {
+      "num_layers": 42,
+      "hidden_size": 2560,
+      "num_attention_heads": 8,
+      "num_key_value_heads": 2,
+      "num_global_key_value_heads": null,
+      "head_dim": 256,
+      "global_head_dim": 512,
+      "attention_k_eq_v": false,
+      "num_experts": null,
+      "top_k_experts": null,
+      "moe_intermediate_size": null,
+      "sliding_window": 512,
+      "max_position_embeddings": 131072,
+      "global_layer_indices": [
+        5,
+        11,
+        17,
+        23,
+        29,
+        35,
+        41
+      ],
+      "sliding_layer_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        15,
+        16,
+        18,
+        19,
+        20,
+        21,
+        22,
+        24,
+        25,
+        26,
+        27,
+        28,
+        30,
+        31,
+        32,
+        33,
+        34,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "rope_config": {
+        "full_attention": {
+          "partial_rotary_factor": 0.25,
+          "rope_theta": 1000000.0,
+          "rope_type": "proportional"
+        },
+        "sliding_attention": {
+          "rope_theta": 10000.0,
+          "rope_type": "default"
+        }
+      },
+      "vocab_size": 262144
+    },
+    "optimizations_meta": {
+      "turboquant": {
+        "key_bits": 4,
+        "value_bits": 2,
+        "protected_layers": 1,
+        "global_layers_patched": 7,
+        "key_compression": 3.710144927536232,
+        "value_compression": 6.918918918918919,
+        "average_compression": 4.830188679245283,
+        "key_bits_effective": 4.3125,
+        "value_bits_effective": 2.3125
+      },
+      "kv_cache_1m_compressed_mb": 5673.844736,
+      "kv_cache_1m_bf16_mb": 30101.471232,
+      "yarn": {
+        "original_context": 131072,
+        "target_context": 1048576,
+        "scale_factor": 8.0,
+        "head_dim": 512,
+        "rotary_dim": 128,
+        "rope_theta": 1000000.0,
+        "global_layers_affected": [
+          5,
+          11,
+          17,
+          23,
+          29
+        ],
+        "sliding_layers_unaffected": 25
+      }
+    },
+    "memory_footprint": {
+      "total_params": 7996156448,
+      "total_bytes": 15992312896,
+      "gpu_bytes": 0,
+      "cpu_bytes": 15992312896,
+      "by_component": {
+        "model": {
+          "params": 7996156448,
+          "bytes": 15992312896
+        }
+      },
+      "total_gb": 15.992312896,
+      "gpu_gb": 0.0,
+      "cpu_gb": 15.992312896
+    }
+  },
+  "timestamp": "2026-04-06T04:30:11.677389+00:00",
+  "results": [
+    {
+      "name": "load_time",
+      "value": 11.6,
+      "unit": "seconds"
+    },
+    {
+      "name": "gpu_memory_after_load",
+      "value": 0.0,
+      "unit": "MB"
+    },
+    {
+      "name": "gpu_memory_after_patches",
+      "value": 0.0,
+      "unit": "MB"
+    },
+    {
+      "name": "decode_tok_per_s",
+      "value": 1.4353233176109323,
+      "unit": "tok/s"
+    },
+    {
+      "name": "total_tok_per_s",
+      "value": 1.8838618543643486,
+      "unit": "tok/s"
+    },
+    {
+      "name": "avg_latency",
+      "value": 22.29462840000633,
+      "unit": "seconds"
+    },
+    {
+      "name": "peak_vram",
+      "value": 0.0,
+      "unit": "MB"
+    }
+  ]
+}

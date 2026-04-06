@@ -97,7 +97,7 @@ def apply_optimizations(
         meta["kv_cache_1m_compressed_mb"] = kv_1m["total_compressed_mb"]
         meta["kv_cache_1m_bf16_mb"] = kv_1m["total_bf16_mb"]
         print(f"  KV cache at 1M tokens: {kv_1m['total_bf16_mb']:.0f} MB (bf16)"
-              f" → {kv_1m['total_compressed_mb']:.0f} MB (compressed)")
+              f" ->{kv_1m['total_compressed_mb']:.0f} MB (compressed)")
 
     if enable_yarn:
         print("\n--- Applying YaRN Context Extension ---")
@@ -274,9 +274,9 @@ def _compare_results(baseline_path: str, optimized: BenchmarkSuite) -> None:
             if base_val > 0:
                 change = ((opt_val - base_val) / base_val) * 100
                 direction = "+" if change > 0 else ""
-                print(f"  {metric:30s}: {base_val:>10.1f} → {opt_val:>10.1f} ({direction}{change:.1f}%)")
+                print(f"  {metric:30s}: {base_val:>10.1f} ->{opt_val:>10.1f} ({direction}{change:.1f}%)")
             else:
-                print(f"  {metric:30s}: {base_val:>10.1f} → {opt_val:>10.1f}")
+                print(f"  {metric:30s}: {base_val:>10.1f} ->{opt_val:>10.1f}")
 
 
 def main() -> None:
