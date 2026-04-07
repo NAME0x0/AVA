@@ -53,6 +53,7 @@ build/
 dist/
 *.egg-info/
 unsloth_compiled_cache/
+quantized_cache/
 gguf_build/
 *.gguf
 
@@ -66,6 +67,7 @@ experiments/exp4_finetune/*.log
 
 # Temp test dirs
 .pytest-tmp-*/
+.triton-runtime/
 
 # Claude Code local config
 .claude/
@@ -81,3 +83,8 @@ ui/.next/
 ui/node_modules/
 ui/out/
 ui/src-tauri/target/
+
+# Exp5 machine-local artifacts
+experiments/exp5_gemma4/results/*.json
+experiments/exp5_gemma4/results/llamacpp_logs/
+experiments/exp5_gemma4/tools/

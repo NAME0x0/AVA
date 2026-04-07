@@ -362,6 +362,22 @@ ollama run ava-v2
 
 The GGUF build also runs automatically in CI — trigger it from Actions or publish a GitHub Release.
 
+## Practical Local Gemma 4 Serving
+
+The current `exp5` local-serving work lives in [`experiments/exp5_gemma4`](experiments/exp5_gemma4) and has now split into three tracks:
+
+- `26B feasibility`: streamed `26B-A4B` with TurboQuant/YaRN research and cached reload
+- `deep dense branch`: `E4B` on the existing Transformers runtime at a practical `512K` target
+- `fast branch`: `E2B` through `llama.cpp`, currently the best measured local speed path
+
+Current recommendation on the `4 GB VRAM / 32 GB RAM` laptop:
+
+- default fast responder: `E2B`
+- explicit deep / reasoning escalation: `E4B`
+- keep `26B` for feasibility and systems research, not as the default interactive branch
+
+The detailed checkpoint log is in [`experiments/exp5_gemma4/PROGRESS_LOG.md`](experiments/exp5_gemma4/PROGRESS_LOG.md), and the full experiment write-up is in [`experiments/exp5_gemma4/RESULTS.md`](experiments/exp5_gemma4/RESULTS.md).
+
 ### LoRA Adapter (42 MB)
 
 Available on HuggingFace: [NAME0x0/AVA-v2](https://huggingface.co/NAME0x0/AVA-v2)
