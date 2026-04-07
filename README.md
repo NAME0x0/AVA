@@ -1,8 +1,71 @@
 # AVA
 
-AVA is a high-quality AI assistant built under extreme hardware constraints: a single **4 GB VRAM** laptop GPU (NVIDIA RTX A2000), no cloud budget, no large-cluster training. AVA v2 is a QLoRA fine-tune of Qwen3.5-2B that achieves **79% on ARC-Challenge** and **48% on GSM8K** while training and running inference in under 2 GB of VRAM.
+AVA is a local-first AI lab built under extreme hardware constraints: a single **4 GB VRAM** laptop GPU (NVIDIA RTX A2000), no cloud budget, no large-cluster training. AVA v2 is the first released model from that work: a QLoRA fine-tune of Qwen3.5-2B that achieves **79% on ARC-Challenge** and **48% on GSM8K** while training and running inference in under 2 GB of VRAM.
 
-The entire training pipeline, evaluation harness, and model weights are open. This README documents what was built, how it was built, and how to reproduce the results from scratch.
+But the repo is broader than one released adapter. AVA is the full stack for building local AI from the ground up: scratch architectures, tokenizers, retrieval and memory systems, system-prompt and routing controls, distillation, post-training, evaluation, and fast local serving.
+
+The entire training pipeline, evaluation harness, experiment history, and model weights are open. This README now documents both the released model and the larger AVA research track.
+
+## What AVA Is
+
+AVA currently spans four layers of work:
+
+- `ground-up model building`: compact scratch models, recurrent-depth variants, tokenizer work, and training infrastructure in [`src/ava`](src/ava)
+- `behavior shaping`: tool use, compliance, memory transfer, retrieval, and prompt/routing control
+- `post-training`: QLoRA fine-tuning, teacher distillation, corpus curation, and evaluation on stronger base models
+- `local serving systems`: quantization, long-context engineering, hybrid CPU/GPU runtimes, and fast/deep model routing
+
+If you want the shortest summary: AVA is a personal local AI repository for building, training, distilling, steering, and serving useful AI systems on consumer hardware.
+
+## Experiment Map
+
+```mermaid
+flowchart LR
+    A["Exp1-3<br/>Scratch AVA systems"] --> B["Exp4<br/>Qwen3.5-2B QLoRA"]
+    B --> C["Exp5A<br/>Gemma 4 26B feasibility"]
+    C --> D["Exp5B<br/>Gemma 4 E4B deep branch"]
+    D --> E["Exp5C<br/>Gemma 4 E2B fast branch"]
+    E --> F["Two-tier local runtime<br/>fast + deep routing"]
+```
+
+| Version | Core challenge | What we built | Best result / current status | What remains |
+|---|---|---|---|---|
+| `Exp1-3` scratch AVA systems | Prove useful AI behavior can emerge on a tiny local model | 11M-99M scratch configs, byte/tokenizer experiments, retrieval ensembles, memory-transfer flows, tool/compliance patches | scratch baseline hit `24% ARC`; support-bank retrieval reached `91/299 ARC`; memory-transfer stress suites reached `87/87` | scale the strongest ideas into better tokenizers, recurrent-depth variants, stronger post-training, and distillation targets |
+| `Exp4 / AVA-v1` | Prove QLoRA works on `4 GB` VRAM with a real open base model | Qwen3.5-2B NF4 loading, LoRA pipeline, evaluation harness, agentic harness | `66% ARC`, `40% GSM8K` on the fast v1 run | stronger corpus, cleaner alignment, better reasoning coverage |
+| `Exp4 / AVA-v2` | Turn AVA into a released local assistant | curated 20K corpus, Triton/SDPA training speedups, full eval pipeline, HF model card, GGUF export path | `79% ARC`, `48% GSM8K`, `42 MB` adapter | longer context, stronger math, RL/post-training, better tool specialization, student distillation |
+| `Exp5 / 26B feasibility` | Make Gemma 4 `26B-A4B` run on `32 GB RAM / 4 GB VRAM` | streamed int4 loader, TurboQuant bit-packing, MoE offload, cached reload, YaRN experiments | cached reload about `8.6s`; warm exact decode improved to about `0.45-0.50 tok/s` | still too slow for default use; keep as systems research branch |
+| `Exp5 / E4B deep branch` | Keep Gemma 4 intelligence practical on the same laptop | bf16 manual split, TurboQuant-enabled stack, YaRN at practical `512K`, deep routing path | about `0.79-0.85 tok/s` decode and `2.1-2.2 tok/s` total on best runs | reduce deep-branch latency and switching cost |
+| `Exp5 / E2B fast branch + two-tier runtime` | Make local chat actually feel fast without giving up a deeper path | E2B fast path, `llama.cpp` backend, explicit `quick:` / `deep:` / `reason:` controls, lazy deep escalation to E4B | best fast-path result: about `6.39 tok/s` decode and `17.74 tok/s` total | unify fast/deep UX further and reduce branch escalation overhead |
+
+Experiment logs:
+
+- scratch and fine-tune history: [`experiments/exp4_finetune/EXPERIMENT_LOG.md`](experiments/exp4_finetune/EXPERIMENT_LOG.md)
+- fine-tune report: [`experiments/exp4_finetune/RESULTS_REPORT.md`](experiments/exp4_finetune/RESULTS_REPORT.md)
+- Gemma 4 checkpoint log: [`experiments/exp5_gemma4/PROGRESS_LOG.md`](experiments/exp5_gemma4/PROGRESS_LOG.md)
+- Gemma 4 results write-up: [`experiments/exp5_gemma4/RESULTS.md`](experiments/exp5_gemma4/RESULTS.md)
+
+## Progress Snapshot
+
+```mermaid
+---
+config:
+    xyChart:
+        width: 700
+        height: 350
+---
+xychart-beta
+    title "Best Measured Local Decode Speed by Branch"
+    x-axis ["26B exact", "E4B deep", "E2B Transformers", "E2B llama.cpp"]
+    y-axis "tok/s" 0 --> 7
+    bar [0.50, 0.85, 2.13, 6.39]
+```
+
+| Branch | Role | Practical context target | Best measured decode speed | Notes |
+|---|---|---|---|---|
+| `AVA v2 / Qwen3.5-2B` | released fine-tuned assistant | base-model limits | benchmarked via adapter / GGUF | strongest released training result so far |
+| `Gemma 4 26B-A4B` | feasibility and systems research | `256K -> 1M` experimental | about `0.50 tok/s` warm | proves fit, not speed |
+| `Gemma 4 E4B` | deep branch | `512K` practical, `1M` experimental | about `0.85 tok/s` | dense deep-path model |
+| `Gemma 4 E2B` | fast branch | `512K` practical | about `6.39 tok/s` via `llama.cpp` | current recommended fast local path |
 
 ## Try AVA v2
 
@@ -362,9 +425,11 @@ ollama run ava-v2
 
 The GGUF build also runs automatically in CI — trigger it from Actions or publish a GitHub Release.
 
-## Practical Local Gemma 4 Serving
+## Experiment 5: Practical Local Gemma 4 Serving
 
-The current `exp5` local-serving work lives in [`experiments/exp5_gemma4`](experiments/exp5_gemma4) and has now split into three tracks:
+The current `exp5` local-serving work lives in [`experiments/exp5_gemma4`](experiments/exp5_gemma4) and is the serving/systems branch of AVA rather than a replacement for AVA v2.
+
+It has split into three tracks:
 
 - `26B feasibility`: streamed `26B-A4B` with TurboQuant/YaRN research and cached reload
 - `deep dense branch`: `E4B` on the existing Transformers runtime at a practical `512K` target
@@ -375,6 +440,13 @@ Current recommendation on the `4 GB VRAM / 32 GB RAM` laptop:
 - default fast responder: `E2B`
 - explicit deep / reasoning escalation: `E4B`
 - keep `26B` for feasibility and systems research, not as the default interactive branch
+
+What remains inside `exp5`:
+
+- make deep-branch escalation cheaper than today's reload-heavy path
+- preserve `512K` as the practical target while keeping `1M` as an experimental branch
+- keep TurboQuant and YaRN as research assets without slowing the default fast path
+- decide how much of the custom runtime should stay in Python versus move behind `llama.cpp`-style serving
 
 The detailed checkpoint log is in [`experiments/exp5_gemma4/PROGRESS_LOG.md`](experiments/exp5_gemma4/PROGRESS_LOG.md), and the full experiment write-up is in [`experiments/exp5_gemma4/RESULTS.md`](experiments/exp5_gemma4/RESULTS.md).
 
@@ -428,14 +500,21 @@ AVA/
 │   └── ...                     #   Sessions, activity logging, tools, inspection
 │
 ├── experiments/
-│   └── exp4_finetune/          # Experiment 4: QLoRA fine-tuning (current focus)
-│       ├── scripts/            #   Training, benchmarking, corpus building scripts
-│       │   ├── finetune_v2_full.py     # AVA v2 training script
-│       │   ├── benchmark_full.py       # ARC + GSM8K evaluation
-│       │   ├── upload_to_hf.py         # Push adapter to HuggingFace
-│       │   └── ...                     # Corpus builders, older experiment scripts
-│       ├── models/AVA-v2/      #   Released adapter weights (42 MB)
-│       └── results/            #   Pipeline state and evaluation outputs
+│   ├── exp4_finetune/          # Experiment 4: released QLoRA / AVA v2 branch
+│   │   ├── scripts/            #   Training, benchmarking, corpus building scripts
+│   │   │   ├── finetune_v2_full.py     # AVA v2 training script
+│   │   │   ├── benchmark_full.py       # ARC + GSM8K evaluation
+│   │   │   ├── upload_to_hf.py         # Push adapter to HuggingFace
+│   │   │   └── ...                     # Corpus builders, older experiment scripts
+│   │   ├── models/AVA-v2/      #   Released adapter weights (42 MB)
+│   │   ├── EXPERIMENT_LOG.md   #   Per-run history for v1/v2 fine-tuning
+│   │   └── results/            #   Pipeline state and evaluation outputs
+│   └── exp5_gemma4/            # Experiment 5: local Gemma 4 serving branch
+│       ├── engine/             #   Streaming/offload, routing, and serving runtime
+│       ├── scripts/            #   26B, E4B, E2B, and two-tier runners
+│       ├── configs/            #   Practical presets for each local branch
+│       ├── PROGRESS_LOG.md     #   Checkpoint log for local serving progress
+│       └── RESULTS.md          #   Detailed write-up of measured outcomes
 │
 ├── scripts/
 │   ├── chat.py                 # Interactive chat with AVA v2
@@ -473,7 +552,7 @@ AVA/
 
 ## Roadmap
 
-AVA is a research project exploring how far a single-GPU setup can push AI capability. The roadmap reflects real constraints: everything must train and run on 4 GB VRAM.
+AVA is a research project exploring how far a single-GPU setup can push AI capability. The roadmap reflects real constraints: everything must train and run on 4 GB VRAM or at least degrade gracefully onto the same local machine.
 
 ### Completed
 
@@ -481,11 +560,15 @@ AVA is a research project exploring how far a single-GPU setup can push AI capab
 - [x] QLoRA fine-tuning pipeline on Qwen3.5-2B (experiment 4)
 - [x] AVA v2: 79% ARC-Challenge, 48% GSM8K with 20K curated examples
 - [x] Sparse retrieval ensemble for science reasoning (91/299 ARC with support banks)
+- [x] Gemma 4 26B local feasibility branch with streamed load, TurboQuant, and cached reload
+- [x] Gemma 4 two-tier local runtime with a fast E2B branch and a deeper E4B branch
 - [x] Full reproducibility: open weights, open data, open code
 
 ### In Progress
 
 - [ ] Extended sequence length training (384 -> 1024+ tokens) for longer reasoning chains
+- [ ] Make the deep local branch cheaper to enter than the current reload-heavy E2B -> E4B switch
+- [ ] Stabilize `512K` as the practical dense serving target while keeping `1M` experimental
 - [ ] Post-training with verifiable RL (math and science verification rewards)
 - [ ] Improved GSM8K through chain-of-thought curriculum
 
@@ -507,14 +590,14 @@ AVA is a research project exploring how far a single-GPU setup can push AI capab
 
 ## Prior Work
 
-AVA's earlier experiments (v3 scratch-trained architecture) are preserved in the repo:
+AVA's earlier experiments are preserved in the repo and still matter to the current direction:
 
 - A compact 11M checkpoint with strong internal tool/compliance behavior
 - A memory-transfer system achieving 87/87 on stress suites
 - A science-first sparse retrieval ensemble reaching 91/299 on ARC-Challenge
 - Tokenizer research showing Qwen's tokenizer compresses AVA data at 0.24x byte ratio
 
-These experiments informed the pivot to fine-tuning: the scratch model's 24% ARC ceiling made it clear that parameter count and pre-trained knowledge matter more than architectural cleverness at this scale.
+These experiments informed the pivot to fine-tuning and later to Gemma 4 serving: the scratch model's 24% ARC ceiling made it clear that parameter count and pre-trained knowledge matter, but the retrieval/memory/tooling work remains part of AVA's long-term architecture rather than discarded prior work.
 
 ## Quick Start
 
