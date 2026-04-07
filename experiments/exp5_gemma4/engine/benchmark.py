@@ -79,23 +79,45 @@ def reset_vram_stats() -> None:
         torch.cuda.empty_cache()
 
 
+def get_model_input_device(model: Any) -> torch.device:
+    """Choose the correct input device for a loaded model.
+
+    Manually split models keep embeddings on CPU and rely on boundary hooks
+    to move activations into GPU-resident decoder layers. Those models must
+    receive CPU inputs even though `model.device` may report CUDA.
+    """
+    if hasattr(model, "_manual_gpu_layers"):
+        return torch.device("cpu")
+    return getattr(model, "device", torch.device("cpu"))
+
+
 def benchmark_inference_speed(
     model: Any,
     processor: Any,
     prompts: list[str],
     max_new_tokens: int = 128,
     warmup_runs: int = 1,
+    assistant_model: Any | None = None,
+    generate_kwargs: dict[str, Any] | None = None,
 ) -> dict[str, float]:
     """Measure tokens/second for generation.
 
     Returns:
         dict with prefill_tok_s, decode_tok_s, total_tok_s, latency_s
     """
+    input_device = get_model_input_device(model)
+    extra_generate_kwargs = dict(generate_kwargs or {})
+    if assistant_model is not None:
+        extra_generate_kwargs["assistant_model"] = assistant_model
+
     # Warmup
     for _ in range(warmup_runs):
-        inputs = processor(text=prompts[0], return_tensors="pt").to(model.device)
+        if assistant_model is not None and torch.cuda.is_available():
+            gc.collect()
+            torch.cuda.empty_cache()
+        inputs = processor(text=prompts[0], return_tensors="pt").to(input_device)
         with torch.no_grad():
-            model.generate(**inputs, max_new_tokens=8)
+            model.generate(**inputs, max_new_tokens=8, **extra_generate_kwargs)
 
     if torch.cuda.is_available():
         torch.cuda.synchronize()
@@ -105,7 +127,10 @@ def benchmark_inference_speed(
     total_time = 0.0
 
     for prompt in prompts:
-        inputs = processor(text=prompt, return_tensors="pt").to(model.device)
+        if assistant_model is not None and torch.cuda.is_available():
+            gc.collect()
+            torch.cuda.empty_cache()
+        inputs = processor(text=prompt, return_tensors="pt").to(input_device)
         input_len = inputs["input_ids"].shape[1]
 
         if torch.cuda.is_available():
@@ -113,7 +138,11 @@ def benchmark_inference_speed(
         t0 = time.perf_counter()
 
         with torch.no_grad():
-            output = model.generate(**inputs, max_new_tokens=max_new_tokens)
+            output = model.generate(
+                **inputs,
+                max_new_tokens=max_new_tokens,
+                **extra_generate_kwargs,
+            )
 
         if torch.cuda.is_available():
             torch.cuda.synchronize()
@@ -150,10 +179,11 @@ def benchmark_perplexity(
 
     total_nll = 0.0
     total_tokens = 0
+    input_device = get_model_input_device(model)
 
     for text in texts:
         encodings = processor(text, return_tensors="pt")
-        input_ids = encodings["input_ids"].to(model.device)
+        input_ids = encodings["input_ids"].to(input_device)
         seq_len = input_ids.shape[1]
 
         if max_length:

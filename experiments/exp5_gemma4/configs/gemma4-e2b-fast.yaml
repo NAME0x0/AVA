@@ -1,0 +1,29 @@
+experiment:
+  name: gemma4-e2b-fast
+  version: "0.1.0"
+  description: >
+    Fast local Gemma 4 E2B branch for 4 GB VRAM + 32 GB RAM.
+    Prioritizes interactive speed, with E4B kept as the deeper fallback path.
+
+model:
+  model_id: google/gemma-4-E2B-it
+  dtype: bfloat16
+  quantization: none
+  gpu_memory_gb: 3.5
+  cpu_memory_gb: 24.0
+
+runtime:
+  enable_thinking: false
+  max_new_tokens: 64
+  cache_implementation: static
+
+turboquant:
+  enabled: true
+  key_bits: 4
+  value_bits: 2
+  group_size: 128
+  protected_layers: 1
+
+yarn:
+  enabled: true
+  target_context: 262144  # fast-path compromise; deep E4B path carries 512K

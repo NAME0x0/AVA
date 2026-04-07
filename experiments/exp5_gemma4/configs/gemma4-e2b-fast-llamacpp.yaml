@@ -1,0 +1,21 @@
+experiment:
+  name: gemma4-e2b-fast-llamacpp
+  version: "0.1.0"
+  description: >
+    Fast local Gemma 4 E2B branch through llama.cpp for the 4 GB VRAM + 32 GB RAM target.
+    Uses the official GGUF repo and keeps the Transformers path as the control baseline.
+
+model:
+  model_id: google/gemma-4-E2B-it
+  backend: llama.cpp
+  gguf_repo: ggml-org/gemma-4-E2B-it-GGUF
+  gguf_quant: Q8_0
+
+runtime:
+  enable_thinking: false
+  max_new_tokens: 64
+  ctx_size: 262144
+  gpu_layers: auto
+  flash_attn: on
+  cache_type_k: f16
+  cache_type_v: f16

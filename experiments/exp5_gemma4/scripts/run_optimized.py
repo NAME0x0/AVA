@@ -7,8 +7,8 @@ Usage:
     # Quick test with E4B (dev model):
     python experiments/exp5_gemma4/scripts/run_optimized.py --model google/gemma-4-E4B-it --quick
 
-    # Full optimized run with 26B MoE (pre-quantized):
-    python experiments/exp5_gemma4/scripts/run_optimized.py --quantization prequantized
+    # Full optimized run with 26B MoE (streamed int4 + local cache):
+    python experiments/exp5_gemma4/scripts/run_optimized.py --quantization streaming-int4
 
     # Compare against baseline:
     python experiments/exp5_gemma4/scripts/run_optimized.py --compare results/baseline_*.json
@@ -16,6 +16,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import gc
 import json
 import sys
 import time
@@ -32,6 +33,7 @@ from experiments.exp5_gemma4.engine.benchmark import (
     SPEED_PROMPTS,
     BenchmarkSuite,
     benchmark_inference_speed,
+    get_model_input_device,
     measure_vram,
     reset_vram_stats,
     run_memory_projection,
@@ -48,6 +50,10 @@ from experiments.exp5_gemma4.engine.patches import (
 )
 from experiments.exp5_gemma4.engine.turboquant import TurboQuantV3
 from experiments.exp5_gemma4.engine.yarn import YarnContextExtender
+from experiments.exp5_gemma4.engine.speculative import (
+    AssistedDecodingConfig,
+    load_assistant_model,
+)
 
 
 def apply_optimizations(
@@ -114,7 +120,7 @@ def apply_optimizations(
 
 def run_optimized_benchmark(
     model_id: str,
-    quantization: str = "quanto-int4",
+    quantization: str = "streaming-int4",
     quick: bool = False,
     enable_turboquant: bool = True,
     enable_yarn: bool = True,
@@ -122,6 +128,7 @@ def run_optimized_benchmark(
     tq_value_bits: int = 2,
     yarn_target_context: int = 1_048_576,
     compare_file: str | None = None,
+    assisted_decoding: AssistedDecodingConfig | None = None,
 ) -> None:
     """Load model, apply optimizations, and benchmark."""
     suite = BenchmarkSuite(
@@ -136,6 +143,13 @@ def run_optimized_benchmark(
         },
         timestamp=datetime.now(timezone.utc).isoformat(),
     )
+
+    assistant_model = None
+    assisted_generate_kwargs: dict[str, object] = {}
+    if assisted_decoding is not None:
+        print("\n=== Loading Assistant Model ===")
+        assistant_model, _, assistant_meta, assisted_generate_kwargs = load_assistant_model(assisted_decoding)
+        suite.config["assistant_metadata"] = assistant_meta
 
     # 1. Load model
     print("\n=== Loading Model ===")
@@ -204,6 +218,8 @@ def run_optimized_benchmark(
         model, processor, prompts,
         max_new_tokens=max_tokens,
         warmup_runs=0 if quick else 1,
+        assistant_model=assistant_model,
+        generate_kwargs=assisted_generate_kwargs,
     )
     suite.add("decode_tok_per_s", speed["decode_tok_per_s"], "tok/s")
     suite.add("total_tok_per_s", speed["tok_per_s"], "tok/s")
@@ -216,11 +232,19 @@ def run_optimized_benchmark(
     if not quick:
         print("\n=== Quality Spot-Check ===")
         correct = 0
+        input_device = get_model_input_device(model)
         for prompt, expected in QUALITY_PROMPTS:
-            inputs = processor(text=prompt, return_tensors="pt").to(model.device)
+            if assisted_generate_kwargs and torch.cuda.is_available():
+                gc.collect()
+                torch.cuda.empty_cache()
+            inputs = processor(text=prompt, return_tensors="pt").to(input_device)
             with torch.no_grad():
                 output = model.generate(
-                    **inputs, max_new_tokens=32, temperature=0.0, do_sample=False,
+                    **inputs,
+                    max_new_tokens=32,
+                    temperature=0.0,
+                    do_sample=False,
+                    **assisted_generate_kwargs,
                 )
             response = processor.decode(
                 output[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True,
@@ -286,8 +310,8 @@ def main() -> None:
         help="HuggingFace model ID",
     )
     parser.add_argument(
-        "--quantization", default="quanto-int4",
-        choices=["quanto-int4", "bnb-nf4", "gptq", "awq", "prequantized", "none"],
+        "--quantization", default="streaming-int4",
+        choices=["streaming-int4", "quanto-int4", "bnb-nf4", "gptq", "awq", "prequantized", "none"],
         help="Quantization method",
     )
     parser.add_argument("--quick", action="store_true", help="Quick test")
@@ -297,7 +321,42 @@ def main() -> None:
     parser.add_argument("--tq-value-bits", type=int, default=2, help="TurboQuant value bits")
     parser.add_argument("--yarn-context", type=int, default=1_048_576, help="YaRN target context")
     parser.add_argument("--compare", type=str, default=None, help="Baseline JSON to compare against")
+    parser.add_argument("--assistant-model", type=str, default=None, help="Optional draft model for exact assisted decoding")
+    parser.add_argument(
+        "--assistant-quantization",
+        default="quanto-int4",
+        choices=["streaming-int4", "quanto-int4", "bnb-nf4", "gptq", "awq", "prequantized", "none"],
+        help="Draft-model quantization when assisted decoding is enabled",
+    )
+    parser.add_argument("--assistant-gpu-memory-gb", type=float, default=0.0, help="Draft-model GPU budget")
+    parser.add_argument("--assistant-cpu-memory-gb", type=float, default=10.0, help="Draft-model CPU budget")
+    parser.add_argument("--assistant-num-tokens", type=int, default=8, help="Initial speculative token budget")
+    parser.add_argument(
+        "--assistant-schedule",
+        type=str,
+        default="heuristic_transient",
+        choices=["heuristic", "heuristic_transient", "constant"],
+        help="Assistant token schedule",
+    )
+    parser.add_argument(
+        "--assistant-confidence-threshold",
+        type=float,
+        default=0.4,
+        help="Assistant confidence threshold",
+    )
     args = parser.parse_args()
+
+    assisted_decoding = None
+    if args.assistant_model:
+        assisted_decoding = AssistedDecodingConfig(
+            assistant_model_id=args.assistant_model,
+            assistant_quantization=args.assistant_quantization,
+            assistant_gpu_memory_gb=args.assistant_gpu_memory_gb,
+            assistant_cpu_memory_gb=args.assistant_cpu_memory_gb,
+            num_assistant_tokens=args.assistant_num_tokens,
+            num_assistant_tokens_schedule=args.assistant_schedule,
+            assistant_confidence_threshold=args.assistant_confidence_threshold,
+        )
 
     run_optimized_benchmark(
         model_id=args.model,
@@ -309,6 +368,7 @@ def main() -> None:
         tq_value_bits=args.tq_value_bits,
         yarn_target_context=args.yarn_context,
         compare_file=args.compare,
+        assisted_decoding=assisted_decoding,
     )
 
 

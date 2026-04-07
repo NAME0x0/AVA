@@ -1,0 +1,37 @@
+experiment:
+  name: gemma4-two-tier-local
+  version: "0.1.0"
+  description: >
+    Local two-tier Gemma 4 runtime. E2B is the default fast responder,
+    while E4B is loaded lazily for harder prompts or longer-context work.
+
+fast_path:
+  model_id: google/gemma-4-E2B-it
+  backend: llama.cpp
+  dtype: bfloat16
+  quantization: none
+  gpu_memory_gb: 3.5
+  cpu_memory_gb: 24.0
+  enable_thinking: false
+  yarn_context: 262144
+  cache_implementation: static
+  gguf_model: experiments/exp5_gemma4/gguf/gemma-4-e2b-it-q8_0/gemma-4-e2b-it-Q8_0.gguf
+  flash_attn: on
+  cache_type_k: f16
+  cache_type_v: f16
+
+deep_path:
+  model_id: google/gemma-4-E4B-it
+  backend: transformers
+  dtype: bfloat16
+  quantization: none
+  gpu_memory_gb: 3.5
+  cpu_memory_gb: 28.0
+  enable_thinking: false
+  yarn_context: 524288
+  cache_implementation: static
+
+routing:
+  max_fast_chars: 320
+  max_fast_words: 72
+  max_fast_lines: 6
