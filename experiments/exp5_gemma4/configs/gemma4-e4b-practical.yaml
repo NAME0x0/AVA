@@ -1,0 +1,39 @@
+experiment:
+  name: gemma4-e4b-practical
+  version: "0.1.0"
+  description: >
+    Practical local Gemma 4 E4B branch for 4 GB VRAM + 32 GB RAM.
+    Prioritizes real interactive latency over the 26B deep branch.
+
+model:
+  model_id: google/gemma-4-E4B-it
+  dtype: bfloat16
+  quantization: none
+  gpu_memory_gb: 3.5
+  cpu_memory_gb: 28.0
+
+# Gemma 4 E4B architecture reference:
+#   42 dense layers
+#   sliding window: 512
+#   global layers: 5,11,17,23,29,35,41
+#   hidden_size: 2560, head_dim: 256
+#   max_pos: 131072 native
+
+runtime:
+  enable_thinking: false
+  max_new_tokens: 64
+  cache_implementation: static
+
+turboquant:
+  enabled: true
+  key_bits: 4
+  value_bits: 2
+  group_size: 128
+  protected_layers: 1
+
+yarn:
+  enabled: true
+  target_context: 524288  # practical compromise vs 1M
+  original_context: 131072
+  beta_fast: 32.0
+  beta_slow: 1.0
