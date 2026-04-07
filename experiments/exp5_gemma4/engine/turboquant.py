@@ -22,6 +22,71 @@ import torch
 import torch.nn as nn
 
 
+def pack_indices(indices: torch.Tensor, bits: int) -> torch.Tensor:
+    """Pack quantized indices into bit-packed uint8 storage.
+
+    Args:
+        indices: uint8 tensor with values in [0, 2^bits - 1]
+        bits: number of bits per index (1, 2, 4, or 8)
+
+    Returns:
+        Packed uint8 tensor — 8/bits indices per byte.
+    """
+    if bits == 8:
+        return indices
+    if bits not in (1, 2, 4):
+        raise ValueError(f"Bit-packing supports 1, 2, 4, 8 bits, got {bits}")
+
+    flat = indices.reshape(-1)
+    n = flat.shape[0]
+    per_byte = 8 // bits
+
+    # Pad to multiple of per_byte
+    remainder = n % per_byte
+    if remainder:
+        flat = torch.nn.functional.pad(flat, (0, per_byte - remainder))
+
+    grouped = flat.reshape(-1, per_byte)  # (N/per_byte, per_byte)
+
+    # Shift each element by its bit position and OR together
+    packed = torch.zeros(grouped.shape[0], dtype=torch.uint8, device=indices.device)
+    for i in range(per_byte):
+        shift = bits * (per_byte - 1 - i)
+        packed |= grouped[:, i].to(torch.uint8) << shift
+
+    return packed
+
+
+def unpack_indices(packed: torch.Tensor, bits: int, count: int) -> torch.Tensor:
+    """Unpack bit-packed uint8 storage back to individual indices.
+
+    Args:
+        packed: bit-packed uint8 tensor from pack_indices()
+        bits: number of bits per index (1, 2, 4, or 8)
+        count: number of original indices to recover
+
+    Returns:
+        uint8 tensor of unpacked indices with shape (count,).
+    """
+    if bits == 8:
+        return packed[:count]
+    if bits not in (1, 2, 4):
+        raise ValueError(f"Bit-unpacking supports 1, 2, 4, 8 bits, got {bits}")
+
+    per_byte = 8 // bits
+    mask = (1 << bits) - 1
+
+    # Extract each sub-byte field
+    parts = []
+    for i in range(per_byte):
+        shift = bits * (per_byte - 1 - i)
+        parts.append((packed >> shift) & mask)
+
+    # Interleave: byte0_field0, byte0_field1, ..., byte1_field0, ...
+    unpacked = torch.stack(parts, dim=1).reshape(-1)
+    return unpacked[:count].to(torch.uint8)
+
+
 class RotationMatrix:
     """Generates a deterministic random orthogonal matrix from a seed.
 
@@ -60,10 +125,11 @@ class MSECompressor:
     Dequantization reverses the process: indices → centroids → R^T → scale by norm.
     """
 
-    def __init__(self, bits: int, group_size: int = 128, seed: int = 42):
+    def __init__(self, bits: int, group_size: int = 128, seed: int = 42, pack: bool = True):
         self.bits = bits
         self.group_size = group_size
         self.seed = seed
+        self.pack = pack  # Whether to bit-pack indices
         self.n_levels = 2**bits
         # Uniform grid centroids for standard-normal-like data after rotation
         # After orthogonal rotation of a normalized vector, coordinates are
@@ -137,7 +203,17 @@ class MSECompressor:
         mins_out = g_min.reshape(N, n_groups).to(dtype)
         scales_out = g_scale.reshape(N, n_groups).to(dtype)
 
-        return indices.reshape(B, H, S, n_groups, self.group_size), norms_out, mins_out, scales_out
+        indices_shaped = indices.reshape(B, H, S, n_groups, self.group_size)
+
+        if self.pack and self.bits < 8:
+            # Bit-pack indices for real memory savings
+            # Pack along the last dimension (group_size) within each group
+            packed = pack_indices(
+                indices_shaped.reshape(-1, self.group_size),
+                self.bits,
+            ).reshape(B, H, S, n_groups, -1)
+            return packed, norms_out, mins_out, scales_out
+        return indices_shaped, norms_out, mins_out, scales_out
 
     def decompress(
         self,
@@ -150,7 +226,9 @@ class MSECompressor:
         """Decompress quantized KV cache back to full tensors.
 
         Args:
-            indices: quantized indices from compress()
+            indices: quantized indices from compress() (packed or unpacked).
+                     Packed format is auto-detected from the last dimension
+                     being smaller than group_size.
             norms: per-vector norms
             mins: per-group minimums
             scales: per-group scales
@@ -165,10 +243,19 @@ class MSECompressor:
 
         N = B * H * S
         n_groups = indices.shape[3]
-        gs = indices.shape[4]
+        last_dim = indices.shape[4]
 
-        # Dequantize: indices → float values
-        grouped = indices.float().reshape(N, n_groups, gs)
+        # Detect bit-packed format: packed last dim = group_size * bits / 8
+        is_packed = self.pack and self.bits < 8 and last_dim < self.group_size
+        if is_packed:
+            gs = self.group_size
+            packed_flat = indices.reshape(-1)
+            total_indices = N * n_groups * gs
+            unpacked = unpack_indices(packed_flat, self.bits, total_indices)
+            grouped = unpacked.float().reshape(N, n_groups, gs)
+        else:
+            gs = last_dim
+            grouped = indices.float().reshape(N, n_groups, gs)
         mins_flat = mins.reshape(N, n_groups, 1)
         scales_flat = scales.reshape(N, n_groups, 1).float()
         mins_flat = mins_flat.float()
@@ -216,10 +303,11 @@ class TurboQuantV3(nn.Module):
         protected_layers: int = 1,
         total_global_layers: int = 5,
         seed: int = 42,
+        pack: bool = True,
     ):
         super().__init__()
-        self.key_compressor = MSECompressor(key_bits, group_size, seed)
-        self.value_compressor = MSECompressor(value_bits, group_size, seed + 1)
+        self.key_compressor = MSECompressor(key_bits, group_size, seed, pack=pack)
+        self.value_compressor = MSECompressor(value_bits, group_size, seed + 1, pack=pack)
         self.protected_layers = protected_layers
         self.total_global_layers = total_global_layers
         # Global layer indices in Gemma 4 26B: [5, 11, 17, 23, 29]

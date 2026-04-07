@@ -4,7 +4,7 @@ This script establishes the baseline performance metrics before applying
 our custom optimizations (TurboQuant, YaRN, MoE-aware offloading).
 
 Usage:
-    # Full baseline (downloads ~13 GB on first run):
+    # Full baseline on 26B with streamed int4 + cached reload:
     python experiments/exp5_gemma4/scripts/run_baseline.py
 
     # Quick test with a single prompt:
@@ -34,6 +34,7 @@ from experiments.exp5_gemma4.engine.benchmark import (
     SPEED_PROMPTS,
     BenchmarkSuite,
     benchmark_inference_speed,
+    get_model_input_device,
     measure_vram,
     reset_vram_stats,
     run_memory_projection,
@@ -135,7 +136,7 @@ def dry_run(model_id: str) -> None:
 
 
 def run_full_baseline(
-    model_id: str, quick: bool = False, quantization: str = "quanto-int4",
+    model_id: str, quick: bool = False, quantization: str = "streaming-int4",
 ) -> None:
     """Load model and run full benchmark suite."""
     suite = BenchmarkSuite(
@@ -185,8 +186,9 @@ def run_full_baseline(
     if not quick:
         print("\n=== Quality Spot-Check ===")
         correct = 0
+        input_device = get_model_input_device(model)
         for prompt, expected in QUALITY_PROMPTS:
-            inputs = processor(text=prompt, return_tensors="pt").to(model.device)
+            inputs = processor(text=prompt, return_tensors="pt").to(input_device)
             import torch
             with torch.no_grad():
                 output = model.generate(**inputs, max_new_tokens=32, temperature=0.0, do_sample=False)
@@ -216,9 +218,9 @@ def main() -> None:
         help="HuggingFace model ID",
     )
     parser.add_argument(
-        "--quantization", default="quanto-int4",
-        choices=["quanto-int4", "bnb-nf4", "gptq", "awq", "prequantized", "none"],
-        help="Quantization method (default: quanto-int4)",
+        "--quantization", default="streaming-int4",
+        choices=["streaming-int4", "quanto-int4", "bnb-nf4", "gptq", "awq", "prequantized", "none"],
+        help="Quantization method (default: streaming-int4 for 26B-local feasibility)",
     )
     parser.add_argument("--quick", action="store_true", help="Quick test (1 prompt, fewer tokens)")
     parser.add_argument("--dry-run", action="store_true", help="Memory projections only, no model download")

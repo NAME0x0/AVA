@@ -194,8 +194,9 @@ def _measure_layer(
     # Compress keys
     k_compressed = tq.compress_keys(k, layer_idx)
     if isinstance(k_compressed, tuple):
-        # Actually compressed (not protected)
-        k_indices, k_norms, k_mins, k_scales = k_compressed
+        # Actually compressed (not protected) — 4-tuple or 5-tuple (packed)
+        k_indices = k_compressed[0]
+        k_norms, k_mins, k_scales = k_compressed[1], k_compressed[2], k_compressed[3]
         k_compressed_bytes = (
             k_indices.nbytes + k_norms.nbytes + k_mins.nbytes + k_scales.nbytes
         )
@@ -209,7 +210,8 @@ def _measure_layer(
     # Compress values
     v_compressed = tq.compress_values(v, layer_idx)
     if isinstance(v_compressed, tuple):
-        v_indices, v_norms, v_mins, v_scales = v_compressed
+        v_indices = v_compressed[0]
+        v_norms, v_mins, v_scales = v_compressed[1], v_compressed[2], v_compressed[3]
         v_compressed_bytes = (
             v_indices.nbytes + v_norms.nbytes + v_mins.nbytes + v_scales.nbytes
         )
@@ -221,25 +223,9 @@ def _measure_layer(
 
     compressed_bytes = k_compressed_bytes + v_compressed_bytes
 
-    # Compute theoretical bit-packed size (indices at actual bit width, not uint8)
-    B, H, S, D = k.shape
-    num_vectors = B * H * S  # vectors to compress
-
-    if isinstance(k_compressed, tuple):
-        # Bit-packed indices: bits * num_elements / 8
-        k_theory = (tq.key_compressor.bits * num_vectors * D) // 8
-        k_theory += k_norms.nbytes + k_mins.nbytes + k_scales.nbytes
-    else:
-        k_theory = k.nbytes
-
-    if isinstance(v_compressed, tuple):
-        v_theory = (tq.value_compressor.bits * num_vectors * D) // 8
-        v_theory += v_norms.nbytes + v_mins.nbytes + v_scales.nbytes
-    else:
-        v_theory = v.nbytes
-
+    # Theoretical size = actual packed size now (packing is real, not theoretical)
     stats.layers_compressed += 1
     stats.total_original_bytes += original_bytes
     stats.total_compressed_bytes += compressed_bytes
-    stats.total_theoretical_bytes += k_theory + v_theory
+    stats.total_theoretical_bytes += compressed_bytes
     stats.roundtrip_errors.append((k_error + v_error) / 2)
