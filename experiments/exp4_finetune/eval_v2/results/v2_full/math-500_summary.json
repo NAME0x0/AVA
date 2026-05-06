@@ -1,0 +1,67 @@
+{
+  "n": 500,
+  "correct": 94,
+  "accuracy": 0.188,
+  "ci95": [
+    0.1562,
+    0.2246
+  ],
+  "by_subject": {
+    "Algebra": {
+      "n": 124,
+      "acc": 0.2581
+    },
+    "Counting & Probability": {
+      "n": 38,
+      "acc": 0.0526
+    },
+    "Geometry": {
+      "n": 41,
+      "acc": 0.0976
+    },
+    "Intermediate Algebra": {
+      "n": 97,
+      "acc": 0.1443
+    },
+    "Number Theory": {
+      "n": 62,
+      "acc": 0.2097
+    },
+    "Prealgebra": {
+      "n": 82,
+      "acc": 0.2683
+    },
+    "Precalculus": {
+      "n": 56,
+      "acc": 0.125
+    }
+  },
+  "by_level": {
+    "1": {
+      "n": 43,
+      "acc": 0.5116
+    },
+    "2": {
+      "n": 90,
+      "acc": 0.3111
+    },
+    "3": {
+      "n": 105,
+      "acc": 0.2476
+    },
+    "4": {
+      "n": 128,
+      "acc": 0.0859
+    },
+    "5": {
+      "n": 134,
+      "acc": 0.0522
+    }
+  },
+  "benchmark": "math-500",
+  "elapsed_s": 668.7,
+  "throughput": 0.75,
+  "model": "AVA-v2-Q8_0",
+  "backend": "llama-server (flash-attn, Q8 KV)",
+  "timestamp": "2026-05-06T23:00:01"
+}

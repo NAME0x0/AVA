@@ -1,0 +1,15 @@
+{
+  "n": 200,
+  "correct": 88,
+  "accuracy": 0.44,
+  "ci95": [
+    0.373,
+    0.5093
+  ],
+  "benchmark": "gsm8k-selfcons",
+  "elapsed_s": 729.2,
+  "throughput": 0.27,
+  "model": "AVA-v2-Q8_0",
+  "backend": "llama-server (flash-attn, Q8 KV)",
+  "timestamp": "2026-05-05T12:09:21"
+}

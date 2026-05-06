@@ -1,0 +1,5002 @@
+[
+  {
+    "task_id": "3",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "540",
+    "predicted": "540",
+    "matched": true,
+    "all_answers": [
+      "180",
+      "540",
+      "540",
+      "540",
+      "540"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1445879288,
+        1308686088,
+        302343292,
+        1015459952,
+        1659960194
+      ]
+    }
+  },
+  {
+    "task_id": "1",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "3",
+    "predicted": "3",
+    "matched": true,
+    "all_answers": [
+      "3",
+      "3",
+      "3",
+      "3",
+      "3"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1238685549,
+        1403038068,
+        781388223,
+        771646003,
+        225135012
+      ]
+    }
+  },
+  {
+    "task_id": "0",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "18",
+    "predicted": "24",
+    "matched": false,
+    "all_answers": [
+      "24",
+      "24",
+      "46",
+      "26",
+      "10"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        460735816,
+        455546724,
+        505501295,
+        503392974,
+        737663993
+      ]
+    }
+  },
+  {
+    "task_id": "4",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "20",
+    "predicted": "75",
+    "matched": false,
+    "all_answers": [
+      "75",
+      "60",
+      "35",
+      "20",
+      "10"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1837685338,
+        113640309,
+        1544914246,
+        1927153187,
+        1224123242
+      ]
+    }
+  },
+  {
+    "task_id": "5",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "64",
+    "predicted": "104",
+    "matched": false,
+    "all_answers": [
+      "104",
+      "80",
+      "76",
+      "64",
+      "60"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2062700465,
+        1502318755,
+        1549103194,
+        911655456,
+        440315070
+      ]
+    }
+  },
+  {
+    "task_id": "7",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "160",
+    "predicted": "650",
+    "matched": false,
+    "all_answers": [
+      "650",
+      "360",
+      "180",
+      "375",
+      "250"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        43016803,
+        483162295,
+        655506292,
+        1961095118,
+        1246457204
+      ]
+    }
+  },
+  {
+    "task_id": "10",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "366",
+    "predicted": "288",
+    "matched": false,
+    "all_answers": [
+      "288",
+      "300",
+      "366",
+      "330",
+      "294"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1811033974,
+        967894418,
+        707685552,
+        1536523138,
+        1856507042
+      ]
+    }
+  },
+  {
+    "task_id": "6",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "260",
+    "predicted": "260",
+    "matched": true,
+    "all_answers": [
+      "260",
+      "260",
+      "260",
+      "240",
+      "160"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1948924286,
+        1064913393,
+        1522752840,
+        1757471335,
+        586413062
+      ]
+    }
+  },
+  {
+    "task_id": "2",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "70000",
+    "predicted": "12000",
+    "matched": false,
+    "all_answers": [
+      "12000",
+      "19500",
+      "12000",
+      "25000",
+      "160000"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        755459176,
+        500794833,
+        1948815469,
+        1572339220,
+        166431392
+      ]
+    }
+  },
+  {
+    "task_id": "12",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "13",
+    "predicted": "4",
+    "matched": false,
+    "all_answers": [
+      "4",
+      "60",
+      "1",
+      "6",
+      "0.5"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1401774579,
+        1284022598,
+        1352615222,
+        907548911,
+        2003514880
+      ]
+    }
+  },
+  {
+    "task_id": "8",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "45",
+    "predicted": "380",
+    "matched": false,
+    "all_answers": [
+      "380",
+      "48",
+      "300",
+      "210",
+      "540"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        140581788,
+        810966611,
+        446877878,
+        377802557,
+        1200977886
+      ]
+    }
+  },
+  {
+    "task_id": "11",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "694",
+    "predicted": "519",
+    "matched": false,
+    "all_answers": [
+      "519",
+      "569",
+      "619",
+      "672",
+      "315"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        774713732,
+        642069789,
+        1927216984,
+        1267717534,
+        526963355
+      ]
+    }
+  },
+  {
+    "task_id": "14",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "60",
+    "predicted": "30",
+    "matched": false,
+    "all_answers": [
+      "60",
+      "16",
+      "30",
+      "30",
+      "51"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1396137413,
+        1136969549,
+        1605794154,
+        413242804,
+        1463265267
+      ]
+    }
+  },
+  {
+    "task_id": "13",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "18",
+    "predicted": "18",
+    "matched": true,
+    "all_answers": [
+      "18",
+      "24",
+      "26",
+      "15",
+      "18"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        471712279,
+        1986371735,
+        507040030,
+        494738692,
+        1275466121
+      ]
+    }
+  },
+  {
+    "task_id": "9",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "460",
+    "predicted": "680",
+    "matched": false,
+    "all_answers": [
+      "680",
+      "940",
+      "485",
+      "640",
+      "560"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        503216091,
+        818827564,
+        28800069,
+        1037328237,
+        979996415
+      ]
+    }
+  },
+  {
+    "task_id": "16",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "230",
+    "predicted": "230",
+    "matched": true,
+    "all_answers": [
+      "260",
+      "230",
+      "460",
+      "230",
+      "460"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1827568567,
+        268530842,
+        100022529,
+        2019671068,
+        1972790646
+      ]
+    }
+  },
+  {
+    "task_id": "19",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "6",
+    "predicted": "2",
+    "matched": false,
+    "all_answers": [
+      "14",
+      "2",
+      "6",
+      "2",
+      "10"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        510310425,
+        307883306,
+        1923369354,
+        387933101,
+        230714997
+      ]
+    }
+  },
+  {
+    "task_id": "22",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "7",
+    "predicted": "7",
+    "matched": true,
+    "all_answers": [
+      "13",
+      "7",
+      "7",
+      "7",
+      "11"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1420633588,
+        673158983,
+        135840802,
+        1009755490,
+        1726701857
+      ]
+    }
+  },
+  {
+    "task_id": "18",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "7",
+    "predicted": "3",
+    "matched": false,
+    "all_answers": [
+      "3",
+      "84",
+      "7",
+      "3",
+      "7"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        450479316,
+        775357403,
+        860530481,
+        1038367671,
+        1552887872
+      ]
+    }
+  },
+  {
+    "task_id": "23",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "8",
+    "predicted": "8",
+    "matched": true,
+    "all_answers": [
+      "10",
+      "8",
+      "8",
+      "8",
+      "8"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        819150451,
+        1520078131,
+        76282727,
+        1316359460,
+        1973362241
+      ]
+    }
+  },
+  {
+    "task_id": "25",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "2",
+    "predicted": "2",
+    "matched": true,
+    "all_answers": [
+      "2",
+      "2",
+      "2",
+      "5",
+      "1"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        716992415,
+        71478374,
+        685786352,
+        980084442,
+        2016430565
+      ]
+    }
+  },
+  {
+    "task_id": "17",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "57500",
+    "predicted": "23500",
+    "matched": false,
+    "all_answers": [
+      "23500",
+      "46200",
+      "14250",
+      "2500",
+      "6350"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1793245993,
+        803490571,
+        1145175952,
+        1308641211,
+        797020932
+      ]
+    }
+  },
+  {
+    "task_id": "15",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "125",
+    "predicted": "325",
+    "matched": false,
+    "all_answers": [
+      "325",
+      "350",
+      "117",
+      "355",
+      "150"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1449114555,
+        779853630,
+        148993412,
+        1839849266,
+        1535482071
+      ]
+    }
+  },
+  {
+    "task_id": "20",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "15",
+    "predicted": "32",
+    "matched": false,
+    "all_answers": [
+      "23",
+      "32",
+      "18",
+      "30",
+      "32"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1553445280,
+        61447260,
+        1871836979,
+        2126536993,
+        701670092
+      ]
+    }
+  },
+  {
+    "task_id": "21",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "14",
+    "predicted": "2",
+    "matched": false,
+    "all_answers": [
+      "11",
+      "2",
+      "-21",
+      "3",
+      "2"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1081717543,
+        697479685,
+        686421346,
+        2084546261,
+        404043096
+      ]
+    }
+  },
+  {
+    "task_id": "27",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "16",
+    "predicted": "960",
+    "matched": false,
+    "all_answers": [
+      "960",
+      "36",
+      "8",
+      "96",
+      "240"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1755475717,
+        742604938,
+        1260074855,
+        1308037426,
+        1396627514
+      ]
+    }
+  },
+  {
+    "task_id": "24",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "26",
+    "predicted": "26",
+    "matched": true,
+    "all_answers": [
+      "26",
+      "26",
+      "26.00",
+      "24.37",
+      "26"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1796147106,
+        1511149887,
+        385456019,
+        412880227,
+        116393846
+      ]
+    }
+  },
+  {
+    "task_id": "29",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "104",
+    "predicted": "41",
+    "matched": false,
+    "all_answers": [
+      "41",
+      "147",
+      "127",
+      "98",
+      "88"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2018161762,
+        1132398432,
+        874482192,
+        1401113297,
+        579659683
+      ]
+    }
+  },
+  {
+    "task_id": "28",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "25",
+    "predicted": "25",
+    "matched": true,
+    "all_answers": [
+      "25",
+      "25",
+      "25",
+      "25",
+      "25"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        125119596,
+        778413028,
+        209742030,
+        1739957190,
+        698148079
+      ]
+    }
+  },
+  {
+    "task_id": "26",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "243",
+    "predicted": "184",
+    "matched": false,
+    "all_answers": [
+      "184",
+      "243",
+      "188",
+      "225",
+      "178"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1805620925,
+        408471676,
+        806755933,
+        1447812030,
+        803929467
+      ]
+    }
+  },
+  {
+    "task_id": "32",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "35",
+    "predicted": "35",
+    "matched": true,
+    "all_answers": [
+      "35",
+      "35",
+      "35",
+      "7",
+      "35"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1421517100,
+        280146290,
+        369352650,
+        348772609,
+        335175125
+      ]
+    }
+  },
+  {
+    "task_id": "31",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "80",
+    "predicted": "60",
+    "matched": false,
+    "all_answers": [
+      "60",
+      "45",
+      "85",
+      "48",
+      "95"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1809899563,
+        894734814,
+        756469054,
+        293555171,
+        1188068248
+      ]
+    }
+  },
+  {
+    "task_id": "33",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "70",
+    "predicted": "40",
+    "matched": false,
+    "all_answers": [
+      "40",
+      "55",
+      "80",
+      "45",
+      "40"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        383081242,
+        2116664215,
+        483213004,
+        1942893230,
+        1853329730
+      ]
+    }
+  },
+  {
+    "task_id": "34",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "23",
+    "predicted": "23",
+    "matched": true,
+    "all_answers": [
+      "23",
+      "23",
+      "30",
+      "23",
+      "18"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1263823720,
+        2048089081,
+        169388568,
+        1005279088,
+        1843313896
+      ]
+    }
+  },
+  {
+    "task_id": "30",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "109",
+    "predicted": "34",
+    "matched": false,
+    "all_answers": [
+      "158.5",
+      "34",
+      "34",
+      "109",
+      "284"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        636497669,
+        615715773,
+        1217330745,
+        385837890,
+        140529337
+      ]
+    }
+  },
+  {
+    "task_id": "35",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "9",
+    "predicted": "9",
+    "matched": true,
+    "all_answers": [
+      "9",
+      "15",
+      "85",
+      "35",
+      "6"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2040539281,
+        1962545101,
+        39544027,
+        1061277539,
+        1236205409
+      ]
+    }
+  },
+  {
+    "task_id": "40",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "8",
+    "predicted": "8",
+    "matched": true,
+    "all_answers": [
+      "8",
+      "8",
+      "8",
+      "4",
+      "8"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1571993958,
+        1929407711,
+        1887149984,
+        710697435,
+        1323051126
+      ]
+    }
+  },
+  {
+    "task_id": "36",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "75",
+    "predicted": "30",
+    "matched": false,
+    "all_answers": [
+      "30",
+      "900",
+      "37.5",
+      "75",
+      "300"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1491986485,
+        1166691641,
+        481791547,
+        1505149964,
+        1227584390
+      ]
+    }
+  },
+  {
+    "task_id": "39",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "18",
+    "predicted": "18",
+    "matched": true,
+    "all_answers": [
+      "18",
+      "12",
+      "15",
+      "36",
+      "18"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1163757662,
+        989356647,
+        1922080509,
+        89729984,
+        664771017
+      ]
+    }
+  },
+  {
+    "task_id": "37",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "2",
+    "predicted": "2",
+    "matched": true,
+    "all_answers": [
+      "7",
+      "2",
+      "3",
+      "2",
+      "1"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1993088326,
+        258490865,
+        757918368,
+        1675736680,
+        1290277842
+      ]
+    }
+  },
+  {
+    "task_id": "38",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "10",
+    "predicted": "3",
+    "matched": false,
+    "all_answers": [
+      "3",
+      "3",
+      "6",
+      "5",
+      "20"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2060457338,
+        733800008,
+        1353085325,
+        362276248,
+        1132788485
+      ]
+    }
+  },
+  {
+    "task_id": "42",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "26",
+    "predicted": "26",
+    "matched": true,
+    "all_answers": [
+      "26",
+      "26",
+      "26",
+      "36",
+      "26"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        591554695,
+        1104758890,
+        825357823,
+        1563220860,
+        1189632626
+      ]
+    }
+  },
+  {
+    "task_id": "41",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "200",
+    "predicted": "1200",
+    "matched": false,
+    "all_answers": [
+      "1200",
+      "700",
+      "300",
+      "1800",
+      "1200"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        569093988,
+        1815891473,
+        1510659246,
+        967626444,
+        342544363
+      ]
+    }
+  },
+  {
+    "task_id": "44",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "20",
+    "predicted": "30",
+    "matched": false,
+    "all_answers": [
+      "30",
+      "100",
+      "20",
+      "30",
+      "12"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        974279186,
+        519456058,
+        1377125388,
+        274045409,
+        1238436420
+      ]
+    }
+  },
+  {
+    "task_id": "45",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "104",
+    "predicted": "48",
+    "matched": false,
+    "all_answers": [
+      "48",
+      "220",
+      "36",
+      "52",
+      "80"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1958015080,
+        1710375889,
+        683613717,
+        1815193687,
+        846952226
+      ]
+    }
+  },
+  {
+    "task_id": "48",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "8",
+    "predicted": "8",
+    "matched": true,
+    "all_answers": [
+      "8",
+      "8",
+      "8",
+      "8",
+      "8"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        88398366,
+        1636960983,
+        1863993266,
+        1260913834,
+        804164073
+      ]
+    }
+  },
+  {
+    "task_id": "43",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "48",
+    "predicted": "125",
+    "matched": false,
+    "all_answers": [
+      "125",
+      "100",
+      "160",
+      "400",
+      "20"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        690824711,
+        1281695551,
+        771998496,
+        1374505883,
+        218198374
+      ]
+    }
+  },
+  {
+    "task_id": "46",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "163",
+    "predicted": "14",
+    "matched": false,
+    "all_answers": [
+      "14",
+      "40",
+      "16",
+      "19",
+      "51"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1820868223,
+        610598761,
+        1254030058,
+        1685609431,
+        11591234
+      ]
+    }
+  },
+  {
+    "task_id": "49",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "30",
+    "predicted": "30",
+    "matched": true,
+    "all_answers": [
+      "60",
+      "30",
+      "15",
+      "30",
+      "30"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1905742096,
+        2006415996,
+        564402039,
+        360021581,
+        1226771333
+      ]
+    }
+  },
+  {
+    "task_id": "51",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "5",
+    "predicted": "3",
+    "matched": false,
+    "all_answers": [
+      "3",
+      "10",
+      "3",
+      "5",
+      "15"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1428503457,
+        1197258055,
+        366471777,
+        1788006976,
+        646037745
+      ]
+    }
+  },
+  {
+    "task_id": "47",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "800",
+    "predicted": "350",
+    "matched": false,
+    "all_answers": [
+      "300",
+      "350",
+      "350",
+      "260",
+      "200"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1933336930,
+        76451197,
+        2052647713,
+        710900532,
+        1961647951
+      ]
+    }
+  },
+  {
+    "task_id": "50",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "294",
+    "predicted": "294",
+    "matched": true,
+    "all_answers": [
+      "294",
+      "1476",
+      "294",
+      "294",
+      "294"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1544470426,
+        445826068,
+        402672761,
+        354775921,
+        745744228
+      ]
+    }
+  },
+  {
+    "task_id": "53",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "40",
+    "predicted": "120",
+    "matched": false,
+    "all_answers": [
+      "320",
+      "120",
+      "40",
+      "120",
+      "120"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        978051219,
+        1032103580,
+        549281307,
+        2141688000,
+        30625442
+      ]
+    }
+  },
+  {
+    "task_id": "55",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "14",
+    "predicted": "14",
+    "matched": true,
+    "all_answers": [
+      "14",
+      "14",
+      "14",
+      "14",
+      "14"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        270350195,
+        449225283,
+        1441088215,
+        1873641141,
+        313561479
+      ]
+    }
+  },
+  {
+    "task_id": "52",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "15",
+    "predicted": "15",
+    "matched": true,
+    "all_answers": [
+      "0",
+      "10",
+      "15",
+      "15",
+      "15"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        158817018,
+        718660704,
+        158297888,
+        1445974099,
+        2010665099
+      ]
+    }
+  },
+  {
+    "task_id": "54",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "40",
+    "predicted": "23",
+    "matched": false,
+    "all_answers": [
+      "23",
+      "23",
+      "40",
+      "71",
+      "55"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        166619859,
+        1880693520,
+        1803379404,
+        172816594,
+        1922640572
+      ]
+    }
+  },
+  {
+    "task_id": "56",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "3",
+    "predicted": "3",
+    "matched": true,
+    "all_answers": [
+      "3",
+      "2",
+      "4",
+      "3",
+      "3"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1020708649,
+        1910367364,
+        1201488036,
+        2088296157,
+        1449828171
+      ]
+    }
+  },
+  {
+    "task_id": "57",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "83",
+    "predicted": "20",
+    "matched": false,
+    "all_answers": [
+      "20",
+      "28",
+      "100",
+      "10",
+      "300"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        109995803,
+        1595217282,
+        829219156,
+        580995015,
+        1944667575
+      ]
+    }
+  },
+  {
+    "task_id": "60",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "17",
+    "predicted": "16",
+    "matched": false,
+    "all_answers": [
+      "13",
+      "16",
+      "17",
+      "18",
+      "16"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        380881954,
+        1135111931,
+        1636650094,
+        1464596404,
+        1553767094
+      ]
+    }
+  },
+  {
+    "task_id": "59",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "187",
+    "predicted": "187",
+    "matched": true,
+    "all_answers": [
+      "187",
+      "187",
+      "254",
+      "187",
+      "187"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1496897868,
+        932960167,
+        468500898,
+        1955322331,
+        1687003412
+      ]
+    }
+  },
+  {
+    "task_id": "63",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "1596",
+    "predicted": "200",
+    "matched": false,
+    "all_answers": [
+      "200",
+      "263.75",
+      "1512",
+      "220",
+      "196"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        862485588,
+        609309495,
+        1364081924,
+        1134784925,
+        1469780044
+      ]
+    }
+  },
+  {
+    "task_id": "58",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "57",
+    "predicted": "47",
+    "matched": false,
+    "all_answers": [
+      "47",
+      "57",
+      "61",
+      "31",
+      "53"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1463819912,
+        1574314694,
+        1766356698,
+        651853109,
+        1959413730
+      ]
+    }
+  },
+  {
+    "task_id": "66",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "48",
+    "predicted": "72",
+    "matched": false,
+    "all_answers": [
+      "72",
+      "92",
+      "124",
+      "120",
+      "96"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2044748031,
+        1705853393,
+        448845447,
+        1869060279,
+        273303030
+      ]
+    }
+  },
+  {
+    "task_id": "61",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "1430",
+    "predicted": "1430",
+    "matched": true,
+    "all_answers": [
+      "1430",
+      "1430",
+      "1430",
+      "1430",
+      "1430"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        388011571,
+        860734384,
+        2114823221,
+        2006336485,
+        164741127
+      ]
+    }
+  },
+  {
+    "task_id": "64",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "300",
+    "predicted": "240",
+    "matched": false,
+    "all_answers": [
+      "384",
+      "240",
+      "500",
+      "300",
+      "240"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        104066557,
+        1546556354,
+        562649675,
+        470038451,
+        162138291
+      ]
+    }
+  },
+  {
+    "task_id": "62",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "25000",
+    "predicted": "6250",
+    "matched": false,
+    "all_answers": [
+      "6250",
+      "1250",
+      "28750",
+      "1500",
+      "6500"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1743282376,
+        1076629644,
+        1491273697,
+        459158891,
+        2056941693
+      ]
+    }
+  },
+  {
+    "task_id": "65",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "36",
+    "predicted": "12",
+    "matched": false,
+    "all_answers": [
+      "12",
+      "72",
+      "60",
+      "108",
+      "48"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1119918956,
+        1995166557,
+        1739782647,
+        1610577569,
+        630817154
+      ]
+    }
+  },
+  {
+    "task_id": "68",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "36",
+    "predicted": "36",
+    "matched": true,
+    "all_answers": [
+      "36",
+      "60",
+      "5",
+      "40",
+      "18"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2094936030,
+        327749501,
+        316487508,
+        1200922930,
+        709498001
+      ]
+    }
+  },
+  {
+    "task_id": "71",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "60",
+    "predicted": "60",
+    "matched": true,
+    "all_answers": [
+      "60",
+      "60",
+      "60",
+      "60",
+      "60"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        668659792,
+        1962079533,
+        118880882,
+        436584788,
+        1415387108
+      ]
+    }
+  },
+  {
+    "task_id": "69",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "60",
+    "predicted": "60",
+    "matched": true,
+    "all_answers": [
+      "60",
+      "140",
+      "60",
+      "60",
+      "60"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        614802371,
+        1533831929,
+        1168377623,
+        1265214010,
+        1358999402
+      ]
+    }
+  },
+  {
+    "task_id": "70",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "7425",
+    "predicted": "3450",
+    "matched": false,
+    "all_answers": [
+      "3450",
+      "1365",
+      "7425",
+      "3150",
+      "4950"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1556546346,
+        742282917,
+        173430185,
+        1043480160,
+        1199349093
+      ]
+    }
+  },
+  {
+    "task_id": "72",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "221",
+    "predicted": "221",
+    "matched": true,
+    "all_answers": [
+      "204",
+      "221",
+      "252",
+      "221",
+      "221"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        492825116,
+        240906040,
+        1799635903,
+        653107316,
+        2054426427
+      ]
+    }
+  },
+  {
+    "task_id": "67",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "595",
+    "predicted": "595",
+    "matched": true,
+    "all_answers": [
+      "595",
+      "595",
+      "615",
+      "615",
+      "595"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2146409569,
+        1323531941,
+        1981310741,
+        174330102,
+        990250396
+      ]
+    }
+  },
+  {
+    "task_id": "75",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "60",
+    "predicted": "24",
+    "matched": false,
+    "all_answers": [
+      "8",
+      "16",
+      "20",
+      "24",
+      "24"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        784569886,
+        1221543582,
+        1656641688,
+        1353993099,
+        1647156417
+      ]
+    }
+  },
+  {
+    "task_id": "79",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "70",
+    "predicted": "70",
+    "matched": true,
+    "all_answers": [
+      "70",
+      "70",
+      "70",
+      "70",
+      "70"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1911038860,
+        176180693,
+        743808961,
+        1825060929,
+        1238593687
+      ]
+    }
+  },
+  {
+    "task_id": "76",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "5",
+    "predicted": "3",
+    "matched": false,
+    "all_answers": [
+      "3",
+      "3",
+      "3",
+      "2",
+      "11"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        285786850,
+        14019747,
+        786563440,
+        1612600531,
+        536096839
+      ]
+    }
+  },
+  {
+    "task_id": "73",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "255",
+    "predicted": "255",
+    "matched": true,
+    "all_answers": [
+      "255",
+      "258",
+      "165",
+      "300",
+      "260"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        466416947,
+        1022037433,
+        1846883355,
+        236449374,
+        29008903
+      ]
+    }
+  },
+  {
+    "task_id": "74",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "88",
+    "predicted": "77",
+    "matched": false,
+    "all_answers": [
+      "77",
+      "78",
+      "108",
+      "66",
+      "103"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        408512863,
+        24986079,
+        457835412,
+        1704462900,
+        586818853
+      ]
+    }
+  },
+  {
+    "task_id": "83",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "600",
+    "predicted": "600",
+    "matched": true,
+    "all_answers": [
+      "5000",
+      "600",
+      "600",
+      "600",
+      "600"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        77582439,
+        230076699,
+        1105380385,
+        323931224,
+        1190230665
+      ]
+    }
+  },
+  {
+    "task_id": "80",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "10",
+    "predicted": "10",
+    "matched": true,
+    "all_answers": [
+      "10",
+      "10",
+      "10",
+      "2",
+      "10"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1501578980,
+        2077551190,
+        490870862,
+        174118525,
+        772697636
+      ]
+    }
+  },
+  {
+    "task_id": "78",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "6",
+    "predicted": "3",
+    "matched": false,
+    "all_answers": [
+      "1",
+      "3",
+      "3",
+      "2.70",
+      "6"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1327374757,
+        1953949830,
+        103234264,
+        1658298370,
+        800470427
+      ]
+    }
+  },
+  {
+    "task_id": "77",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "100",
+    "predicted": "200",
+    "matched": false,
+    "all_answers": [
+      "200",
+      "400",
+      "200",
+      "400",
+      "200"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2109018254,
+        788822324,
+        1912056226,
+        434902834,
+        1712779188
+      ]
+    }
+  },
+  {
+    "task_id": "81",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "17",
+    "predicted": "29",
+    "matched": false,
+    "all_answers": [
+      "29",
+      "17",
+      "44",
+      "5",
+      "23"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        643129451,
+        1265693000,
+        1502524455,
+        1073113577,
+        1682997702
+      ]
+    }
+  },
+  {
+    "task_id": "86",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "22",
+    "predicted": "21",
+    "matched": false,
+    "all_answers": [
+      "21",
+      "11",
+      "26",
+      "27",
+      "28"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1178303861,
+        1707612660,
+        383453812,
+        766291826,
+        550921466
+      ]
+    }
+  },
+  {
+    "task_id": "84",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "15",
+    "predicted": "7",
+    "matched": false,
+    "all_answers": [
+      "7",
+      "11",
+      "7",
+      "11",
+      "12"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        745102084,
+        35906582,
+        1141306301,
+        1514147432,
+        1572350541
+      ]
+    }
+  },
+  {
+    "task_id": "82",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "623",
+    "predicted": "623",
+    "matched": true,
+    "all_answers": [
+      "623",
+      "623",
+      "623",
+      "623",
+      "623"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1487044612,
+        566321812,
+        740342209,
+        246063136,
+        1834558276
+      ]
+    }
+  },
+  {
+    "task_id": "90",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "225",
+    "predicted": "300",
+    "matched": false,
+    "all_answers": [
+      "250",
+      "225",
+      "300",
+      "300",
+      "275"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        830831850,
+        663547435,
+        131958442,
+        737602647,
+        1979452936
+      ]
+    }
+  },
+  {
+    "task_id": "85",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "44",
+    "predicted": "44",
+    "matched": true,
+    "all_answers": [
+      "44",
+      "44",
+      "44",
+      "44",
+      "176"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1712925728,
+        222701433,
+        1652131870,
+        479248017,
+        961835064
+      ]
+    }
+  },
+  {
+    "task_id": "88",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "8000",
+    "predicted": "8000",
+    "matched": true,
+    "all_answers": [
+      "8000",
+      "8000",
+      "8000",
+      "75200",
+      "8000"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1625629804,
+        736972764,
+        1474616473,
+        1345156673,
+        1636893941
+      ]
+    }
+  },
+  {
+    "task_id": "87",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "9360",
+    "predicted": "660",
+    "matched": false,
+    "all_answers": [
+      "660",
+      "13680",
+      "852",
+      "7920",
+      "900"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1246408580,
+        1306765632,
+        1344185116,
+        729543090,
+        410318966
+      ]
+    }
+  },
+  {
+    "task_id": "96",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "3",
+    "predicted": "3",
+    "matched": true,
+    "all_answers": [
+      "3",
+      "3",
+      "3",
+      "3",
+      "3"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        470399346,
+        1630697812,
+        43518490,
+        679064981,
+        833137856
+      ]
+    }
+  },
+  {
+    "task_id": "89",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "24",
+    "predicted": "24",
+    "matched": true,
+    "all_answers": [
+      "24",
+      "24",
+      "14",
+      "27",
+      "96"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2651443,
+        161878999,
+        508252929,
+        2013847540,
+        526338418
+      ]
+    }
+  },
+  {
+    "task_id": "92",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "4",
+    "predicted": "7",
+    "matched": false,
+    "all_answers": [
+      "4",
+      "7",
+      "8",
+      "9",
+      "7"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        673153308,
+        1081380485,
+        798697707,
+        852797983,
+        524816984
+      ]
+    }
+  },
+  {
+    "task_id": "91",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "28",
+    "predicted": "28",
+    "matched": true,
+    "all_answers": [
+      "28",
+      "22",
+      "28",
+      "28",
+      "22"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2079140410,
+        1363664711,
+        1552866816,
+        1464968944,
+        1468431065
+      ]
+    }
+  },
+  {
+    "task_id": "98",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "5",
+    "predicted": "10",
+    "matched": false,
+    "all_answers": [
+      "20",
+      "5",
+      "10",
+      "10",
+      "10"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        836141148,
+        1888189658,
+        309462888,
+        493289334,
+        339140022
+      ]
+    }
+  },
+  {
+    "task_id": "94",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "348",
+    "predicted": "192",
+    "matched": false,
+    "all_answers": [
+      "192",
+      "192",
+      "162",
+      "252",
+      "192"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1480273036,
+        247548920,
+        1823946881,
+        459290291,
+        1340727537
+      ]
+    }
+  },
+  {
+    "task_id": "93",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "36",
+    "predicted": "34",
+    "matched": false,
+    "all_answers": [
+      "34",
+      "35",
+      "180",
+      "34",
+      "36"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        728898587,
+        1353145621,
+        924657066,
+        347098033,
+        814621528
+      ]
+    }
+  },
+  {
+    "task_id": "97",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "12",
+    "predicted": "72",
+    "matched": false,
+    "all_answers": [
+      "72",
+      "96",
+      "14",
+      "60",
+      "3"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1838666886,
+        393721354,
+        1132811928,
+        1406806115,
+        2119603229
+      ]
+    }
+  },
+  {
+    "task_id": "102",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "26",
+    "predicted": "42",
+    "matched": false,
+    "all_answers": [
+      "42",
+      "28",
+      "30",
+      "36",
+      "21"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1370735993,
+        1818130467,
+        2012309685,
+        1911607785,
+        1856935306
+      ]
+    }
+  },
+  {
+    "task_id": "99",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "58",
+    "predicted": "68",
+    "matched": false,
+    "all_answers": [
+      "68",
+      "104",
+      "60",
+      "58",
+      "62"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        436345021,
+        144961993,
+        1966114905,
+        1076504224,
+        1005791443
+      ]
+    }
+  },
+  {
+    "task_id": "95",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "40",
+    "predicted": "40",
+    "matched": true,
+    "all_answers": [
+      "20",
+      "72",
+      "40",
+      "56",
+      "40"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1967619675,
+        1598775924,
+        575608255,
+        520320761,
+        585224370
+      ]
+    }
+  },
+  {
+    "task_id": "103",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "140",
+    "predicted": "140",
+    "matched": true,
+    "all_answers": [
+      "196",
+      "140",
+      "140",
+      "140",
+      "46"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2020974407,
+        1085489360,
+        17365167,
+        758515023,
+        220614495
+      ]
+    }
+  },
+  {
+    "task_id": "101",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "6",
+    "predicted": "24",
+    "matched": false,
+    "all_answers": [
+      "24",
+      "7",
+      "9.75",
+      "10",
+      "13"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1292650798,
+        2011568249,
+        1337664829,
+        715489994,
+        1160912926
+      ]
+    }
+  },
+  {
+    "task_id": "100",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "175",
+    "predicted": "190",
+    "matched": false,
+    "all_answers": [
+      "190",
+      "410",
+      "270",
+      "205",
+      "160"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        611717532,
+        407720579,
+        264185602,
+        1807031745,
+        1709848992
+      ]
+    }
+  },
+  {
+    "task_id": "104",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "500",
+    "predicted": "150",
+    "matched": false,
+    "all_answers": [
+      "150",
+      "166",
+      "500",
+      "100",
+      "150"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        663558264,
+        1174227427,
+        103495105,
+        298000192,
+        608393981
+      ]
+    }
+  },
+  {
+    "task_id": "105",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "20",
+    "predicted": "20",
+    "matched": true,
+    "all_answers": [
+      "20",
+      "20",
+      "20",
+      "20",
+      "20"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        217512762,
+        1779292586,
+        1114967086,
+        698851507,
+        387662501
+      ]
+    }
+  },
+  {
+    "task_id": "107",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "3",
+    "predicted": "4",
+    "matched": false,
+    "all_answers": [
+      "4",
+      "1",
+      "2",
+      "3",
+      "5"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1964215437,
+        1611684788,
+        238471988,
+        8100406,
+        780841684
+      ]
+    }
+  },
+  {
+    "task_id": "108",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "50",
+    "predicted": "55",
+    "matched": false,
+    "all_answers": [
+      "55",
+      "105",
+      "114",
+      "31",
+      "58"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1097760151,
+        1922547367,
+        215167699,
+        1893812292,
+        1720980228
+      ]
+    }
+  },
+  {
+    "task_id": "109",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "28",
+    "predicted": "28",
+    "matched": true,
+    "all_answers": [
+      "16",
+      "28",
+      "3",
+      "28",
+      "28.00"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1555149415,
+        1772857905,
+        583388542,
+        1478100552,
+        2106574689
+      ]
+    }
+  },
+  {
+    "task_id": "112",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "24",
+    "predicted": "24",
+    "matched": true,
+    "all_answers": [
+      "24",
+      "24",
+      "24",
+      "12",
+      "24"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        100143161,
+        1122629643,
+        1116860808,
+        33277154,
+        70521302
+      ]
+    }
+  },
+  {
+    "task_id": "106",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "72",
+    "predicted": "360",
+    "matched": false,
+    "all_answers": [
+      "360",
+      "336",
+      "360",
+      "1080",
+      "354"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1874985427,
+        69480585,
+        312702523,
+        34041643,
+        1720982238
+      ]
+    }
+  },
+  {
+    "task_id": "111",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "16",
+    "predicted": "10",
+    "matched": false,
+    "all_answers": [
+      "240",
+      "25",
+      "10",
+      "10",
+      "960"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        171066299,
+        960311504,
+        1293652731,
+        909580295,
+        482023526
+      ]
+    }
+  },
+  {
+    "task_id": "113",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "25",
+    "predicted": "25",
+    "matched": true,
+    "all_answers": [
+      "25",
+      "25",
+      "25",
+      "25",
+      "25"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1540536071,
+        747880303,
+        219326506,
+        1728957845,
+        289448797
+      ]
+    }
+  },
+  {
+    "task_id": "110",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "45",
+    "predicted": "45",
+    "matched": true,
+    "all_answers": [
+      "45",
+      "51",
+      "45",
+      "45",
+      "15"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        318395775,
+        1687946117,
+        1319328462,
+        1351162696,
+        1698318673
+      ]
+    }
+  },
+  {
+    "task_id": "116",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "42",
+    "predicted": "15",
+    "matched": false,
+    "all_answers": [
+      "15",
+      "42",
+      "60",
+      "63",
+      "40"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1760374371,
+        1261629765,
+        172870715,
+        1841128461,
+        1988641378
+      ]
+    }
+  },
+  {
+    "task_id": "114",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "6",
+    "predicted": "40",
+    "matched": false,
+    "all_answers": [
+      "40",
+      "3",
+      "36",
+      "450",
+      "6"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1333350971,
+        382443738,
+        1614103593,
+        124764256,
+        1080513483
+      ]
+    }
+  },
+  {
+    "task_id": "117",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "360",
+    "predicted": "360",
+    "matched": true,
+    "all_answers": [
+      "360",
+      "360",
+      "360",
+      "360",
+      "360"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1662626092,
+        1676215409,
+        1933565977,
+        2111842042,
+        1400216417
+      ]
+    }
+  },
+  {
+    "task_id": "118",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "4",
+    "predicted": "2",
+    "matched": false,
+    "all_answers": [
+      "2",
+      "4",
+      "2",
+      "2",
+      "2"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        384912079,
+        710393505,
+        1202427164,
+        1551331514,
+        487245400
+      ]
+    }
+  },
+  {
+    "task_id": "120",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "240",
+    "predicted": "240",
+    "matched": true,
+    "all_answers": [
+      "720",
+      "1800",
+      "240",
+      "240",
+      "240"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1361528417,
+        154872771,
+        1712045284,
+        281952190,
+        1160701332
+      ]
+    }
+  },
+  {
+    "task_id": "122",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "48",
+    "predicted": "26",
+    "matched": false,
+    "all_answers": [
+      "26",
+      "35",
+      "57",
+      "30",
+      "18"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1497949513,
+        1500958546,
+        699008203,
+        1552905780,
+        1540686728
+      ]
+    }
+  },
+  {
+    "task_id": "115",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "90",
+    "predicted": "200",
+    "matched": false,
+    "all_answers": [
+      "200",
+      "250",
+      "160",
+      "28",
+      "36"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1833347284,
+        2040955958,
+        71312271,
+        842995521,
+        922370308
+      ]
+    }
+  },
+  {
+    "task_id": "121",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "27",
+    "predicted": "22",
+    "matched": false,
+    "all_answers": [
+      "22",
+      "40",
+      "27",
+      "19",
+      "14"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1501706594,
+        699552894,
+        1105663643,
+        821685978,
+        370149491
+      ]
+    }
+  },
+  {
+    "task_id": "123",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "50",
+    "predicted": "90",
+    "matched": false,
+    "all_answers": [
+      "90",
+      "50",
+      "85",
+      "40",
+      "115"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        367949151,
+        1368822672,
+        1267882823,
+        2057817670,
+        1486251216
+      ]
+    }
+  },
+  {
+    "task_id": "119",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "95200",
+    "predicted": "112000",
+    "matched": false,
+    "all_answers": [
+      "112000",
+      "171111",
+      "67200",
+      "112000",
+      "88000"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1109512069,
+        1023170052,
+        1031437892,
+        476982714,
+        841623093
+      ]
+    }
+  },
+  {
+    "task_id": "126",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "82",
+    "predicted": "82",
+    "matched": true,
+    "all_answers": [
+      "82",
+      "82",
+      "82",
+      "82",
+      "82"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        11020744,
+        747942632,
+        172821205,
+        241251765,
+        1055211180
+      ]
+    }
+  },
+  {
+    "task_id": "124",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "10",
+    "predicted": "50",
+    "matched": false,
+    "all_answers": [
+      "100",
+      "50",
+      "50",
+      "50",
+      "30"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1286779488,
+        2015485937,
+        228258264,
+        31859429,
+        2064431204
+      ]
+    }
+  },
+  {
+    "task_id": "125",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "10",
+    "predicted": "4",
+    "matched": false,
+    "all_answers": [
+      "4",
+      "14",
+      "9",
+      "4",
+      "10"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        743948945,
+        1541868154,
+        1627893793,
+        1673945658,
+        557444959
+      ]
+    }
+  },
+  {
+    "task_id": "127",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "120",
+    "predicted": "120",
+    "matched": true,
+    "all_answers": [
+      "120",
+      "120",
+      "120",
+      "120",
+      "120"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1089714235,
+        80344029,
+        342398344,
+        1939846847,
+        206735868
+      ]
+    }
+  },
+  {
+    "task_id": "130",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "30",
+    "predicted": "10",
+    "matched": false,
+    "all_answers": [
+      "30",
+      "10",
+      "30",
+      "10",
+      "10"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        695093647,
+        684398834,
+        297861845,
+        1491774665,
+        265633894
+      ]
+    }
+  },
+  {
+    "task_id": "128",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "880",
+    "predicted": "1020",
+    "matched": false,
+    "all_answers": [
+      "1020",
+      "730",
+      "930",
+      "565",
+      "450"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        853979602,
+        701367750,
+        202786623,
+        1074247344,
+        1156718307
+      ]
+    }
+  },
+  {
+    "task_id": "131",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "940",
+    "predicted": "940",
+    "matched": true,
+    "all_answers": [
+      "1040",
+      "940",
+      "940",
+      "940",
+      "940"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1301652427,
+        385841619,
+        1501188157,
+        693068182,
+        1003222034
+      ]
+    }
+  },
+  {
+    "task_id": "133",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "13",
+    "predicted": "13",
+    "matched": true,
+    "all_answers": [
+      "13",
+      "13",
+      "13",
+      "13",
+      "13"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1788447880,
+        1636082952,
+        1371242373,
+        728085840,
+        1805183788
+      ]
+    }
+  },
+  {
+    "task_id": "132",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "60",
+    "predicted": "60",
+    "matched": true,
+    "all_answers": [
+      "30",
+      "60",
+      "60",
+      "66",
+      "54"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1728907331,
+        600285448,
+        592300279,
+        1958714186,
+        1695614876
+      ]
+    }
+  },
+  {
+    "task_id": "135",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "40",
+    "predicted": "40",
+    "matched": true,
+    "all_answers": [
+      "40",
+      "40",
+      "40",
+      "40",
+      "55"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        176355396,
+        383051170,
+        1412765253,
+        936928540,
+        383505483
+      ]
+    }
+  },
+  {
+    "task_id": "136",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "6",
+    "predicted": "6",
+    "matched": true,
+    "all_answers": [
+      "6",
+      "4.5",
+      "6",
+      "4.5",
+      "6"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1695917631,
+        1609595324,
+        282876534,
+        1450471523,
+        87417031
+      ]
+    }
+  },
+  {
+    "task_id": "134",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "720",
+    "predicted": "720",
+    "matched": true,
+    "all_answers": [
+      "720",
+      "720",
+      "720",
+      "720",
+      "720"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1351206462,
+        1158338843,
+        1539357691,
+        1265908711,
+        1651703093
+      ]
+    }
+  },
+  {
+    "task_id": "129",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "10000",
+    "predicted": "10000",
+    "matched": true,
+    "all_answers": [
+      "10000",
+      "1500",
+      "12000",
+      "18000",
+      "20000"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        269485441,
+        1442688454,
+        101063987,
+        272685612,
+        312350075
+      ]
+    }
+  },
+  {
+    "task_id": "138",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "105",
+    "predicted": "26",
+    "matched": false,
+    "all_answers": [
+      "26",
+      "30",
+      "10",
+      "15",
+      "60"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        544825661,
+        1428986849,
+        1574118071,
+        260376253,
+        1485279606
+      ]
+    }
+  },
+  {
+    "task_id": "139",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "70",
+    "predicted": "70",
+    "matched": true,
+    "all_answers": [
+      "70",
+      "66",
+      "70",
+      "70",
+      "70"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1957805687,
+        1073194273,
+        1388472779,
+        705269684,
+        1676630472
+      ]
+    }
+  },
+  {
+    "task_id": "140",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "20",
+    "predicted": "20",
+    "matched": true,
+    "all_answers": [
+      "80",
+      "20",
+      "75",
+      "30",
+      "20"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1877687950,
+        1184464102,
+        11518560,
+        71928850,
+        1983225517
+      ]
+    }
+  },
+  {
+    "task_id": "137",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "29",
+    "predicted": "31",
+    "matched": false,
+    "all_answers": [
+      "31",
+      "29",
+      "54",
+      "27",
+      "34"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        613248150,
+        1695901385,
+        349045342,
+        780624849,
+        1317377647
+      ]
+    }
+  },
+  {
+    "task_id": "141",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "400",
+    "predicted": "400",
+    "matched": true,
+    "all_answers": [
+      "400",
+      "260",
+      "400",
+      "800",
+      "1200"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2010017462,
+        66478994,
+        1230935085,
+        899468821,
+        54695639
+      ]
+    }
+  },
+  {
+    "task_id": "142",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "140",
+    "predicted": "140",
+    "matched": true,
+    "all_answers": [
+      "140",
+      "140",
+      "140",
+      "140",
+      "140"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1361767024,
+        192212018,
+        2086686446,
+        889149370,
+        178368178
+      ]
+    }
+  },
+  {
+    "task_id": "144",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "20",
+    "predicted": "18",
+    "matched": false,
+    "all_answers": [
+      "18",
+      "28",
+      "36",
+      "6",
+      "3"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        262527318,
+        970915643,
+        716228791,
+        82601379,
+        289573337
+      ]
+    }
+  },
+  {
+    "task_id": "143",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "16",
+    "predicted": "16.5",
+    "matched": false,
+    "all_answers": [
+      "17",
+      "20",
+      "16.5",
+      "16.5",
+      "16.5"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1038339774,
+        568115710,
+        877790357,
+        1219988888,
+        111171661
+      ]
+    }
+  },
+  {
+    "task_id": "147",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "75",
+    "predicted": "20",
+    "matched": false,
+    "all_answers": [
+      "20",
+      "75",
+      "60",
+      "75",
+      "20"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        680819127,
+        888370137,
+        1997850173,
+        846165550,
+        1375728250
+      ]
+    }
+  },
+  {
+    "task_id": "146",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "2125",
+    "predicted": "1625",
+    "matched": false,
+    "all_answers": [
+      "1625",
+      "1825",
+      "3000",
+      "1725",
+      "1375"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1835638719,
+        1694716809,
+        1478077414,
+        2107985409,
+        399109569
+      ]
+    }
+  },
+  {
+    "task_id": "145",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "4000",
+    "predicted": "4000",
+    "matched": true,
+    "all_answers": [
+      "120",
+      "4000",
+      "2000",
+      "4000",
+      "4000"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        94598423,
+        658628115,
+        229761398,
+        473406497,
+        94997265
+      ]
+    }
+  },
+  {
+    "task_id": "148",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "30",
+    "predicted": "30",
+    "matched": true,
+    "all_answers": [
+      "30",
+      "30",
+      "20",
+      "30",
+      "20"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1425876394,
+        777379565,
+        446526508,
+        1076800606,
+        1734182595
+      ]
+    }
+  },
+  {
+    "task_id": "149",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "16",
+    "predicted": "16",
+    "matched": true,
+    "all_answers": [
+      "16",
+      "16",
+      "48",
+      "16",
+      "16"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1355232129,
+        1809601315,
+        134334485,
+        1948154691,
+        1576571723
+      ]
+    }
+  },
+  {
+    "task_id": "150",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "4",
+    "predicted": "20",
+    "matched": false,
+    "all_answers": [
+      "20",
+      "10",
+      "12",
+      "1",
+      "2"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1758558325,
+        798312045,
+        1042943199,
+        1761506173,
+        41050459
+      ]
+    }
+  },
+  {
+    "task_id": "151",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "5",
+    "predicted": "20",
+    "matched": false,
+    "all_answers": [
+      "20",
+      "20",
+      "2",
+      "1",
+      "4"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1545515665,
+        2026185893,
+        1277842025,
+        1823334585,
+        1245124888
+      ]
+    }
+  },
+  {
+    "task_id": "152",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "4",
+    "predicted": "4",
+    "matched": true,
+    "all_answers": [
+      "5",
+      "4",
+      "4",
+      "2",
+      "4"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        433046313,
+        2138469640,
+        340698245,
+        350452949,
+        1746231939
+      ]
+    }
+  },
+  {
+    "task_id": "153",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "48",
+    "predicted": "30",
+    "matched": false,
+    "all_answers": [
+      "30",
+      "67",
+      "62",
+      "10",
+      "45"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        265714893,
+        592808981,
+        1813197806,
+        894274574,
+        1881769517
+      ]
+    }
+  },
+  {
+    "task_id": "155",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "280",
+    "predicted": "168",
+    "matched": false,
+    "all_answers": [
+      "168",
+      "40",
+      "10",
+      "24",
+      "171"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1227692132,
+        1434201608,
+        1444720788,
+        1881880005,
+        1556207798
+      ]
+    }
+  },
+  {
+    "task_id": "154",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "272",
+    "predicted": "368",
+    "matched": false,
+    "all_answers": [
+      "368",
+      "192",
+      "396",
+      "232",
+      "200"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        367426083,
+        1917542281,
+        88523772,
+        713776481,
+        1930926822
+      ]
+    }
+  },
+  {
+    "task_id": "156",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "1400",
+    "predicted": "1800",
+    "matched": false,
+    "all_answers": [
+      "1800",
+      "1800",
+      "2600",
+      "1400",
+      "1200"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        910853456,
+        1848719497,
+        107412863,
+        1217301606,
+        884878042
+      ]
+    }
+  },
+  {
+    "task_id": "159",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "15",
+    "predicted": "15",
+    "matched": true,
+    "all_answers": [
+      "15",
+      "3",
+      "15",
+      "7",
+      "3"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2016000598,
+        1300944449,
+        1100166761,
+        277124119,
+        1808855849
+      ]
+    }
+  },
+  {
+    "task_id": "160",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "16",
+    "predicted": "16",
+    "matched": true,
+    "all_answers": [
+      "16",
+      "16",
+      "16",
+      "16",
+      "16"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        415407383,
+        2010441852,
+        401193146,
+        1340870373,
+        696946770
+      ]
+    }
+  },
+  {
+    "task_id": "157",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "80",
+    "predicted": "1330",
+    "matched": false,
+    "all_answers": [
+      "1330",
+      "140",
+      "1000",
+      "38",
+      "950"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        869594683,
+        1262585255,
+        2044478337,
+        94078501,
+        1116331788
+      ]
+    }
+  },
+  {
+    "task_id": "158",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "34",
+    "predicted": "34",
+    "matched": true,
+    "all_answers": [
+      "26",
+      "32",
+      "34",
+      "34",
+      "34"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2109958452,
+        2134937256,
+        569417829,
+        304423067,
+        26471732
+      ]
+    }
+  },
+  {
+    "task_id": "162",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "92",
+    "predicted": "97",
+    "matched": false,
+    "all_answers": [
+      "384",
+      "97",
+      "144",
+      "97",
+      "48"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1559025207,
+        693427870,
+        274141006,
+        104020609,
+        1312639369
+      ]
+    }
+  },
+  {
+    "task_id": "161",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "32",
+    "predicted": "40",
+    "matched": false,
+    "all_answers": [
+      "40",
+      "60",
+      "53",
+      "31",
+      "34"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        923551336,
+        2032771909,
+        1247403629,
+        213929060,
+        530614385
+      ]
+    }
+  },
+  {
+    "task_id": "163",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "50",
+    "predicted": "65",
+    "matched": false,
+    "all_answers": [
+      "65",
+      "44",
+      "49",
+      "35",
+      "93"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        491642565,
+        1915827565,
+        597367303,
+        821562507,
+        1633455339
+      ]
+    }
+  },
+  {
+    "task_id": "166",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "5",
+    "predicted": "5",
+    "matched": true,
+    "all_answers": [
+      "5",
+      "5",
+      "5",
+      "5",
+      "5"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1740256052,
+        115649810,
+        658210744,
+        454814813,
+        1538965575
+      ]
+    }
+  },
+  {
+    "task_id": "168",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "18",
+    "predicted": "18",
+    "matched": true,
+    "all_answers": [
+      "18",
+      "18",
+      "18",
+      "18",
+      "18"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1492923809,
+        566401683,
+        651506247,
+        124085918,
+        536174398
+      ]
+    }
+  },
+  {
+    "task_id": "164",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "15",
+    "predicted": "15",
+    "matched": true,
+    "all_answers": [
+      "81",
+      "15",
+      "180",
+      "390",
+      "15"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        254616420,
+        1809605879,
+        327981369,
+        269092987,
+        140561803
+      ]
+    }
+  },
+  {
+    "task_id": "167",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "16",
+    "predicted": "12",
+    "matched": false,
+    "all_answers": [
+      "12",
+      "12",
+      "18",
+      "8",
+      "10"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1513468948,
+        139763584,
+        1242986171,
+        970766778,
+        2092623322
+      ]
+    }
+  },
+  {
+    "task_id": "172",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "51",
+    "predicted": "60",
+    "matched": false,
+    "all_answers": [
+      "60",
+      "36",
+      "60",
+      "40",
+      "24"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        891226005,
+        232085554,
+        1668183844,
+        1420718792,
+        1428234253
+      ]
+    }
+  },
+  {
+    "task_id": "169",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "120",
+    "predicted": "100",
+    "matched": false,
+    "all_answers": [
+      "100",
+      "50",
+      "110",
+      "210",
+      "160"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        943206050,
+        1954703349,
+        683322247,
+        166999937,
+        628747418
+      ]
+    }
+  },
+  {
+    "task_id": "165",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "77",
+    "predicted": "57",
+    "matched": false,
+    "all_answers": [
+      "57",
+      "80",
+      "410",
+      "57",
+      "57"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1140339065,
+        1688863827,
+        1615984509,
+        2074469034,
+        1113973556
+      ]
+    }
+  },
+  {
+    "task_id": "171",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "1210",
+    "predicted": "1020",
+    "matched": false,
+    "all_answers": [
+      "960",
+      "1240",
+      "1020",
+      "1100",
+      "1020"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        748524877,
+        1611394167,
+        1121147920,
+        638657554,
+        1039281489
+      ]
+    }
+  },
+  {
+    "task_id": "174",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "95",
+    "predicted": "95",
+    "matched": true,
+    "all_answers": [
+      "95",
+      "200",
+      "31",
+      "2600",
+      "1"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1102169354,
+        725134585,
+        925424332,
+        1547151359,
+        478139960
+      ]
+    }
+  },
+  {
+    "task_id": "176",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "100",
+    "predicted": "100",
+    "matched": true,
+    "all_answers": [
+      "100",
+      "0",
+      "100",
+      "100",
+      "100"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        972052325,
+        1764662103,
+        1272363095,
+        136112665,
+        467078499
+      ]
+    }
+  },
+  {
+    "task_id": "170",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "150",
+    "predicted": "150",
+    "matched": true,
+    "all_answers": [
+      "150",
+      "125",
+      "150",
+      "150",
+      "150"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        484057463,
+        1543570442,
+        962543210,
+        1873806275,
+        1188770828
+      ]
+    }
+  },
+  {
+    "task_id": "175",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "15",
+    "predicted": "15",
+    "matched": true,
+    "all_answers": [
+      "15",
+      "45",
+      "120",
+      "10",
+      "15"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1900472695,
+        1509405437,
+        313024417,
+        2141368384,
+        395157484
+      ]
+    }
+  },
+  {
+    "task_id": "173",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "18000",
+    "predicted": "12000",
+    "matched": false,
+    "all_answers": [
+      "12000",
+      "3500",
+      "24000",
+      "4400",
+      "14400"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1287326605,
+        1232280419,
+        939168764,
+        588104133,
+        1397600004
+      ]
+    }
+  },
+  {
+    "task_id": "180",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "20",
+    "predicted": "20",
+    "matched": true,
+    "all_answers": [
+      "20",
+      "20",
+      "20",
+      "20",
+      "20"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        112382725,
+        516937301,
+        1213802721,
+        713918714,
+        2132266199
+      ]
+    }
+  },
+  {
+    "task_id": "178",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "122",
+    "predicted": "122",
+    "matched": true,
+    "all_answers": [
+      "122",
+      "122",
+      "116",
+      "114",
+      "126"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        299360206,
+        1494436753,
+        815335726,
+        851820516,
+        1750917146
+      ]
+    }
+  },
+  {
+    "task_id": "179",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "130",
+    "predicted": "130",
+    "matched": true,
+    "all_answers": [
+      "130",
+      "130",
+      "130",
+      "130",
+      "130"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        453710207,
+        905051061,
+        1168526873,
+        314549162,
+        580274967
+      ]
+    }
+  },
+  {
+    "task_id": "177",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "350",
+    "predicted": "1100",
+    "matched": false,
+    "all_answers": [
+      "1100",
+      "2200",
+      "1200",
+      "3000",
+      "4375"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1517433181,
+        1023200213,
+        837690693,
+        901202876,
+        1960238538
+      ]
+    }
+  },
+  {
+    "task_id": "182",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "23",
+    "predicted": "22",
+    "matched": false,
+    "all_answers": [
+      "22",
+      "20",
+      "34",
+      "14",
+      "32"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1343946746,
+        1344723094,
+        968349054,
+        637663047,
+        1612724639
+      ]
+    }
+  },
+  {
+    "task_id": "181",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "160",
+    "predicted": "700",
+    "matched": false,
+    "all_answers": [
+      "700",
+      "800",
+      "160",
+      "1200",
+      "300"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        970116636,
+        2028937127,
+        1677405290,
+        2126743120,
+        1954726497
+      ]
+    }
+  },
+  {
+    "task_id": "184",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "25",
+    "predicted": "5",
+    "matched": false,
+    "all_answers": [
+      "5",
+      "75",
+      "3",
+      "100",
+      "50"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1140125870,
+        1137357151,
+        1928893817,
+        865569307,
+        1435194129
+      ]
+    }
+  },
+  {
+    "task_id": "185",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "30",
+    "predicted": "30",
+    "matched": true,
+    "all_answers": [
+      "30",
+      "40",
+      "30",
+      "30",
+      "40"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2123407923,
+        1910857362,
+        841800598,
+        521641468,
+        1463954971
+      ]
+    }
+  },
+  {
+    "task_id": "186",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "5",
+    "predicted": "5",
+    "matched": true,
+    "all_answers": [
+      "5",
+      "2",
+      "1",
+      "5",
+      "12"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1084484657,
+        881085413,
+        589687955,
+        1370510847,
+        251875168
+      ]
+    }
+  },
+  {
+    "task_id": "183",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "2",
+    "predicted": "250",
+    "matched": false,
+    "all_answers": [
+      "250",
+      "80",
+      "25",
+      "20",
+      "40"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        9759986,
+        2126440966,
+        649914629,
+        1350696266,
+        198892085
+      ]
+    }
+  },
+  {
+    "task_id": "188",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "50",
+    "predicted": "20",
+    "matched": false,
+    "all_answers": [
+      "15",
+      "33",
+      "133",
+      "20",
+      "20"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        8630443,
+        70255024,
+        1552323799,
+        869254630,
+        923868678
+      ]
+    }
+  },
+  {
+    "task_id": "187",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "106",
+    "predicted": "106",
+    "matched": true,
+    "all_answers": [
+      "106",
+      "106",
+      "106",
+      "104",
+      "106"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        846498695,
+        1753497918,
+        2137284626,
+        1710423477,
+        1348442872
+      ]
+    }
+  },
+  {
+    "task_id": "191",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "5",
+    "predicted": "5",
+    "matched": true,
+    "all_answers": [
+      "5",
+      "1.75",
+      "0.5",
+      "5",
+      "5"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        260343508,
+        1763914178,
+        1680600954,
+        1092496803,
+        481495618
+      ]
+    }
+  },
+  {
+    "task_id": "190",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "360",
+    "predicted": "360",
+    "matched": true,
+    "all_answers": [
+      "360",
+      "360",
+      "360",
+      "360",
+      "360"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1759535753,
+        1474018834,
+        936964000,
+        334214784,
+        408816696
+      ]
+    }
+  },
+  {
+    "task_id": "193",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "24",
+    "predicted": "18",
+    "matched": false,
+    "all_answers": [
+      "18",
+      "9",
+      "15",
+      "12",
+      "30"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1469719559,
+        2078965299,
+        462836567,
+        1098246802,
+        1255222382
+      ]
+    }
+  },
+  {
+    "task_id": "192",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "91",
+    "predicted": "96",
+    "matched": false,
+    "all_answers": [
+      "96",
+      "156",
+      "30",
+      "46",
+      "70"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2025182862,
+        1382412190,
+        12978732,
+        121976677,
+        810880552
+      ]
+    }
+  },
+  {
+    "task_id": "189",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "34",
+    "predicted": "6",
+    "matched": false,
+    "all_answers": [
+      "6",
+      "16",
+      "6",
+      "17",
+      "55"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        992031335,
+        801709068,
+        954918891,
+        596384420,
+        1678021833
+      ]
+    }
+  },
+  {
+    "task_id": "195",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "12",
+    "predicted": "12",
+    "matched": true,
+    "all_answers": [
+      "11",
+      "12",
+      "12",
+      "12",
+      "12"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        814636953,
+        1074971294,
+        1472765744,
+        411427761,
+        650341069
+      ]
+    }
+  },
+  {
+    "task_id": "196",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "120",
+    "predicted": "120",
+    "matched": true,
+    "all_answers": [
+      "120",
+      "120",
+      "120",
+      "100",
+      "120"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        1340821992,
+        1472013121,
+        933494690,
+        1437453145,
+        343050831
+      ]
+    }
+  },
+  {
+    "task_id": "194",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "10",
+    "predicted": "10",
+    "matched": true,
+    "all_answers": [
+      "10",
+      "10",
+      "10",
+      "10",
+      "10"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2089606191,
+        1205474519,
+        221153707,
+        49337670,
+        443462175
+      ]
+    }
+  },
+  {
+    "task_id": "199",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "7500",
+    "predicted": "35000",
+    "matched": false,
+    "all_answers": [
+      "35000",
+      "9000",
+      "7500",
+      "1000",
+      "5000"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        227961440,
+        840065517,
+        2005979891,
+        935443037,
+        1857893239
+      ]
+    }
+  },
+  {
+    "task_id": "197",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "6277",
+    "predicted": "6277",
+    "matched": true,
+    "all_answers": [
+      "6277",
+      "6277",
+      "6277",
+      "6277",
+      "6277"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        233743420,
+        35122684,
+        1599955648,
+        419418082,
+        229665183
+      ]
+    }
+  },
+  {
+    "task_id": "198",
+    "kind": "selfcons",
+    "k": 5,
+    "expected": "320",
+    "predicted": "180",
+    "matched": false,
+    "all_answers": [
+      "300",
+      "180",
+      "250",
+      "220",
+      "180"
+    ],
+    "metadata": {
+      "k": 5,
+      "seeds": [
+        2072921633,
+        525975486,
+        1062720125,
+        800729740,
+        1976935741
+      ]
+    }
+  }
+]

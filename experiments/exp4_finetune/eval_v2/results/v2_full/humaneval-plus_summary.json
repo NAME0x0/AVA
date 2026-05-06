@@ -1,0 +1,15 @@
+{
+  "n": 164,
+  "correct": 32,
+  "accuracy": 0.1951,
+  "ci95": [
+    0.1417,
+    0.2625
+  ],
+  "benchmark": "humaneval-plus",
+  "elapsed_s": 338.3,
+  "throughput": 0.48,
+  "model": "AVA-v2-Q8_0",
+  "backend": "llama-server (flash-attn, Q8 KV)",
+  "timestamp": "2026-05-06T21:31:28"
+}

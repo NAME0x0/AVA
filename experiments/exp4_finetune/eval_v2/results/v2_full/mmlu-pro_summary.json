@@ -1,0 +1,73 @@
+{
+  "n": 12032,
+  "correct": 3722,
+  "accuracy": 0.3093,
+  "ci95": [
+    0.3011,
+    0.3177
+  ],
+  "by_category": {
+    "biology": {
+      "n": 717,
+      "acc": 0.643
+    },
+    "business": {
+      "n": 789,
+      "acc": 0.2104
+    },
+    "chemistry": {
+      "n": 1132,
+      "acc": 0.2261
+    },
+    "computer science": {
+      "n": 410,
+      "acc": 0.3073
+    },
+    "economics": {
+      "n": 844,
+      "acc": 0.4585
+    },
+    "engineering": {
+      "n": 969,
+      "acc": 0.2663
+    },
+    "health": {
+      "n": 818,
+      "acc": 0.39
+    },
+    "history": {
+      "n": 381,
+      "acc": 0.3307
+    },
+    "law": {
+      "n": 1101,
+      "acc": 0.2035
+    },
+    "math": {
+      "n": 1351,
+      "acc": 0.2139
+    },
+    "other": {
+      "n": 924,
+      "acc": 0.2879
+    },
+    "philosophy": {
+      "n": 499,
+      "acc": 0.2786
+    },
+    "physics": {
+      "n": 1299,
+      "acc": 0.2463
+    },
+    "psychology": {
+      "n": 798,
+      "acc": 0.4825
+    }
+  },
+  "benchmark": "mmlu-pro",
+  "elapsed_s": 2618.6,
+  "throughput": 4.59,
+  "model": "AVA-v2-Q8_0",
+  "backend": "llama-server (flash-attn, Q8 KV)",
+  "timestamp": "2026-05-05T11:26:04"
+}

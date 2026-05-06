@@ -1,0 +1,241 @@
+{
+  "n": 14042,
+  "correct": 8318,
+  "accuracy": 0.5924,
+  "ci95": [
+    0.5842,
+    0.6005
+  ],
+  "by_subject": {
+    "_": {
+      "n": 373,
+      "acc": 0.0
+    },
+    "abstract_algebra": {
+      "n": 100,
+      "acc": 0.43
+    },
+    "anatomy": {
+      "n": 135,
+      "acc": 0.637
+    },
+    "astronomy": {
+      "n": 152,
+      "acc": 0.7237
+    },
+    "business_ethics": {
+      "n": 100,
+      "acc": 0.66
+    },
+    "clinical_knowledge": {
+      "n": 265,
+      "acc": 0.6755
+    },
+    "college_biology": {
+      "n": 144,
+      "acc": 0.75
+    },
+    "college_chemistry": {
+      "n": 100,
+      "acc": 0.55
+    },
+    "college_computer_science": {
+      "n": 100,
+      "acc": 0.45
+    },
+    "college_mathematics": {
+      "n": 100,
+      "acc": 0.36
+    },
+    "college_medicine": {
+      "n": 173,
+      "acc": 0.6358
+    },
+    "college_physics": {
+      "n": 102,
+      "acc": 0.4314
+    },
+    "computer_security": {
+      "n": 100,
+      "acc": 0.73
+    },
+    "conceptual_physics": {
+      "n": 235,
+      "acc": 0.6511
+    },
+    "econometrics": {
+      "n": 114,
+      "acc": 0.5439
+    },
+    "electrical_engineering": {
+      "n": 145,
+      "acc": 0.6621
+    },
+    "elementary_mathematics": {
+      "n": 378,
+      "acc": 0.5132
+    },
+    "formal_logic": {
+      "n": 126,
+      "acc": 0.4762
+    },
+    "global_facts": {
+      "n": 100,
+      "acc": 0.35
+    },
+    "high_school_biology": {
+      "n": 310,
+      "acc": 0.8097
+    },
+    "high_school_chemistry": {
+      "n": 203,
+      "acc": 0.6847
+    },
+    "high_school_computer_science": {
+      "n": 100,
+      "acc": 0.65
+    },
+    "high_school_geography": {
+      "n": 198,
+      "acc": 0.7374
+    },
+    "high_school_government_and_politics": {
+      "n": 193,
+      "acc": 0.7668
+    },
+    "high_school_macroeconomics": {
+      "n": 390,
+      "acc": 0.6333
+    },
+    "high_school_mathematics": {
+      "n": 270,
+      "acc": 0.4333
+    },
+    "high_school_microeconomics": {
+      "n": 238,
+      "acc": 0.7437
+    },
+    "high_school_physics": {
+      "n": 151,
+      "acc": 0.4768
+    },
+    "high_school_psychology": {
+      "n": 545,
+      "acc": 0.8055
+    },
+    "high_school_statistics": {
+      "n": 216,
+      "acc": 0.537
+    },
+    "high_school_world_history": {
+      "n": 237,
+      "acc": 0.7806
+    },
+    "human_aging": {
+      "n": 223,
+      "acc": 0.5919
+    },
+    "human_sexuality": {
+      "n": 131,
+      "acc": 0.6641
+    },
+    "international_law": {
+      "n": 121,
+      "acc": 0.8017
+    },
+    "jurisprudence": {
+      "n": 108,
+      "acc": 0.7407
+    },
+    "logical_fallacies": {
+      "n": 163,
+      "acc": 0.6442
+    },
+    "machine_learning": {
+      "n": 112,
+      "acc": 0.4554
+    },
+    "management": {
+      "n": 103,
+      "acc": 0.835
+    },
+    "marketing": {
+      "n": 234,
+      "acc": 0.8462
+    },
+    "medical_genetics": {
+      "n": 100,
+      "acc": 0.69
+    },
+    "miscellaneous": {
+      "n": 783,
+      "acc": 0.6794
+    },
+    "moral_disputes": {
+      "n": 346,
+      "acc": 0.6387
+    },
+    "moral_scenarios": {
+      "n": 895,
+      "acc": 0.3877
+    },
+    "nutrition": {
+      "n": 306,
+      "acc": 0.6797
+    },
+    "philosophy": {
+      "n": 311,
+      "acc": 0.6656
+    },
+    "prehistory": {
+      "n": 324,
+      "acc": 0.679
+    },
+    "professional_accounting": {
+      "n": 282,
+      "acc": 0.4858
+    },
+    "professional_law": {
+      "n": 1530,
+      "acc": 0.4301
+    },
+    "professional_medicine": {
+      "n": 272,
+      "acc": 0.6471
+    },
+    "professional_psychology": {
+      "n": 612,
+      "acc": 0.616
+    },
+    "public_relations": {
+      "n": 110,
+      "acc": 0.5818
+    },
+    "security_studies": {
+      "n": 245,
+      "acc": 0.6857
+    },
+    "sociology": {
+      "n": 201,
+      "acc": 0.796
+    },
+    "us_foreign_policy": {
+      "n": 100,
+      "acc": 0.75
+    },
+    "virology": {
+      "n": 166,
+      "acc": 0.4759
+    },
+    "world_religions": {
+      "n": 171,
+      "acc": 0.7427
+    }
+  },
+  "benchmark": "mmlu",
+  "elapsed_s": 3633.2,
+  "throughput": 3.86,
+  "model": "AVA-v2-Q8_0",
+  "backend": "llama-server (flash-attn, Q8 KV)",
+  "timestamp": "2026-05-04T22:15:59"
+}

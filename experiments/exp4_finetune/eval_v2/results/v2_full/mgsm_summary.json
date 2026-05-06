@@ -1,0 +1,29 @@
+{
+  "n": 750,
+  "correct": 258,
+  "accuracy": 0.344,
+  "ci95": [
+    0.3109,
+    0.3787
+  ],
+  "by_lang": {
+    "en": {
+      "n": 250,
+      "acc": 0.428
+    },
+    "es": {
+      "n": 250,
+      "acc": 0.32
+    },
+    "fr": {
+      "n": 250,
+      "acc": 0.284
+    }
+  },
+  "benchmark": "mgsm",
+  "elapsed_s": 543.1,
+  "throughput": 1.38,
+  "model": "AVA-v2-Q8_0",
+  "backend": "llama-server (flash-attn, Q8 KV)",
+  "timestamp": "2026-05-06T22:46:55"
+}

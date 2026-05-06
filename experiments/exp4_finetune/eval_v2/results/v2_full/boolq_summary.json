@@ -1,0 +1,15 @@
+{
+  "n": 3270,
+  "correct": 2454,
+  "accuracy": 0.7505,
+  "ci95": [
+    0.7353,
+    0.765
+  ],
+  "benchmark": "boolq",
+  "elapsed_s": 668.8,
+  "throughput": 4.89,
+  "model": "AVA-v2-Q8_0",
+  "backend": "llama-server (flash-attn, Q8 KV)",
+  "timestamp": "2026-05-05T10:42:16"
+}
