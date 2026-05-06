@@ -1,0 +1,64 @@
+# AVA v3 student architecture spec.
+# This is the authoritative shape used by engine/student_model.py at P2.
+
+name: ava-v3-6b-mote
+total_params_target_b: 6.4
+active_params_target_b: 1.8
+
+vocab_size: 248320
+hidden_size: 1792
+intermediate_size_routed: 768
+intermediate_size_shared: 4096
+num_hidden_layers: 28
+rope_theta: 1000000
+rope_scaling:
+  type: yarn
+  factor: 4.0          # 256K → 1M
+  original_max_position_embeddings: 262144
+
+# Hybrid stack: 3x GatedDeltaNet + 1x GatedAttention per repeat.
+# 28 layers / 4 = 7 repeats.
+attention_layout:
+  pattern: [delta, delta, delta, full]
+  repeats: 7
+
+gated_deltanet:
+  num_q_heads: 48
+  num_kv_heads: 16
+  head_dim: 128
+
+gated_attention:
+  num_q_heads: 24
+  num_kv_heads: 4
+  head_dim: 256
+  use_rope: true
+
+moe:
+  num_routed_experts: 32
+  num_shared_experts: 1
+  top_k: 4
+  router_dtype: bfloat16
+  routed_expert_quant: ternary    # {-1, 0, +1}
+  shared_expert_dtype: bfloat16
+  load_balance: bias-based         # DeepSeek-V3 style, no aux loss
+
+quantization:
+  routed_expert: ternary
+  router: bf16
+  shared_expert: bf16
+  attention: bf16
+  embedding: bf16
+  lm_head: tied
+  kv_cache: turboquant_k4_v2
+
+normalization:
+  type: subln                       # BitNet-style
+  rms_norm_eps: 1.0e-6
+
+teacher: Qwen/Qwen3.6-35B-A3B
+teacher_logit_temperature: 2.0
+
+context:
+  native: 262144
+  trained: 32768                    # stage-2 training window
+  yarn_extended: 1048576            # inference-time extension target

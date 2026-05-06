@@ -21,11 +21,9 @@ If you want the shortest summary: AVA is a personal local AI repository for buil
 
 ```mermaid
 flowchart LR
-    A["Exp1-3<br/>Scratch AVA systems"] --> B["Exp4<br/>Qwen3.5-2B QLoRA"]
-    B --> C["Exp5A<br/>Gemma 4 26B feasibility"]
-    C --> D["Exp5B<br/>Gemma 4 E4B deep branch"]
-    D --> E["Exp5C<br/>Gemma 4 E2B fast branch"]
-    E --> F["Two-tier local runtime<br/>fast + deep routing"]
+    A["Exp1-3<br/>Scratch AVA systems"] --> B["Exp4<br/>Qwen3.5-2B QLoRA<br/>(AVA v2)"]
+    B --> C["Exp5<br/>Gemma 4 inference<br/>(paused)"]
+    B --> G["Exp6 / AVA v3<br/>Qwen 3.6 ternary MoE<br/>+ Gated DeltaNet + MCP"]
 ```
 
 | Version | Core challenge | What we built | Best result / current status | What remains |
@@ -35,7 +33,8 @@ flowchart LR
 | `Exp4 / AVA-v2` | Turn AVA into a released local assistant | curated 20K corpus, Triton/SDPA training speedups, full eval pipeline (17 benchmarks, 16,872 tasks), HF model card, GGUF export path | `82.0% ARC-C` (full 1,172), `35.3% GSM8K` (full 1,319, 44.0% w/ self-cons), `59.2% MMLU` (full 14,042), `42 MB` adapter | longer context, stronger math, RL/post-training, better tool specialization, student distillation |
 | `Exp5 / 26B feasibility` | Make Gemma 4 `26B-A4B` run on `32 GB RAM / 4 GB VRAM` | streamed int4 loader, TurboQuant bit-packing, MoE offload, cached reload, YaRN experiments | cached reload about `8.6s`; warm exact decode improved to about `0.45-0.50 tok/s` | still too slow for default use; keep as systems research branch |
 | `Exp5 / E4B deep branch` | Keep Gemma 4 intelligence practical on the same laptop | bf16 manual split, TurboQuant-enabled stack, YaRN at practical `512K`, deep routing path | about `0.79-0.85 tok/s` decode and `2.1-2.2 tok/s` total on best runs | reduce deep-branch latency and switching cost |
-| `Exp5 / E2B fast branch + two-tier runtime` | Make local chat actually feel fast without giving up a deeper path | E2B fast path, `llama.cpp` backend, explicit `quick:` / `deep:` / `reason:` controls, lazy deep escalation to E4B | best fast-path result: about `6.39 tok/s` decode and `17.74 tok/s` total | unify fast/deep UX further and reduce branch escalation overhead |
+| `Exp5 / E2B fast branch + two-tier runtime` | Make local chat actually feel fast without giving up a deeper path | E2B fast path, `llama.cpp` backend, explicit `quick:` / `deep:` / `reason:` controls, lazy deep escalation to E4B | best fast-path result: about `6.39 tok/s` decode and `17.74 tok/s` total | **paused** in favor of AVA v3 below; files retained |
+| `Exp6 / AVA v3` | Push capacity per VRAM by 5x via ternary MoE + sub-quadratic attention | distill Qwen 3.6 35B-A3B teacher into a 6-8B ternary MoE student, native Gated DeltaNet 3:1 hybrid (linear-time decode), MoTE pattern (ternary FFN experts + BF16 router + 1 BF16 shared expert), MCP-based tool use via FastMCP 3.0 + XGrammar constrained decoding, BitDistiller 3-stage QAT | scaffolding (P0) — design doc, configs, engine stubs, MCP catalog, scripts | execute P1-P11: download teacher, implement ternary linear / MoTE-FFN / Gated DeltaNet wiring, BF16 warmup, ternary QAT distill, SFT+DPO, MCP server, GGUF export, full eval |
 
 Experiment logs:
 
@@ -43,6 +42,8 @@ Experiment logs:
 - fine-tune report: [`experiments/exp4_finetune/RESULTS_REPORT.md`](experiments/exp4_finetune/RESULTS_REPORT.md)
 - Gemma 4 checkpoint log: [`experiments/exp5_gemma4/PROGRESS_LOG.md`](experiments/exp5_gemma4/PROGRESS_LOG.md)
 - Gemma 4 results write-up: [`experiments/exp5_gemma4/RESULTS.md`](experiments/exp5_gemma4/RESULTS.md)
+- AVA v2 full evaluation (17 benchmarks): [`experiments/exp4_finetune/eval_v2/RESULTS_REPORT_V2_FULL.md`](experiments/exp4_finetune/eval_v2/RESULTS_REPORT_V2_FULL.md)
+- AVA v3 design doc (Qwen 3.6 + ternary MoE + Gated DeltaNet + MCP): [`experiments/exp6_v3/DESIGN.md`](experiments/exp6_v3/DESIGN.md)
 
 ## Progress Snapshot
 

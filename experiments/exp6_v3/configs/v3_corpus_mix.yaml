@@ -1,0 +1,78 @@
+# AVA v3 SFT + DPO corpus mix.
+# Used by scripts/build_v3_corpus.py at P3 / P5.
+
+sft_mix:
+  - id: lordx64/reasoning-distill-opus-4-7-max-sft
+    weight: 1.0
+    sample: 8000
+    license: apache-2.0
+    note: Opus 4.7 extended-thinking traces; ultra-high quality, small scale
+  - id: PrimeIntellect/SYNTHETIC-1-SFT
+    weight: 1.0
+    sample: 450000
+    license: apache-2.0
+    note: Largest open R1 distillation; math/code/STEM/software-eng
+  - id: bespokelabs/Bespoke-Stratos-17k
+    weight: 0.6                    # CC-BY-NC, research-only branch
+    sample: 17000
+    license: cc-by-nc-4.0
+    note: Sky-T1 ultra-curated; commercial=skip
+  - id: nvidia-adlr/OpenMathInstruct-2
+    weight: 0.5
+    sample: 100000
+    license: permissive
+    note: 14M total; sample math-heavy 100K
+  - id: allenai/tulu-3-sft-mixture
+    weight: 1.0
+    sample: 150000
+    license: apache-2.0
+    note: Multilingual instruction foundation
+  - id: NousResearch/hermes-function-calling-v1
+    weight: 1.0
+    sample: 30000
+    license: mit
+    note: Tool-call traces; stage-2 only as positive examples
+  - id: gorilla-llm/Berkeley-Function-Calling-Leaderboard
+    weight: 1.0
+    sample: 20000
+    license: cc-by-4.0
+    note: BFCL v4 train split
+  - id: Yukang/LongAlpaca-12k
+    weight: 0.7
+    sample: 12000
+    license: cc-by-nc-4.0
+    note: Long-context instruction
+  - id: princeton-nlp/ProLong-train
+    weight: 1.0
+    sample: 18000
+    license: apache-2.0
+    note: 512K-window training data
+
+dpo_mix:
+  - id: HuggingFaceH4/ultrafeedback_binarized
+    weight: 1.0
+    sample: 40000
+    license: cc-by-nc-4.0
+  - id: Skywork/Skywork-Reward-Preference-80K-v0.2
+    weight: 1.0
+    sample: 20000
+    license: apache-2.0
+  - id: PrimeIntellect/SYNTHETIC-1-DPO
+    weight: 1.0
+    sample: 11000
+    license: apache-2.0
+
+tool_discrimination_set:
+  path: experiments/exp6_v3/corpora/tool_discrimination_v1.jsonl
+  size_target: 300
+  classes:
+    - call_calculator
+    - call_python_exec
+    - call_code_exec
+    - call_web_fetch
+    - call_file_read
+    - call_file_write
+    - call_memory_get
+    - call_memory_set
+    - call_shell_exec
+    - no_tool                        # the critical class — ~50% of examples
