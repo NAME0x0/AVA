@@ -1,0 +1,1059 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AVA — Capable AI on a 4 GB laptop GPU</title>
+<meta name="description" content="AVA v2 — a 42 MB adapter that scores 82% ARC-Challenge, beating Llama 3.2 3B-Instruct. Trained in 100 minutes on a single consumer card." />
+<meta name="theme-color" content="#0B0D0E" />
+<meta name="author" content="Muhammad Afsah Mumtaz" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="AVA — Capable AI on a 4 GB laptop GPU" />
+<meta property="og:description" content="A 42 MB QLoRA adapter trained on a single laptop GPU that scores 82% ARC-Challenge — beating Llama 3.2 3B-Instruct. Open weights, open data, open code." />
+<meta property="og:url" content="https://name0x0.github.io/AVA/" />
+<meta property="og:site_name" content="AVA" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="AVA — Capable AI on a 4 GB laptop GPU" />
+<meta name="twitter:description" content="42 MB adapter, 82% ARC-Challenge, 100 min train, 4 GB VRAM. Open weights." />
+
+<!-- Favicon (inline SVG, brutalist mono mark) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%230B0D0E'/><text x='32' y='44' font-family='ui-monospace,Menlo,monospace' font-size='34' font-weight='700' text-anchor='middle' fill='%23C73A2C'>A</text></svg>" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body data-screen-label="AVA marketing site">
+
+<!-- ============================================================
+     TOP BAR
+============================================================ -->
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand">
+      <b>AVA</b>
+      <span class="ver">v2 · 2B · QLoRA</span>
+    </div>
+    <nav>
+      <a href="#numbers">Numbers</a>
+      <a href="#how">Method</a>
+      <a href="#try">Try</a>
+      <a href="#limits">Limits</a>
+      <a href="#v3">V3</a>
+      <a href="#research">Research</a>
+    </nav>
+    <a class="ext" href="https://github.com/NAME0x0/AVA" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</header>
+
+<!-- ============================================================
+     1. HERO
+============================================================ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-meta">
+      <span><b>Released</b> &nbsp; AVA v2</span>
+      <span><b>Author</b> &nbsp; Muhammad Afsah Mumtaz</span>
+      <span><b>Hardware</b> &nbsp; 1× RTX A2000 Laptop · 4 GB VRAM</span>
+      <span><b>License</b> &nbsp; Apache-2.0 / Qwen</span>
+    </div>
+
+    <h1 id="hero-h1" data-text="Capable AI on a 4 GB laptop GPU."><span id="hero-typewriter">Capable AI on a 4 GB laptop GPU.</span><span class="caret"></span></h1>
+
+    <p class="hero-sub">
+      AVA v2 — a <b>42&nbsp;MB</b> adapter that scores
+      <b>82.0% ARC-Challenge</b> on the full <b>1,172-question</b> set,
+      beating Llama 3.2 3B-Instruct (78.6%). Trained in
+      <b>100 minutes</b> on a single consumer card. No cloud, no cluster, no budget.
+    </p>
+
+    <div class="hero-ctas">
+      <button class="btn" data-action="open-try">Try AVA v2 <span class="arrow">→</span></button>
+      <a class="btn outline" href="#numbers">View benchmarks</a>
+      <a class="btn outline" href="https://github.com/NAME0x0/AVA" target="_blank" rel="noopener">GitHub</a>
+    </div>
+
+    <div class="frame" id="hero-frame">
+      <span class="frame-cap">─ training summary ─</span>
+      <div class="frame-grid">
+        <div class="frame-row"><span class="k">base model</span><span class="v">Qwen3.5-2B</span></div>
+        <div class="frame-row"><span class="k">attention</span><span class="v">SDPA + Triton</span></div>
+        <div class="frame-row"><span class="k">quantization</span><span class="v">NF4 (BitsAndBytes)</span></div>
+        <div class="frame-row"><span class="k">optimizer</span><span class="v">paged_adamw_8bit</span></div>
+        <div class="frame-row"><span class="k">adapter</span><span class="v accent">LoRA r=16, α=32</span></div>
+        <div class="frame-row"><span class="k">lr / schedule</span><span class="v">1.5e-4 cosine</span></div>
+        <div class="frame-row"><span class="k">trainable</span><span class="v">10.9M / 1.89B  ·  0.58%</span></div>
+        <div class="frame-row"><span class="k">corpus</span><span class="v">20,741 examples</span></div>
+        <div class="frame-row"><span class="k">peak VRAM</span><span class="v accent">1.81 GB</span></div>
+        <div class="frame-row"><span class="k">final loss</span><span class="v">0.4145</span></div>
+        <div class="frame-row"><span class="k">wall time</span><span class="v accent">100 min · 2,593 steps</span></div>
+        <div class="frame-row"><span class="k">adapter size</span><span class="v accent">42 MB</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- big numbers band -->
+<div class="wrap">
+  <div class="stat-band">
+    <div>
+      <span class="label">ARC-Challenge</span>
+      <div class="num">82.0<small>%</small></div>
+    </div>
+    <div>
+      <span class="label">MMLU 5-shot</span>
+      <div class="num">59.2<small>%</small></div>
+    </div>
+    <div>
+      <span class="label">Adapter</span>
+      <div class="num">42<small>MB</small></div>
+    </div>
+    <div>
+      <span class="label">Training peak</span>
+      <div class="num">1.81<small>GB</small></div>
+    </div>
+    <div>
+      <span class="label">Train wall</span>
+      <div class="num">100<small>min</small></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     2. THE CONSTRAINT
+============================================================ -->
+<div class="wrap"><div class="ascii-rule"></div></div>
+<section id="constraint">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="num">§01</span>
+      <span class="title">THE CONSTRAINT</span>
+      <span class="filler"></span>
+      <span>One laptop · No cloud · No budget</span>
+    </div>
+
+    <p class="para">
+      Most AI labs assume <b>80 GB GPUs</b> and cluster compute. AVA assumes one laptop, no cloud, no budget. Everything in this project — training, evaluation, serving — fits in <b>4 GB</b> of VRAM and runs on a $400 laptop GPU.
+    </p>
+
+    <div class="constraint-grid">
+      <div>
+        <div class="lbl">typical lab</div>
+        <h3>8× H100, 640 GB VRAM</h3>
+        <ul>
+          <li>GPUs <b>8× H100 80GB</b></li>
+          <li>VRAM total <b>640 GB</b></li>
+          <li>Cluster <b>NVLink / Infiniband</b></li>
+          <li>Cloud cost <b>~$25,000 / mo</b></li>
+          <li>Engineers <b>research team</b></li>
+          <li>Setup <b>cluster, scheduler, ops</b></li>
+        </ul>
+      </div>
+      <div>
+        <div class="lbl">ava</div>
+        <h3>1× RTX A2000, 4 GB VRAM</h3>
+        <ul>
+          <li>GPUs <b>1× RTX A2000 Laptop</b></li>
+          <li>VRAM total <b>4 GB</b></li>
+          <li>Cluster <b>none — Windows + WSL</b></li>
+          <li>Cloud cost <b>$0 / mo</b></li>
+          <li>Engineers <b>1 person</b></li>
+          <li>Setup <b>pip install</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     3. THE NUMBERS — centerpiece
+============================================================ -->
+<div class="wrap" style="margin-top: 40px;"><div class="ascii-rule"></div></div>
+<section id="numbers">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="num">§02</span>
+      <span class="title">THE NUMBERS</span>
+      <span class="filler"></span>
+      <span>17 benchmarks · 16,872 tasks · 4h 18m wall</span>
+    </div>
+
+    <p class="para" style="max-width: 820px;">
+      Q8_0 GGUF served via llama-server. Letter-argmax MCQ scoring. 95% Wilson CI. Full per-benchmark JSON in the repo.
+    </p>
+
+    <!-- Comparison chart -->
+    <div class="cmp-block fade-in" id="cmp-block">
+      <div>
+        <div class="cmp-title"><b>ARC-Challenge</b><span>science reasoning</span><span class="n">n = 1,172</span></div>
+        <div class="bars" data-bars="arc"></div>
+      </div>
+      <div>
+        <div class="cmp-title"><b>GSM8K</b><span>math reasoning</span><span class="n">n = 1,319</span></div>
+        <div class="bars" data-bars="gsm"></div>
+      </div>
+    </div>
+
+    <!-- Toolbar + Table -->
+    <div class="bm-toolbar" style="margin-top: 56px;">
+      <span>Filter</span>
+      <div class="seg" data-filter-group>
+        <button data-filter="all" aria-pressed="true">All 17</button>
+        <button data-filter="reasoning">Reasoning</button>
+        <button data-filter="knowledge">Knowledge</button>
+        <button data-filter="math">Math</button>
+        <button data-filter="code">Code</button>
+        <button data-filter="other">Other</button>
+      </div>
+      <span class="meta">Click column to sort · Hover row to highlight</span>
+    </div>
+
+    <table class="bm-table" id="bm-table">
+      <thead>
+        <tr>
+          <th data-sort="name" class="col-name">Benchmark <span class="arr"></span></th>
+          <th data-sort="cat" class="col-cat is-mobile-hidden">Category <span class="arr"></span></th>
+          <th data-sort="n">n <span class="arr"></span></th>
+          <th data-sort="acc" aria-sort="descending">Accuracy <span class="arr">▼</span></th>
+          <th data-sort="ci" class="col-ci is-mobile-hidden">95% CI <span class="arr"></span></th>
+          <th class="col-bar is-mobile-hidden">Range</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================
+     4. HOW IT WORKS
+============================================================ -->
+<div class="wrap" style="margin-top: 40px;"><div class="ascii-rule"></div></div>
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="num">§03</span>
+      <span class="title">HOW IT WORKS</span>
+      <span class="filler"></span>
+      <span>QLoRA · curated 20K · Triton SDPA</span>
+    </div>
+
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="num">01 · QLoRA</div>
+        <h3>4-bit base, 0.58% trainable</h3>
+        <p>The full Qwen3.5-2B base loads in NF4 4-bit through BitsAndBytes — about 1.4 GB resident. A LoRA adapter (rank 16, alpha 32) attaches to every attention and MLP projection. We update 10.9M parameters out of 1.89B and freeze the rest. Peak VRAM during training stays at 1.81 GB.</p>
+        <div class="pin"><span>Adapter</span><b>42 MB</b></div>
+      </div>
+      <div class="how-card">
+        <div class="num">02 · Curated 20K</div>
+        <h3>Math, science, reasoning, instructions</h3>
+        <p>20,741 prompt-response pairs, hand-mixed: GSM8K-style step-by-step math, ARC + SciQ + OpenBookQA-style science, instruction following, tool use, and teacher-distilled chains for harder reasoning. v1 used 5K examples and showed zero ARC gain. v2 used 4× the data and jumped +13 pp.</p>
+        <div class="pin"><span>Lift over base</span><b>+16.0 pp ARC-C</b></div>
+      </div>
+      <div class="how-card">
+        <div class="num">03 · Triton SDPA</div>
+        <h3>10.7× faster on Windows</h3>
+        <p>Compiling SDPA attention through Triton on Windows took the per-step time from 25.0 s to 5.8 s — a 10.7× speedup. The full 20K corpus fits in one epoch (2,593 steps) in 100 minutes. Gradient checkpointing and 8-bit paged AdamW keep memory pinned under 2 GB on a 4 GB card.</p>
+        <div class="pin"><span>Steps / sec</span><b>0.43</b></div>
+      </div>
+    </div>
+
+    <!-- Code block -->
+    <div class="code" style="margin-top: 24px;">
+      <div class="code-head">
+        <span class="file">finetune_v2_full.py · NF4 + LoRA setup</span>
+        <div class="right">
+          <button class="copy-btn" data-copy="how-code">Copy</button>
+        </div>
+      </div>
+<pre id="how-code"><span class="kw">from</span> transformers <span class="kw">import</span> AutoModelForCausalLM, BitsAndBytesConfig
+<span class="kw">from</span> peft <span class="kw">import</span> LoraConfig, get_peft_model
+<span class="kw">import</span> torch
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=<span class="kw">True</span>,
+    bnb_4bit_quant_type=<span class="str">"nf4"</span>,
+    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_use_double_quant=<span class="kw">True</span>,
+)
+
+model = AutoModelForCausalLM.from_pretrained(
+    <span class="str">"Qwen/Qwen3.5-2B"</span>,
+    quantization_config=bnb_config,
+    device_map=<span class="str">"auto"</span>,
+    dtype=torch.bfloat16,
+    attn_implementation=<span class="str">"sdpa"</span>,   <span class="com"># required when FLA is installed</span>
+)
+
+lora_config = LoraConfig(
+    r=<span class="num">16</span>, lora_alpha=<span class="num">32</span>, lora_dropout=<span class="num">0.05</span>,
+    bias=<span class="str">"none"</span>, task_type=<span class="str">"CAUSAL_LM"</span>,
+    target_modules=[<span class="str">"q_proj"</span>, <span class="str">"k_proj"</span>, <span class="str">"v_proj"</span>, <span class="str">"o_proj"</span>,
+                    <span class="str">"gate_proj"</span>, <span class="str">"up_proj"</span>, <span class="str">"down_proj"</span>],
+)
+model = get_peft_model(model, lora_config)
+model.print_trainable_parameters()
+<span class="com"># trainable: 10,911,744 / 1,889,488,896  =  0.58%</span></pre>
+    </div>
+
+    <!-- Rig diagram -->
+    <div class="rig" aria-label="AVA v2 training rig">
+      <div class="rig-cap">RTX A2000 LAPTOP &nbsp;·&nbsp; <b>4 GB VRAM</b> &nbsp;·&nbsp; 32 GB RAM &nbsp;·&nbsp; WINDOWS</div>
+      <div class="rig-flow">
+        <div class="rig-box">
+          <span class="lbl">corpus</span>
+          <span class="v accent">20,741 pairs</span>
+          <ul>
+            <li>math · science</li>
+            <li>reasoning · tools</li>
+            <li>JSONL on disk</li>
+          </ul>
+        </div>
+        <div class="rig-arrow">─►</div>
+        <div class="rig-box">
+          <span class="lbl">trainer</span>
+          <span class="v">Qwen3.5-2B · NF4 4-bit</span>
+          <ul>
+            <li>q · k · v · o · gate · up · down projections</li>
+            <li>attn: Triton-compiled SDPA</li>
+            <li>optim: paged_adamw_8bit · bf16</li>
+            <li>gradient checkpointing</li>
+          </ul>
+        </div>
+        <div class="rig-arrow">─►</div>
+        <div class="rig-box">
+          <span class="lbl">adapter</span>
+          <span class="v accent">LoRA r=16 · 42 MB</span>
+          <ul>
+            <li>safetensors</li>
+            <li>0.58% trainable</li>
+          </ul>
+          <div class="rig-out">
+            <span>Q4_K_M GGUF</span>
+            <span>Q8_0 GGUF</span>
+          </div>
+        </div>
+      </div>
+      <div class="rig-foot">
+        <span><b>peak</b> <span class="accent">1.81 GB</span></span>
+        <span><b>wall</b> <span class="accent">100 min</span> · 2,593 steps</span>
+        <span><b>final loss</b> 0.4145</span>
+        <span><b>cost</b> $0 / month</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     5. TRY AVA v2
+============================================================ -->
+<div class="wrap" style="margin-top: 40px;"><div class="ascii-rule"></div></div>
+<section id="try">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="num">§04</span>
+      <span class="title">TRY AVA V2</span>
+      <span class="filler"></span>
+      <span>Local · CPU or GPU · &lt; 2 GB VRAM</span>
+    </div>
+
+    <div class="try-block" id="try-block">
+      <div class="try-tabs" role="tablist">
+        <button role="tab" data-tab="ollama" aria-pressed="true">Ollama</button>
+        <button role="tab" data-tab="python">Python adapter</button>
+        <button role="tab" data-tab="hf">HuggingFace</button>
+        <div class="meta">
+          <span><b>Q4_K_M</b> ~1.5 GB</span>
+          <span><b>Q8_0</b> ~2.0 GB</span>
+        </div>
+      </div>
+
+      <div class="try-pane" data-tab="ollama" data-active>
+        <div class="code">
+          <div class="code-head">
+            <span class="file">terminal · no python required</span>
+            <div class="right">
+              <button class="copy-btn" data-copy="ollama-code">Copy</button>
+            </div>
+          </div>
+<pre id="ollama-code"><span class="com"># 1. download a GGUF from huggingface.co/NAME0x0/AVA-v2-GGUF</span>
+<span class="com"># 2. build the local model from the bundled Modelfile</span>
+ollama create ava-v2 -f Modelfile
+
+<span class="com"># 3. chat</span>
+ollama run ava-v2
+
+<span class="com"># works on CPU, Apple Silicon, AMD, NVIDIA. No Python needed.</span></pre>
+        </div>
+      </div>
+
+      <div class="try-pane" data-tab="python">
+        <div class="code">
+          <div class="code-head">
+            <span class="file">python · transformers + peft</span>
+            <div class="right">
+              <button class="copy-btn" data-copy="py-code">Copy</button>
+            </div>
+          </div>
+<pre id="py-code"><span class="com"># pip install -e .[bench]; pip install peft</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+<span class="kw">from</span> peft <span class="kw">import</span> PeftModel
+<span class="kw">import</span> torch
+
+bnb = BitsAndBytesConfig(
+    load_in_4bit=<span class="kw">True</span>, bnb_4bit_quant_type=<span class="str">"nf4"</span>,
+    bnb_4bit_compute_dtype=torch.bfloat16, bnb_4bit_use_double_quant=<span class="kw">True</span>,
+)
+tok = AutoTokenizer.from_pretrained(<span class="str">"Qwen/Qwen3.5-2B"</span>)
+m  = AutoModelForCausalLM.from_pretrained(
+        <span class="str">"Qwen/Qwen3.5-2B"</span>, quantization_config=bnb,
+        device_map=<span class="str">"auto"</span>, dtype=torch.bfloat16,
+        attn_implementation=<span class="str">"sdpa"</span>)
+m  = PeftModel.from_pretrained(m, <span class="str">"NAME0x0/AVA-v2"</span>).merge_and_unload()
+
+msgs = [{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Why does ice float on water?"</span>}]
+text = tok.apply_chat_template(msgs, tokenize=<span class="kw">False</span>, add_generation_prompt=<span class="kw">True</span>)
+ids  = tok(text, return_tensors=<span class="str">"pt"</span>).to(m.device)
+out  = m.generate(**ids, max_new_tokens=<span class="num">512</span>, temperature=<span class="num">0.7</span>, do_sample=<span class="kw">True</span>)
+<span class="kw">print</span>(tok.decode(out[<span class="num">0</span>][ids[<span class="str">"input_ids"</span>].shape[<span class="num">1</span>]:], skip_special_tokens=<span class="kw">True</span>))</pre>
+        </div>
+      </div>
+
+      <div class="try-pane" data-tab="hf">
+        <div class="code">
+          <div class="code-head">
+            <span class="file">huggingface · model card + adapter</span>
+            <div class="right">
+              <button class="copy-btn" data-copy="hf-code">Copy</button>
+            </div>
+          </div>
+<pre id="hf-code"><span class="com"># LoRA adapter (42 MB, safetensors)</span>
+huggingface.co/NAME0x0/AVA-v2
+
+<span class="com"># pre-quantized GGUFs for Ollama / llama.cpp</span>
+huggingface.co/NAME0x0/AVA-v2-GGUF
+  ├─ AVA-v2-Q4_K_M.gguf    ~1.5 GB    recommended
+  └─ AVA-v2-Q8_0.gguf      ~2.0 GB    near-lossless (used for the 17-bench eval)
+
+<span class="com"># one-line load in code</span>
+<span class="kw">from</span> peft <span class="kw">import</span> PeftModel
+PeftModel.from_pretrained(base, <span class="str">"NAME0x0/AVA-v2"</span>)</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     6. HONEST LIMITS
+============================================================ -->
+<div class="wrap" style="margin-top: 40px;"><div class="ascii-rule"></div></div>
+<section id="limits">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="num">§05</span>
+      <span class="title">HONEST LIMITS</span>
+      <span class="filler"></span>
+      <span>What v2 is not yet good at</span>
+    </div>
+
+    <div class="limits">
+      <div class="limit-row">
+        <div class="tag">MATH</div>
+        <div class="body"><b>Math is the weak area.</b> GSM8K reaches 35.3% greedy and 44.0% with k=5 self-consistency. MATH-500 sits at 18.8%. Self-consistency buys roughly +9 pp but doesn't close the gap with stronger 2-3B math models.</div>
+        <div class="num">35.3% / 18.8%</div>
+      </div>
+      <div class="limit-row">
+        <div class="tag">TOOLS</div>
+        <div class="body"><b>Tool-use was trained but mostly latent.</b> The agentic GSM8K harness invoked the calculator on only 0.6% of problems. The fine-tune corpus had ~55 tool-use examples vs 20K math examples; the model defaults to direct chain-of-thought.</div>
+        <div class="num">0.6% invoke rate</div>
+      </div>
+      <div class="limit-row">
+        <div class="tag">MULTILINGUAL</div>
+        <div class="body"><b>Multilingual transfer is partial.</b> MGSM lands at 42.8% in English, 32.0% Spanish, 28.4% French. The model can read other languages but reasoning quality degrades outside English.</div>
+        <div class="num">en 42.8 → fr 28.4</div>
+      </div>
+      <div class="limit-row">
+        <div class="tag">COMMONSENSE</div>
+        <div class="body"><b>HellaSwag is below most peers.</b> 56.8% on the full 10,042-question set. Narrative commonsense is under-represented in the v2 corpus and shows it.</div>
+        <div class="num">56.8%</div>
+      </div>
+      <div class="limit-row">
+        <div class="tag">PROTOCOL</div>
+        <div class="body"><b>Eval uses letter-argmax MCQ scoring.</b> Directionally comparable to leaderboards but not numerically identical to lm-eval-harness. Treat the AVA numbers as internally consistent and the relative ranking as the headline.</div>
+        <div class="num">Wilson 95% CI</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     7. AVA v3 ROADMAP
+============================================================ -->
+<div class="wrap" style="margin-top: 40px;"><div class="ascii-rule"></div></div>
+<section id="v3">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="num">§06</span>
+      <span class="title">WHAT'S NEXT — AVA V3</span>
+      <span class="filler"></span>
+      <span>Currently P0 · scaffolding</span>
+    </div>
+
+    <div class="roadmap-intro">
+      <div>
+        <h3>5× capacity per VRAM.</h3>
+        <p>Distill Qwen 3.6 35B-A3B into a 6-8B ternary MoE student with native Gated DeltaNet attention and MCP-based tool routing. Ternary FFN experts + BF16 router + one BF16 shared expert (MoTE). 3:1 hybrid attention with linear-time decode. BitDistiller 3-stage QAT.</p>
+      </div>
+      <div>
+        <p style="color: var(--muted); margin: 0 0 14px;">Click any phase below to expand its plan.</p>
+        <div style="font-family: var(--mono); font-size: var(--fs-tiny); text-transform: uppercase; letter-spacing: .1em; color: var(--muted);">
+          ✓ done&nbsp;&nbsp; ▣ active&nbsp;&nbsp; · queued
+        </div>
+      </div>
+    </div>
+
+    <div class="chev-row" id="chev-row"></div>
+    <div class="chev-detail" id="chev-detail"></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     8. RESEARCH TRACK
+============================================================ -->
+<div class="wrap" style="margin-top: 40px;"><div class="ascii-rule"></div></div>
+<section id="research">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="num">§07</span>
+      <span class="title">RESEARCH TRACK</span>
+      <span class="filler"></span>
+      <span>Logs · reports · weights</span>
+    </div>
+
+    <div class="link-grid">
+      <a class="link-card" href="https://github.com/NAME0x0/AVA/blob/main/experiments/exp4_finetune/eval_v2/RESULTS_REPORT_V2_FULL.md" target="_blank" rel="noopener">
+        <div class="kicker">REPORT · 17 BENCHMARKS</div>
+        <h4>Full evaluation report</h4>
+        <p>Per-benchmark methodology, prompts, refusals, sample budgets, per-subject breakdowns, and the 4h 18m wall log.</p>
+        <div class="arr">RESULTS_REPORT_V2_FULL.md</div>
+      </a>
+      <a class="link-card" href="https://github.com/NAME0x0/AVA/blob/main/experiments/exp4_finetune/EXPERIMENT_LOG.md" target="_blank" rel="noopener">
+        <div class="kicker">LOG · v1 → v2</div>
+        <h4>EXPERIMENT_LOG.md</h4>
+        <p>Per-run history. Every config, every loss curve, every dead-end. The corpus jump from 5K to 20K and what fell out of it.</p>
+        <div class="arr">github · NAME0x0/AVA</div>
+      </a>
+      <a class="link-card" href="https://github.com/NAME0x0/AVA/blob/main/experiments/exp6_v3/DESIGN.md" target="_blank" rel="noopener">
+        <div class="kicker">DESIGN · v3</div>
+        <h4>AVA v3 DESIGN.md</h4>
+        <p>Ternary MoE student from a Qwen 3.6 35B-A3B teacher. Gated DeltaNet 3:1 hybrid. MCP via FastMCP 3.0 + XGrammar.</p>
+        <div class="arr">P0 → P11 plan</div>
+      </a>
+      <a class="link-card" href="https://huggingface.co/NAME0x0/AVA-v2" target="_blank" rel="noopener">
+        <div class="kicker">WEIGHTS · 42 MB</div>
+        <h4>HuggingFace model card</h4>
+        <p>The released AVA v2 LoRA adapter in standard PEFT format. Tokenizer, training report, and the full reproducibility table.</p>
+        <div class="arr">huggingface · NAME0x0/AVA-v2</div>
+      </a>
+      <a class="link-card" href="https://github.com/NAME0x0/AVA" target="_blank" rel="noopener">
+        <div class="kicker">CODE · APACHE-2.0</div>
+        <h4>GitHub repository</h4>
+        <p>Training scripts, evaluation harness, GGUF conversion, all configs, every corpus recipe. Reproduce the numbers end-to-end.</p>
+        <div class="arr">github · NAME0x0/AVA</div>
+      </a>
+      <a class="link-card" href="#try">
+        <div class="kicker">RUN · LOCAL</div>
+        <h4>Reproduce locally</h4>
+        <p>Three install paths (Ollama, Python, HF). On 4 GB+ VRAM the full benchmark sweep runs in ~4h 18m.</p>
+        <div class="arr">Try AVA v2</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer>
+  <div class="wrap">
+    <div class="grid">
+      <div>
+        <h5>AVA</h5>
+        <p>A personal local-first AI lab. Author: Muhammad Afsah Mumtaz. Released model: AVA v2 (QLoRA fine-tune of Qwen3.5-2B). Apache-2.0 code; weights under the Qwen license.</p>
+      </div>
+      <div>
+        <h5>Project</h5>
+        <a href="https://github.com/NAME0x0/AVA" target="_blank" rel="noopener">github / NAME0x0/AVA</a>
+        <a href="https://huggingface.co/NAME0x0/AVA-v2" target="_blank" rel="noopener">huggingface / AVA-v2</a>
+        <a href="https://huggingface.co/NAME0x0/AVA-v2-GGUF" target="_blank" rel="noopener">huggingface / AVA-v2-GGUF</a>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <a href="mailto:lancearmour24200@gmail.com">lancearmour24200@gmail.com</a>
+        <a href="https://github.com/NAME0x0" target="_blank" rel="noopener">github / NAME0x0</a>
+      </div>
+    </div>
+
+    <div class="citation">
+      <div class="code-head">
+        <span class="file">citation · bibtex</span>
+        <div class="right">
+          <button class="copy-btn" data-copy="bib-code">Copy</button>
+        </div>
+      </div>
+<pre id="bib-code">@misc{ava-v2-2026,
+  title  = {AVA v2: QLoRA Fine-tuning Under Extreme VRAM Constraints},
+  author = {Muhammad Afsah Mumtaz},
+  year   = {2026},
+  url    = {https://github.com/NAME0x0/AVA}
+}</pre>
+    </div>
+
+    <div class="colofon">
+      <span>© 2026 · Apache-2.0 / Qwen license</span>
+      <span>built local · no analytics · no cloud</span>
+    </div>
+  </div>
+</footer>
+
+<!-- code modal scaffold -->
+<div class="modal-back" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <div class="modal-head">
+      <b id="modal-title">TRY AVA v2</b>
+      <span>three install paths · &lt; 2 GB VRAM</span>
+      <button class="x" data-close-modal>✕ ESC</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     scripts
+============================================================ -->
+<script>
+  // tweak defaults — keep marker comments intact
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "mode": "light",
+    "type": "plex",
+    "density": "comfortable",
+    "hero": "ascii"
+  }/*EDITMODE-END*/;
+  // apply on initial load (data attrs only — Tweaks panel handles further changes)
+  (function () {
+    const r = document.documentElement;
+    r.setAttribute('data-mode', TWEAK_DEFAULTS.mode === 'dark' ? 'dark' : 'light');
+    r.setAttribute('data-type', TWEAK_DEFAULTS.type);
+    r.setAttribute('data-density', TWEAK_DEFAULTS.density);
+    r.setAttribute('data-hero', TWEAK_DEFAULTS.hero);
+  })();
+</script>
+
+<script>
+// AVA — interactivity (vanilla)
+
+(function () {
+  'use strict';
+
+  // -------------------------------------------------------------
+  // Benchmark data — full 17, with categories
+  // -------------------------------------------------------------
+  const BM = [
+    { name: 'ARC-Easy',                   cat: 'reasoning',  n: 2376,  acc: 92.0, ci: '[90.8, 93.0]' },
+    { name: 'ARC-Challenge',              cat: 'reasoning',  n: 1172,  acc: 82.0, ci: '[79.7, 84.1]', star: true },
+    { name: 'PIQA',                       cat: 'reasoning',  n: 1838,  acc: 75.9, ci: '[73.9, 77.8]' },
+    { name: 'BoolQ',                      cat: 'knowledge',  n: 3270,  acc: 75.0, ci: '[73.5, 76.5]' },
+    { name: 'MMLU (5-shot)',              cat: 'knowledge',  n: 14042, acc: 59.2, ci: '[58.4, 60.1]', star: true },
+    { name: 'HellaSwag',                  cat: 'reasoning',  n: 10042, acc: 56.8, ci: '[55.8, 57.8]' },
+    { name: 'WinoGrande XL',              cat: 'reasoning',  n: 1267,  acc: 56.4, ci: '[53.7, 59.1]' },
+    { name: 'TruthfulQA-MC1',             cat: 'knowledge',  n: 817,   acc: 47.5, ci: '[44.1, 50.9]' },
+    { name: 'GSM8K self-cons (k=5)',      cat: 'math',       n: 200,   acc: 44.0, ci: '[37.3, 50.9]' },
+    { name: 'MBPP+',                      cat: 'code',       n: 378,   acc: 35.7, ci: '[31.0, 40.7]' },
+    { name: 'Agentic GSM8K',              cat: 'math',       n: 1319,  acc: 35.4, ci: '[32.9, 38.0]' },
+    { name: 'GSM8K (greedy)',             cat: 'math',       n: 1319,  acc: 35.3, ci: '[32.8, 38.0]' },
+    { name: 'MGSM (en/es/fr)',            cat: 'other',      n: 750,   acc: 34.4, ci: '[31.1, 37.9]' },
+    { name: 'IFEval (strict)',            cat: 'other',      n: 541,   acc: 31.6, ci: '[27.8, 35.6]' },
+    { name: 'MMLU-Pro',                   cat: 'knowledge',  n: 12032, acc: 30.9, ci: '[30.1, 31.8]' },
+    { name: 'HumanEval+',                 cat: 'code',       n: 164,   acc: 19.5, ci: '[14.2, 26.3]' },
+    { name: 'MATH-500',                   cat: 'math',       n: 500,   acc: 18.8, ci: '[15.6, 22.5]' },
+  ];
+
+  // ARC-Challenge across small models (from README)
+  const ARC = [
+    { m: 'TinyLlama 1.1B',         v: 30.1 },
+    { m: 'SmolLM2 1.7B',           v: 52.0 },
+    { m: 'Qwen2.5 1.5B',           v: 54.7 },
+    { m: 'Mistral 7B-IT',          v: 55.5 },
+    { m: 'Gemma2 2B',              v: 55.7 },
+    { m: 'Llama 3.2 1B-IT',        v: 59.4 },
+    { m: 'Llama 3.2 3B',           v: 69.1 },
+    { m: 'Llama 3.2 3B-IT',        v: 78.6 },
+    { m: 'AVA v2 2B',              v: 82.0, ava: true },
+    { m: 'Phi-4-mini 3.8B',        v: 83.7 },
+    { m: 'Phi-3.5-mini 3.8B',      v: 84.6 },
+  ];
+
+  const GSM = [
+    { m: 'TinyLlama 1.1B',         v: 2.0 },
+    { m: 'Gemma2 2B',              v: 24.3 },
+    { m: 'Qwen3.5 2B Base',        v: 28.0 },
+    { m: 'AVA v2 (greedy)',        v: 35.3, ava: true },
+    { m: 'AVA v2 (self-cons k=5)', v: 44.0, ava: true },
+    { m: 'Llama 3.2 1B-IT',        v: 44.4 },
+    { m: 'SmolLM2 1.7B',           v: 48.2 },
+    { m: 'Mistral 7B-IT',          v: 52.2 },
+    { m: 'Qwen2.5 1.5B',           v: 68.5 },
+    { m: 'Llama 3.2 3B-IT',        v: 77.7 },
+    { m: 'Qwen2.5 3B',             v: 79.1 },
+    { m: 'Phi-3.5 3.8B',           v: 86.2 },
+    { m: 'Phi-4 3.8B',             v: 88.6 },
+  ];
+
+  // -------------------------------------------------------------
+  // Comparison bar chart
+  // -------------------------------------------------------------
+  function buildBars(host, rows, max) {
+    const m = max || 100;
+    host.innerHTML = '';
+    rows.forEach((r) => {
+      const row = document.createElement('div');
+      row.className = 'bar-row' + (r.ava ? ' is-ava' : '');
+      row.innerHTML = `
+        <div class="lbl">${r.m}</div>
+        <div class="bar" style="--w:${(r.v / m) * 100}%"></div>
+        <div class="val">${r.v.toFixed(1)}</div>
+      `;
+      host.appendChild(row);
+    });
+  }
+
+  function initBars() {
+    const arcHost = document.querySelector('[data-bars="arc"]');
+    const gsmHost = document.querySelector('[data-bars="gsm"]');
+    if (arcHost) buildBars(arcHost, ARC);
+    if (gsmHost) buildBars(gsmHost, GSM);
+
+    const block = document.getElementById('cmp-block');
+    if (!block) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          block.classList.add('revealed', 'in');
+          io.disconnect();
+        }
+      });
+    }, { threshold: 0.18 });
+    io.observe(block);
+  }
+
+  // -------------------------------------------------------------
+  // Benchmark table — sortable + filterable
+  // -------------------------------------------------------------
+  let bmState = {
+    sort: { key: 'acc', dir: 'desc' },
+    filter: 'all',
+  };
+  const MAX_BAR = 100;
+
+  function renderBM() {
+    const tbody = document.querySelector('#bm-table tbody');
+    if (!tbody) return;
+    let rows = BM.slice();
+    if (bmState.filter !== 'all') {
+      rows = rows.filter((r) => r.cat === bmState.filter);
+    }
+    rows.sort((a, b) => {
+      const k = bmState.sort.key;
+      let x = a[k], y = b[k];
+      if (k === 'ci') { x = parseFloat(a.ci.replace('[','').split(',')[0]); y = parseFloat(b.ci.replace('[','').split(',')[0]); }
+      if (typeof x === 'string') {
+        const r = x.localeCompare(y);
+        return bmState.sort.dir === 'asc' ? r : -r;
+      }
+      return bmState.sort.dir === 'asc' ? x - y : y - x;
+    });
+
+    tbody.innerHTML = rows.map((r, i) => `
+      <tr data-cat="${r.cat}">
+        <td class="col-name col-acc">${r.star ? '<span class="star">★</span>' : ''}${r.name}</td>
+        <td class="col-cat is-mobile-hidden">${r.cat}</td>
+        <td>${r.n.toLocaleString()}</td>
+        <td class="col-acc">${r.acc.toFixed(1)}%</td>
+        <td class="col-ci is-mobile-hidden">${r.ci}</td>
+        <td class="col-bar is-mobile-hidden"><div class="mini" style="--w:${(r.acc / MAX_BAR) * 100}%; --d:${i * 25}ms;"></div></td>
+      </tr>
+    `).join('');
+
+    // sort indicators
+    document.querySelectorAll('#bm-table thead th').forEach((th) => {
+      const key = th.getAttribute('data-sort');
+      const arr = th.querySelector('.arr');
+      if (!key) return;
+      if (key === bmState.sort.key) {
+        th.setAttribute('aria-sort', bmState.sort.dir === 'asc' ? 'ascending' : 'descending');
+        if (arr) arr.textContent = bmState.sort.dir === 'asc' ? '▲' : '▼';
+      } else {
+        th.removeAttribute('aria-sort');
+        if (arr) arr.textContent = '';
+      }
+    });
+  }
+
+  function initBM() {
+    document.querySelectorAll('#bm-table thead th[data-sort]').forEach((th) => {
+      th.addEventListener('click', () => {
+        const key = th.getAttribute('data-sort');
+        if (bmState.sort.key === key) {
+          bmState.sort.dir = bmState.sort.dir === 'asc' ? 'desc' : 'asc';
+        } else {
+          bmState.sort.key = key;
+          bmState.sort.dir = (key === 'name' || key === 'cat') ? 'asc' : 'desc';
+        }
+        renderBM();
+      });
+    });
+    document.querySelectorAll('[data-filter-group] button').forEach((b) => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('[data-filter-group] button').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+        b.setAttribute('aria-pressed', 'true');
+        bmState.filter = b.getAttribute('data-filter');
+        renderBM();
+      });
+    });
+    renderBM();
+  }
+
+  // -------------------------------------------------------------
+  // Try-it tabs + copy buttons
+  // -------------------------------------------------------------
+  function initTabs() {
+    document.querySelectorAll('.try-tabs button[data-tab]').forEach((b) => {
+      b.addEventListener('click', () => {
+        const t = b.getAttribute('data-tab');
+        document.querySelectorAll('.try-tabs button[data-tab]').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+        b.setAttribute('aria-pressed', 'true');
+        document.querySelectorAll('.try-pane').forEach((p) => {
+          if (p.getAttribute('data-tab') === t) p.setAttribute('data-active', '');
+          else p.removeAttribute('data-active');
+        });
+      });
+    });
+  }
+
+  function initCopy() {
+    document.querySelectorAll('.copy-btn').forEach((b) => {
+      b.addEventListener('click', async () => {
+        const id = b.getAttribute('data-copy');
+        const el = document.getElementById(id);
+        if (!el) return;
+        const text = el.innerText;
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (e) {
+          const ta = document.createElement('textarea');
+          ta.value = text; document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); } catch (_) {}
+          document.body.removeChild(ta);
+        }
+        const prev = b.textContent;
+        b.classList.add('copied');
+        b.textContent = '✓ Copied';
+        setTimeout(() => { b.classList.remove('copied'); b.textContent = prev; }, 1400);
+      });
+    });
+  }
+
+  // -------------------------------------------------------------
+  // Code modal — opens Try section
+  // -------------------------------------------------------------
+  function initModal() {
+    const modal = document.getElementById('modal');
+    const body = document.getElementById('modal-body');
+    if (!modal || !body) return;
+
+    function openModal() {
+      // clone the try-block markup into modal
+      const src = document.getElementById('try-block');
+      if (!src) return;
+      body.innerHTML = '';
+      const clone = src.cloneNode(true);
+      clone.id = 'try-block-modal';
+      body.appendChild(clone);
+      // re-wire tabs and copy in clone
+      clone.querySelectorAll('.try-tabs button[data-tab]').forEach((b) => {
+        b.addEventListener('click', () => {
+          const t = b.getAttribute('data-tab');
+          clone.querySelectorAll('.try-tabs button[data-tab]').forEach((x) => x.setAttribute('aria-pressed','false'));
+          b.setAttribute('aria-pressed','true');
+          clone.querySelectorAll('.try-pane').forEach((p) => {
+            if (p.getAttribute('data-tab') === t) p.setAttribute('data-active','');
+            else p.removeAttribute('data-active');
+          });
+        });
+      });
+      clone.querySelectorAll('.copy-btn').forEach((b) => {
+        b.addEventListener('click', async () => {
+          const id = b.getAttribute('data-copy');
+          // grab text from the visible source (may exist in multiple places)
+          const el = clone.querySelector('#' + id) || document.getElementById(id);
+          if (!el) return;
+          try { await navigator.clipboard.writeText(el.innerText); } catch (_) {}
+          const prev = b.textContent;
+          b.classList.add('copied');
+          b.textContent = '✓ Copied';
+          setTimeout(()=>{ b.classList.remove('copied'); b.textContent = prev; }, 1400);
+        });
+      });
+      modal.setAttribute('data-open','');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      modal.removeAttribute('data-open');
+      document.body.style.overflow = '';
+      body.innerHTML = '';
+    }
+    document.querySelectorAll('[data-action="open-try"]').forEach((b) => b.addEventListener('click', openModal));
+    document.querySelectorAll('[data-close-modal]').forEach((b) => b.addEventListener('click', closeModal));
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.hasAttribute('data-open')) closeModal(); });
+  }
+
+  // -------------------------------------------------------------
+  // Roadmap chevrons
+  // -------------------------------------------------------------
+  const PHASES = [
+    { id: 'P0',  s: 'done',   label: 'Scaffolding',          eta: 'Q4 2025',
+      desc: 'Repository layout, design doc, configs, engine stubs, MCP catalog, and bring-up scripts. Done — the foundations are checked in.' },
+    { id: 'P1',  s: 'active', label: 'Teacher download',     eta: 'Q1 2026',
+      desc: 'Pull Qwen 3.6 35B-A3B, set up streamed loading on the laptop, validate teacher logits across the distillation prompt set.' },
+    { id: 'P2',  s: 'queued', label: 'Ternary linear',       eta: 'Q1 2026',
+      desc: 'Implement the ternary linear primitive for FFN experts (BitDistiller-style {-1, 0, +1} with learnable per-channel scale).' },
+    { id: 'P3',  s: 'queued', label: 'MoTE-FFN',             eta: 'Q1 2026',
+      desc: 'Mixture of Ternary Experts: ternary FFN experts, BF16 router, one BF16 shared expert. Smoke-test on a 6-8B base.' },
+    { id: 'P4',  s: 'queued', label: 'Gated DeltaNet',       eta: 'Q2 2026',
+      desc: 'Wire the 3:1 hybrid: three Gated DeltaNet linear-time layers per one full-attention layer. Decode-time linear scaling target.' },
+    { id: 'P5',  s: 'queued', label: 'BF16 warmup',          eta: 'Q2 2026',
+      desc: 'BF16 warmup of the student so the architecture trains stably before introducing ternary QAT.' },
+    { id: 'P6',  s: 'queued', label: 'Ternary QAT distill',  eta: 'Q2 2026',
+      desc: 'BitDistiller 3-stage QAT: cold ternary, asymmetric quantization, KD against the Qwen 3.6 teacher. Track loss and ARC/GSM8K every 200 steps.' },
+    { id: 'P7',  s: 'queued', label: 'SFT + DPO',            eta: 'Q3 2026',
+      desc: 'Supervised fine-tune on the v2 corpus extended for tools and long-form, then DPO alignment for instruction-following quality.' },
+    { id: 'P8',  s: 'queued', label: 'MCP server',           eta: 'Q3 2026',
+      desc: 'FastMCP 3.0 tool server + XGrammar constrained decoding. Calculator, code, retrieval, file. Make tool-use non-latent.' },
+    { id: 'P9',  s: 'queued', label: 'GGUF export',          eta: 'Q3 2026',
+      desc: 'Convert merged student to GGUF, verify Q4_K_M and Q8_0 retain QAT gains within tolerance.' },
+    { id: 'P10', s: 'queued', label: 'Full eval',            eta: 'Q4 2026',
+      desc: 'Run the same 17-benchmark / 16,872-task suite on v3 and publish a side-by-side report with v2.' },
+    { id: 'P11', s: 'queued', label: 'Release',              eta: 'Q4 2026',
+      desc: 'Model card, GGUF release, documentation, and a research write-up of what changed and why.' },
+  ];
+
+  function initRoadmap() {
+    const row = document.getElementById('chev-row');
+    const detail = document.getElementById('chev-detail');
+    if (!row || !detail) return;
+    row.innerHTML = PHASES.map((p, i) => `
+      <div class="chev ${p.s === 'done' ? 'is-done' : ''} ${p.s === 'active' && i === 1 ? 'is-active' : ''}" data-i="${i}">
+        <span class="id">${p.id}</span>
+        <span>${p.label}</span>
+      </div>
+    `).join('');
+
+    function show(i) {
+      const p = PHASES[i];
+      detail.innerHTML = `
+        <div class="meta">
+          <b>${p.id} · ${p.s.toUpperCase()}</b>
+          target&nbsp;${p.eta}
+        </div>
+        <div>
+          <h4>${p.label}</h4>
+          <p>${p.desc}</p>
+        </div>
+      `;
+      row.querySelectorAll('.chev').forEach((c) => c.classList.remove('is-active'));
+      row.querySelector('.chev[data-i="' + i + '"]').classList.add('is-active');
+    }
+
+    row.querySelectorAll('.chev').forEach((c) => {
+      c.addEventListener('click', () => show(parseInt(c.getAttribute('data-i'), 10)));
+    });
+    show(1);
+  }
+
+  // -------------------------------------------------------------
+  // Hero typewriter (only when hero=typing)
+  // -------------------------------------------------------------
+  let typingTimer = null;
+  function applyHero() {
+    const h1 = document.getElementById('hero-h1');
+    const tw = document.getElementById('hero-typewriter');
+    const frame = document.getElementById('hero-frame');
+    const mode = document.documentElement.getAttribute('data-hero') || 'ascii';
+    if (!h1 || !tw) return;
+
+    const full = h1.getAttribute('data-text');
+    if (typingTimer) { clearInterval(typingTimer); typingTimer = null; }
+
+    if (mode === 'typing') {
+      tw.textContent = '';
+      let i = 0;
+      typingTimer = setInterval(() => {
+        if (i >= full.length) { clearInterval(typingTimer); typingTimer = null; return; }
+        tw.textContent = full.slice(0, ++i);
+      }, 38);
+    } else {
+      tw.textContent = full;
+    }
+
+    if (frame) frame.style.display = (mode === 'static') ? 'none' : '';
+  }
+
+  // -------------------------------------------------------------
+  // Scroll reveal
+  // -------------------------------------------------------------
+  function initReveal() {
+    const els = document.querySelectorAll('.fade-in');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12 });
+    els.forEach((el) => io.observe(el));
+  }
+
+  // -------------------------------------------------------------
+  // Public hook for tweaks panel
+  // -------------------------------------------------------------
+  window.AVA = {
+    setMode(m)    { document.documentElement.setAttribute('data-mode', m); },
+    setType(t)    { document.documentElement.setAttribute('data-type', t); },
+    setDensity(d) { document.documentElement.setAttribute('data-density', d); },
+    setHero(h)    { document.documentElement.setAttribute('data-hero', h); applyHero(); },
+  };
+
+  // -------------------------------------------------------------
+  // Boot
+  // -------------------------------------------------------------
+  document.addEventListener('DOMContentLoaded', () => {
+    initBars();
+    initBM();
+    initTabs();
+    initCopy();
+    initModal();
+    initRoadmap();
+    applyHero();
+    initReveal();
+  });
+})();
+
+</script>
+
+</body>
+</html>

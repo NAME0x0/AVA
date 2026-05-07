@@ -1,10 +1,42 @@
 # AVA
 
-AVA is a local-first AI lab built under extreme hardware constraints: a single **4 GB VRAM** laptop GPU (NVIDIA RTX A2000), no cloud budget, no large-cluster training. AVA v2 is the first released model from that work: a QLoRA fine-tune of Qwen3.5-2B. On a 17-benchmark / 16,872-task **full evaluation** at Q8_0 GGUF, it scores **82.0% ARC-Challenge**, **92.0% ARC-Easy**, **59.2% MMLU**, **75.9% PIQA**, **75.0% BoolQ**, and **35.3% GSM8K** (44.0% with k=5 self-consistency) — all while training and running inference in under 2 GB of VRAM. See [`experiments/exp4_finetune/eval_v2/RESULTS_REPORT_V2_FULL.md`](experiments/exp4_finetune/eval_v2/RESULTS_REPORT_V2_FULL.md) for the complete report.
+> **TL;DR for newcomers.** AVA is a personal AI lab proving you can train and run capable models on a single laptop GPU with 4 GB VRAM — no cloud, no cluster, no budget. The first released model, **AVA v2**, is a 42 MB adapter on Qwen3.5-2B that scores **82% on ARC-Challenge** (science reasoning) — beating Llama 3.2 3B-Instruct (78.6%) and matching Phi-4-mini 3.8B (83.7%). Training peaks at **1.81 GB VRAM** and finishes in **100 minutes** on a $400 laptop GPU. Everything is open: weights, data, code, evals.
+>
+> ```
+>     LAPTOP GPU                    AVA v2 RESULT
+>   ┌──────────────┐              ┌──────────────────┐
+>   │ RTX A2000    │   QLoRA      │ ARC-C   82.0%    │
+>   │ 4 GB VRAM    │  ────────▶   │ MMLU    59.2%    │
+>   │ Single card  │   100 min    │ GSM8K   44.0%*   │
+>   └──────────────┘              │ 42 MB adapter    │
+>                                 └──────────────────┘
+>                                  *k=5 self-cons
+> ```
+>
+> **What's in this repo:** released model + adapter, full training pipeline, 17-benchmark evaluation harness, scratch architectures, retrieval/memory systems, local serving runtimes, and the in-progress AVA v3 (a ternary MoE student distilled from Qwen 3.6 35B-A3B with MCP tools).
+>
+> **Try it now:** `ollama run` a GGUF (link below) or `pip install -e .[bench] && python scripts/chat.py`.
+
+## What This Project Is
+
+AVA is a local-first AI lab built under extreme hardware constraints: a single **4 GB VRAM** laptop GPU (NVIDIA RTX A2000), no cloud budget, no large-cluster training.
+
+The released model is **AVA v2**, a QLoRA fine-tune of Qwen3.5-2B. On a 17-benchmark / 16,872-task **full evaluation** at Q8_0 GGUF, it scores **82.0% ARC-Challenge**, **92.0% ARC-Easy**, **59.2% MMLU**, **75.9% PIQA**, **75.0% BoolQ**, and **35.3% GSM8K** (44.0% with k=5 self-consistency) — all while training and running inference in under 2 GB of VRAM. See [`experiments/exp4_finetune/eval_v2/RESULTS_REPORT_V2_FULL.md`](experiments/exp4_finetune/eval_v2/RESULTS_REPORT_V2_FULL.md) for the complete report.
 
 But the repo is broader than one released adapter. AVA is the full stack for building local AI from the ground up: scratch architectures, tokenizers, retrieval and memory systems, system-prompt and routing controls, distillation, post-training, evaluation, and fast local serving.
 
-The entire training pipeline, evaluation harness, experiment history, and model weights are open. This README now documents both the released model and the larger AVA research track.
+The entire training pipeline, evaluation harness, experiment history, and model weights are open. This README documents both the released model and the larger AVA research track.
+
+## Glossary (skim if any of this looks unfamiliar)
+
+- **VRAM** — GPU memory. AVA targets 4 GB; most labs assume 80 GB+ per card.
+- **QLoRA** — Quantized Low-Rank Adaptation. Train a tiny add-on (~10M parameters) on top of a frozen 4-bit-quantized base model. Drops training VRAM by ~10x.
+- **LoRA adapter** — the trained add-on. AVA v2's adapter is a 42 MB file that "patches" Qwen3.5-2B with new behavior.
+- **GGUF** — a packaged single-file model format used by Ollama and llama.cpp. Convenient for running locally without a Python setup.
+- **ARC-Challenge / GSM8K / MMLU / etc.** — public reasoning benchmarks. ARC-C is grade-school science MCQ; GSM8K is grade-school math word problems; MMLU is 57-subject knowledge MCQ.
+- **Distillation** — training a smaller student model to mimic a larger teacher's outputs.
+- **MoE / ternary MoE** — Mixture of Experts. Many small experts, only a few activated per token. "Ternary" = expert weights compressed to {-1, 0, +1}, ~16x smaller than BF16.
+- **MCP** — Model Context Protocol. A standard for letting models call external tools (calculator, code runner, web fetch) via a small server.
 
 ## What AVA Is
 
@@ -190,11 +222,26 @@ The numbers below come from the early v2 release evaluation on 100-question ARC 
 
 AVA v2 trained **10.7x faster** than v1 per step thanks to Triton kernel compilation for SDPA attention. The 4x larger corpus with augmented science and reasoning data was the key driver behind the ARC breakthrough (v1 showed zero ARC improvement over base).
 
-### Comparison to Other Models
+### Comparison to Other Small Models
 
-All scores from official model cards and technical reports. Evaluation protocols vary by source (shot count, prompting). AVA v2 scores are 0-shot.
+All non-AVA scores from official model cards / technical reports. Evaluation protocols vary by source (shot count, prompting). AVA v2 numbers are from the full 17-benchmark eval above; AVA v2 GSM8K is shown as `greedy / k=5 self-cons`.
 
-#### ARC-Challenge (Science Reasoning)
+| Model | Params | ARC-C | MMLU | HellaSwag | GSM8K |
+|---|---:|---:|---:|---:|---:|
+| TinyLlama 1.1B-Chat | 1.1B | 30.1 | 25.3 | 60.3 | 2.0 |
+| Llama 3.2 1B-Instruct | 1.0B | 59.4 | 49.3 | 60.8 | 44.4 |
+| Qwen2.5 1.5B-Instruct | 1.5B | 54.7 | 60.9 | 67.9 | 68.5 |
+| SmolLM2 1.7B-Instruct | 1.7B | 52.0 | 50.4 | 68.9 | 48.2 |
+| Gemma 2 2B-Instruct | 2.0B | 55.7 | 51.3 | 73.0 | 24.3 |
+| Qwen3.5 2B Base | 2.0B | 66.0 | — | — | 28.0 |
+| **AVA v2 (this repo)** | **2.0B** | **82.0** | **59.2** | 56.8 | **35.3 / 44.0** |
+| Qwen2.5 3B-Instruct | 3.0B | ~70 | 65.6 | 73.6 | 79.1 |
+| Llama 3.2 3B-Instruct | 3.0B | 78.6 | 63.4 | 69.8 | 77.7 |
+| Phi-4-mini 3.8B-Instruct | 3.8B | 83.7 | 67.3 | 76.2 | 88.6 |
+| Phi-3.5-mini-Instruct | 3.8B | 84.6 | 69.0 | 69.4 | 86.2 |
+| Mistral 7B-Instruct v0.2 | 7.0B | 55.5 | 60.1 | 81.3 | 52.2 |
+
+#### ARC-Challenge — visual
 
 ```mermaid
 ---
@@ -205,12 +252,12 @@ config:
 ---
 xychart-beta
     title "ARC-Challenge Accuracy by Model (AVA v2 = full 1,172-question eval)"
-    x-axis ["TinyLlama 1.1B", "SmolLM2 1.7B", "Gemma2 2B", "Qwen2.5 1.5B", "Mistral 7B", "Llama3.2 1B-IT", "Llama3.2 3B", "Llama3.2 3B-IT", "Phi-4-mini 3.8B", "AVA v2 2B", "Phi-3.5-mini 3.8B"]
+    x-axis ["TinyLlama 1.1B", "SmolLM2 1.7B", "Qwen2.5 1.5B", "Mistral 7B", "Gemma2 2B", "Llama3.2 1B-IT", "Qwen3.5 2B Base", "Llama3.2 3B-IT", "AVA v2 2B", "Phi-4-mini 3.8B", "Phi-3.5-mini 3.8B"]
     y-axis "Accuracy (%)" 0 --> 100
-    bar [30.1, 52, 55.7, 54.7, 55.5, 59.4, 69.1, 78.6, 83.7, 82, 84.6]
+    bar [30.1, 52, 54.7, 55.5, 55.7, 59.4, 66.0, 78.6, 82.0, 83.7, 84.6]
 ```
 
-#### GSM8K (Math Reasoning)
+#### GSM8K — visual
 
 ```mermaid
 ---
@@ -226,12 +273,13 @@ xychart-beta
     bar [2, 24.3, 28, 35.3, 44.4, 44, 48.2, 52.2, 68.5, 77.7, 79.1, 86.2, 88.6]
 ```
 
-**Key takeaways (full-eval numbers):**
+**What this comparison says:**
 
-- AVA v2's **82% ARC-Challenge** at 2B parameters exceeds Llama 3.2 3B-Instruct (78.6% at 3B) and beats Mistral-7B (55.5% at 7B) by 26.5 percentage points -- on the full 1,172-question test set, not a 100-question subset
-- On GSM8K full set, v2 reaches **35.3% greedy / 44.0% with k=5 self-consistency**. Self-consistency lands competitive with Llama 3.2 1B-Instruct (44.4%) and behind SmolLM2-1.7B-Instruct (48.2%). Math is v2's weakest area
-- The ARC result is achieved with a 42 MB LoRA adapter on a Q8_0 GGUF (under 2 GB inference VRAM) -- not a full model retrain
-- Tool-use was trained but mostly latent at inference: agentic GSM8K invoked tools on only 0.6% of problems and matched plain greedy accuracy (35.4%)
+- **AVA v2 leads its size class on ARC-Challenge.** 82.0% on the full 1,172-question test set is ahead of every 1-2B model surveyed and ahead of Llama 3.2 3B-Instruct (78.6%) and Mistral-7B-Instruct (55.5%). Only the Phi 3.5/4-mini 3.8B-class models beat it, by 1.7-2.6 pp. This was achieved with a 42 MB LoRA on top of an open base — no cluster, no large pretraining run.
+- **MMLU is competitive at 59.2%.** Close to Mistral 7B (60.1%) and roughly +8 pp over Gemma 2 2B (51.3%). Below Qwen2.5 1.5B (60.9%) and the Phi/Llama 3B-class models (63-69%).
+- **GSM8K is the main weakness.** Greedy 35.3% trails Qwen2.5 1.5B (68.5%) and the 3B-class instruct models. With k=5 self-consistency v2 reaches 44.0%, near Llama 3.2 1B-Instruct (44.4%). The fine-tune corpus is reasoning-heavy but not math-heavy enough; AVA v3 targets this directly.
+- **HellaSwag (commonsense narrative) trails.** 56.8% — below most peers. The fine-tune leaned toward science and instructions, not narrative completion.
+- **Tool-use was trained but mostly latent.** Agentic GSM8K invoked tools on only 0.6% of problems and matched plain greedy. AVA v3 fixes this with MCP-based tool routing instead of fine-tune-only tool teaching.
 
 ### Loss Curve
 
