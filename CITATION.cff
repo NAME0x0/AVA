@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use AVA in research, please cite it as below."
+title: "AVA: QLoRA fine-tuning under extreme VRAM constraints"
+authors:
+  - family-names: Mumtaz
+    given-names: Muhammad Afsah
+version: "v2"
+date-released: "2026-03-18"
+url: "https://github.com/NAME0x0/AVA"
+repository-code: "https://github.com/NAME0x0/AVA"
+license: MIT
+keywords:
+  - language-model
+  - small-model
+  - 4gb-vram
+  - qlora
+  - quantization
+  - distillation
+  - reproducible-research
+preferred-citation:
+  type: misc
+  authors:
+    - family-names: Mumtaz
+      given-names: Muhammad Afsah
+  title: "AVA v2: QLoRA Fine-tuning Under Extreme VRAM Constraints"
+  year: 2026
+  url: "https://github.com/NAME0x0/AVA"

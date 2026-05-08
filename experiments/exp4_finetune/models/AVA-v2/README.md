@@ -151,6 +151,15 @@ For a no-Python path, GGUF builds (Q4_K_M, Q8_0) are at [`NAME0x0/AVA-v2-GGUF`](
 - **MMLU 5-shot context overflow.** 2.7% of MMLU items errored on a 8K context cap (long sub-categories like `professional_law`); they are counted as failures. Accuracy on completed items was 60.8%.
 - **MCQ scoring is letter-argmax.** AVA's eval uses 1-token argmax over candidate label tokens via `/completion n_probs=60`, which differs slightly from lm-evaluation-harness's logprob-of-continuation scoring. Numbers are directionally comparable to leaderboards but not numerically identical.
 
+## More documentation
+
+- **Reproduce**: [docs/REPRODUCE.md](https://github.com/NAME0x0/AVA/blob/main/docs/REPRODUCE.md)
+- **Windows setup (Triton / FLA / BnB)**: [public gist](https://gist.github.com/NAME0x0/8fe9084e606d3e7ae17d4f1da6a96667)
+- **Full eval report**: [RESULTS_REPORT_V2_FULL.md](https://github.com/NAME0x0/AVA/blob/main/experiments/exp4_finetune/eval_v2/RESULTS_REPORT_V2_FULL.md)
+- **Cross-model comparison**: [docs/COMPARE.md](https://github.com/NAME0x0/AVA/blob/main/docs/COMPARE.md)
+- **Experiment progression (v1 → v2 → v3)**: [docs/EXPERIMENTS.md](https://github.com/NAME0x0/AVA/blob/main/docs/EXPERIMENTS.md)
+- **Roadmap**: [docs/ROADMAP.md](https://github.com/NAME0x0/AVA/blob/main/docs/ROADMAP.md)
+
 ## Citation
 
 ```
