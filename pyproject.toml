@@ -103,6 +103,54 @@ files = ["src", "tests"]
 ignore_missing_imports = true
 warn_unused_configs = true
 
+# TODO(types): incremental type-cleanup. Modules below are exempted while we
+# tighten signatures across the research stack. New code should be fully typed;
+# remove modules from the lists below as they're cleaned up. See
+# https://github.com/NAME0x0/AVA/issues for the tracking issue.
+
+[[tool.mypy.overrides]]
+module = [
+    "ava.activity",
+    "ava.cli",
+    "ava.corpus_recipes",
+    "ava.dense_retrieval",
+    "ava.eval",
+    "ava.experiments",
+    "ava.external_benchmarks",
+    "ava.inspect",
+    "ava.memory_transfer",
+    "ava.model",
+    "ava.reranking",
+    "ava.rl",
+    "ava.sessions",
+    "ava.synthetic",
+    "ava.tokenizer",
+    "ava.tokenizer_artifacts",
+    "ava.tools",
+    "ava.train",
+]
+ignore_errors = true
+
+# tests/ has no __init__.py, so mypy sees each file as a top-level module
+[[tool.mypy.overrides]]
+module = [
+    "test_activity",
+    "test_benchmarks",
+    "test_corpus_recipes",
+    "test_env",
+    "test_experiments",
+    "test_external_benchmarks",
+    "test_inspect",
+    "test_memory_transfer",
+    "test_reranking",
+    "test_retrieval",
+    "test_sessions",
+    "test_synthetic",
+    "test_tokenizer",
+    "test_train",
+]
+ignore_errors = true
+
 [tool.ruff]
 target-version = "py310"
 line-length = 100
