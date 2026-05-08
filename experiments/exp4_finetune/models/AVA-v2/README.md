@@ -19,6 +19,10 @@ language:
 pipeline_tag: text-generation
 ---
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/NAME0x0/AVA/main/AVA_logo.png" alt="AVA logo" width="160" />
+</p>
+
 # AVA v2
 
 AVA v2 is a 42 MB QLoRA adapter for [Qwen/Qwen3.5-2B](https://huggingface.co/Qwen/Qwen3.5-2B), trained and evaluated entirely on a single NVIDIA RTX A2000 Laptop GPU with 4 GB VRAM. It targets strong general-purpose reasoning at the 2B scale on consumer hardware.

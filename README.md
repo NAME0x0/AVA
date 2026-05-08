@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="AVA_logo.png" alt="AVA logo" width="160" />
+
 # AVA
 
 **Capable AI on a 4 GB laptop GPU. No cloud. No cluster. No budget.**

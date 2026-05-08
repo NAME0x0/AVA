@@ -109,10 +109,19 @@ a.ink:hover { border-bottom-color: var(--accent); color: var(--accent); }
   height: 44px;
 }
 .topbar .brand {
-  display: flex; align-items: baseline; gap: 10px;
+  display: flex; align-items: center; gap: 12px;
+}
+.topbar .brand-mark {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--fg); text-decoration: none;
+}
+.topbar .brand-mark img {
+  display: block; width: 24px; height: 24px;
+  border-radius: 4px;
 }
 .topbar .brand b { letter-spacing: .12em; }
 .topbar .brand .ver { color: var(--muted); }
+[data-mode="light"] .topbar .brand-mark img { filter: invert(1); }
 .topbar nav {
   display: flex; gap: 22px;
 }
