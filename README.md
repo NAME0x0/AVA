@@ -120,6 +120,7 @@ The repo is documented progressively. Pick your depth:
 | Set up Triton/FLA on Windows | [public gist](https://gist.github.com/NAME0x0/8fe9084e606d3e7ae17d4f1da6a96667) ([repo copy](docs/WINDOWS_SETUP.md)) |
 | See every experiment, what shipped, what failed | [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md) |
 | See where v3 is heading | [docs/ROADMAP.md](docs/ROADMAP.md) |
+| Read the **AVA v3 full doc set** (HRM-Text + Mamba-3 + PrismML) | [docs/v3/INDEX.md](docs/v3/INDEX.md) |
 | Browse the architecture | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | Read the research roadmap (arXiv mapping) | [docs/RESEARCH_ROADMAP.md](docs/RESEARCH_ROADMAP.md) |
 | Contribute | [CONTRIBUTING.md](CONTRIBUTING.md) |

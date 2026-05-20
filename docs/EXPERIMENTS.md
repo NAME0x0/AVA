@@ -82,19 +82,21 @@ The repo keeps every branch. Closed branches stay so the failure modes remain vi
 
 ## Exp 6 / AVA v3 — ternary MoE student + MCP tools · 🚧 active
 
-**Goal**: push capacity-per-VRAM by ~5× and fix v2's structural weaknesses (math, tool routing, instruction following).
+**Goal**: strict dominance over v2 on every benchmark v2 measured, plus native 32 K context (256 K via YaRN, 1 M target), MCP tool routing, and ~13× capacity-per-VRAM. The architecture stacks three 2026 research lines on top of the original distillation backbone.
 
 **Plan**:
 - **Teacher**: Qwen 3.6 35B-A3B (active 3B / total 35B MoE).
-- **Student**: 6-8B ternary MoE — ternary FFN experts (~16× smaller than BF16) + BF16 router + 1 BF16 shared expert (the "MoTE" pattern).
-- **Attention**: native 3:1 hybrid Gated DeltaNet (linear-time decode) instead of full attention.
-- **Distillation**: BitDistiller 3-stage QAT — BF16 warmup → mixed-precision intermediate → ternary QAT distillation from teacher logits.
+- **Student**: ~3.26B ternary MoE — ternary routed FFN experts + BF16 router + ternary shared expert (the "MoTE" pattern, with PrismML-packed storage).
+- **Reasoning**: **HRM-Text dual recurrence** — per-block H-module (slow planner) + L-module (fast computer, up to 6 iterations) + halting head. Latent multi-step reasoning in one forward pass, no CoT tokens emitted. Source: Sapient HRM-Text (arXiv:2506.21734, May 2026).
+- **Attention**: **Mamba-3 (MIMO, complex SSM) in 3 : 1 hybrid** with gated softmax attention. +1.8 pp over Gated DeltaNet at 1.5 B; half the state size of Mamba-2 (ICLR 2026, arXiv:2603.15569). Gated DeltaNet kept as fallback.
+- **Storage**: **PrismML BB1_0 (1.125 bpw)** routed expert weights + **TQ1_0 (1.58 bpw)** shared expert. Kernels merged into `llama.cpp` head + Apple MLX (PrismML Bonsai / Ternary Bonsai, Mar–Apr 2026).
+- **Distillation**: BitDistiller 3-stage QAT — BF16 warmup → HRM halting curriculum (ACT ponder loss) → ternary QAT distillation from teacher logits.
 - **Tools**: MCP-based via FastMCP 3.0 + XGrammar constrained decoding. The model learns to call external tools through a protocol, not by memorizing JSON syntax inside SFT.
-- **Post-training**: SFT then DPO on a curated mix.
+- **Post-training**: SFT then DPO then tool-discrimination SFT (300 "when NOT to call" examples).
 
-**Status**: P0 (scaffolding) — design doc, configs, engine stubs, MCP catalog, scripts in place. P1-P11 (download teacher → ternary linear → MoTE-FFN wiring → BF16 warmup → QAT → SFT/DPO → MCP server → GGUF export → full eval) are queued.
+**Status**: P0 (scaffolding) — design doc, configs, engine stubs, MCP catalog, scripts in place. P1-P12 (teacher → student init → BF16 warmup → HRM halting curriculum → ternary QAT distillation → SFT / DPO / tool-SFT → PrismML packing → MCP wiring → full eval → release) are queued.
 
-**Files**: `experiments/exp6_v3/DESIGN.md`, `experiments/exp6_v3/README.md`, `experiments/exp6_v3/configs/`, `experiments/exp6_v3/engine/`, `experiments/exp6_v3/mcp/`.
+**Files**: `experiments/exp6_v3/DESIGN.md`, `experiments/exp6_v3/README.md`, `experiments/exp6_v3/configs/`, `experiments/exp6_v3/engine/`, `experiments/exp6_v3/mcp/`, and the full v3 doc set under [`docs/v3/`](v3/INDEX.md).
 
 ## Why each branch stays in the repo
 

@@ -14,24 +14,31 @@ AVA's roadmap follows the constraint: every milestone must train and run on 4 GB
 
 ## Active — Exp 6 / AVA v3
 
-Distill Qwen 3.6 35B-A3B → 6-8B ternary MoE student with native Gated DeltaNet 3:1 hybrid + MCP tools.
+Distill Qwen 3.6 35B-A3B → ~3 B ternary MoE student, layered on three 2026 research pillars:
+
+1. **HRM-Text** — Sapient's two-stack latent-recurrent reasoner (H-module + L-module, halting head). Closes v2's MATH/GSM8K gap structurally without emitting CoT tokens.
+2. **Mamba-3 (MIMO, complex SSM)** — ICLR 2026 generation-3 subquadratic attention; +1.8 pp over Gated DeltaNet at 1.5 B, half the state size of Mamba-2. Deployed in a 3 : 1 hybrid with gated softmax attention.
+3. **PrismML Bonsai / Ternary Bonsai** — Caltech's 1-bit (1.125 bpw) and 1.58-bit packed formats. Kernels merged into `llama.cpp` head and Apple MLX. Used as the GGUF storage layer for v3.
+
+Full v3 doc set: [`docs/v3/INDEX.md`](v3/INDEX.md). Design: [`docs/v3/ARCHITECTURE_V3.md`](v3/ARCHITECTURE_V3.md). Recipe: [`docs/v3/RECIPE.md`](v3/RECIPE.md). Targets: [`docs/v3/PERF_TARGETS.md`](v3/PERF_TARGETS.md).
 
 Phases:
 
 - **P0** Scaffolding (configs, engine stubs, MCP catalog, scripts) — *in progress*
 - **P1** Download Qwen 3.6 35B-A3B teacher weights
-- **P2** Implement ternary linear, MoTE-FFN, SubLN, FLA Gated DeltaNet swap
-- **P3** BF16 warmup pretraining
-- **P4** Mixed-precision intermediate stage
-- **P5** Ternary QAT distillation from teacher logits (BitDistiller stage 3)
-- **P6** SFT on a math + science + reasoning + tool-routing mix
+- **P2** Student init: sparse-upcycle attention, init Mamba-3 (complex state), random MoE FFN, HRM halting head
+- **P3** BF16 warmup pretraining (2–3 B tokens)
+- **P4** HRM halting curriculum — train L-loop and halting head with ACT ponder loss (1–1.5 B tokens)
+- **P5** Ternary QAT + teacher distillation (5–8 B tokens, rented A100s)
+- **P6** SFT on math + science + reasoning + tool-routing mix
 - **P7** DPO alignment
-- **P8** MCP server (FastMCP 3.0 + XGrammar constrained decoding) + tool catalog
-- **P9** GGUF export, llama.cpp serving
-- **P10** Full 17-benchmark eval + new tool-routing benchmarks
-- **P11** Public release
+- **P8** Tool-discrimination SFT (300 "when NOT to call" examples)
+- **P9** PrismML packing — export to GGUF with BB1_0 routed + TQ1_0 shared
+- **P10** MCP wiring (FastMCP 3.0 + XGrammar constrained decoding)
+- **P11** Full eval — 17-bench v2 suite + BFCL v3 + MCP-Bench + RULER long context
+- **P12** Public release
 
-Target: capacity-per-VRAM ≈ 5× v2 with materially better math + tool routing.
+Target: **strict dominance** over v2 on every published benchmark, plus 32 K native context, MCP tools, and ~13× capacity per VRAM. See [`docs/v3/PERF_TARGETS.md`](v3/PERF_TARGETS.md) for the row-by-row gate.
 
 ## Planned (post-v3)
 

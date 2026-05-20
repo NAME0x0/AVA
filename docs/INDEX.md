@@ -26,7 +26,8 @@ Start here. Every doc is short and answers one question.
 |---|---|
 | [EXPERIMENTS.md](EXPERIMENTS.md) | Exp 1-6. What we tried, what failed, what shipped. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | The training stack and the AVA-v2 design. |
-| [ROADMAP.md](ROADMAP.md) | What's coming. AVA v3 plan. |
+| [ROADMAP.md](ROADMAP.md) | What's coming. AVA v3 phases at a glance. |
+| [v3/INDEX.md](v3/INDEX.md) | **AVA v3 full doc set** — HRM-Text + Mamba-3 + PrismML architecture, gap analysis, recipe, targets, risks. |
 | [RESEARCH_ROADMAP.md](RESEARCH_ROADMAP.md) | arXiv survey mapped to AVA experiments. |
 | [TEACHER_DISTILLATION_SOP.md](TEACHER_DISTILLATION_SOP.md) | Distillation procedure. |
 | [SESSIONS.md](SESSIONS.md) | Internal session-tracking workflow. |
