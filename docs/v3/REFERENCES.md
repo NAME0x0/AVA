@@ -4,6 +4,10 @@ All citations behind the v3 documentation set. Every numerical claim or design d
 
 ---
 
+> **Edge portfolio citations** (memory layers, Coconut, EAGLE-3, NSA, precision
+> scaling laws, μP, Absolute Zero, Titans) live with their claims in
+> [EDGES.md](EDGES.md) §References.
+
 ## Architecture & reasoning
 
 - Wang et al., **Hierarchical Reasoning Model**, arXiv:[2506.21734](https://arxiv.org/abs/2506.21734). HRM-base, 27 M params, two-stack recurrence, ARC-AGI/Sudoku/maze. Foundation for the v3 H/L recurrence pattern.

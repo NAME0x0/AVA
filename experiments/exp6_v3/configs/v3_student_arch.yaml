@@ -84,6 +84,38 @@ quantization:
   lm_head: tied
   kv_cache: turboquant_k4_v2
 
+# Edge portfolio (docs/v3/EDGES.md) — June 2026.
+
+memory_layer:                        # E1: RAM-tier product-key memory
+  enabled: true
+  num_keys: 1024                     # slots = num_keys^2 ~ 1.05M
+  key_dim: 256
+  topk: 32
+  num_heads: 2
+  mount_units: [1, 4]                # shared pool, residual branch on these units
+  residency: system_ram              # value table never enters VRAM
+  lr_multiplier: 10.0                # memory params train hot (Meta 2412.09764)
+  growth_path_slots: 16777216        # 16M-slot SSD "capacity pack" (v3.x)
+
+latent_curriculum:                   # E2: Coconut-style CoT internalization (P4b)
+  enabled: true
+  schedule: progressive              # replace j leading CoT sentences with j L-steps
+  gate_ablation: A9                  # adopt iff >= +3pp MATH-500 at equal tokens
+
+speculative:                         # E3: EAGLE-3 self-draft (P10)
+  enabled: true
+  draft_params_fraction: 0.02
+  halting_coupled_depth: true        # halting prob drives draft depth (A11)
+
+h_block_long_context:                # E4: NSA option for the 64K+ fine-tune phase
+  attention: full                    # full | nsa  (nsa only at long-context stage)
+
+self_play:                           # E7: Absolute Zero flywheel (v3.1 lane)
+  enabled: false                     # scaffolding lands with P10 MCP sandbox
+  executor: mcp_sandbox
+  propose_budget: 6                  # reasoning_budget for proposer/solver
+  distill_budget: 2
+
 normalization:
   type: subln                        # BitNet-style
   rms_norm_eps: 1.0e-6

@@ -53,6 +53,7 @@ End-to-end pipeline for AVA v3, phase by phase. Each phase has: inputs, outputs,
 | Wall time | ~30 wall-days on laptop, ~1 day on 4× A100 |
 | Gate | Train-loss converges below baseline; ARC-E zero-shot ≥ 85 % |
 | Risks | Mamba-3 instability (complex state needs careful normalization — Mamba-3 paper §5.1 recipe) |
+| Edge hooks (June 2026) | **E1 memory tier trains from step 0** with 10× LR multiplier on memory params (Meta 2412.09764 recipe); zero-init output proj makes mounting a no-op at start. **E6 μP**: all P3 hyperparameters transferred from 50 M → 800 M proxy sweeps; proxy loss curves must superpose before the full run launches. Ablation A8 (±memory) runs as a P3-scale fork |
 
 ## P4 — Stage 2a: HRM halting curriculum
 
@@ -68,6 +69,7 @@ End-to-end pipeline for AVA v3, phase by phase. Each phase has: inputs, outputs,
 | Gate | Mean L-steps/token converges to ~2.5; MATH-500 zero-shot ≥ 25 % (vs v2 18.8 %) at `reasoning_budget=auto` |
 | Notes | First 10 % of P4 keeps halting head frozen at "always halt at k=1"; gradually unfreezes. This protects Stage 1's pre-trained CE loss from being destabilized by an unbounded recurrence on day one |
 | Risks | Ponder collapse (always k=1 or always k=max). Mitigation: clip ponder loss; clamp budget |
+| Edge hooks (June 2026) | **P4b — E2 latent curriculum**: teacher CoT internalization, Coconut schedule (progressively replace the first j CoT sentences with j L-iterations; supervise answer + remaining CoT). Runs as the second half of P4. Gate: ablation A9 — adopt iff ≥ +3 pp MATH-500 at equal token budget vs plain halting curriculum (EDGES.md E2) |
 
 ## P5 — Stage 2b: Ternary QAT + teacher distillation
 
@@ -214,7 +216,7 @@ See [RISKS.md](RISKS.md) for the full version.
 
 | Phase | Top risk | Mitigation |
 |---|---|---|
-| P3 | Mamba-3 instability at BF16 | Use Mamba-3 paper §5.1 init + low LR for first 5 % of phase |
+| P3 | Mamba-3 instability at BF16 | Use Mamba-3 paper §5.1 init + low LR for first 5 % of phase; hyperparameters transferred from μP proxy sweeps (EDGES.md E6) |
 | P4 | Ponder collapse | Clip ponder loss; clamp budget; freeze halting head if MATH-500 regresses |
 | P5 | Ternary MoE quality cliff | Fallback: keep routed at BF16, only shared at ternary |
 | P9 | TQ1_0 kernel rounding vs QAT fake-quant | Round-trip test in export script; ship TQ2_0-only if MMLU drops > 1.5 pp (kernel availability risk closed June 2026 — R8) |

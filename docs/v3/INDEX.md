@@ -23,11 +23,12 @@ The hardware constraint is unchanged: **4 GB VRAM laptop, single card, no cloud,
 | 3 | [HRM_TEXT.md](HRM_TEXT.md) | How the H-module / L-module dual recurrence integrates with the MoE student |
 | 4 | [SUBQUADRATIC.md](SUBQUADRATIC.md) | Mamba-3 vs Gated DeltaNet evaluation, hybrid ratio, FLA kernel plan, RoPE placement |
 | 5 | [PRISMML.md](PRISMML.md) | Sub-2-bpw packed storage: group-256 ternary QAT → stock TQ1_0/TQ2_0 GGUF export |
-| 6 | [V2_GAP_ANALYSIS.md](V2_GAP_ANALYSIS.md) | Every v2 weakness mapped to the v3 mechanism that closes it |
-| 7 | [PERF_TARGETS.md](PERF_TARGETS.md) | Beat-v2 matrix: every benchmark + speed/memory/context targets |
-| 8 | [RECIPE.md](RECIPE.md) | End-to-end training pipeline P0..P12 with token budgets and stage losses |
-| 9 | [RISKS.md](RISKS.md) | Research risks, ablation plan, and explicit fallback paths |
-| 10 | [REFERENCES.md](REFERENCES.md) | Full citation list for every claim in this doc set |
+| 6 | [EDGES.md](EDGES.md) | **The compounding moat portfolio** — RAM-tier memory, latent superposition reasoning, halting-coupled speculation, NSA, precision tailwind, μP, self-play flywheel |
+| 7 | [V2_GAP_ANALYSIS.md](V2_GAP_ANALYSIS.md) | Every v2 weakness mapped to the v3 mechanism that closes it |
+| 8 | [PERF_TARGETS.md](PERF_TARGETS.md) | Beat-v2 matrix: every benchmark + speed/memory/context targets |
+| 9 | [RECIPE.md](RECIPE.md) | End-to-end training pipeline P0..P12 with token budgets and stage losses |
+| 10 | [RISKS.md](RISKS.md) | Research risks, ablation plan, and explicit fallback paths |
+| 11 | [REFERENCES.md](REFERENCES.md) | Full citation list for every claim in this doc set |
 
 If you only have five minutes: read [WHY_V3.md](WHY_V3.md) and [PERF_TARGETS.md](PERF_TARGETS.md).
 

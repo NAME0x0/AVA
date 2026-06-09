@@ -101,6 +101,26 @@ The rows are ordered by **stage at which the risk first manifests** — earliest
 | Risk | Mamba-3 PR in `fla-org/flash-linear-attention` may not land before we need P3 |
 | Status | **Closed (June 2026):** `fla.layers.mamba3` merged into FLA in April 2026 and verified present at head. Gated DeltaNet remains the config-flip fallback only for stability issues (R2), not availability |
 
+### R18 — Memory-tier lookup op missing in llama.cpp graph (E1)
+
+| | |
+|---|---|
+| Risk | Product-key retrieval (2 small matmuls + top-k + row gather + weighted sum) is not a stock GGML graph pattern. The GGUF export of the memory build needs either a custom op or a graph assembled from `argsort`/`get_rows` primitives |
+| First detected at | P9b (memory-build export) |
+| Severity | Medium — affects the memory build only; the core TQ build ships regardless |
+| Probability | Medium |
+| Mitigation | (a) compose from existing GGML primitives (argsort + get_rows exist); (b) serve the memory build via the PyTorch path while GGUF ships memory-free; (c) upstream a `ggml_pkm_lookup` op. Gate: ablation A8 must justify the effort first |
+
+### R19 — RAM-tier retrieval latency exceeds decode budget (E1)
+
+| | |
+|---|---|
+| Risk | Value rows live in system RAM; per-token fetch (~32 rows × 1792 × 1 B ≈ 57 KB + key scoring) could stall decode if PCIe/driver path is slow |
+| First detected at | P9b latency probe |
+| Severity | Low-medium |
+| Probability | Low — traffic is ~100× smaller than MoE expert streaming, which llama.cpp already does from RAM |
+| Mitigation | Pin value table in page-locked memory; overlap lookup with the next layer's compute (retrieval depends only on the mount unit's output). Kill condition in [EDGES.md](EDGES.md): > 15 % decode overhead → ship without memory |
+
 ### R10 — Ternary Bonsai license restriction on shared expert
 
 | | |
@@ -211,5 +231,7 @@ Any one of these is acceptable. A combination of (1) + (4) is the *typical* expe
 | R15 | Bench drift | P11 | L × M | mitigated by re-baselining |
 | R16 | Bandwidth | any | M × M | open |
 | R17 | Hardware loss | any | L × C | mitigated by HF mirrors |
+| R18 | Memory-tier GGML op (E1) | P9b | M × M | open — gated behind ablation A8 |
+| R19 | Memory-tier RAM latency (E1) | P9b | L × M | open — kill condition defined |
 
 `P × S` = probability × severity. L=low, M=medium, H=high, C=critical.

@@ -27,6 +27,7 @@ from torch import Tensor, nn
 from .hrm_core import HRMOutput, HRMRepeatUnit
 from .mamba3_block import build_l_mixer
 from .mote_ffn import MoTEFFN
+from .pkm_memory import ProductKeyMemory
 
 
 @dataclass
@@ -60,6 +61,14 @@ class V3Config:
     detach_between_segments: bool = True
     restart_confidence_threshold: float = 0.35
     restart_perturbation_std: float = 0.02
+    # Product-key memory tier (E1, docs/v3/EDGES.md) — RAM-resident capacity.
+    # One shared pool, mounted as a residual branch on the listed units.
+    use_memory: bool = False
+    memory_num_keys: int = 1024            # slots = num_keys^2 (~1.05M)
+    memory_key_dim: int = 256
+    memory_topk: int = 32
+    memory_heads: int = 2
+    memory_units: tuple[int, ...] = (1, 4)
 
     @classmethod
     def tiny(cls) -> V3Config:
@@ -114,6 +123,18 @@ class V3Config:
             detach_between_segments=hrm["deep_supervision"]["detach_between_segments"],
             restart_confidence_threshold=hrm["latent_restart"]["confidence_threshold"],
             restart_perturbation_std=hrm["latent_restart"]["perturbation_std"],
+            **(
+                {
+                    "use_memory": True,
+                    "memory_num_keys": mem["num_keys"],
+                    "memory_key_dim": mem["key_dim"],
+                    "memory_topk": mem["topk"],
+                    "memory_heads": mem["num_heads"],
+                    "memory_units": tuple(mem["mount_units"]),
+                }
+                if (mem := raw.get("memory_layer", {})).get("enabled", False)
+                else {}
+            ),
         )
 
 
@@ -257,7 +278,21 @@ class AVAv3ForCausalLM(nn.Module):
             for _ in range(cfg.num_repeats)
         )
         self.final_norm = nn.RMSNorm(cfg.hidden_size, eps=cfg.rms_norm_eps)
+        # E1: one shared product-key memory pool, mounted on cfg.memory_units.
+        self.memory: ProductKeyMemory | None = (
+            ProductKeyMemory(
+                cfg.hidden_size,
+                num_keys=cfg.memory_num_keys,
+                key_dim=cfg.memory_key_dim,
+                topk=cfg.memory_topk,
+                num_heads=cfg.memory_heads,
+            )
+            if cfg.use_memory
+            else None
+        )
         self.apply(self._init_weights)
+        if self.memory is not None:
+            self.memory.reset_parameters()  # restore zero-init out_proj after apply()
 
     @staticmethod
     def _init_weights(module: nn.Module) -> None:
@@ -275,12 +310,14 @@ class AVAv3ForCausalLM(nn.Module):
         cos, sin = self.rotary(input_ids.shape[1], input_ids.device)
 
         unit_outputs: list[HRMOutput] = []
-        for unit in self.units:
+        for i, unit in enumerate(self.units):
             # cond = unit input: re-injected at every L-iteration so the
             # refinement loop stays anchored (HRM input-injection convention).
             h, hrm_out = unit(
                 h, cond=h, reasoning_budget=reasoning_budget, cos=cos, sin=sin
             )
+            if self.memory is not None and i in self.cfg.memory_units:
+                h = h + self.memory(h)
             unit_outputs.append(hrm_out)
 
         logits = F.linear(self.final_norm(h), self.embed_tokens.weight)  # tied head
@@ -315,16 +352,19 @@ def count_full_size_params(cfg: V3Config | None = None) -> dict[str, Any]:
         model = AVAv3ForCausalLM(cfg)
     total = model.num_parameters()
     embed = model.embed_tokens.weight.numel()
-    routed = shared = 0
+    routed = shared = memory = 0
     for name, p in model.named_parameters():
         if ".experts." in name:
             routed += p.numel()
         elif ".shared_expert." in name:
             shared += p.numel()
+        elif name.startswith("memory."):
+            memory += p.numel()
     return {
         "total": total,
         "embedding_tied": embed,
         "routed_experts": routed,
         "shared_experts": shared,
-        "other": total - embed - routed - shared,
+        "memory_ram_tier": memory,
+        "other": total - embed - routed - shared - memory,
     }

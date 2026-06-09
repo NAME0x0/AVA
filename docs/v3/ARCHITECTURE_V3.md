@@ -2,6 +2,12 @@
 
 > **Companions:** [HRM_TEXT.md](HRM_TEXT.md) · [SUBQUADRATIC.md](SUBQUADRATIC.md) · [PRISMML.md](PRISMML.md). This document specifies the block diagram, dimensions, and memory math. Each cited mechanism is explained in detail in the companion file.
 
+> **June 2026 addition:** the architecture below is extended by the edge portfolio in
+> [EDGES.md](EDGES.md) — RAM-tier product-key memory (E1), latent-superposition
+> reasoning curriculum (E2), halting-coupled speculative decoding (E3), and an NSA
+> long-context option (E4). E1 is implemented in `engine/pkm_memory.py` and appears
+> in the parameter table below.
+
 The v3 student is a single network that wears three hats at once:
 
 1. A **ternary MoE student** distilled from the Qwen 3.6 35B-A3B MoE teacher (already established in [`experiments/exp6_v3/DESIGN.md`](../../experiments/exp6_v3/DESIGN.md)).
@@ -88,9 +94,16 @@ Parameter count (active + total):
 | Embedding + LM head (tied) | Q8_0 at export (BF16 in training) | — | 445 M | 0.47 GB |
 | RMSNorm + biases | BF16 | — | ~5 M | 10 MB |
 | **Total (storage, TQ1_0 build)** | | | **~3.26 B** | **~1.70 GB** |
+| **Product-key memory tier (E1)** — values + keys, **system-RAM resident** | Q8 in RAM | shared pool | **~1.89 B** | **0 GB VRAM** (~1.9 GB RAM) |
 | KV cache (TurboQuant K4/V2, 32 K ctx) | mixed | — | — | ~0.7 GB |
 | Activations + workspace | BF16 | — | — | ~0.9 GB |
 | **GPU resident at 32 K context** | | | | **~3.3 GB ✅** |
+
+The memory tier (see [EDGES.md](EDGES.md) E1) raises total parameters to **~5.1 B**
+while leaving VRAM untouched: per token the GPU receives only the k = 32 retrieved
+value rows (a few hundred KB of traffic). The value table scales independently —
+1 M slots at launch, 16 M-slot SSD growth path — making factual capacity the first
+v3 axis that is unbounded by the 4 GB ceiling.
 
 The 4 GB ceiling is met with ~0.7 GB headroom for OS + driver overhead. The TQ2_0 speed build adds ~0.10 GB on the expert tensors (still ≤ 3.4 GB resident). If PrismML's `BB1_0` lands upstream, the routed experts drop a further ~0.30 GB (stretch lane).
 

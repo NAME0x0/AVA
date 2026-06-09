@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from engine import (  # noqa: E402
     AVAv3ForCausalLM,
     MoTEFFN,
+    ProductKeyMemory,
     ReferenceMamba3Mixer,
     TernaryLinear,
     V3Config,
@@ -116,6 +117,47 @@ def test_adaptive_mode_runs_and_reports_steps() -> None:
     with torch.no_grad():
         out = model(ids, reasoning_budget="adaptive")
     assert all(1 <= u.steps_used <= cfg.max_l_steps for u in out.unit_outputs)
+
+
+def test_pkm_memory_forward_and_sparse_grad() -> None:
+    mem = ProductKeyMemory(hidden_size=64, num_keys=16, key_dim=16, topk=4, num_heads=1)
+    x = torch.randn(2, 8, 64, requires_grad=True)
+    out = mem(x)
+    assert out.shape == x.shape
+    # Zero-init out_proj: memory branch is a no-op at step 0.
+    assert out.abs().max().item() == 0.0
+    out.sum().backward()
+    assert x.grad is not None
+    # Sparse touch: only retrieved value rows receive gradient.
+    grad_rows = (mem.values.weight.grad.abs().sum(dim=-1) > 0).sum().item()
+    assert grad_rows <= 2 * 8 * 4  # tokens x topk upper bound
+    assert mem.keys.grad is not None and torch.isfinite(mem.keys.grad).all()
+
+
+def test_memory_build_forward_tiny() -> None:
+    cfg = V3Config.tiny()
+    cfg.use_memory = True
+    cfg.memory_num_keys = 16
+    cfg.memory_key_dim = 16
+    cfg.memory_topk = 4
+    cfg.memory_heads = 1
+    cfg.memory_units = (0, 1)
+    model = AVAv3ForCausalLM(cfg).train()
+    ids = torch.randint(0, cfg.vocab_size, (2, 8))
+    out = model(ids, labels=ids)
+    assert out.loss is not None and torch.isfinite(out.loss)
+    out.loss.backward()
+    assert model.memory is not None
+    assert model.memory.values.weight.grad is not None
+
+
+def test_memory_build_param_budget() -> None:
+    cfg = V3Config()
+    cfg.use_memory = True
+    sizes = count_full_size_params(cfg)
+    # EDGES.md E1: ~1.9B RAM-tier parameters on top of the ~3.24B core.
+    assert sizes["memory_ram_tier"] / 1e9 == pytest.approx(1.89, abs=0.1)
+    assert (sizes["total"] - sizes["memory_ram_tier"]) / 1e9 == pytest.approx(3.24, abs=0.1)
 
 
 def test_full_size_parameter_budget() -> None:
