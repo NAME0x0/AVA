@@ -1,12 +1,12 @@
 # AVA v3 — Design Document
 
-**Status:** Planning, May 2026 (revised to incorporate HRM-Text / Mamba-3 / PrismML pillars).
+**Status:** P2 implementation, June 2026 (engine modules + smoke tests landed; June revision: refinement-first HRM per ARC Prize / arXiv:2601.10679, group-256 ternary → stock TQ1_0/TQ2_0 export).
 **Goal:** Build a SOTA-class assistant on a 4 GB VRAM laptop by combining
 (1) a Qwen 3.6 35B-A3B MoE teacher → ternary student distillation,
 (2) **HRM-Text-style dual-recurrent reasoning** (H-module + L-module + halting head, latent multi-step inference, no emitted CoT tokens),
 (3) **Mamba-3 (MIMO, complex SSM) in a 3 : 1 hybrid** with gated softmax attention for subquadratic decode + long context,
 (4) **MoTE-pattern ternary FFN experts** with BF16 router and BF16 → ternary shared expert,
-(5) **PrismML Bonsai-style packed storage** (1.125 bpw routed + 1.58 bpw shared) for the GGUF artifact,
+(5) **sub-2-bpw packed storage** — group-256 ternary QAT exported to stock upstream llama.cpp `TQ1_0`/`TQ2_0` (PrismML Bonsai is the existence proof, not a dependency),
 (6) MCP-based tool use via constrained decoding + targeted "when NOT to call" SFT,
 (7) frontier-distilled CoT corpus.
 
@@ -28,11 +28,11 @@ This document supersedes the AVA v3 plan in `plans/linked-growing-mccarthy.md` (
 | **Reasoning** | **HRM-Text dual recurrence** — H-module (slow planner, softmax + MoE) + L-module (fast computer, Mamba-3 + MoE), per-token halting (max 6 L-steps, mean ~2.5) | Latent multi-step reasoning in one forward pass; closes v2 MATH/GSM8K gap. Source: Sapient HRM-Text, arXiv:2506.21734, April 2026 numbers MMLU 60.7 / MATH 56.2 |
 | **Subquadratic attention** | **Mamba-3 (MIMO, complex SSM)** in **3 : 1 hybrid** with Gated Attention; YaRN to 256 K → 1 M | +1.8 pp over Gated DeltaNet at 1.5 B; half the state size of Mamba-2 (ICLR 2026, arXiv:2603.15569). Gated DeltaNet kept as fallback if Mamba-3 kernel ships late |
 | Quantization | MoTE pattern: ternary routed FFN experts + BF16 router + ternary (1.58-bit) shared expert | Best published 1-bit + MoE combination; saves ~5 GB on the CPU-resident set vs BF16 shared |
-| **Storage / packing** | **PrismML BB1_0 (1.125 bpw routed) + TQ1_0 (1.58 bpw shared)**, FP16 group scales of 128 | Kernels upstream in `llama.cpp` head + Apple MLX; gives up-to-8× FP16 decode throughput. Source: PrismML Bonsai (Mar 2026) + Ternary Bonsai (Apr 2026) |
+| **Storage / packing** | **Stock upstream `TQ1_0` (1.6875 bpw) / `TQ2_0` (2.0625 bpw)**, FP16 group scales of 256 baked into QAT; Q8_0 embeddings | Zero fork dependency (June 2026: PrismML BB1_0 confirmed fork-only, group-128 incompatible — see `docs/v3/PRISMML.md`). PrismML demonstrated up-to-8× FP16 decode at sub-2 bpw |
 | Training method | BitDistiller 3-stage QAT + distillation from Qwen 3.6 35B-A3B teacher + HRM halting curriculum (ACT ponder loss) | PTQ to 1-bit fails catastrophically; QAT-from-scratch needs trillions of tokens; HRM curriculum is added in Stage 2a |
 | Corpus | SYNTHETIC-1 + Bespoke-Stratos-17k + Tulu-3 + Opus-4.7 distill + OpenMathInstruct-2 + Hermes-FC + Skywork-Reward | ~755 K SFT + 75 K DPO, all Apache-2.0 / MIT |
 | Tool use | TOOLS.md + FastMCP 3.0 server + XGrammar constrained decoding + small discrimination SFT (300 examples) | BFCL evidence: prompting + constraints beats heavy FT for small models |
-| Inference | llama.cpp head build (BB1_0 + TQ1_0 kernels merged; MCP client merged Mar 2026) + llama-server | Reuses Exp4-eval infrastructure; native MCP loop; PrismML packed kernels |
+| Inference | **Stock** llama.cpp (TQ1_0/TQ2_0 kernels upstream since 2024; MCP client merged Mar 2026) + llama-server | Reuses Exp4-eval infrastructure; native MCP loop; no fork pin |
 | Evaluation | BFCL v3 Prompt-mode, MCP-Bench, Tau-Bench, full Exp4-v2 17-bench suite, RULER long-context | Regression-gated CI; strict dominance over v2 |
 
 ---
@@ -309,16 +309,20 @@ Reuse Exp4 eval-v2 runner; add new benchmarks. CI gates on every checkpoint:
 ## 8. Roadmap (numbered phases)
 
 ```
-P0  Skeleton + design doc (this PR)
+P0  Skeleton + design doc — DONE (May 2026)
 P1  Pull Qwen 3.6 27B + 35B-A3B weights, register HF tokenizer + chat template
-P2  Implement student architecture in src/ava/v3/ (Mamba-3 / FLA, MoTE-FFN, SubLN, HRM halting head)
+P2  Implement student architecture — IN PROGRESS (June 2026): engine/ modules landed
+    (TernaryLinear group-256 QAT, MoTEFFN, Mamba-3 reference + FLA wrapper, HRM
+    refinement recurrence w/ convergence-aware halting, AVAv3ForCausalLM, 8 smoke
+    tests passing, 3.24 B params verified on meta device). Next: sparse-upcycle init
+    from teacher + FLA kernel wiring on CUDA
 P3  Stage 1 BF16 warmup pipeline (LoRA + CPU optim, 2-3 B tokens, CE only)
 P4  Stage 2a HRM halting curriculum — train L-loop + halting head with ACT ponder loss (1-1.5 B tokens)
 P5  Stage 2b ternary QAT + teacher distillation harness (5-8 B tokens, rented A100s)
 P6  Stage 3a SFT on the curated mix (LoRA-only on routed; full FT on shared + router)
 P7  Stage 3b DPO alignment on Skywork + UltraFeedback + SYNTHETIC-1-DPO
 P8  Stage 3c tool-discrimination SFT (300-example "when NOT to call" set)
-P9  Stage 4 PrismML packing — export GGUF with BB1_0 routed + TQ1_0 shared
+P9  Stage 4 ternary packing — export stock-llama.cpp GGUF (TQ1_0 + TQ2_0, Q8_0 embed)
 P10 MCP wiring — FastMCP 3.0 + XGrammar constrained decoding + sandboxed tools
 P11 Full eval — 17-bench v2 suite + BFCL v3 + MCP-Bench + RULER + LongBench v2
 P12 Public release — HF model card, GGUF artifacts, README update, blog post

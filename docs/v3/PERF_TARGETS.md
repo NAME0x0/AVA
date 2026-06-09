@@ -2,7 +2,7 @@
 
 Single source of truth for v3 pass/fail. Every target below must be hit at release time, evaluated under the exact conditions listed. If any single row fails, **v3 does not ship**. v2 numbers are from [`docs/RESULTS.md`](../RESULTS.md). Mechanism column links the v3 component that delivers the gain.
 
-All v3 numbers are evaluated on the **packed GGUF (BB1_0 routed + TQ1_0 shared)**, served by `llama-server` head, on the laptop, with `reasoning_budget="auto"` unless the row specifies otherwise.
+All v3 numbers are evaluated on the **packed GGUF (TQ1_0 ternary build, Q8_0 embeddings)**, served by **stock** `llama-server`, on the laptop, with `reasoning_budget="auto"` unless the row specifies otherwise.
 
 ---
 
@@ -69,13 +69,13 @@ Evaluated on **RTX A2000 Laptop 4 GB VRAM**, `llama-server` head with FlashAttn 
 
 | Metric | v2 (Q8_0) | v3 target | Mechanism |
 |---|---:|---:|---|
-| Decode tok/s @ `reasoning_budget=1`, 2 K ctx | ~50 | **≥ 50** | Mamba-3 linear decode + PrismML kernels |
+| Decode tok/s @ `reasoning_budget=1`, 2 K ctx | ~50 | **≥ 50** | Mamba-3 linear decode + TQ2_0 2-bit-aligned kernels |
 | Decode tok/s @ `reasoning_budget=auto` (mean 2.5), 2 K ctx | n/a | **≥ 30** | Same |
 | Decode tok/s @ `reasoning_budget=6`, 2 K ctx | n/a | **≥ 12** | Same |
 | Decode tok/s @ 32 K ctx, `auto` | n/a | **≥ 20** | Subquadratic dominates |
 | Prefill tok/s @ 32 K ctx | n/a | **≥ 800** | Chunked Mamba-3 prefill |
-| Resident GPU memory @ 8 K ctx | ~1.4 GB | **≤ 2.5 GB** | 1.125 bpw routed |
-| Resident GPU memory @ 32 K ctx | n/a | **≤ 3.5 GB** | Q4/Q2 KV cache |
+| Resident GPU memory @ 8 K ctx | ~1.4 GB | **≤ 2.5 GB** | 1.6875 bpw experts + Q8_0 embeddings |
+| Resident GPU memory @ 32 K ctx | n/a | **≤ 3.5 GB** (expected ~3.3) | Q4/Q2 KV cache |
 | Resident GPU memory @ 256 K ctx (YaRN) | n/a | **≤ 4.0 GB** (right at the edge) | KV streaming |
 | Wall-clock for v3 full eval suite | ~6 h on laptop | **≤ 8 h on laptop** | More benchmarks, faster per-token |
 
@@ -93,7 +93,7 @@ Tests that the BF16-trained student survives the packing step.
 | MATH-500 | (measured at P8) | **≤ 2.0 pp drop** |
 | Halting head behavior | (mean L-steps ≈ 2.5) | **mean L-steps within ± 0.3** |
 
-If MMLU drops > 1.5 pp under packing, downgrade routed weights from BB1_0 (1-bit) to TQ1_0 (1.58-bit). See [PRISMML.md](PRISMML.md) §2 fallback.
+If MMLU drops > 1.5 pp under TQ1_0 packing, ship the TQ2_0 build only (smaller kernel rounding differences) and file the delta in release notes. See [PRISMML.md](PRISMML.md) §5.
 
 ---
 

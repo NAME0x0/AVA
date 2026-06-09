@@ -8,7 +8,7 @@ The v3 student is a single network that wears three hats at once:
 2. A **HRM-style dual-recurrent reasoner**: the top half of each block is a "high-level" planner that runs slowly, the bottom half is a "low-level" computer that runs at every micro-step inside the same forward pass.
 3. A **Mamba-3 / Gated DeltaNet hybrid** for subquadratic context handling, deployed in a **3:1 ratio** with a gated softmax-attention layer.
 
-The packed binary for serving is produced by **PrismML-style packing** (1.125 bpw routed expert weights + Ternary Bonsai 1.58-bit for the shared expert), exported to GGUF with a custom `TQ1_0` quant type already targeted in v3 P9.
+The packed binary for serving uses **stock upstream GGUF ternary types** — `TQ1_0` (1.6875 bpw, smallest) and `TQ2_0` (2.0625 bpw, fastest) with group-256 scales baked into QAT — so the release runs on unmodified `llama.cpp`. PrismML's fork-only 1.125 bpw `BB1_0` is a stretch lane, adopted only if their upstream PR lands (June 2026 status check — see [PRISMML.md](PRISMML.md)).
 
 ---
 
@@ -47,7 +47,7 @@ The packed binary for serving is produced by **PrismML-style packing** (1.125 bp
                                   RMSNorm → LM head (BF16, tied)
 ```
 
-24 blocks total. Inside each block the H-module is conventional (one attention sublayer + one MoE FFN). The L-module is the new piece: a Mamba-3 sublayer + MoE FFN, **conditioned on the latest H-output**, that is allowed to fire 2–6 times before the next H-step. Halting is decided by a per-token sigmoid head with a fixed compute budget (max 6 L-steps).
+24 blocks total. Inside each block the H-module is conventional (one attention sublayer + one MoE FFN). The L-module is the new piece: a Mamba-3 sublayer + MoE FFN, **conditioned on the latest H-output**, that is allowed to fire 2–6 times before the next H-step. Halting is decided by a per-token **convergence-aware** sigmoid head — input `[z_L ; z_H ; ‖z_L − z_L_prev‖]`, so the head sees the fixed-point residual — with a hard budget of 6 L-steps and an optional perturbed-restart escape in adaptive mode (June 2026 revision; rationale in [HRM_TEXT.md](HRM_TEXT.md) §1b).
 
 This gives v3 the property that motivated HRM-Text: **latent multi-step reasoning inside a single forward pass, with no chain-of-thought tokens emitted.** The model still emits a normal token stream — the recurrence is invisible to the inference API.
 
@@ -80,19 +80,19 @@ Parameter count (active + total):
 
 | Component | Quant | Per-layer | Total (24 layers) | Footprint |
 |---|---|---|---|---|
-| Routed experts (32 × 2 × 1792 × 768) | 1.125 bpw (PrismML) | 88.0 M params | 2.11 B params | **0.30 GB** |
-| Shared expert (2 × 1792 × 4096) | 1.58 bpw (Ternary Bonsai) | 14.7 M params | 0.35 B params | **0.07 GB** |
+| Routed experts (32 × 2 × 1792 × 768) | TQ1_0, 1.6875 bpw (group 256) | 88.0 M params | 2.11 B params | **0.45 GB** |
+| Shared expert (2 × 1792 × 4096) | TQ1_0, 1.6875 bpw (group 256) | 14.7 M params | 0.35 B params | **0.07 GB** |
 | Router (32 × 1792) | BF16 | 0.06 M | 1.4 M | 3 MB |
 | Attention Q/K/V/O (H-blocks, 6 of 24) | BF16 | 13.5 M | 81 M | 0.16 GB |
 | Mamba-3 projections (L-blocks, 18 of 24) | BF16 | 14.8 M | 266 M | 0.53 GB |
-| Embedding + LM head (tied) | BF16 | — | 445 M | 0.89 GB |
+| Embedding + LM head (tied) | Q8_0 at export (BF16 in training) | — | 445 M | 0.47 GB |
 | RMSNorm + biases | BF16 | — | ~5 M | 10 MB |
-| **Total (storage)** | | | **~3.26 B** | **~1.96 GB** |
+| **Total (storage, TQ1_0 build)** | | | **~3.26 B** | **~1.70 GB** |
 | KV cache (TurboQuant K4/V2, 32 K ctx) | mixed | — | — | ~0.7 GB |
 | Activations + workspace | BF16 | — | — | ~0.9 GB |
-| **GPU resident at 32 K context** | | | | **~3.5 GB ✅** |
+| **GPU resident at 32 K context** | | | | **~3.3 GB ✅** |
 
-The 4 GB ceiling is met with ~0.5 GB headroom for the OS + driver overhead.
+The 4 GB ceiling is met with ~0.7 GB headroom for OS + driver overhead. The TQ2_0 speed build adds ~0.10 GB on the expert tensors (still ≤ 3.4 GB resident). If PrismML's `BB1_0` lands upstream, the routed experts drop a further ~0.30 GB (stretch lane).
 
 For comparison: AVA v2 at Q8_0 GGUF takes ~1.4 GB at 8 K context with no MoE and no Mamba state. v3 has **~13× more parameters per VRAM** (3.26 B vs 1.89 B Qwen 3.5 base × 0.5 quant savings) while staying inside the same 4 GB envelope.
 
@@ -110,8 +110,8 @@ The architecture below answers the v2 failure modes from [`V2_GAP_ANALYSIS.md`](
 | Multilingual MGSM degradation | Larger active capacity (~1.4 B active vs 1.89 B all-active) + Qwen 3.6 tokenizer |
 | HellaSwag 56.8 % below peers | Distilled from 35 B teacher; more capacity + balanced SFT mix |
 | Long context untrained | Native 32 K + YaRN to 256 K; Mamba-3 subquadratic decode |
-| Throughput ceiling | Mamba-3 linear decode + PrismML packed kernels (up to 8× FP16 speedup per PrismML) |
-| Memory ceiling | 1.125 bpw routed experts + Q4/Q2 KV cache |
+| Throughput ceiling | Mamba-3 linear decode + stock TQ2_0 2-bit-aligned kernels (PrismML demonstrated up to 8× FP16 at sub-2 bpw) |
+| Memory ceiling | 1.6875 bpw packed experts + Q8_0 embeddings + Q4/Q2 KV cache |
 
 ---
 
@@ -125,10 +125,10 @@ The original v3 design in [`experiments/exp6_v3/DESIGN.md`](../../experiments/ex
 | Subquadratic layer | Gated DeltaNet | Mamba-3 (MIMO) | +1.8 pp at 1.5 B (ICLR 2026 result) |
 | FFN inside L-block | Same MoE | Same MoE | Unchanged |
 | Recurrence | None | H/L dual loop with halting | HRM-Text architecture |
-| Routed expert packing | ternary BF16 weights | 1.125 bpw packed (PrismML) | Smaller GGUF, faster kernels |
+| Routed expert packing | ternary BF16 weights | TQ1_0 1.6875 bpw, group 256 (BB1_0 1.125 bpw stretch) | Stock llama.cpp kernels, no fork dependency |
 | KV cache | TurboQuant K4/V2 | TurboQuant K4/V2 | Unchanged |
 | Routing | top-4/32 | top-4/32 | Unchanged |
-| Shared expert | 1 BF16 | 1 Ternary Bonsai (1.58 bpw) | Saves ~5 GB on CPU resident set |
+| Shared expert | 1 BF16 | 1 ternary TQ1_0 (1.6875 bpw) | Saves ~5 GB on CPU resident set |
 | Tokenizer | Qwen 3.6 | Qwen 3.6 | Unchanged |
 
 All other choices (BitDistiller 3-stage, teacher = Qwen 3.6 35B-A3B, FLA kernel toolkit, MCP tool stack) are inherited unchanged.
@@ -141,6 +141,7 @@ The architecture above maps to one extra training requirement on top of the v3 p
 
 - **Halting curriculum.** The L-module halting sigmoid is trained with ACT-style ponder loss (mean target = 2.5 L-steps/token, max 6). This is bolted onto Stage 2 of BitDistiller.
 - **Mamba-3 stability tricks.** Complex-valued state at BF16 needs careful init; reuse the recipe in the Mamba-3 paper (5.1 of the ICLR 2026 PDF).
-- **PrismML packer.** Stage 4 (export) adds a new packing pass that produces the 1.125-bpw layout and emits a custom `TQ1_0_GROUP128` GGUF variant. Patch needed in our llama.cpp head build (PR template in [PRISMML.md](PRISMML.md)).
+- **Ternary packer.** Stage 4 (export) packs experts to stock `TQ1_0`/`TQ2_0` (group 256 — the same grouping the QAT forward used), embeddings to Q8_0. No llama.cpp patch needed (June 2026 revision — see [PRISMML.md](PRISMML.md) §2).
+- **Halting curriculum addition (June 2026).** Deep supervision on intermediate L-iterates (2/4/final, weights 0.2/0.3/0.5) + convergence-aware halting inputs — see [HRM_TEXT.md](HRM_TEXT.md) §1b.
 
 Full pipeline in [RECIPE.md](RECIPE.md).

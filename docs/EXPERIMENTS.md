@@ -89,12 +89,12 @@ The repo keeps every branch. Closed branches stay so the failure modes remain vi
 - **Student**: ~3.26B ternary MoE — ternary routed FFN experts + BF16 router + ternary shared expert (the "MoTE" pattern, with PrismML-packed storage).
 - **Reasoning**: **HRM-Text dual recurrence** — per-block H-module (slow planner) + L-module (fast computer, up to 6 iterations) + halting head. Latent multi-step reasoning in one forward pass, no CoT tokens emitted. Source: Sapient HRM-Text (arXiv:2506.21734, May 2026).
 - **Attention**: **Mamba-3 (MIMO, complex SSM) in 3 : 1 hybrid** with gated softmax attention. +1.8 pp over Gated DeltaNet at 1.5 B; half the state size of Mamba-2 (ICLR 2026, arXiv:2603.15569). Gated DeltaNet kept as fallback.
-- **Storage**: **PrismML BB1_0 (1.125 bpw)** routed expert weights + **TQ1_0 (1.58 bpw)** shared expert. Kernels merged into `llama.cpp` head + Apple MLX (PrismML Bonsai / Ternary Bonsai, Mar–Apr 2026).
+- **Storage**: ternary experts trained with **group-256 QAT**, exported to **stock upstream llama.cpp `TQ1_0` (1.6875 bpw) / `TQ2_0` (2.0625 bpw)** + Q8_0 embeddings — zero fork dependency. PrismML Bonsai (Mar–Apr 2026) is the existence proof for sub-2-bpw quality; its `BB1_0` format stays a stretch lane until upstreamed.
 - **Distillation**: BitDistiller 3-stage QAT — BF16 warmup → HRM halting curriculum (ACT ponder loss) → ternary QAT distillation from teacher logits.
 - **Tools**: MCP-based via FastMCP 3.0 + XGrammar constrained decoding. The model learns to call external tools through a protocol, not by memorizing JSON syntax inside SFT.
 - **Post-training**: SFT then DPO then tool-discrimination SFT (300 "when NOT to call" examples).
 
-**Status**: P0 (scaffolding) — design doc, configs, engine stubs, MCP catalog, scripts in place. P1-P12 (teacher → student init → BF16 warmup → HRM halting curriculum → ternary QAT distillation → SFT / DPO / tool-SFT → PrismML packing → MCP wiring → full eval → release) are queued.
+**Status**: P2 (student implementation) — design doc, configs, MCP catalog in place; engine modules **implemented June 2026** (group-256 ternary QAT linear, MoTE FFN, Mamba-3 reference mixer + FLA wrapper, HRM refinement recurrence with convergence-aware halting and latent-restart escape, full 3.24 B-param `AVAv3ForCausalLM` assembly, 8 passing CPU smoke tests). P1 (teacher fetch) and the rest of P2 (sparse-upcycle init) next; P3-P12 (BF16 warmup → HRM halting curriculum → ternary QAT distillation → SFT / DPO / tool-SFT → TQ packing → MCP wiring → full eval → release) queued.
 
 **Files**: `experiments/exp6_v3/DESIGN.md`, `experiments/exp6_v3/README.md`, `experiments/exp6_v3/configs/`, `experiments/exp6_v3/engine/`, `experiments/exp6_v3/mcp/`, and the full v3 doc set under [`docs/v3/`](v3/INDEX.md).
 

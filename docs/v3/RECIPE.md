@@ -74,7 +74,7 @@ End-to-end pipeline for AVA v3, phase by phase. Each phase has: inputs, outputs,
 | | |
 |---|---|
 | Inputs | P4 student |
-| Outputs | Ternary-aware student; routed experts at fake-quant 1.58-bit; shared expert at fake-quant 1.58-bit |
+| Outputs | Ternary-aware student; routed + shared experts at fake-quant ternary with **group-256 scales** (bit-exact with the TQ1_0/TQ2_0 export — see [PRISMML.md](PRISMML.md) §2) |
 | Loss | `0.5·CE + 0.3·KL(teacher_logits || student_logits) + 0.15·MiniLM_attn_distill + 0.05·ponder_loss` |
 | Token budget | **5–8 B** |
 | Sequence length | 4 096 (shorter than P3/P4 to fit batched teacher logits) |
@@ -127,12 +127,12 @@ End-to-end pipeline for AVA v3, phase by phase. Each phase has: inputs, outputs,
 | | |
 |---|---|
 | Inputs | P8 BF16 student (ternary-aware but still float storage) |
-| Outputs | GGUF binary with `BB1_0` routed expert tensors + `TQ1_0` shared expert tensors |
+| Outputs | Two GGUF builds from one checkpoint: `TQ1_0` (smallest) and `TQ2_0` (fastest) expert tensors, Q8_0 embeddings — stock llama.cpp formats |
 | Token budget | 0 (post-train) |
 | Hardware | Laptop CPU pack; no training |
 | Gate | Round-trip dequant matches BF16 within rounding; MMLU non-regression ≤ 1.5 pp vs BF16; resident GPU mem ≤ 3.6 GB |
 | Script | `experiments/exp6_v3/scripts/export_gguf.py` |
-| Risks | `llama.cpp` BB1_0 kernel availability — needs PR confirmed merged before P9 |
+| Risks | None on kernel availability (TQ1_0/TQ2_0 upstream since 2024 — R8 closed June 2026). Residual risk: TQ1_0 kernel rounding vs QAT fake-quant; gate covers it |
 
 ## P10 — MCP wiring
 
@@ -217,4 +217,4 @@ See [RISKS.md](RISKS.md) for the full version.
 | P3 | Mamba-3 instability at BF16 | Use Mamba-3 paper §5.1 init + low LR for first 5 % of phase |
 | P4 | Ponder collapse | Clip ponder loss; clamp budget; freeze halting head if MATH-500 regresses |
 | P5 | Ternary MoE quality cliff | Fallback: keep routed at BF16, only shared at ternary |
-| P9 | BB1_0 kernel not in llama.cpp head | Fallback: pack everything as TQ1_0 (1.58-bit), accept ~0.4 GB more storage |
+| P9 | TQ1_0 kernel rounding vs QAT fake-quant | Round-trip test in export script; ship TQ2_0-only if MMLU drops > 1.5 pp (kernel availability risk closed June 2026 — R8) |

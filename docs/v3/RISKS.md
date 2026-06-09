@@ -84,24 +84,22 @@ The rows are ordered by **stage at which the risk first manifests** — earliest
 
 ## 3. Deployment risks (manifest by P9)
 
-### R8 — `llama.cpp` BB1_0 kernel not in head build
+### R8 — PrismML kernels not upstream (CONFIRMED 9 June 2026 → design pivoted, risk closed)
 
 | | |
 |---|---|
-| Risk | PrismML's BB1_0 (1-bit) kernel was merged in March–April 2026, but if our llama.cpp head pin gets reverted or the kernel is replaced, the export breaks |
-| First detected at | P9 — kernel symbol missing at link time |
-| Severity | Low-medium — affects packed footprint, not training |
-| Probability | Low |
-| Mitigation | Pack all routed expert weights as TQ1_0 (1.58-bit) instead of BB1_0 (1.125-bit). Routed expert storage rises from 0.30 GB to 0.42 GB. Total still ≤ 2.1 GB, well under target |
+| Risk | Original plan assumed BB1_0 was merged into llama.cpp head. June 2026 verification: Bonsai kernels live only in the `PrismML-Eng/llama.cpp` fork (`prism` branch); upstream PRs pending. Worse, Bonsai uses group-128 scales while upstream `TQ1_0`/`TQ2_0` use group-256 — formats not interchangeable (llama.cpp discussion #22019) |
+| First detected at | Pre-P2 research check (this revision) — caught before any code depended on it |
+| Severity | Was low-medium; now none |
+| Probability | Materialized |
+| Resolution | **Pivot, not fallback**: QAT now trains with group-256 scales natively, so the checkpoint exports to stock upstream `TQ1_0` (1.6875 bpw) / `TQ2_0` (2.0625 bpw) with zero fork dependency. Routed expert storage 0.45 GB; total packed ~1.70 GB with Q8_0 embeddings; resident ~3.3 GB. BB1_0 demoted to opportunistic stretch (−0.30 GB) if PrismML's upstream PR lands before P9. See [PRISMML.md](PRISMML.md) §2 |
 
 ### R9 — Mamba-3 kernel not in FLA toolkit
 
 | | |
 |---|---|
 | Risk | Mamba-3 PR in `fla-org/flash-linear-attention` may not land before we need P3 |
-| First detected at | P3 setup |
-| Severity | Medium |
-| Mitigation | Fall back to Gated DeltaNet (already shipped in FLA). Lose Mamba-3's +1.8 pp gain. Architecture unchanged otherwise |
+| Status | **Closed (June 2026):** `fla.layers.mamba3` merged into FLA in April 2026 and verified present at head. Gated DeltaNet remains the config-flip fallback only for stability issues (R2), not availability |
 
 ### R10 — Ternary Bonsai license restriction on shared expert
 
@@ -185,7 +183,7 @@ If multiple risks trigger, the v3 "minimum viable" path is:
 1. **First fallback** — drop HRM L-loop (R1 fails). v3 still has Mamba-3 + ternary MoE + MCP tools. Loses MATH headline but every v2 row still passes.
 2. **Second fallback** — drop Mamba-3 (R2 fails), use Gated DeltaNet. Loses long-context-decode-throughput edge. Still has HRM + MoE + MCP.
 3. **Third fallback** — drop MoE (R4 critical fail), ship as dense 1.8 B ternary student. v3 still beats v2 on math/code via HRM + distillation. Loses the "13× capacity per VRAM" headline.
-4. **Fourth fallback** — drop PrismML 1-bit (R8), use TQ1_0 everywhere. Storage rises ~0.4 GB; still fits.
+4. ~~**Fourth fallback** — drop PrismML 1-bit (R8), use TQ1_0 everywhere.~~ **Already taken as the primary path** (June 2026): group-256 TQ1_0/TQ2_0 is now the design, not the fallback. Rung retired.
 5. **Worst case** — release as **v3-research-preview**: BF16 student weights only, no GGUF, no MCP. Document the work, publish the ablations, plan v3.1.
 
 Any one of these is acceptable. A combination of (1) + (4) is the *typical* expected outcome — a model that beats v2 on every row but doesn't hit the MATH-500 50 % stretch target.
@@ -203,8 +201,8 @@ Any one of these is acceptable. A combination of (1) + (4) is the *typical* expe
 | R5 | Teacher caching | P5 | H × H | rental planned |
 | R6 | Budget slip | P5 | M × M | open |
 | R7 | SFT forgetting | P6 | M × H | open |
-| R8 | BB1_0 kernel | P9 | L × M | open |
-| R9 | Mamba-3 kernel | P3 | L × M | open |
+| R8 | BB1_0 kernel | P9 | — | **closed** (pivoted to upstream TQ formats, June 2026) |
+| R9 | Mamba-3 kernel | P3 | — | **closed** (`fla.layers.mamba3` merged April 2026, verified June 2026) |
 | R10 | License | P12 | L × L | closed (no inheritance) |
 | R11 | Tool overfit | P8 | M × M | open |
 | R12 | Sandbox breakout | P10 | M × C | mitigated by sandbox spec |

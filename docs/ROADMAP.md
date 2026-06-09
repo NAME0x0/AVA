@@ -18,22 +18,22 @@ Distill Qwen 3.6 35B-A3B → ~3 B ternary MoE student, layered on three 2026 res
 
 1. **HRM-Text** — Sapient's two-stack latent-recurrent reasoner (H-module + L-module, halting head). Closes v2's MATH/GSM8K gap structurally without emitting CoT tokens.
 2. **Mamba-3 (MIMO, complex SSM)** — ICLR 2026 generation-3 subquadratic attention; +1.8 pp over Gated DeltaNet at 1.5 B, half the state size of Mamba-2. Deployed in a 3 : 1 hybrid with gated softmax attention.
-3. **PrismML Bonsai / Ternary Bonsai** — Caltech's 1-bit (1.125 bpw) and 1.58-bit packed formats. Kernels merged into `llama.cpp` head and Apple MLX. Used as the GGUF storage layer for v3.
+3. **PrismML Bonsai / Ternary Bonsai** — Caltech's 1-bit (1.125 bpw) and 1.58-bit packed formats, proving sub-2-bpw quality at 8 B. v3 ships the idea through **stock upstream llama.cpp `TQ1_0`/`TQ2_0`** (group-256 ternary QAT) — no fork dependency (June 2026 revision).
 
 Full v3 doc set: [`docs/v3/INDEX.md`](v3/INDEX.md). Design: [`docs/v3/ARCHITECTURE_V3.md`](v3/ARCHITECTURE_V3.md). Recipe: [`docs/v3/RECIPE.md`](v3/RECIPE.md). Targets: [`docs/v3/PERF_TARGETS.md`](v3/PERF_TARGETS.md).
 
 Phases:
 
-- **P0** Scaffolding (configs, engine stubs, MCP catalog, scripts) — *in progress*
+- **P0** Scaffolding (configs, engine stubs, MCP catalog, scripts) — *done*
 - **P1** Download Qwen 3.6 35B-A3B teacher weights
-- **P2** Student init: sparse-upcycle attention, init Mamba-3 (complex state), random MoE FFN, HRM halting head
+- **P2** Student implementation + init — *in progress (June 2026)*: engine modules implemented (ternary QAT linear, MoTE FFN, Mamba-3 reference mixer, HRM refinement recurrence, full 3.24 B-param assembly + CPU smoke tests); sparse-upcycle init from teacher next
 - **P3** BF16 warmup pretraining (2–3 B tokens)
 - **P4** HRM halting curriculum — train L-loop and halting head with ACT ponder loss (1–1.5 B tokens)
 - **P5** Ternary QAT + teacher distillation (5–8 B tokens, rented A100s)
 - **P6** SFT on math + science + reasoning + tool-routing mix
 - **P7** DPO alignment
 - **P8** Tool-discrimination SFT (300 "when NOT to call" examples)
-- **P9** PrismML packing — export to GGUF with BB1_0 routed + TQ1_0 shared
+- **P9** Ternary packing — export to stock-llama.cpp GGUF (TQ1_0 + TQ2_0 builds, Q8_0 embeddings)
 - **P10** MCP wiring (FastMCP 3.0 + XGrammar constrained decoding)
 - **P11** Full eval — 17-bench v2 suite + BFCL v3 + MCP-Bench + RULER long context
 - **P12** Public release

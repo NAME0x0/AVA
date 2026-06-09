@@ -1,64 +1,97 @@
-# AVA v3 student architecture spec.
-# This is the authoritative shape used by engine/student_model.py at P2.
+# AVA v3 student architecture spec — authoritative shape.
+# Mirrors docs/v3/ARCHITECTURE_V3.md (June 2026 revision).
+# Consumed by experiments/exp6_v3/engine/student_model.py.
 
-name: ava-v3-6b-mote
-total_params_target_b: 6.4
-active_params_target_b: 1.8
+name: ava-v3-3b-hrm-mote
+total_params_target_b: 3.26
+packed_size_target_gb: 1.70          # TQ1_0 build, Q8_0 embeddings
+resident_target_gb_32k: 3.3
 
-vocab_size: 248320
+vocab_size: 248320                   # Qwen 3.6 tokenizer
 hidden_size: 1792
-intermediate_size_routed: 768
-intermediate_size_shared: 4096
-num_hidden_layers: 28
+num_hidden_layers: 24
+tie_word_embeddings: true
+
 rope_theta: 1000000
 rope_scaling:
   type: yarn
-  factor: 4.0          # 256K → 1M
-  original_max_position_embeddings: 262144
+  factor: 8.0                        # 32K native -> 256K
+  original_max_position_embeddings: 32768
 
-# Hybrid stack: 3x GatedDeltaNet + 1x GatedAttention per repeat.
-# 28 layers / 4 = 7 repeats.
+# Hybrid stack: 3x L-block (Mamba-3) + 1x H-block (gated softmax attention).
+# 24 layers / 4 = 6 repeats -> 18 L-blocks, 6 H-blocks.
 attention_layout:
-  pattern: [delta, delta, delta, full]
-  repeats: 7
+  pattern: [L, L, L, H]
+  repeats: 6
 
-gated_deltanet:
-  num_q_heads: 48
-  num_kv_heads: 16
+h_block:                             # softmax attention, RoPE applied here only
+  num_q_heads: 14
+  num_kv_heads: 4                    # GQA
   head_dim: 128
-
-gated_attention:
-  num_q_heads: 24
-  num_kv_heads: 4
-  head_dim: 256
   use_rope: true
+  gated: true                        # output gating (Qwen 3.6 style)
+
+l_block:                             # subquadratic, no RoPE
+  sublayer: mamba3                   # config-flip fallback: gated_deltanet (R2)
+  num_heads: 14
+  head_dim: 128
+  state_size: 64                     # half of Mamba-2's 128 (MIMO result)
+  complex_state: true                # Mamba-3 complex-valued update
+  kernel: fla                        # fla.layers.mamba3; "reference" = pure-PyTorch oracle
+
+# HRM-style recurrence (June 2026 revision — refinement-first design).
+# See docs/v3/HRM_TEXT.md section 1b for D1-D4 rationale.
+hrm:
+  enabled: true
+  max_l_steps: 6
+  mean_l_steps_target: 2.5
+  halting:
+    type: act_ponder                 # ACT ponder loss, not Q-learning
+    ponder_loss_weight: 0.05
+    convergence_aware: true          # D2: head input = [z_L ; z_H ; ||z_L - z_prev||]
+  deep_supervision:                  # D1: train the refinement loop directly
+    supervised_steps: [2, 4, 6]
+    step_loss_weights: [0.2, 0.3, 0.5]
+    detach_between_segments: true    # 1-step gradient, O(1) memory
+  latent_restart:                    # D3: inference-only fixed-point escape
+    enabled_in_adaptive_mode: true
+    confidence_threshold: 0.35
+    perturbation_std: 0.02
+    max_restarts: 1
 
 moe:
   num_routed_experts: 32
   num_shared_experts: 1
   top_k: 4
+  intermediate_size_routed: 768
+  intermediate_size_shared: 4096
+  expert_activation: relu_squared   # 2-matrix experts (up + down, ReLU^2) — BitNet b1.58 2B4T
+                                    # precedent; matches the 3.26B param budget in
+                                    # docs/v3/ARCHITECTURE_V3.md (32 x 2 x 1792 x 768)
   router_dtype: bfloat16
-  routed_expert_quant: ternary    # {-1, 0, +1}
-  shared_expert_dtype: bfloat16
-  load_balance: bias-based         # DeepSeek-V3 style, no aux loss
+  routed_expert_quant: ternary       # {-1, 0, +1}, group-256 scales (QAT)
+  shared_expert_quant: ternary       # group-256 (June 2026: was BF16 plan, then TQ)
+  load_balance: bias-based           # DeepSeek-V3 style, no aux loss
 
 quantization:
-  routed_expert: ternary
+  ternary_group_size: 256            # matches upstream llama.cpp TQ1_0/TQ2_0 blocks
+  export_formats: [TQ1_0, TQ2_0]     # stock llama.cpp; no fork dependency
   router: bf16
-  shared_expert: bf16
   attention: bf16
-  embedding: bf16
+  mamba3: bf16
+  embedding_train: bf16
+  embedding_export: q8_0
   lm_head: tied
   kv_cache: turboquant_k4_v2
 
 normalization:
-  type: subln                       # BitNet-style
+  type: subln                        # BitNet-style
   rms_norm_eps: 1.0e-6
 
 teacher: Qwen/Qwen3.6-35B-A3B
 teacher_logit_temperature: 2.0
 
 context:
-  native: 262144
-  trained: 32768                    # stage-2 training window
-  yarn_extended: 1048576            # inference-time extension target
+  native: 32768                      # trained natively (P3-P5 window)
+  yarn_extended: 262144              # post-process extension
+  experimental_target: 1048576       # 1M, P-late curriculum (see SUBQUADRATIC.md section 6)

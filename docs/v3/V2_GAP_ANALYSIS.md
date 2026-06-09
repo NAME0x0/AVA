@@ -43,8 +43,8 @@ The non-obvious row is **GSM8K (greedy)**: the v3 target of 70 % at `k=1` decode
 | Max training context | 384 tokens | Memory budget at 4 GB with quadratic attention | Mamba-3 3 : 1 hybrid; 32 K native, YaRN to 256 K, target 1 M |
 | Inference context (advertised) | 8 K | Qwen 3.5 base default | 32 K native, 256 K with YaRN |
 | Tool-call protocol | none built in | No MCP path in v2 | Full MCP server + client, llama-server `--mcp-config` |
-| Decode throughput | ~45 tok/s on RTX A2000 (Q8_0) | Quadratic attention dominates beyond 2 K | Mamba-3 linear decode + PrismML 1-bit kernels (up to 8× FP16 speed) |
-| Quantization floor | Q8 (no further savings) | Single base; no QAT | 1.125 bpw routed + 1.58 bpw shared; ~3.5 GB resident at 32 K |
+| Decode throughput | ~45 tok/s on RTX A2000 (Q8_0) | Quadratic attention dominates beyond 2 K | Mamba-3 linear decode + TQ2_0 2-bit-aligned kernels (PrismML demonstrated up to 8× FP16 at sub-2 bpw) |
+| Quantization floor | Q8 (no further savings) | Single base; no QAT | 1.6875 bpw ternary experts (group-256 QAT) + Q8_0 embeddings; ~3.3 GB resident at 32 K |
 | Reasoning budget knob | none | Static dense forward | `reasoning_budget` 1..6 L-steps |
 
 Every architecture row has a single named mechanism in v3.

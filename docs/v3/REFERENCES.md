@@ -10,13 +10,15 @@ All citations behind the v3 documentation set. Every numerical claim or design d
 - Sapient Intelligence, **HRM-Text launch**, PR Newswire, 18 May 2026 ([release](https://www.prnewswire.com/news-releases/sapient-intelligence-launches-hrm-text-challenging-the-llm-monopoly-with-a-brain-inspired-foundation-model-trained-on-up-to-1000x-fewer-tokens-302774638.html)). 1 B HRM scale-up. Independent April 2026 numbers: MMLU 60.7, ARC-C 81.9, MATH 56.2, DROP 82.2.
 - Sapient Intelligence GitHub, [`sapientinc/HRM`](https://github.com/sapientinc/HRM). Reference implementation of HRM-base.
 - Graves, **Adaptive Computation Time for Recurrent Neural Networks**, arXiv:[1603.08983](https://arxiv.org/abs/1603.08983). ACT ponder loss used in v3 P4 halting curriculum.
+- ARC Prize, **The Hidden Drivers of HRM's Performance on ARC-AGI** ([blog](https://arcprize.org/blog/hrm-analysis)). Independent ablations: hierarchy ≈ ≤ 5 pp; outer refinement loop is the dominant lever (+13 pp from 1→2 loops; 16-loop training ≈ 2×). Basis for v3 design responses D1/D4 in [HRM_TEXT.md](HRM_TEXT.md) §1b.
+- **Are Your Reasoning Models Reasoning or Guessing? A Mechanistic Analysis of Hierarchical Reasoning Models**, arXiv:[2601.10679](https://arxiv.org/abs/2601.10679). Fixed-point traps, grokking-style transitions; perturbation + bootstrapping lifts Sudoku-Extreme 54.5 % → 96.9 %. Basis for D2/D3 (convergence-aware halting, latent restart escape).
 
 ## Subquadratic attention
 
 - Yang et al., **Gated Delta Networks: Improving Mamba2 with Delta Rule**, OpenReview [r8H7xhYPwz](https://openreview.net/forum?id=r8H7xhYPwz). Gated DeltaNet — v3 fallback subquadratic kernel.
 - Mamba-3 authors, **Mamba-3: Improved Sequence Modeling using State Space Principles**, arXiv:[2603.15569](https://arxiv.org/abs/2603.15569) (ICLR 2026). Complex SSM update, MIMO formulation, half-state-size at equal perplexity. Primary v3 L-block sublayer.
 - Peng et al., **A Systematic Analysis of Hybrid Linear Attention**, arXiv:[2507.06457](https://arxiv.org/abs/2507.06457). 2026 generation-3 taxonomy for linear attention.
-- `fla-org/flash-linear-attention`, GitHub [link](https://github.com/fla-org/flash-linear-attention). Triton kernel library, source of RetNet/GLA/Mamba/HGRN/HGRN2/RWKV-6/RWKV-7 and (planned) Mamba-3 implementations.
+- `fla-org/flash-linear-attention`, GitHub [link](https://github.com/fla-org/flash-linear-attention). Triton kernel library; `fla.layers.mamba3` and `fla.layers.gated_deltanet` both shipped (Mamba-3 merged April 2026, verified June 2026).
 - Peng, **YaRN: Efficient Context Window Extension**, arXiv:[2309.00071](https://arxiv.org/abs/2309.00071). YaRN extension recipe used to stretch native 32 K → 256 K → 1 M.
 
 ## Quantization & deployment
@@ -27,7 +29,8 @@ All citations behind the v3 documentation set. Every numerical claim or design d
 - Du et al., **BitNet b1.58 2B4T Technical Report**, arXiv:[2504.12285](https://arxiv.org/abs/2504.12285). Ternary 1.58-bit baseline for the routed-expert path.
 - Yan et al., **MoTE: Mixture of Ternary Experts**, NeurIPS 2025. MoTE pattern: ternary routed experts + BF16 shared expert.
 - Du et al., **BitDistiller**, arXiv:[2402.10631](https://arxiv.org/abs/2402.10631). 3-stage QAT-via-distillation, the training scaffold v3 P3–P5 inherits.
-- `ggerganov/llama.cpp`, GitHub [link](https://github.com/ggerganov/llama.cpp). Head build hosts `TQ1_0` and (per PrismML PR) `BB1_0` quant types used by v3 GGUF export.
+- `ggml-org/llama.cpp`, GitHub [link](https://github.com/ggml-org/llama.cpp). Upstream hosts `TQ1_0` (1.6875 bpw) / `TQ2_0` (2.0625 bpw) ternary types with group-256 scales (2024, Compilade) — the formats v3 ships. PrismML's `BB1_0` is fork-only as of June 2026.
+- `ggml-org/llama.cpp` discussion [#22019](https://github.com/ggml-org/llama.cpp/discussions/22019) — Bonsai group-128 vs upstream group-256 incompatibility; PrismML fork status. Trigger for the v3 group-256 pivot.
 
 ## Distillation, MoE, and base teachers
 

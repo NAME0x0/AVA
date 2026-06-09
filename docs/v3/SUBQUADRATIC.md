@@ -3,7 +3,7 @@
 > **Source papers:**
 > - Yang et al., *Gated Delta Networks: Improving Mamba2 with Delta Rule*, OpenReview r8H7xhYPwz (Gated DeltaNet)
 > - Mamba-3 authors, *Mamba-3: Improved Sequence Modeling using State Space Principles*, arXiv:2603.15569 (ICLR 2026)
-> - `fla-org/flash-linear-attention` — Triton kernel library, RWKV7 added Jan 2025, Mamba-3 PR open as of May 2026
+> - `fla-org/flash-linear-attention` — Triton kernel library; **`fla.layers.mamba3` merged April 2026** (verified 9 June 2026)
 
 AVA v3 must deliver native 32 K context (256 K via YaRN, 1 M target) on a 4 GB laptop. Softmax attention is impossible at those lengths under our memory budget — the KV cache alone for 256 K context with 14 heads × 128 dim × BF16 would be ~14 GB. We therefore need **subquadratic** sequence modeling on most layers, with a small fraction of softmax-attention layers preserved for tasks that require exact recall.
 
@@ -86,13 +86,13 @@ This is the same convention Qwen 3.6 uses, and was validated on RULER (Long-cont
 
 We rely on the `fla-org/flash-linear-attention` Triton kernel library.
 
-| Kernel | FLA status | v3 dependency |
+| Kernel | FLA status (verified 9 June 2026) | v3 dependency |
 |---|---|---|
-| Gated DeltaNet (`fused_recurrent`, `chunkwise`) | Released | Fallback if Mamba-3 kernel not ready |
-| Mamba-3 (MIMO) | PR open (May 2026) | **Primary kernel; vendor or contribute upstream** |
+| Gated DeltaNet (`fla.layers.gated_deltanet`) | Released | Fallback only for stability issues (R2) |
+| Mamba-3 (`fla.layers.mamba3`) | **Merged April 2026** | **Primary kernel — availability risk (R9) closed** |
 | Flash Attention 3 (for H-blocks) | Stable | Used as-is |
 
-Risk: if the Mamba-3 PR doesn't land in FLA by P3 (warmup), we fall back to Gated DeltaNet. The architecture change is one-line — the L-block sublayer type is configurable.
+The engine additionally ships a pure-PyTorch reference recurrence for the L-sublayer (`experiments/exp6_v3/engine/mamba3_block.py`), used for CPU smoke tests and as a numerical oracle against the Triton kernels. The L-block sublayer type stays a one-line config flip.
 
 ---
 
