@@ -194,6 +194,25 @@ For comparison: AVA v2 consumed ~10 M training tokens (20 741 examples × ~500 t
 
 The recipe ships under "trained on a single laptop" — except for P5, which is the only phase the laptop physically cannot do at reasonable speed. We document P5 rental cost openly in the release.
 
+**Honest caveats on the wall-time table (June 2026):**
+
+1. **Refinement-loop FLOP multiplier.** Training runs the L-group at the full
+   `max_l_steps = 6`. L-blocks are ~70 % of per-token FLOPs, so training cost is
+   ~`0.3 + 0.7 × 6 ≈ 4.5×` a single-pass model of the same size. The laptop
+   wall-times above carry that multiplier as a ±2× uncertainty band; P3/P4 may
+   land at 1.5–2× the listed days. Mitigations: train the first 60 % of P3 at
+   `max_l_steps = 2` (curriculum), and treat a short A100 rental for P3
+   (~$150–300, ~1 day) as the pressure-release valve. Backprop *memory* is flat
+   regardless — the 1-step gradient detach keeps it O(1) in L-steps.
+2. **Memory-tier optimizer (E1).** The ~1.9 B memory values train on CPU with
+   8-bit Adam over *touched rows only* (lookups are sparse): ≈ 3.8 GB RAM for
+   BF16 masters + ≈ 3.8 GB for 8-bit moments. Fits the 32 GB box alongside
+   activations and the data loader; do not schedule teacher streaming in the
+   same phase.
+3. **Teacher logits are computed on the rental, not stored locally.** Top-64
+   logits at 8 B tokens would be ~2 TB — cached shard-by-shard on the rental's
+   object store (R5), never on the laptop SSD.
+
 ---
 
 ## Reproducibility invariants

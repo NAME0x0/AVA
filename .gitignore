@@ -68,6 +68,7 @@ experiments/exp4_finetune/*.log
 # Temp test dirs
 .pytest-tmp-*/
 .triton-runtime/
+.temp/
 
 # Claude Code local config
 .claude/
