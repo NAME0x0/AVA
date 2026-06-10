@@ -72,10 +72,24 @@ compute:                          # CODE_PIVOT.md section 6 — all free
   laptop: rtx_a2000_4gb_24x7
   kaggle: 2xT4_30h_per_week
   colab: T4_free_sessions
-  checkpointing:
+  checkpointing:                  # scripts/checkpoint_sync.py (tested offline)
+    hub_repo: NAME0x0/AVA-v3-checkpoints   # private during training
     push_to_hub_every_minutes: 30
     resumable_shard_hours: 3
     optimizer_state: included
+    rng_state: included
+    auth: HF_TOKEN_env_only       # token never in code, configs, or git
+
+demands:                          # docs/v3/INVENTION.md D1-D8 (gates there)
+  cpu_only_decode_toks: 5         # D1: 4-core AVX2, no GPU
+  calibration_ece_max: 0.15       # D2: self-estimated pass probability
+  hallucinated_import_rate_max: 0.02
+  air_gap_required: true          # D3
+  explain_mode: first_class       # D4
+  diff_minimality_median_max: 1.5 # D5
+  energy_ledger: published_kwh    # D6
+  reproducible_from_script: true  # D7
+  nightly_self_maintenance: true  # D8
 
 evals:                            # gates in CODE_PIVOT.md section 7
   matrix: [humaneval_plus, mbpp_plus, livecodebench, bigcodebench, multipl_e,

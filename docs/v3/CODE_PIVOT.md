@@ -161,7 +161,7 @@ Inventory (all free):
 | Laptop RTX A2000 4 GB + 32 GB RAM | 24/7 | self-play loop, teacher trace gen (overnight), small ablations, evals |
 | Google Colab free (T4 16 GB) | session-capped, variable | T1/T2 training shards (3–4 h resumable chunks) |
 | Kaggle (2×T4, 30 h/week) | 30 GPU-h/wk | the workhorse: weekly long shards + teacher trace generation |
-| Hugging Face Hub | free storage | **every 30 min: checkpoint + optimizer state push** — sessions are preemptible by design |
+| Hugging Face Hub | free storage | **every 30 min: checkpoint + optimizer state push** — sessions are preemptible by design. Implemented: [`scripts/checkpoint_sync.py`](../../experiments/exp6_v3/scripts/checkpoint_sync.py) — atomic LATEST-pointer protocol, RNG + data-position capture, resume-from-anywhere (Claim 6 in [INVENTION.md](INVENTION.md)). Token via `HF_TOKEN` env only — never in code or configs |
 | HF Spaces / local | free | eval dashboards |
 
 Throughput honesty: QLoRA-style training of the ~4 B student on a T4 runs
