@@ -1,0 +1,84 @@
+# AVA v3-Code — donor transplant configuration (the $0 coding pivot).
+# Authoritative plan: docs/v3/CODE_PIVOT.md. Supersedes v3_student_arch.yaml's
+# clean-slate dimensions; block design and edge portfolio carry over.
+
+name: ava-v3-code
+mission: coding specialist, <=4 GB VRAM, $0 training, free forever
+
+donor:
+  model: Qwen/Qwen3-4B            # Apache 2.0; re-evaluate at C1 if a stronger
+  license: apache-2.0             # Apache <=4B coder exists (Qwen2.5-Coder-3B is
+  hidden_size: 2560               # research-license -> disqualified)
+  num_layers: 36
+  num_q_heads: 32
+  num_kv_heads: 8
+  head_dim: 128
+  intermediate_size: 9728
+  vocab_size: 151936              # Qwen3 tokenizer; tied embeddings
+  tie_word_embeddings: true
+
+teacher:
+  model: Qwen/Qwen3.6-27B         # Apache 2.0; SWE-bench Verified 77.2
+  mode: trace_distillation        # text traces, NOT logit KL — no vocab coupling,
+  serving:                        # no terabyte cache, no rented cluster
+    - kaggle_2xT4_int4
+    - laptop_streaming_int4       # Exp5 loader, overnight generation
+
+transplant:                       # CODE_PIVOT.md section 3
+  t1_linearize:
+    recipe: lolcats               # attention transfer + LoRA recovery (2410.10254)
+    target_mixer: mamba3          # fallback: gated_deltanet
+    layers_converted: 27          # keep 9 softmax -> 3:1 hybrid
+    token_budget: 80e6
+    fallback_recipes: [mohawk, mamba_in_llama, radlads]
+  t2_moeify:
+    recipe: sparse_upcycling      # 2212.05055 + BitDistiller ternary QAT
+    num_routed_experts: 32
+    top_k: 4
+    routed_intermediate: 1216     # ~9728/8; exact split fixed at C3
+    shared_expert: full_donor_ffn_copy   # worst case = donor quality
+    quant: ternary_group256       # exports stock TQ1_0/TQ2_0
+    token_budget: 500e6
+  t3_mount:                       # all zero-init = donor-identical at mount time
+    hrm_refinement: true          # engine/hrm_core.py
+    pkm_memory: true              # engine/pkm_memory.py — API/library memory
+    convergence_aware_halting: true
+  t4_specialize:
+    token_budget: 900e6
+
+context:
+  native: 8192                    # $0 cut: was 32K; YaRN to 32-64K post-hoc
+  yarn_extended: 65536
+  long_context_lane: deferred     # repo-level work leans on agentic harness
+
+data:                             # all redistributable; CODE_PIVOT.md section 4
+  reasoning_sft: [nvidia/OpenCodeReasoning, nvidia/OpenCodeReasoning-2]
+  pretrain_mix: the-stack-v2-permissive-subsets
+  edit_sft: commitpackft
+  instruct: self-oss-instruct
+  teacher_traces: generated_weekly
+  self_play: mcp_sandbox_verified
+  objectives: [next_token, fim]   # FIM mandatory from C3 onward
+
+self_play:                        # E7 promoted to core (phase C6)
+  enabled: true
+  recipe: absolute_zero           # 2505.03335; stepwise rewards per ExecVerify
+  executor: mcp_sandbox
+  propose_budget: 6
+  distill_budget: 2
+  improvement_ladder: [S1_fix_own_code, S2_generate_tasks, S3_repair_pipeline, S4_curriculum_proposals]
+
+compute:                          # CODE_PIVOT.md section 6 — all free
+  laptop: rtx_a2000_4gb_24x7
+  kaggle: 2xT4_30h_per_week
+  colab: T4_free_sessions
+  checkpointing:
+    push_to_hub_every_minutes: 30
+    resumable_shard_hours: 3
+    optimizer_state: included
+
+evals:                            # gates in CODE_PIVOT.md section 7
+  matrix: [humaneval_plus, mbpp_plus, livecodebench, bigcodebench, multipl_e,
+           cruxeval, canitedit, aider_polyglot, swebench_lite, swebench_verified]
+  sanity_floors: {arc_easy: 75, mmlu: 45}
+  baseline: donor_full_matrix_at_C1

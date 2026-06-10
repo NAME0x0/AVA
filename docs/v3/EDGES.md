@@ -241,9 +241,11 @@ labs run at datacenter scale), on one laptop.
 **Scaling behavior.** Quality scales with *cumulative idle hours* — a resource
 every deployed laptop has in abundance and no static checkpoint can use.
 
-**Status & gate.** v3.1 lane (out of v3.0 release scope; scaffolding lands with P10
-MCP wiring). Gate for v3.1: +3 pp GSM8K after 100 self-play hours with no external
-data, no regression elsewhere.
+**Status & gate.** **Promoted to core training phase by the coding pivot (10 June
+2026)** — code's execution verifier makes this the primary $0 data engine; see
+[CODE_PIVOT.md](CODE_PIVOT.md) §5 (phase C6, self-improvement ladder S1–S4). Gate:
+verified pass-rate gain on a held-out probe set after 100 self-play hours, no
+regression elsewhere.
 
 ---
 

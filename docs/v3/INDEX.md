@@ -1,6 +1,6 @@
 # AVA v3 — Documentation Index
 
-> **Status:** P2 engine implementation started (June 2026) — architecture modules + smoke tests live in [`experiments/exp6_v3/engine/`](../../experiments/exp6_v3/engine/). No v3 weights yet. See [docs/ROADMAP.md](../ROADMAP.md) for phase progress.
+> **Status (10 June 2026): v3 pivoted to a CODING SPECIALIST — read [CODE_PIVOT.md](CODE_PIVOT.md) first.** One domain, all languages, ≤4 GB VRAM, trained for $0 on free compute (donor transplant + execution-verified self-play), free forever. Engine modules + smoke tests live in [`experiments/exp6_v3/engine/`](../../experiments/exp6_v3/engine/); the architecture below survives the pivot, the training plan and targets are superseded where CODE_PIVOT says so.
 
 AVA v3 is the next major version of AVA. It is not a fine-tune. It is a new student model built from three converging 2026 research lines:
 
@@ -18,6 +18,7 @@ The hardware constraint is unchanged: **4 GB VRAM laptop, single card, no cloud,
 
 | # | Doc | What you'll learn |
 |---|---|---|
+| 0 | [CODE_PIVOT.md](CODE_PIVOT.md) | **THE current plan** — coding specialist, donor transplant, $0 training, self-improvement loop, eval tiers |
 | 1 | [WHY_V3.md](WHY_V3.md) | One-page motivation: what v2 cannot do and why v3 needs a new architecture |
 | 2 | [ARCHITECTURE_V3.md](ARCHITECTURE_V3.md) | Block-level diagram, dimensions, layer ratios, parameter budget, memory math |
 | 3 | [HRM_TEXT.md](HRM_TEXT.md) | How the H-module / L-module dual recurrence integrates with the MoE student |

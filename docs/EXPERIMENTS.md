@@ -82,7 +82,7 @@ The repo keeps every branch. Closed branches stay so the failure modes remain vi
 
 ## Exp 6 / AVA v3 — ternary MoE student + MCP tools · 🚧 active
 
-**Goal**: strict dominance over v2 on every benchmark v2 measured, plus native 32 K context (256 K via YaRN, 1 M target), MCP tool routing, and ~13× capacity-per-VRAM. The architecture stacks three 2026 research lines on top of the original distillation backbone.
+**Goal (pivoted 10 June 2026)**: a **coding specialist** — beat every ≤4 B open model on every coding eval, punch at 7–14 B class, all programming languages, ≤4 GB VRAM, trained for **$0** on free compute (donor transplant from Qwen3-4B + trace distillation from Qwen3.6-27B + execution-verified self-play), free forever. Authoritative plan: [`docs/v3/CODE_PIVOT.md`](v3/CODE_PIVOT.md). The architecture stacks three 2026 research lines plus the edge portfolio on top of a donor-inherited backbone.
 
 **Plan**:
 - **Teacher**: Qwen 3.6 35B-A3B (active 3B / total 35B MoE).

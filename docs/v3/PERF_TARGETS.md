@@ -1,5 +1,13 @@
 # Performance Targets
 
+> **Superseded in part (10 June 2026):** v3 is now a coding specialist. The
+> authoritative pass/fail gate is the coding eval matrix in
+> [CODE_PIVOT.md](CODE_PIVOT.md) §7 (beat every ≤4 B open model on every coding
+> eval; ≥70 % of the matrix vs 7–9 B; agentic wins vs 14 B-class). The general
+> tables below are demoted to **sanity floors** (ARC-E ≥ 75, MMLU ≥ 45 —
+> catastrophic-forgetting alarms, not goals). Speed/footprint targets (§2) and
+> packing-stability targets (§3) remain binding.
+
 Single source of truth for v3 pass/fail. Every target below must be hit at release time, evaluated under the exact conditions listed. If any single row fails, **v3 does not ship**. v2 numbers are from [`docs/RESULTS.md`](../RESULTS.md). Mechanism column links the v3 component that delivers the gain.
 
 All v3 numbers are evaluated on the **packed GGUF (TQ1_0 ternary build, Q8_0 embeddings)**, served by **stock** `llama-server`, on the laptop, with `reasoning_budget="auto"` unless the row specifies otherwise.

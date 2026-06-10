@@ -1,6 +1,13 @@
 # Training Recipe
 
-> **Read first:** [ARCHITECTURE_V3.md](ARCHITECTURE_V3.md), [HRM_TEXT.md](HRM_TEXT.md), [SUBQUADRATIC.md](SUBQUADRATIC.md), [PRISMML.md](PRISMML.md).
+> **Superseded for training (10 June 2026):** the $0 coding pivot replaces this
+> pipeline's training plan — donor transplant (LoLCATs + sparse upcycle), trace
+> distillation instead of logit KL, free Colab/Kaggle compute instead of the P5
+> rental. Current phases: C0–C8 in [CODE_PIVOT.md](CODE_PIVOT.md) §8. This file
+> remains the reference for per-stage loss recipes, gate style, and the
+> packing/export mechanics (P9), which carry over unchanged.
+
+> **Read first:** [CODE_PIVOT.md](CODE_PIVOT.md), then [ARCHITECTURE_V3.md](ARCHITECTURE_V3.md), [HRM_TEXT.md](HRM_TEXT.md), [SUBQUADRATIC.md](SUBQUADRATIC.md), [PRISMML.md](PRISMML.md).
 
 End-to-end pipeline for AVA v3, phase by phase. Each phase has: inputs, outputs, training objective, token budget, hardware, success gate, and known risks. The pipeline supersedes the 11-phase plan in [`experiments/exp6_v3/DESIGN.md`](../../experiments/exp6_v3/DESIGN.md) §8 by adding phases for HRM halting-head training, Mamba-3 init, and PrismML packing.
 

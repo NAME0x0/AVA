@@ -20,7 +20,13 @@ Distill Qwen 3.6 35B-A3B → ~3 B ternary MoE student, layered on three 2026 res
 2. **Mamba-3 (MIMO, complex SSM)** — ICLR 2026 generation-3 subquadratic attention; +1.8 pp over Gated DeltaNet at 1.5 B, half the state size of Mamba-2. Deployed in a 3 : 1 hybrid with gated softmax attention.
 3. **PrismML Bonsai / Ternary Bonsai** — Caltech's 1-bit (1.125 bpw) and 1.58-bit packed formats, proving sub-2-bpw quality at 8 B. v3 ships the idea through **stock upstream llama.cpp `TQ1_0`/`TQ2_0`** (group-256 ternary QAT) — no fork dependency (June 2026 revision).
 
-Plus the June 2026 **edge portfolio** ([`docs/v3/EDGES.md`](v3/EDGES.md)): RAM-tier product-key memory (factual capacity with zero VRAM cost — implemented), latent-superposition reasoning curriculum, halting-coupled speculative decoding, NSA long-context option, the precision-scaling tailwind, μP hyperparameter transfer, and an Absolute-Zero self-play flywheel for v3.1.
+Plus the June 2026 **edge portfolio** ([`docs/v3/EDGES.md`](v3/EDGES.md)): RAM-tier product-key memory (factual capacity with zero VRAM cost — implemented), latent-superposition reasoning curriculum, halting-coupled speculative decoding, NSA long-context option, the precision-scaling tailwind, μP hyperparameter transfer, and an Absolute-Zero self-play flywheel.
+
+> **Pivot (10 June 2026):** v3 is now a **coding specialist** — one domain, all
+> languages, ≤4 GB VRAM, trained for **$0** on free compute (donor transplant from
+> Qwen3-4B + trace distillation from Qwen3.6-27B + execution-verified self-play),
+> free forever. Authoritative plan: [`docs/v3/CODE_PIVOT.md`](v3/CODE_PIVOT.md)
+> (phases C0–C8 there supersede P0–P12 below for training).
 
 Full v3 doc set: [`docs/v3/INDEX.md`](v3/INDEX.md). Design: [`docs/v3/ARCHITECTURE_V3.md`](v3/ARCHITECTURE_V3.md). Recipe: [`docs/v3/RECIPE.md`](v3/RECIPE.md). Targets: [`docs/v3/PERF_TARGETS.md`](v3/PERF_TARGETS.md).
 
