@@ -127,7 +127,14 @@ output = model.generate(**inputs, max_new_tokens=512, temperature=0.7, do_sample
 print(tokenizer.decode(output[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True))
 ```
 
-For a no-Python path, GGUF builds (Q4_K_M, Q8_0) are at [`NAME0x0/AVA-v2-GGUF`](https://huggingface.co/NAME0x0/AVA-v2-GGUF) and run on Ollama, llama.cpp, LM Studio, etc.
+Two easier paths:
+
+- **Pre-merged bf16 weights** (no PEFT, plain `transformers`): [`NAME0x0/AVA-v2-merged`](https://huggingface.co/NAME0x0/AVA-v2-merged)
+- **No Python at all** — imatrix-calibrated GGUF builds (IQ4_XS → Q8_0) for Ollama, llama.cpp, LM Studio: [`NAME0x0/AVA-v2-GGUF`](https://huggingface.co/NAME0x0/AVA-v2-GGUF)
+
+```
+ollama run hf.co/NAME0x0/AVA-v2-GGUF:Q4_K_M
+```
 
 ## Training Details
 

@@ -36,13 +36,16 @@ model's own training distribution (reasoning, math, science, instruction
 following) — the same idea behind Google's Gemma QAT releases: keep the small
 quants as close to reference quality as possible.
 
-| File | Bits | Size | RAM needed | Use when |
-|---|---|---|---|---|
-| AVA-v2-IQ4_XS.gguf | 4.25 bpw | ~1.0 GB | ~1.5 GB | Tightest fit — old laptops, SBCs |
-| AVA-v2-Q4_0.gguf | 4.5 bpw | ~1.1 GB | ~1.6 GB | ARM/AVX-optimized CPU inference |
-| **AVA-v2-Q4_K_M.gguf** | 4.8 bpw | ~1.2 GB | ~1.7 GB | **Recommended default** |
-| AVA-v2-Q5_K_M.gguf | 5.7 bpw | ~1.4 GB | ~1.9 GB | Better quality, still small |
-| AVA-v2-Q8_0.gguf | 8.5 bpw | ~1.9 GB | ~2.4 GB | Reference quality (matches the published eval) |
+Measured quality cost vs the Q8_0 reference (perplexity on a held-out slice
+of the training distribution, 512-token context — lower is better):
+
+| File | Size | RAM needed | PPL | vs Q8_0 | Use when |
+|---|---|---|---|---|---|
+| AVA-v2-IQ4_XS.gguf | 1.11 GB | ~1.6 GB | 2.5347 | +2.0% | Tightest fit — old laptops, SBCs |
+| AVA-v2-Q4_0.gguf | 1.12 GB | ~1.6 GB | 2.5244 | +1.6% | ARM/AVX-optimized CPU inference |
+| **AVA-v2-Q4_K_M.gguf** | 1.19 GB | ~1.7 GB | 2.4907 | **+0.25%** | **Recommended default** |
+| AVA-v2-Q5_K_M.gguf | 1.31 GB | ~1.8 GB | — | — | Better quality, still small |
+| AVA-v2-Q8_0.gguf | 1.87 GB | ~2.4 GB | 2.4844 | reference | Matches the published eval |
 
 ## Quick start
 
