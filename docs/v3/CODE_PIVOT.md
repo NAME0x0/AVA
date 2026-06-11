@@ -49,13 +49,24 @@ design*; dimensions now come from the donor. Re-evaluate donor choice at P1-Code
 (if a stronger Apache ≤4 B coder exists by then, swap — the transplant recipe is
 donor-agnostic).
 
-### Teacher: Qwen3.6-27B
+### Teacher: Qwen3.6-27B — now a teacher *panel* (round 2)
 
 SWE-bench Verified 77.2 — flagship-level coding, Apache 2.0, 262 K context. Runs
 int4 (~14.5 GB) on Kaggle's free 2×T4 (32 GB combined) for trace generation, and on
 the laptop via Exp 5's streaming int4 loader (slow, but overnight is free). We
 take **text traces** (problem → reasoning → code → test results), not logits:
 no vocab mismatch with the donor, no terabyte logit cache, no rented cluster.
+
+**Revision 2026-06-11 ([RESEARCH_ROUND_2.md](RESEARCH_ROUND_2.md) §3):** v3 is
+taught by a **multi-teacher panel**, not one model — Qwen3.6-27B (agentic/SWE),
+**Devstral Small 2 24B-2512** (Apache 2.0, SWE-bench V 68.0, tool-driven
+multi-file editing; different lineage = different failure modes), the donor
+itself as style anchor, and NVIDIA's open Nemotron agentic-trace datasets
+(pre-generated, zero serving cost). Conflict protocol is binding: execution
+filter → domain routing → local-naturalness trace selection → one format
+contract; **text traces only, never logit fusion**. Evidence: TinyLLM
+(+5–15.7 pp, students beating teachers at 1–26% size), peer-review KD
+(+5.48 pp), Local Naturalness (+9.4 pp over global selection).
 
 ---
 
@@ -170,6 +181,17 @@ quota** (Kaggle 30 h + Colab ~10–20 h + laptop continuous). Every phase is bui
 as **resumable 3-hour shards**: deterministic data order, seed + step in the
 checkpoint name, `push_to_hub` on a timer, auto-resume script. Preemption costs
 ≤ 30 min of work by construction.
+
+> **Realism revision (2026-06-11, supersedes the paragraph above where they
+> conflict — [RESEARCH_ROUND_2.md](RESEARCH_ROUND_2.md) §6):** HRM deep
+> supervision multiplies training FLOPs ≈ 4.5× on supervised iterates, and the
+> teacher panel consumes ~25% of weekly Kaggle quota for trace generation.
+> Honest budget: **400–700 T4-hours ≈ 3–6 calendar months**, with
+> single-maintainer bandwidth — not GPU quota — as the binding constraint
+> (budget 1–2 redo cycles per transplant phase). Primary eval gate revised to
+> *donor + δ on the full matrix; beat all ≤4B opens on ≥ 70% of the matrix*,
+> with all/all kept as a stretch goal. Each phase still ends with a published
+> HF checkpoint — any phase can ship.
 
 What the $0 constraint kills, explicitly:
 

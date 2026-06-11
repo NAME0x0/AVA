@@ -17,9 +17,22 @@ donor:
   vocab_size: 151936              # Qwen3 tokenizer; tied embeddings
   tie_word_embeddings: true
 
-teacher:
-  model: Qwen/Qwen3.6-27B         # Apache 2.0; SWE-bench Verified 77.2
+teacher:                          # RESEARCH_ROUND_2.md section 3 — multi-teacher panel
+  panel:
+    - model: Qwen/Qwen3.6-27B     # Apache 2.0; SWE-bench Verified 77.2
+      role: agentic_swe_primary
+    - model: mistralai/Devstral-Small-2-24B-Instruct-2512  # Apache 2.0; SWE-bench V 68.0
+      role: multifile_edit_toolnav
+    - model: Qwen/Qwen3-4B        # donor as style anchor (low-conflict basics)
+      role: style_anchor
+    - dataset: nvidia_nemotron_agentic_traces  # OpenMDW; pre-generated, zero serving cost
+      role: agentic_tool_patterns
   mode: trace_distillation        # text traces, NOT logit KL — no vocab coupling,
+  conflict_protocol:              # binding, in order; never logit fusion
+    - execution_filter            # only test-passing traces enter the pool
+    - domain_routing              # primary teacher per task family
+    - local_naturalness_selection # student-side stepwise trace scoring
+    - single_format_contract      # analysis -> plan -> code -> self-check
   serving:                        # no terabyte cache, no rented cluster
     - kaggle_2xT4_int4
     - laptop_streaming_int4       # Exp5 loader, overnight generation

@@ -19,7 +19,8 @@ The hardware constraint is unchanged: **4 GB VRAM laptop, single card, no cloud,
 | # | Doc | What you'll learn |
 |---|---|---|
 | 0 | [CODE_PIVOT.md](CODE_PIVOT.md) | **THE current plan** — coding specialist, donor transplant, $0 training, self-improvement loop, eval tiers |
-| 0b | [INVENTION.md](INVENTION.md) | The demands beyond benchmarks (D1–D8: CPU-only, calibrated honesty, air-gap, teach mode, energy ledger…) + novelty claims 1–7 |
+| 0b | [INVENTION.md](INVENTION.md) | The demands beyond benchmarks (D1–D9: CPU-only, calibrated honesty, air-gap, teach mode, energy ledger, glass-box decoding…) + novelty claims 1–8 |
+| 0c | [RESEARCH_ROUND_2.md](RESEARCH_ROUND_2.md) | June-2026 round-2 sweep: multi-teacher panel, TurboQuant RAM tier, SIA-pattern self-play, Nemotron data, tokenizer transfer (E8), realism revision |
 | 1 | [WHY_V3.md](WHY_V3.md) | One-page motivation: what v2 cannot do and why v3 needs a new architecture |
 | 2 | [ARCHITECTURE_V3.md](ARCHITECTURE_V3.md) | Block-level diagram, dimensions, layer ratios, parameter budget, memory math |
 | 3 | [HRM_TEXT.md](HRM_TEXT.md) | How the H-module / L-module dual recurrence integrates with the MoE student |

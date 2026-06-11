@@ -107,6 +107,25 @@ the fix, and append verified self-play data — every night, on idle hardware.
 *Gate:* 30 consecutive nights unattended without a regression escaping the
 loop's own detection.
 
+### D9 — Glass-box decoding: transparency as a product surface
+
+Added 2026-06-11 ([RESEARCH_ROUND_2.md](RESEARCH_ROUND_2.md) §5). The model
+must show its work *mechanically*, not just rhetorically:
+
+- **Per-token confidence** exposed in the API and surfaced as annotations on
+  generated code (calibrated per D2 — the two demands share one machinery).
+- **Parametric memory attribution**: product-key memory lookups are discrete
+  indices; log which slots fired per token and map slots to training
+  provenance. Attribution from *inside the weights*, nearly free because the
+  index structure already exists.
+- **Structured trace** (analysis → plan → code → self-check) as the only
+  output mode in explain contexts (D4 synergy).
+- **Per-response compute meter**: HRM steps taken, draft tokens
+  accepted/rejected, memory hits — D6's energy ledger, per answer.
+
+*Gate:* attribution logging costs ≤ 5% decode speed, and logged memory indices
+are demonstrably non-uniform (informative) on the probe set.
+
 ---
 
 ## Part 2 — Novelty claims (invention-disclosure style)
@@ -165,7 +184,16 @@ latent steps) during distillation, yielding a knob-controlled latent reasoner.
 (HRM_TEXT.md §1b D1 + EDGES.md E2.) Coconut and HRM published separately; the
 distillation-time fusion: novel — flagged hypothesis, gated by ablation A9.
 
-Claims 2–7 are each independently publishable if validated; Claim 1 is the
+**Claim 8 — Parametric memory attribution (candidate, added 2026-06-11).**
+Per-token provenance reporting from product-key memory indices in a
+consumer-grade model: each generated token carries the identity of the memory
+slots that contributed, mapped to their training-data provenance. (D9;
+[RESEARCH_ROUND_2.md](RESEARCH_ROUND_2.md) §5.) Interpretability work probes
+memories post-hoc; no shipped open model exposes parametric-memory attribution
+as an inference-time API. Struck if logged indices prove uninformative
+(near-uniform) or cost > 5% decode speed.
+
+Claims 2–8 are each independently publishable if validated; Claim 1 is the
 invention. If ablations falsify a claim, it is struck here — this document is
 a ledger, not a brochure.
 

@@ -67,6 +67,15 @@ only if ≥ +2 pp on factual cluster (NaturalQuestions-style probes + HellaSwag)
 equal step count. Risk R18 covers the llama.cpp export op (fallback: PyTorch serving
 path for the memory build, GGUF build ships without memory).
 
+**Round-2 upgrade (2026-06-11, [RESEARCH_ROUND_2.md](RESEARCH_ROUND_2.md) §1.2).**
+TurboQuant-style 2-bit data-oblivious quantization (RyanCodrai/turbovec, MIT —
+random rotation → Lloyd-Max buckets, SIMD nibble-LUT kernels) applied to the
+value table: ~3.8 GB fp16 → **~0.5 GB + scales** at recall loss measured under
+1 pp in vector-retrieval benchmarks. Directly attacks R19 (RAM-bandwidth
+latency): ~7× fewer bytes per EmbeddingBag gather. Same library doubles as a
+zero-VRAM repo-retrieval index for the agentic harness (air-gap compatible).
+Discrete lookup indices also feed D9 memory attribution (INVENTION.md Claim 8).
+
 ---
 
 ## E2 — Latent superposition reasoning: the refinement loop becomes a search
@@ -249,6 +258,30 @@ regression elsewhere.
 
 ---
 
+## E8 — Code-native tokenizer transfer (gated, round 2)
+
+**Mechanism.** ZeTT-style zero-shot tokenizer transfer (hypernetwork embedding
+init) from the donor's 151,936-token general vocabulary to a ~80 K
+code-weighted vocabulary, followed by a short recovery run.
+
+**Published proof.** ZeTT outperforms FVT/FOCUS for code-generation tokenizer
+transfer; TokenAdapt halves perplexity ratios vs ReTok/TransTokenizer; tokenizer
+quality can dominate scale (a 350 M model with the right tokenizer beating a
+2.7 B one, ACL). Byte-level/tokenizer-free remains unproven at this scale for
+code — rejected.
+
+**Why it compounds.** The donor's tied embedding is 389 M params (~12% of core
+budget) sized for general multilingual text. A code-weighted vocabulary returns
+~180 M params (real Q8 GGUF megabytes), shrinks the per-token softmax, and
+compresses code into fewer tokens — fewer tokens per line multiplies with
+every speed edge (D1 CPU decode, E3 speculation).
+
+**Status & gate.** Off the critical path; run only if T1–T4 land early.
+Ablation A12: transfer + recovery must hold the C1 500-problem probe within
+1 pp of pre-transfer — else revert. See [RESEARCH_ROUND_2.md](RESEARCH_ROUND_2.md) §4.
+
+---
+
 ## The 1000× ledger (kept honest)
 
 "1000× better than v2" is meaningless on a single benchmark — MMLU does not go to
@@ -282,6 +315,7 @@ every row ≥ v2.
 | E5 precision thesis | ternary cliff at P5 (R4) | R4 fallback ladder |
 | E6 μP | proxy LR fails to transfer | conventional sweep at 800 M only |
 | E7 flywheel | reward hacking / no verified gain | static v3.0 (unchanged) |
+| E8 tokenizer transfer | A12 probe drop > 1 pp after recovery | donor vocabulary (unchanged) |
 
 Every kill condition leaves v3 ≥ the pre-edge design. The portfolio is strictly
 additive in expectation — that is what makes it a moat rather than a bet.
