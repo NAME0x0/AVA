@@ -121,6 +121,26 @@ The rows are ordered by **stage at which the risk first manifests** — earliest
 | Probability | Low — traffic is ~100× smaller than MoE expert streaming, which llama.cpp already does from RAM |
 | Mitigation | Pin value table in page-locked memory; overlap lookup with the next layer's compute (retrieval depends only on the mount unit's output). Kill condition in [EDGES.md](EDGES.md): > 15 % decode overhead → ship without memory |
 
+### R20 — Self-play reward hacking (E7/C6)
+
+| | |
+|---|---|
+| Risk | Model learns to satisfy its own generated tests rather than solve tasks: trivial asserts, tests mirroring the solution, degenerate task families. Corrupts the self-play data engine silently |
+| First detected at | C6 (first self-play cycles) |
+| Severity | High — poisons the flywheel that the breakthrough story depends on |
+| Probability | Medium — documented failure mode of AZR-style loops |
+| Mitigation | [RESEARCH_ROUND_3.md](RESEARCH_ROUND_3.md) §5: hidden held-out test half; mutation smoke-test (suites killing < 30 % of simple mutants discarded); property-based templates; SERA soft verification for ranking. Kill condition unchanged (EDGES.md E7) |
+
+### R21 — Eval contamination undermines publishability
+
+| | |
+|---|---|
+| Risk | Training mixes (Stack v2, OpenCodeReasoning, teacher traces, self-play logs) contain eval-set solutions; headline numbers become unreviewable |
+| First detected at | C3 (first large data mixes) |
+| Severity | High for the research claim, low for the product |
+| Probability | High if unmitigated — known contamination in public code corpora |
+| Mitigation | [RESEARCH_ROUND_3.md](RESEARCH_ROUND_3.md) §3: MinHash near-dedup + 10-gram + normalized-AST decontamination against every matrix eval; per-phase contamination report ships with each checkpoint; LiveCodeBench time-window as temporal holdout |
+
 ### R10 — Ternary Bonsai license restriction on shared expert
 
 | | |
@@ -233,5 +253,7 @@ Any one of these is acceptable. A combination of (1) + (4) is the *typical* expe
 | R17 | Hardware loss | any | L × C | mitigated by HF mirrors |
 | R18 | Memory-tier GGML op (E1) | P9b | M × M | open — gated behind ablation A8 |
 | R19 | Memory-tier RAM latency (E1) | P9b | L × M | open — kill condition defined |
+| R20 | Self-play reward hacking (E7) | C6 | M × H | mitigated — verifier hardening (round 3) |
+| R21 | Eval contamination | C3 | H × H | mitigated — decontam gate + published report |
 
 `P × S` = probability × severity. L=low, M=medium, H=high, C=critical.

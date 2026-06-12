@@ -42,6 +42,11 @@ transplant:                       # CODE_PIVOT.md section 3
     recipe: lolcats               # attention transfer + LoRA recovery (2410.10254)
     target_mixer: mamba3          # fallback: gated_deltanet
     layers_converted: 27          # keep 9 softmax -> 3:1 hybrid
+    softmax_layer_selection: induction_probe   # RESEARCH_ROUND_3.md section 1
+    probe_result: configs/qwen3_4b_induction_probe.json
+    exit_checks:                  # catches "linearized but lobotomized" early
+      induction_retention_min: 0.80
+      needle_in_repo_drop_max_pp: 5
     token_budget: 80e6
     fallback_recipes: [mohawk, mamba_in_llama, radlads]
   t2_moeify:
@@ -71,7 +76,14 @@ data:                             # all redistributable; CODE_PIVOT.md section 4
   instruct: self-oss-instruct
   teacher_traces: generated_weekly
   self_play: mcp_sandbox_verified
+  agentic_synthetic: swe_playground          # RESEARCH_ROUND_3.md section 4
   objectives: [next_token, fim]   # FIM mandatory from C3 onward
+  packing: repo_topological       # DeepSeek-Coder recipe; FIM after packing
+  hygiene:                        # R21 — ships as a published report per phase
+    dedup: minhash_lsh
+    decontamination: [ngram_10, normalized_ast]
+    against: all_eval_matrix_sets
+    temporal_holdout: livecodebench_time_window
 
 self_play:                        # E7 promoted to core (phase C6)
   enabled: true
@@ -80,6 +92,24 @@ self_play:                        # E7 promoted to core (phase C6)
   propose_budget: 6
   distill_budget: 2
   improvement_ladder: [S1_fix_own_code, S2_generate_tasks, S3_repair_pipeline, S4_curriculum_proposals]
+  verifier_hardening:             # R20 — RESEARCH_ROUND_3.md section 5
+    hidden_test_half: true
+    mutation_smoke_min_kill: 0.30 # weaker test suites discarded
+    property_based_templates: true
+    soft_verification: sera_style # ranks among passers; D5 diff-minimality in reward
+    feedback_agent: true          # SIA pattern: failures become critique data
+  task_families:
+    - function_level_azr
+    - swe_playground_synthetic
+    - perf_verifiable_speedup     # timed harness reward (kernels, hot loops)
+
+training_recipe_extras:           # RESEARCH_ROUND_3.md section 6
+  checkpoint_ema_last_k: 4        # soup before each gate eval; fabric stores them
+  gkd_on_policy_lane:             # gated A14; Qwen-vocab teachers only
+    enabled_at: C5_ablation
+    teacher: Qwen/Qwen3.6-27B
+    adopt_if: beats_trace_sft_at_equal_gpu_hours
+  canon_layer_ablation: A13_50M_proxy_only
 
 compute:                          # CODE_PIVOT.md section 6 — all free
   laptop: rtx_a2000_4gb_24x7

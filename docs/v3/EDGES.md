@@ -277,8 +277,9 @@ compresses code into fewer tokens — fewer tokens per line multiplies with
 every speed edge (D1 CPU decode, E3 speculation).
 
 **Status & gate.** Off the critical path; run only if T1–T4 land early.
-Ablation A12: transfer + recovery must hold the C1 500-problem probe within
-1 pp of pre-transfer — else revert. See [RESEARCH_ROUND_2.md](RESEARCH_ROUND_2.md) §4.
+Ablation A15: transfer + recovery must hold the C1 500-problem probe within
+1 pp of pre-transfer — else revert. (A12 belongs to router-entropy-per-language
+in CODE_PIVOT §4.) See [RESEARCH_ROUND_2.md](RESEARCH_ROUND_2.md) §4.
 
 ---
 
@@ -315,7 +316,7 @@ every row ≥ v2.
 | E5 precision thesis | ternary cliff at P5 (R4) | R4 fallback ladder |
 | E6 μP | proxy LR fails to transfer | conventional sweep at 800 M only |
 | E7 flywheel | reward hacking / no verified gain | static v3.0 (unchanged) |
-| E8 tokenizer transfer | A12 probe drop > 1 pp after recovery | donor vocabulary (unchanged) |
+| E8 tokenizer transfer | A15 probe drop > 1 pp after recovery | donor vocabulary (unchanged) |
 
 Every kill condition leaves v3 ≥ the pre-edge design. The portfolio is strictly
 additive in expectation — that is what makes it a moat rather than a bet.

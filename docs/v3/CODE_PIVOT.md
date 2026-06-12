@@ -85,6 +85,14 @@ attention-transfer loss treats the donor's own attention as the teacher.
 Alternatives if quality drops: MOHAWK / Mamba-in-Llama / RADLADS (full-update
 variants, costlier but more exact).
 
+> **Round-3 revision ([RESEARCH_ROUND_3.md](RESEARCH_ROUND_3.md) §1):** the 9
+> kept softmax layers are chosen by the **induction-head probe**
+> (`experiments/exp6_v3/scripts/induction_probe.py`, implemented + tested),
+> not uniform spacing — hybrid ablations show recall/copying lives in a few
+> induction/retrieval heads and code is the worst-case domain for losing them.
+> Added T1 exit checks: kept layers retain ≥ 80% of pre-conversion induction
+> score; needle-in-repo retrieval within 5 pp of donor.
+
 **T2 — MoE-ify: donor FFN → 32 ternary experts (sparse upcycling + BitDistiller).**
 Sparse upcycling (arXiv:[2212.05055](https://arxiv.org/abs/2212.05055)): replicate
 the donor FFN into experts (split + noise), add the BF16 sigmoid router with
@@ -130,6 +138,21 @@ ablation A12).
 FIM (fill-in-middle) objective joins next-token from T2 onward — non-negotiable
 for editor/agent use.
 
+**Round-3 data-pipeline additions ([RESEARCH_ROUND_3.md](RESEARCH_ROUND_3.md)
+§2–§4), all mandatory:**
+
+- **Repo-level topological packing** (DeepSeek-Coder recipe): Stack v2 contexts
+  are packed repo-wise in import-dependency order, FIM applied after packing so
+  spans cross file boundaries.
+- **Dedup + decontamination gate (R21)**: MinHash near-dedup over every mix;
+  10-gram + normalized-AST overlap removal against every eval set in the
+  matrix; a per-phase **contamination report ships with every checkpoint**.
+  LiveCodeBench time-windowing is the temporal holdout.
+- **SWE-Playground synthetic environments** join the agentic tier between AZR
+  function tasks and SWE-bench-style work; **SERA-style soft verification**
+  ranks passing solutions (hard execution filter for inclusion, soft
+  verification for ranking).
+
 ---
 
 ## 5. Self-improvement: the part that makes it a breakthrough
@@ -143,6 +166,12 @@ computer itself. v3-Code's training closes the loop:
 2. **Solve** — at `reasoning_budget=6` + latent restarts (expensive mode).
 3. **Verify** — run in the MCP sandbox; tests pass or fail. Stepwise execution
    rewards where applicable (ExecVerify, arXiv:[2603.11226](https://arxiv.org/abs/2603.11226)).
+   **Verifier hardening ([RESEARCH_ROUND_3.md](RESEARCH_ROUND_3.md) §5):**
+   hidden held-out test half; mutation smoke-test discards suites killing
+   < 30% of simple mutants; property-based templates for algorithmic
+   families; SERA soft verification ranks among passers (diff minimality D5
+   enters the reward here). A **feedback-agent role** (SIA pattern) turns
+   failed trajectories into critique data instead of discards.
 4. **Distill** — verified solutions become SFT data consumed at
    `reasoning_budget=2` (cheap mode). Test-time compute converted into weights.
 5. **Repeat** — overnight, on the laptop, forever. Capability grows with idle
