@@ -141,6 +141,16 @@ The rows are ordered by **stage at which the risk first manifests** — earliest
 | Probability | High if unmitigated — known contamination in public code corpora |
 | Mitigation | [RESEARCH_ROUND_3.md](RESEARCH_ROUND_3.md) §3: MinHash near-dedup + 10-gram + normalized-AST decontamination against every matrix eval; per-phase contamination report ships with each checkpoint; LiveCodeBench time-window as temporal holdout |
 
+### R22 — Hybrid multi-hop reasoning deficit hidden by standard benchmarks
+
+| | |
+|---|---|
+| Risk | v3's Mamba-3 hybrid may match dense attention on release-length standard benchmarks yet silently underperform on higher-order **multi-hop reasoning** at scale — the exact failure MiniMax hit (M1 hybrid → M2 reverted to full attention), per the SubQ-1.1 report §2.5 |
+| First detected at | T1 gate (linearization) and again at C2 |
+| Severity | High — the deficit is invisible on single-needle/retrieval probes, surfaces only on multi-hop composition |
+| Probability | Medium — documented across MiniMax and SubQ's own framing of the SSM compression-vs-retrieval gap |
+| Mitigation | [RESEARCH_ROUND_5.md](RESEARCH_ROUND_5.md): (a) evidence-placed softmax keep-set already via the induction probe (R3 round); (b) **add a multi-hop reasoning probe to the T1/T2 gate suite**, not just single-key recall; (c) re-validate the induction keep-set against multi-hop, not only single-needle. Fallback: raise the softmax-layer count (fewer converted layers) or keep a full-attention H-lane |
+
 ### R10 — Ternary Bonsai license restriction on shared expert
 
 | | |
@@ -255,5 +265,6 @@ Any one of these is acceptable. A combination of (1) + (4) is the *typical* expe
 | R19 | Memory-tier RAM latency (E1) | P9b | L × M | open — kill condition defined |
 | R20 | Self-play reward hacking (E7) | C6 | M × H | mitigated — verifier hardening (round 3) |
 | R21 | Eval contamination | C3 | H × H | mitigated — decontam gate + published report |
+| R22 | Hybrid multi-hop deficit | T1 | M × H | mitigated — multi-hop gate probe + evidence keep-set (round 5) |
 
 `P × S` = probability × severity. L=low, M=medium, H=high, C=critical.

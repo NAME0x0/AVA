@@ -57,6 +57,12 @@ class V3Config:
     max_l_steps: int = 6
     mean_l_steps_target: float = 2.5
     ponder_loss_weight: float = 0.05
+    # Sample-level loss aggregation (SubQ-1.1 report section 3.4,
+    # docs/v3/RESEARCH_ROUND_5.md): average CE per example, then over the batch,
+    # so a few very long sequences do not dominate the gradient. Matters once
+    # YaRN-extended variable-length batches enter training; token-level default
+    # is unchanged for fixed-length training.
+    sample_level_loss: bool = False
     supervised_steps: tuple[int, ...] = (2, 4, 6)
     detach_between_segments: bool = True
     restart_confidence_threshold: float = 0.35
@@ -332,11 +338,34 @@ class AVAv3ForCausalLM(nn.Module):
 
         loss = lm_loss = ponder = None
         if labels is not None:
-            lm_loss = F.cross_entropy(
-                logits[:, :-1].reshape(-1, self.cfg.vocab_size).float(),
-                labels[:, 1:].reshape(-1),
-                ignore_index=-100,
-            )
+            shift_logits = logits[:, :-1].float()
+            shift_labels = labels[:, 1:]
+            if self.cfg.sample_level_loss:
+                # Per-example mean CE, then mean over examples (SubQ §3.4): a few
+                # long sequences cannot dominate the gradient. Examples with no
+                # supervised tokens (all -100) are dropped from the batch mean.
+                b, t, v = shift_logits.shape
+                per_tok = F.cross_entropy(
+                    shift_logits.reshape(-1, v),
+                    shift_labels.reshape(-1),
+                    ignore_index=-100,
+                    reduction="none",
+                ).view(b, t)
+                valid = (shift_labels != -100).float()
+                counts = valid.sum(dim=1)
+                per_ex = (per_tok * valid).sum(dim=1) / counts.clamp(min=1.0)
+                has_tokens = counts > 0
+                lm_loss = (
+                    per_ex[has_tokens].mean()
+                    if has_tokens.any()
+                    else per_ex.sum() * 0.0
+                )
+            else:
+                lm_loss = F.cross_entropy(
+                    shift_logits.reshape(-1, self.cfg.vocab_size),
+                    shift_labels.reshape(-1),
+                    ignore_index=-100,
+                )
             expected = torch.stack([u.expected_steps.mean() for u in unit_outputs])
             ponder = (expected - self.cfg.mean_l_steps_target).abs().mean()
             loss = lm_loss + self.cfg.ponder_loss_weight * ponder

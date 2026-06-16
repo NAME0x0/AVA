@@ -108,6 +108,18 @@ is bit-identical at mount time; capability grows from there.
 
 **T4 — Specialize: the coding curriculum (§4) + self-play (§5).**
 
+**Recovery-phase discipline ([RESEARCH_ROUND_5.md](RESEARCH_ROUND_5.md)).**
+SubQ-1.1 validated the transplant thesis at frontier scale *and* showed the
+failure mode: early checkpoints improved the target capability while
+knowledge/reasoning regressed. So each transplant stage (T1, T2) is followed by
+an explicit **recovery phase** before the next surgery, every stage gate is
+**multi-capability** (incl. a **multi-hop reasoning** probe, not just
+single-needle recall — R22), and checkpoint selection uses a fixed
+**deployment-shaped spot-check set** (repo-scale code reasoning, multi-file
+edits) alongside the eval matrix — a checkpoint that wins the proxy but loses
+the spot-checks does not advance. The long-context training option
+`sample_level_loss` (SubQ §3.4) is enabled for the YaRN/mixed-length phases.
+
 Honest cost of the transplant chain: T1 ≈ 40–80 M tokens, T2 ≈ 300–600 M, T3+T4 ≈
 600 M–1 B. Total **≈ 1–1.7 B tokens** — an order of magnitude under the clean-slate
 plan, which is what makes $0 arithmetic close (§6).
