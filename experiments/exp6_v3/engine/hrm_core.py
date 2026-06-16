@@ -16,6 +16,26 @@ Implements the design responses D1–D3 from docs/v3/HRM_TEXT.md section 1b:
   restarts once from a perturbed initial state and the higher-confidence
   outcome wins (perturbation+bootstrapping result of arXiv:2601.10679).
 
+Two optional refinements ported from OpenMythos (kyegomez, MIT) after the
+2026-06-16 review (docs/v3/RESEARCH_ROUND_4.md), both **default-off** and
+**no-op at initialization** so the donor warm-start stays bit-identical and
+the existing tested forward path is unchanged:
+
+- **D5 loop-index embedding** (``use_loop_index_embedding``): a sinusoidal
+  depth-index signal added before each L-group, scaled by a zero-init learned
+  gate, so shared loop weights can tell which iteration they are on (a RoPE
+  analog over recurrence depth instead of token position).
+- **D6 LTI-stable injection** (``use_lti_injection``): an opt-in contractive
+  update ``z_k = (1-g)·f(z) + g·(A⊙z + (f(z)-z) + B⊙cond)`` with a diagonal
+  ``A = exp(-exp(·)) ∈ [0,1)`` guaranteeing spectral radius < 1 by
+  construction — the same SSM discretization v3 already uses inside Mamba-3,
+  applied to the outer refinement loop. The increment ``f(z)-z`` is kept while
+  the carry is decayed (v3 blocks already carry ``z`` via internal residuals).
+  The interpolation gate ``g`` is zero-init, so at enable time the update
+  equals the current rule; ``g`` lets the provable-contraction term phase in.
+  This is the structural counterpart to the D3 perturbed-restart band-aid for
+  fixed-point blow-up.
+
 Halting is trained with an ACT-style ponder objective (Graves 2016): the unit
 returns the differentiable expected step count; the P4 trainer regresses it
 toward ``mean_l_steps_target`` (docs/v3/RECIPE.md).
@@ -44,6 +64,64 @@ class HRMOutput:
     steps_used: int                 # actual L-iterations executed
     restarted: bool = False         # D3 escape fired
     supervised_iterates: list[Tensor] = field(default_factory=list)
+
+
+def loop_index_embedding(
+    z: Tensor, loop_t: int, loop_dim: int, theta: float = 10000.0
+) -> Tensor:
+    """Sinusoidal embedding of the recurrence-depth index (additive bias).
+
+    Analogous to RoPE for token position, but over loop iteration. Returns a
+    bias of shape ``[hidden]`` (broadcast over batch/time); only the first
+    ``loop_dim`` channels are populated. Ported from OpenMythos (MIT).
+    """
+    half = torch.arange(0, loop_dim, 2, device=z.device, dtype=torch.float32)
+    freqs = 1.0 / (theta ** (half / loop_dim))
+    angles = loop_t * freqs
+    emb = torch.cat([angles.sin(), angles.cos()], dim=-1)[:loop_dim]
+    full = torch.zeros(z.shape[-1], device=z.device, dtype=torch.float32)
+    full[:loop_dim] = emb
+    return full.to(z.dtype)
+
+
+class LTIStableInjection(nn.Module):
+    """Provably contractive injection for the outer refinement loop.
+
+    v3's L-blocks already carry the state through their own internal residuals,
+    so ``transformer_out`` already contains a unit-coefficient copy of ``z``.
+    Stabilizing the *increment* rather than re-adding the carry, the update is
+
+        Δ = transformer_out − z                  (the loop's refinement step)
+        z_next = A⊙z + Δ + B⊙cond                (decay the carry, keep Δ)
+
+    with diagonal ``A = exp(-exp(clamp(log_dt + log_A))) ∈ [0,1)`` guaranteeing
+    spectral radius < 1 by construction (ZOH discretization of a negative-real
+    diagonal continuous-time SSM — the same form as Mamba-3's per-step decay).
+    At ``A = 1, B = 0`` this is exactly the current rule (``z_next =
+    transformer_out``), so the contraction is opt-in.
+
+    A zero-init interpolation gate ``g = sigmoid(gate_logit)`` with
+    ``gate_logit`` init very negative makes the module's contribution start at
+    ~0, so enabling it does not perturb a warm-started (donor) network; the
+    gate learns the contraction term in. Ported/adapted from OpenMythos (MIT).
+    """
+
+    def __init__(self, hidden_size: int, dtype: torch.dtype | None = None) -> None:
+        super().__init__()
+        self.log_A = nn.Parameter(torch.zeros(hidden_size, dtype=dtype))
+        self.log_dt = nn.Parameter(torch.zeros(1, dtype=dtype))
+        self.B = nn.Parameter(torch.full((hidden_size,), 0.1, dtype=dtype))
+        # gate init -> sigmoid(-8) ~= 3e-4: effectively the current rule at enable.
+        self.gate_logit = nn.Parameter(torch.full((1,), -8.0, dtype=dtype))
+
+    def get_A(self) -> Tensor:
+        return torch.exp(-torch.exp((self.log_dt + self.log_A).clamp(-20, 20)))
+
+    def forward(self, z: Tensor, cond: Tensor, transformer_out: Tensor) -> Tensor:
+        g = torch.sigmoid(self.gate_logit).to(z.dtype)
+        delta = transformer_out - z
+        stabilized = self.get_A().to(z.dtype) * z + delta + self.B.to(z.dtype) * cond
+        return (1.0 - g) * transformer_out + g * stabilized
 
 
 class HaltingHead(nn.Module):
@@ -92,6 +170,9 @@ class HRMRepeatUnit(nn.Module):
         detach_between_segments: bool = True,
         restart_confidence_threshold: float = 0.35,
         restart_perturbation_std: float = 0.02,
+        use_loop_index_embedding: bool = False,
+        loop_index_dim: int = 64,
+        use_lti_injection: bool = False,
         dtype: torch.dtype | None = None,
     ) -> None:
         super().__init__()
@@ -110,11 +191,30 @@ class HRMRepeatUnit(nn.Module):
         self.halting_head = HaltingHead(hidden_size, dtype=dtype)
         self._sqrt_d = float(hidden_size) ** 0.5
 
-    def _run_l_group(self, z: Tensor, cond: Tensor, **block_kwargs: object) -> Tensor:
-        z = z + self.cond_proj(cond)
+        # D5 — loop-index embedding (default off; zero-init gate => no-op at enable).
+        self.use_loop_index_embedding = use_loop_index_embedding
+        self.loop_index_dim = min(loop_index_dim, hidden_size)
+        if use_loop_index_embedding:
+            self.loop_emb_gate = nn.Parameter(torch.zeros(1, dtype=dtype))
+        # D6 — LTI-stable injection (default off; contractive outer-loop update).
+        self.use_lti_injection = use_lti_injection
+        self.lti = (
+            LTIStableInjection(hidden_size, dtype=dtype) if use_lti_injection else None
+        )
+
+    def _run_l_group(
+        self, z: Tensor, cond: Tensor, loop_t: int = 0, **block_kwargs: object
+    ) -> Tensor:
+        z_in = z + self.cond_proj(cond)
+        if self.use_loop_index_embedding:
+            bias = loop_index_embedding(z_in, loop_t, self.loop_index_dim)
+            z_in = z_in + self.loop_emb_gate.to(z_in.dtype) * bias
+        out = z_in
         for blk in self.l_blocks:
-            z = blk(z, **block_kwargs)
-        return z
+            out = blk(out, **block_kwargs)
+        if self.lti is not None:
+            out = self.lti(z, cond, out)
+        return out
 
     def _refine(
         self,
@@ -134,7 +234,7 @@ class HRMRepeatUnit(nn.Module):
         steps_used = 0
 
         for k in range(1, steps + 1):
-            z = self._run_l_group(z, cond, **block_kwargs)
+            z = self._run_l_group(z, cond, loop_t=k - 1, **block_kwargs)
             residual = (z - z_prev).float().norm(dim=-1, keepdim=True) / self._sqrt_d
             p = self.halting_head(z, cond, residual.to(z.dtype))        # [b, t]
             halt_probs.append(p)

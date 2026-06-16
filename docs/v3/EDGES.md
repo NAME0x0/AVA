@@ -305,6 +305,28 @@ face *only* in the composite sense above, never about a single score. The strict
 per-benchmark commitments stay where they always were: [PERF_TARGETS.md](PERF_TARGETS.md),
 every row ≥ v2.
 
+## E9 — Loop stability + depth-index (OpenMythos-derived, implemented)
+
+**Mechanism.** Two opt-in refinements to the HRM refinement loop, both
+implemented in `engine/hrm_core.py`, both default-off and no-op at init
+(donor warm-start preserved): a **loop-index embedding** (sinusoidal
+recurrence-depth signal, RoPE analog over depth) so shared loop weights know
+which iteration they are on; and an **LTI-stable injection** that decays the
+inter-iteration carry with a diagonal `A = exp(-exp(·)) ∈ [0,1)`, giving
+provable spectral radius < 1 — the structural fix for the fixed-point blow-up
+that D3's perturbed restart currently band-aids.
+
+**Why it compounds.** Near-zero cost (one gate scalar + one diagonal SSM per
+unit), and it makes an *existing* edge cheaper: if A17 cuts D3 restart
+frequency, adaptive inference spends fewer wasted forward passes — speed that
+multiplies with E3 speculation and D1 CPU decode.
+
+**Status & gate.** Implemented + tested (5 tests). Off until measured.
+A16 (loop-index): enable if it improves the loss-vs-L-step curve at equal
+steps (bar = non-negative, cost ≈ 0). A17 (LTI): enable if it reduces
+grad-norm spikes / D3 restart rate without hurting refinement gain. Full
+rationale: [RESEARCH_ROUND_4.md](RESEARCH_ROUND_4.md).
+
 ## What would kill each edge
 
 | Edge | Kill condition | Survives as |
@@ -317,6 +339,7 @@ every row ≥ v2.
 | E6 μP | proxy LR fails to transfer | conventional sweep at 800 M only |
 | E7 flywheel | reward hacking / no verified gain | static v3.0 (unchanged) |
 | E8 tokenizer transfer | A15 probe drop > 1 pp after recovery | donor vocabulary (unchanged) |
+| E9 loop stability + depth-index | A16/A17 no gain at proxy | current HRM loop (unchanged; both default off) |
 
 Every kill condition leaves v3 ≥ the pre-edge design. The portfolio is strictly
 additive in expectation — that is what makes it a moat rather than a bet.

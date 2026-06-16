@@ -61,6 +61,11 @@ class V3Config:
     detach_between_segments: bool = True
     restart_confidence_threshold: float = 0.35
     restart_perturbation_std: float = 0.02
+    # OpenMythos-derived refinements (docs/v3/RESEARCH_ROUND_4.md), default off:
+    # no-op at init, gated ablations A16 (loop-index) / A17 (LTI stability).
+    use_loop_index_embedding: bool = False
+    loop_index_dim: int = 64
+    use_lti_injection: bool = False
     # Product-key memory tier (E1, docs/v3/EDGES.md) — RAM-resident capacity.
     # One shared pool, mounted as a residual branch on the listed units.
     use_memory: bool = False
@@ -274,6 +279,9 @@ class AVAv3ForCausalLM(nn.Module):
                 detach_between_segments=cfg.detach_between_segments,
                 restart_confidence_threshold=cfg.restart_confidence_threshold,
                 restart_perturbation_std=cfg.restart_perturbation_std,
+                use_loop_index_embedding=cfg.use_loop_index_embedding,
+                loop_index_dim=cfg.loop_index_dim,
+                use_lti_injection=cfg.use_lti_injection,
             )
             for _ in range(cfg.num_repeats)
         )
