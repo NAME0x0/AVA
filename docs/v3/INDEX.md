@@ -24,6 +24,7 @@ The hardware constraint is unchanged: **4 GB VRAM laptop, single card, no cloud,
 | 0d | [RESEARCH_ROUND_3.md](RESEARCH_ROUND_3.md) | The de-risk package: induction-aware T1 layer selection (implemented), repo-topo packing, decontamination gate (R21), verifier hardening (R20), EMA/GKD lanes — then C1, not more design |
 | 0e | [RESEARCH_ROUND_4.md](RESEARCH_ROUND_4.md) | OpenMythos review: loop-index embedding (A16) + LTI-stable injection (A17) added to the HRM loop (E9, implemented, default-off); second link (system-prompt gist) off-topic |
 | 0f | [RESEARCH_ROUND_5.md](RESEARCH_ROUND_5.md) | SubQ-1.1-Small review: external validation of the donor-transplant thesis at frontier scale; sample-level loss (implemented); recovery-phase discipline + multi-hop gate (R22); does NOT reopen the long-context cut |
+| 0g | [RESEARCH_ROUND_6.md](RESEARCH_ROUND_6.md) | A v3-pattern hobby model in the wild (Gemma-4-12B coder): validates the $0 execution-verified multi-teacher recipe; tightens fallback to fresh-derivation (round-2 §3); base model not usable (12B, Gemma license) |
 | 1 | [WHY_V3.md](WHY_V3.md) | One-page motivation: what v2 cannot do and why v3 needs a new architecture |
 | 2 | [ARCHITECTURE_V3.md](ARCHITECTURE_V3.md) | Block-level diagram, dimensions, layer ratios, parameter budget, memory math |
 | 3 | [HRM_TEXT.md](HRM_TEXT.md) | How the H-module / L-module dual recurrence integrates with the MoE student |

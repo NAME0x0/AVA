@@ -105,8 +105,14 @@ What is proven:
 **Conflict protocol (binding, in priority order):**
 1. **Execution filter first**: only traces whose final code passes tests enter
    the pool. Two teachers disagreeing but both passing = both valid (diversity).
-2. **Domain routing**: each task family has a designated primary teacher;
-   secondary teacher traces enter only if primary fails the execution filter.
+2. **Domain routing with fresh-derivation fallback**: each task family has a
+   designated primary teacher; secondary teacher traces enter only if the
+   primary fails the execution filter. On fallback the secondary teacher
+   **re-derives a fresh, self-consistent chain-of-thought from scratch**, it
+   does *not* patch or repair the primary's failed trace — a stitched
+   correction trains the student on reasoning that does not actually lead to
+   the verified answer. Both the fresh CoT and its code are execution-gated.
+   (Validated in the wild — [RESEARCH_ROUND_6.md](RESEARCH_ROUND_6.md).)
 3. **Local-naturalness scoring** (student-side, stepwise) picks among
    surviving traces — choose what the student can learn, not what looks best.
 4. **One format contract**: a single trace template (analysis → plan → code →
