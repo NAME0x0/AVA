@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="500" viewBox="0 0 980 500" role="img" aria-labelledby="title desc">
+  <title id="title">AVA v2 GGUF quantization choices</title>
+  <desc id="desc">Chart comparing AVA v2 GGUF quant sizes and recommended use cases. Q4_K_M is marked as the recommended default.</desc>
+  <rect width="980" height="500" rx="18" fill="#101418"/>
+  <text x="48" y="58" fill="#ffffff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="700">AVA v2 GGUF choices</text>
+  <text x="48" y="88" fill="#aeb6c2" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">All sub-8-bit quants use an importance matrix calibrated on AVA's training distribution.</text>
+  <g font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#aeb6c2">
+    <text x="48" y="132">Tag</text>
+    <text x="220" y="132">Size</text>
+    <text x="340" y="132">RAM</text>
+    <text x="455" y="132">Use when</text>
+  </g>
+  <g font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18">
+    <rect x="36" y="150" width="908" height="54" rx="10" fill="#171c22"/>
+    <text x="48" y="184" fill="#e8edf5">IQ4_XS</text>
+    <text x="220" y="184" fill="#e8edf5">1.11 GB</text>
+    <text x="340" y="184" fill="#e8edf5">~1.6 GB</text>
+    <text x="455" y="184" fill="#c5ccd8">Tightest fit: old laptops and small boxes</text>
+    <rect x="36" y="214" width="908" height="54" rx="10" fill="#171c22"/>
+    <text x="48" y="248" fill="#e8edf5">Q4_0</text>
+    <text x="220" y="248" fill="#e8edf5">1.12 GB</text>
+    <text x="340" y="248" fill="#e8edf5">~1.6 GB</text>
+    <text x="455" y="248" fill="#c5ccd8">ARM/AVX-optimized CPU inference</text>
+    <rect x="36" y="278" width="908" height="64" rx="12" fill="#f5c542"/>
+    <text x="48" y="318" fill="#101418" font-weight="700">Q4_K_M</text>
+    <text x="220" y="318" fill="#101418" font-weight="700">1.19 GB</text>
+    <text x="340" y="318" fill="#101418" font-weight="700">~1.7 GB</text>
+    <text x="455" y="318" fill="#101418" font-weight="700">Recommended default: tiny, fast, close to reference</text>
+    <rect x="36" y="352" width="908" height="54" rx="10" fill="#171c22"/>
+    <text x="48" y="386" fill="#e8edf5">Q5_K_M</text>
+    <text x="220" y="386" fill="#e8edf5">1.31 GB</text>
+    <text x="340" y="386" fill="#e8edf5">~1.8 GB</text>
+    <text x="455" y="386" fill="#c5ccd8">Better quality while staying small</text>
+    <rect x="36" y="416" width="908" height="54" rx="10" fill="#171c22"/>
+    <text x="48" y="450" fill="#e8edf5">Q8_0</text>
+    <text x="220" y="450" fill="#e8edf5">1.87 GB</text>
+    <text x="340" y="450" fill="#e8edf5">~2.4 GB</text>
+    <text x="455" y="450" fill="#c5ccd8">Reference quality; matches published eval</text>
+  </g>
+</svg>

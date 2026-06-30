@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="620" viewBox="0 0 980 620" role="img" aria-labelledby="title desc">
+  <title id="title">AVA v2 ARC-Challenge comparison</title>
+  <desc id="desc">Horizontal bar chart comparing ARC-Challenge scores for small models. AVA v2 scores 82.0 percent, ahead of several 1B to 3B models and near Phi mini models.</desc>
+  <rect width="980" height="620" rx="18" fill="#ffffff"/>
+  <text x="48" y="58" fill="#111318" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="700">ARC-Challenge: reasoning on small models</text>
+  <text x="48" y="88" fill="#667085" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">Scores from published model cards/reports; protocols vary by source. AVA v2 uses full 1,172-question test split.</text>
+  <line x1="280" y1="126" x2="280" y2="544" stroke="#d6dbe5"/>
+  <line x1="280" y1="544" x2="900" y2="544" stroke="#d6dbe5"/>
+  <g font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#667085">
+    <text x="272" y="568" text-anchor="end">0</text>
+    <text x="404" y="568" text-anchor="middle">20</text>
+    <text x="528" y="568" text-anchor="middle">40</text>
+    <text x="652" y="568" text-anchor="middle">60</text>
+    <text x="776" y="568" text-anchor="middle">80</text>
+    <text x="900" y="568" text-anchor="middle">100</text>
+  </g>
+  <g stroke="#edf0f5">
+    <line x1="404" y1="126" x2="404" y2="544"/>
+    <line x1="528" y1="126" x2="528" y2="544"/>
+    <line x1="652" y1="126" x2="652" y2="544"/>
+    <line x1="776" y1="126" x2="776" y2="544"/>
+    <line x1="900" y1="126" x2="900" y2="544"/>
+  </g>
+  <g font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16">
+    <text x="48" y="152" fill="#111318">TinyLlama 1.1B</text><rect x="280" y="135" width="187" height="20" rx="5" fill="#cfd6e4"/><text x="478" y="152" fill="#333946">30.1</text>
+    <text x="48" y="190" fill="#111318">SmolLM2 1.7B</text><rect x="280" y="173" width="322" height="20" rx="5" fill="#cfd6e4"/><text x="613" y="190" fill="#333946">52.0</text>
+    <text x="48" y="228" fill="#111318">Qwen2.5 1.5B</text><rect x="280" y="211" width="339" height="20" rx="5" fill="#cfd6e4"/><text x="630" y="228" fill="#333946">54.7</text>
+    <text x="48" y="266" fill="#111318">Gemma 2 2B</text><rect x="280" y="249" width="345" height="20" rx="5" fill="#cfd6e4"/><text x="636" y="266" fill="#333946">55.7</text>
+    <text x="48" y="304" fill="#111318">Llama 3.2 1B-IT</text><rect x="280" y="287" width="368" height="20" rx="5" fill="#cfd6e4"/><text x="659" y="304" fill="#333946">59.4</text>
+    <text x="48" y="342" fill="#111318">Llama 3.2 3B-IT</text><rect x="280" y="325" width="487" height="20" rx="5" fill="#cfd6e4"/><text x="778" y="342" fill="#333946">78.6</text>
+    <text x="48" y="380" fill="#111318" font-weight="700">AVA v2 2B</text><rect x="280" y="363" width="508" height="20" rx="5" fill="#111318"/><text x="800" y="380" fill="#111318" font-weight="700">82.0</text>
+    <text x="48" y="418" fill="#111318">Phi-4-mini 3.8B</text><rect x="280" y="401" width="519" height="20" rx="5" fill="#f5c542"/><text x="810" y="418" fill="#333946">83.7</text>
+    <text x="48" y="456" fill="#111318">Phi-3.5-mini 3.8B</text><rect x="280" y="439" width="525" height="20" rx="5" fill="#f5c542"/><text x="816" y="456" fill="#333946">84.6</text>
+  </g>
+  <text x="48" y="596" fill="#667085" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">AVA v2: 42 MB LoRA adapter, trained on one 4 GB VRAM laptop GPU.</text>
+</svg>
