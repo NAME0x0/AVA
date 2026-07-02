@@ -70,6 +70,35 @@ def test_interval_gating(monkeypatch) -> None:
     assert sync.maybe_save(3, model, force=True) is True
 
 
+def test_trainable_only_saves_subset_and_resumes(tmp_path, monkeypatch) -> None:
+    api = FakeApi()
+    monkeypatch.setattr(cs, "hf_hub_download", _fake_download_factory(api, tmp_path))
+
+    # Frozen "donor" layer + a small trainable "adapter"; only the adapter trains.
+    model = torch.nn.Sequential(torch.nn.Linear(8, 8), torch.nn.Linear(8, 8))
+    for p in model[0].parameters():
+        p.requires_grad_(False)
+
+    sync = cs.CheckpointSync("user/repo", phase="C2", api=api, trainable_only=True)
+    path = sync.save(5, model)
+    payload = torch.load(
+        _fake_download_factory(api, tmp_path)("user/repo", path),
+        weights_only=False,
+    )
+    keys = set(payload["model"])
+    assert all(k.startswith("1.") for k in keys)  # only the trainable second layer
+    assert payload["trainable_only"] is True
+
+    # Resume onto a full fresh model (frozen base already present) must not error.
+    fresh = torch.nn.Sequential(torch.nn.Linear(8, 8), torch.nn.Linear(8, 8))
+    next_step = cs.CheckpointSync(
+        "user/repo", phase="C2", api=api, trainable_only=True
+    ).resume(fresh)
+    assert next_step == 6
+    for a, b in zip(model[1].parameters(), fresh[1].parameters(), strict=True):
+        assert torch.equal(a, b)
+
+
 def test_fresh_start_when_no_pointer(tmp_path, monkeypatch) -> None:
     api = FakeApi()
     monkeypatch.setattr(cs, "hf_hub_download", _fake_download_factory(api, tmp_path))

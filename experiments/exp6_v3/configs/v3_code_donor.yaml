@@ -5,17 +5,25 @@
 name: ava-v3-code
 mission: coding specialist, <=4 GB VRAM, $0 training, free forever
 
-donor:
-  model: Qwen/Qwen3-4B            # Apache 2.0; re-evaluate at C1 if a stronger
-  license: apache-2.0             # Apache <=4B coder exists (Qwen2.5-Coder-3B is
-  hidden_size: 2560               # research-license -> disqualified)
-  num_layers: 36
-  num_q_heads: 32
-  num_kv_heads: 8
-  head_dim: 128
-  intermediate_size: 9728
-  vocab_size: 151936              # Qwen3 tokenizer; tied embeddings
+donor:                            # SWAPPED 2026-07-02 (donor re-eval, REVIEW_2026-07.md section 10):
+  model: Qwen/Qwen3.5-4B          # Apache 2.0, Feb 2026. LiveCodeBench v6 55.8,
+  license: apache-2.0             # MMLU-Pro 79.1, GPQA-D 76.2 — out of the box.
+  hidden_size: 2560               # NATIVE 3:1 Gated DeltaNet : Gated Attention hybrid
+  num_layers: 32                  # -> 8 x [3 x GDN->FFN, 1 x GatedAttn->FFN]
+  attention_layout: hybrid_gdn_3to1   # T1 LINEARIZATION ELIMINATED — donor ships it
+  gdn_heads: {v: 32, qk: 16}
+  attn_heads: {q: 16, kv: 4}
+  context_native: 262144          # -> 1M extensible; reverses the 8K-native cut
+  vocab_size: 248320              # Qwen3.5 tokenizer; tied embeddings
   tie_word_embeddings: true
+  thinking_default: true          # traces carry <think> — handle in format contract
+  verify_at_c1: [ffn_intermediate_size, dense_vs_moe_ffn, vision_tower_droppable]
+  previous: Qwen/Qwen3-4B         # superseded — pre-dated Qwen3.5 family
+  runners_up:
+    - model: nvidia/Nemotron-3-Nano-4B   # Mamba-2 hybrid, MATH500 95.4, 262K ctx
+      rejected_for: [non_apache_license, tokenizer_mismatch_with_teacher]
+    - model: google/gemma-4-4b-moe
+      rejected_for: [gemma_license]      # same ruling as RESEARCH_ROUND_6
 
 teacher:                          # RESEARCH_ROUND_2.md section 3 — multi-teacher panel
   panel:
@@ -39,16 +47,13 @@ teacher:                          # RESEARCH_ROUND_2.md section 3 — multi-teac
 
 transplant:                       # CODE_PIVOT.md section 3
   t1_linearize:
-    recipe: lolcats               # attention transfer + LoRA recovery (2410.10254)
-    target_mixer: mamba3          # fallback: gated_deltanet
-    layers_converted: 27          # keep 9 softmax -> 3:1 hybrid
-    softmax_layer_selection: induction_probe   # RESEARCH_ROUND_3.md section 1
-    probe_result: configs/qwen3_4b_induction_probe.json
-    exit_checks:                  # catches "linearized but lobotomized" early
-      induction_retention_min: 0.80
-      needle_in_repo_drop_max_pp: 5
-    token_budget: 80e6
-    fallback_recipes: [mohawk, mamba_in_llama, radlads]
+    status: ELIMINATED_2026-07-02 # Qwen3.5-4B donor is already the 3:1 GDN hybrid.
+    rationale: >                  # LoLCATs surgery, induction-probe keep-set, R2/R22
+      Donor ships the target hybrid trained-in at 262K context with published
+      quality. Converting GDN->Mamba-3 for the +1.8pp ICLR result would re-open
+      the riskiest stage for marginal gain — rejected. SUBQUADRATIC.md's
+      Mamba-3-vs-GDN debate resolves to: keep donor GDN.
+    savings: {tokens: 80e6, risks_retired: [R2, R22_mostly], probe_machinery: kept_for_regression_checks}
   t2_moeify:
     recipe: sparse_upcycling      # 2212.05055 + BitDistiller ternary QAT
     num_routed_experts: 32

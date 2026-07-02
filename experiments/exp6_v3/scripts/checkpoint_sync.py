@@ -76,6 +76,7 @@ class CheckpointSync:
         max_retries: int = 5,
         private: bool = True,
         api: Any | None = None,
+        trainable_only: bool = False,
     ) -> None:
         if api is None:
             if _IMPORT_ERROR is not None:
@@ -88,6 +89,7 @@ class CheckpointSync:
         self.phase = phase
         self.every_seconds = every_minutes * 60.0
         self.max_retries = max_retries
+        self.trainable_only = trainable_only
         self._last_push = 0.0
 
         token_present = bool(os.environ.get("HF_TOKEN")) or bool(
@@ -119,6 +121,20 @@ class CheckpointSync:
         self._last_push = time.monotonic()
         return True
 
+    def _model_state(self, model: torch.nn.Module) -> dict[str, Any]:
+        """Full state_dict, or only params with requires_grad when trainable_only.
+
+        QLoRA/transplant runs freeze the multi-GB donor base and train a small
+        set of adapters + norms + router + halting/mamba projections. Pushing
+        only those keeps each 30-min checkpoint in the MB range instead of GB —
+        the difference between a sync that fits free quota and one that does not.
+        """
+        if not self.trainable_only:
+            return model.state_dict()
+        trainable = {n for n, p in model.named_parameters() if p.requires_grad}
+        full = model.state_dict()
+        return {k: v for k, v in full.items() if k in trainable}
+
     def save(
         self,
         step: int,
@@ -129,10 +145,11 @@ class CheckpointSync:
         payload = {
             "step": step,
             "phase": self.phase,
-            "model": model.state_dict(),
+            "model": self._model_state(model),
             "optimizer": optimizer.state_dict() if optimizer is not None else None,
             "rng": _rng_state(),
             "extra": extra or {},
+            "trainable_only": self.trainable_only,
             "saved_unix": time.time(),
         }
         buffer = io.BytesIO()
@@ -184,7 +201,14 @@ class CheckpointSync:
             return 0
         local = hf_hub_download(self.repo_id, pointer["path"])
         payload = torch.load(local, map_location=map_location, weights_only=False)
-        model.load_state_dict(payload["model"])
+        # strict=False: trainable-only checkpoints carry a subset of keys; the
+        # frozen donor base is already loaded from the donor repo before resume.
+        result = model.load_state_dict(payload["model"], strict=False)
+        if payload.get("trainable_only") and result.unexpected_keys:
+            raise RuntimeError(
+                f"resume: unexpected keys in trainable-only checkpoint: "
+                f"{result.unexpected_keys[:5]}..."
+            )
         if optimizer is not None and payload["optimizer"] is not None:
             optimizer.load_state_dict(payload["optimizer"])
         _restore_rng(payload["rng"])
