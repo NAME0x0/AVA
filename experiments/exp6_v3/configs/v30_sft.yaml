@@ -1,0 +1,44 @@
+# AVA v3.0 SFT run config — single source of truth for the C5 lane.
+# Consumed by train/sft.py::SFTConfig.from_yaml. Reproducible from this file
+# + git hash + seed alone (RECIPE reproducibility invariants).
+
+phase: C5
+ckpt_repo: NAME0x0/AVA-v3-checkpoints
+donor: Qwen/Qwen3.5-4B
+seed: 1234
+
+# -- data ---------------------------------------------------------------
+seq_len: 1024                    # laptop: drop to 640; Kaggle/Colab T4: 1024
+sources:
+  - name: opencodereasoning      # reasoning-trace backbone (Apache 2.0)
+    hf_id: nvidia/OpenCodeReasoning
+    split: split_0
+    weight: 0.7
+    fim_fraction: 0.15           # auto-disabled if tokenizer lacks FIM sentinels
+  - name: commitpackft           # edit skill -> hashline dialect (REVIEW section 11.3)
+    hf_id: bigcode/commitpackft
+    split: train
+    weight: 0.3
+    fim_fraction: 0.0
+decontam_against:                # R21 floor; full MinHash gate is v3-full work
+  - evalplus/humanevalplus
+  - evalplus/mbppplus
+
+# -- optimization --------------------------------------------------------
+lr: 1.0e-4
+micro_batch: 1
+grad_accum: 16                   # laptop: 32
+total_steps: 20000
+warmup_steps: 100
+max_grad_norm: 1.0
+
+# -- lora ----------------------------------------------------------------
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+
+# -- fabric ---------------------------------------------------------------
+shard_minutes: 150               # kaggle batch: 550; laptop: 600
+sync_minutes: 30
+log_every: 20
+dry_run: false
