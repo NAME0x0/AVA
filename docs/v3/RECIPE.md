@@ -1,11 +1,14 @@
 # Training Recipe
 
-> **Superseded for training (10 June 2026):** the $0 coding pivot replaces this
-> pipeline's training plan — donor transplant (LoLCATs + sparse upcycle), trace
+> **Superseded for training (10 June 2026; donor swap 2 July 2026):** the $0
+> coding pivot replaces this pipeline's training plan — donor transplant, trace
 > distillation instead of logit KL, free Colab/Kaggle compute instead of the P5
-> rental. Current phases: C0–C8 in [CODE_PIVOT.md](CODE_PIVOT.md) §8. This file
-> remains the reference for per-stage loss recipes, gate style, and the
-> packing/export mechanics (P9), which carry over unchanged.
+> rental. Current phases: C0–C8 in [CODE_PIVOT.md](CODE_PIVOT.md) §8, revised by
+> [REVIEW_2026-07.md](REVIEW_2026-07.md) (donor = Qwen3.5-4B, T1 eliminated,
+> staged v3.0/v3.1 scope; the runnable v3.0 pipeline lives in
+> `experiments/exp6_v3/train/`). P1's 35B teacher and P5's rental below are
+> historical. This file remains the reference for per-stage loss recipes, gate
+> style, and the packing/export mechanics (P9).
 
 > **Read first:** [CODE_PIVOT.md](CODE_PIVOT.md), then [ARCHITECTURE_V3.md](ARCHITECTURE_V3.md), [HRM_TEXT.md](HRM_TEXT.md), [SUBQUADRATIC.md](SUBQUADRATIC.md), [PRISMML.md](PRISMML.md).
 

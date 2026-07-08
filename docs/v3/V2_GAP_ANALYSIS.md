@@ -77,7 +77,12 @@ BFCL v3 (tools)            —           ≥ 70         —
 RULER 128 K              n/a           ≥ 90         —
 ```
 
-If any single row regresses (v3 < v2), v3 does not ship. This is the **strict-dominance gate** for the v3 release. See [`PERF_TARGETS.md`](PERF_TARGETS.md) for the full pass/fail matrix.
+~~If any single row regresses (v3 < v2), v3 does not ship.~~ **Superseded by the
+coding pivot.** The unmodified Qwen3.5-4B donor already beats every v2 row above
+before any v3 mechanism runs ([REVIEW_2026-07.md](REVIEW_2026-07.md) §5b) — the
+"v3 mechanism" column overcredits HRM/MoE/distillation for deltas that donor
+inheritance delivers for free. This table stands as the historical v2 gap record;
+the live gate is CODE_PIVOT §7 (delta over donor, coding matrix, sanity floors).
 
 ---
 

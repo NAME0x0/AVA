@@ -61,6 +61,16 @@ This gives v3 the property that motivated HRM-Text: **latent multi-step reasonin
 
 ## 2. Dimensions
 
+> **⚠ Superseded table (2026-07 review).** Every dimension and memory figure below
+> is the **clean-slate 24×1792 design** — it was never recomputed for the donor.
+> With the actual donor (Qwen3.5-4B: hidden 2560, 32 layers, vocab 248 320,
+> native 3:1 GDN hybrid), the MoE-as-specced upcycle costs **≈ 4.0 GB in weights
+> alone and breaks the 4 GB budget**; the dense-ternary donor fits at ≈ 1.7 GB.
+> Numbers + decision: [REVIEW_2026-07.md](REVIEW_2026-07.md) §1, §10. MoE is
+> demoted to a gated v3.1 ablation. Donor-shape config:
+> `V3Config.donor_qwen35_4b()` in `engine/student_model.py`. The table remains as
+> the block-design reference only.
+
 | Field | Value | Rationale |
 |---|---|---|
 | Layers (blocks) | 24 | Down from 28 in original v3 design — saves ~1.2 GB; recurrence makes up for depth |

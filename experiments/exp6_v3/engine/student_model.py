@@ -104,6 +104,28 @@ class V3Config:
         )
 
     @classmethod
+    def donor_qwen35_4b(cls) -> V3Config:
+        """Qwen3.5-4B donor skeleton.
+
+        dims are PROVISIONAL pending the donor config.json verification at C1
+        (head_dim and GDN head dims are family-typical guesses; FFN/MoE fields
+        are not donor-derived — v3.0 runs dense); engine's Mamba-3 reference
+        mixer approximates the donor's Gated DeltaNet at matching dimensions
+        for T3 mount experiments.
+        """
+        return cls(
+            vocab_size=248320,
+            hidden_size=2560,
+            num_repeats=8,
+            num_q_heads=16,
+            num_kv_heads=4,
+            head_dim=128,
+            l_num_heads=32,
+            l_head_dim=80,
+            l_state_size=64,
+        )
+
+    @classmethod
     def from_yaml(cls, path: str | Path) -> V3Config:
         import yaml
 

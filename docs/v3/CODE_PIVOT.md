@@ -34,7 +34,15 @@ pretraining bill**.
 
 ## 2. Donor and teacher (both free, both Apache 2.0)
 
-### Donor: Qwen3-4B
+### Donor: ~~Qwen3-4B~~ → **Qwen3.5-4B** (swapped 2026-07-02)
+
+> **Revision ([REVIEW_2026-07.md](REVIEW_2026-07.md) §10):** donor re-eval found
+> Qwen3.5-4B (Feb/Mar 2026, Apache 2.0) — LCB v6 55.8, MMLU-Pro 79.1, **native
+> 3:1 Gated DeltaNet hybrid, 262 K context, vocab 248 320**. T1 linearization is
+> **eliminated** (donor ships the hybrid); the 8 K-native context cut is reversed
+> for free. The table below describes the superseded Qwen3-4B choice and stands
+> as the selection-criteria record. Authoritative donor block:
+> `configs/v3_code_donor.yaml`.
 
 | Criterion | Why Qwen3-4B |
 |---|---|

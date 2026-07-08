@@ -168,3 +168,11 @@ def test_full_size_parameter_budget() -> None:
     assert 2.9 <= total_b <= 3.6, f"total params {total_b:.3f} B outside budget"
     assert sizes["routed_experts"] / 1e9 == pytest.approx(2.11, abs=0.1)
     assert sizes["embedding_tied"] == 248320 * 1792
+
+
+def test_donor_preset_shape() -> None:
+    cfg = V3Config.donor_qwen35_4b()
+    assert cfg.vocab_size == 248320
+    assert cfg.hidden_size == 2560
+    assert cfg.num_repeats == 8
+    assert V3Config.tiny().hidden_size == 64

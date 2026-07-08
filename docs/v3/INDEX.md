@@ -10,7 +10,7 @@ AVA v3 is the next major version of AVA. It is not a fine-tune. It is a new stud
 
 Stacked on top of the AVA v2 distillation backbone (Qwen 3.6 35B-A3B teacher → ternary MoE student) and the MCP tool-use stack already designed in [`experiments/exp6_v3/DESIGN.md`](../../experiments/exp6_v3/DESIGN.md).
 
-The hardware constraint is unchanged: **4 GB VRAM laptop, single card, no cloud, no cluster**. The deliverable target is a model that strictly dominates AVA v2 on every published benchmark, runs faster, holds longer context, and uses tools natively.
+The hardware constraint is unchanged: **4 GB VRAM laptop, single card, no cloud, no cluster**. The deliverable target (revised by the coding pivot + [REVIEW_2026-07.md](REVIEW_2026-07.md)): **best open coder in the ≤4 GB class** — beat the donor decisively in-domain, beat every ≤4 B open coder, stay competitive with 7–14 B on agentic coding; general benchmarks are sanity floors, not gates. The donor warm-start already dominates v2 everywhere — v3's success metric is delta over the donor, not delta over v2.
 
 ---
 

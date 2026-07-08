@@ -8,7 +8,12 @@
 > catastrophic-forgetting alarms, not goals). Speed/footprint targets (§2) and
 > packing-stability targets (§3) remain binding.
 
-Single source of truth for v3 pass/fail. Every target below must be hit at release time, evaluated under the exact conditions listed. If any single row fails, **v3 does not ship**. v2 numbers are from [`docs/RESULTS.md`](../RESULTS.md). Mechanism column links the v3 component that delivers the gain.
+~~Single source of truth for v3 pass/fail.~~ **Historical (pre-pivot).** The §1
+tables below are the old general-assistant gate, kept for reference; they are NOT
+release gates. Authoritative pass/fail = CODE_PIVOT §7 coding matrix + the two
+sanity floors. The donor (Qwen3.5-4B, [REVIEW_2026-07.md](REVIEW_2026-07.md) §10)
+clears most §1 rows out of the box — targets are re-derived from the C1 donor
+baseline, not from v2. v2 numbers are from [`docs/RESULTS.md`](../RESULTS.md).
 
 All v3 numbers are evaluated on the **packed GGUF (TQ1_0 ternary build, Q8_0 embeddings)**, served by **stock** `llama-server`, on the laptop, with `reasoning_budget="auto"` unless the row specifies otherwise.
 
@@ -119,14 +124,14 @@ If MMLU drops > 1.5 pp under TQ1_0 packing, ship the TQ2_0 build only (smaller k
 
 ## 5. What "release-ready" means in one paragraph
 
-v3 ships when, on the same RTX A2000 laptop that trained v2, the packed GGUF binary:
+**(Revised for the coding pivot.)** v3 ships when, on the same RTX A2000 laptop, the packed build:
 
-- beats v2 on every benchmark in §1,
-- meets every speed/memory target in §2,
-- survives packing within the tolerances in §3,
-- and demonstrates the tool/safety/multilingual behavior in §4.
+- passes the CODE_PIVOT §7 coding tier gates (beat donor + every ≤4 B open coder; ≥70 % of matrix vs 7–9 B),
+- holds the sanity floors (ARC-E ≥ 75, MMLU ≥ 45),
+- meets the speed/memory targets in §2 and packing tolerances in §3,
+- and demonstrates the tool/safety behavior in §4.
 
-If any single row fails, the release blocks. There is no partial-release path. The closest fallback is "ship as v3-rc1" with explicit caveats on the failing row, but the strict-dominance promise in the README would have to be revised.
+§1's per-row strict dominance over v2 is expected to hold as a *side effect* of donor inheritance, but it is no longer the gate.
 
 ---
 
