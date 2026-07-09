@@ -10,3 +10,6 @@ pyyaml>=6.0
 # NOTE: Qwen3.5 (Gated DeltaNet hybrid) needs a transformers release with
 # qwen3_5 support — if AutoModel raises KeyError on model_type, upgrade
 # transformers first. Verified at C1 (REVIEW section 10 checklist).
+# GGUF/serving (2026-07-09): donor GGUFs exist (unsloth/Qwen3.5-4B-MTP-GGUF);
+# llama.cpp needs a HEAD build for the hybrid ops + --spec-type draft-mtp
+# (PR #22673). Pin a known-good llama.cpp commit at C1.

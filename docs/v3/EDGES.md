@@ -124,23 +124,29 @@ absorb CoT content (MATH-500 delta < 1 pp).
 
 ## E3 — Speed is accuracy: halting-coupled self-speculation
 
-**Mechanism.** EAGLE-3 (arXiv:[2503.01840](https://arxiv.org/abs/2503.01840)) trains
-a tiny draft head (~1–2 % of base parameters) on the target model's *own hidden
-states*; 2–6× decode speedup at zero quality change. **Already in llama.cpp**
-(PR [#18039](https://github.com/ggml-org/llama.cpp/pull/18039)); third-party Qwen3
-MoE draft checkpoints ship today.
+**Mechanism (revised 2026-07-09).** The donor **ships trained MTP heads**: the
+whole Qwen3.5 family releases with built-in multi-token prediction, supported in
+llama.cpp via `--spec-type draft-mtp` (PR #22673; bleeding-edge builds), with
+**1.7× measured decode speedup** on Qwen3.6-27B and unsloth MTP GGUFs already
+published for Qwen3.5-4B. E3 therefore no longer requires training a draft head —
+the EAGLE-3 lane (arXiv:[2503.01840](https://arxiv.org/abs/2503.01840), llama.cpp
+PR [#18039](https://github.com/ggml-org/llama.cpp/pull/18039)) is demoted to
+fallback if surgery destroys the MTP heads. **New invariant: every phase gate
+checks MTP-head preservation** — losing them costs a free 1.7×.
 
 **The unexploited coupling (our second zero-day).** v3 has a signal no other model
 has: the **convergence-aware halting head already computes per-token difficulty**
 (it reads the fixed-point residual). Speculation and pondering are the same decision
 viewed from opposite ends — "how predictable is what comes next":
 
-- halting prob high (easy region) → draft deep (8+ tokens), L-steps = 1
+- halting prob high (easy region) → draft deep (`--spec-draft-n-max` up), L-steps = 1
 - halting prob low (hard region) → draft shallow, spend the saved budget on L-steps
 
 One scalar drives both knobs. No published system couples adaptive computation with
-speculative depth. Cost: a lookup table on the halting logit. Expected effect: the
-*joint* throughput-accuracy frontier dominates either knob alone.
+speculative depth. With donor MTP heads the coupling target is the MTP draft length,
+not a trained EAGLE head — cost drops to a lookup table on the halting logit driving
+an existing llama.cpp flag. Expected effect: the *joint* throughput-accuracy frontier
+dominates either knob alone.
 
 **Why it compounds.** Wall-clock saved by speculation converts directly into accuracy
 through E2: at fixed latency, 2–3× decode speed funds 2–3× more latent restarts or
@@ -327,6 +333,39 @@ steps (bar = non-negative, cost ≈ 0). A17 (LTI): enable if it reduces
 grad-norm spikes / D3 restart rate without hurting refinement gain. Full
 rationale: [RESEARCH_ROUND_4.md](RESEARCH_ROUND_4.md).
 
+## E10 — Fuzzy-glue co-processor + skill packs (PAW pattern, gated)
+
+**Mechanism.** Program-as-Weights (arXiv:[2607.02512](https://arxiv.org/abs/2607.02512),
+July 2026, CC BY 4.0, code released): compile a natural-language function spec into a
+~23 MB LoRA executed by a **frozen Qwen3-0.6B interpreter** — 0.6B+adapter beats
+Qwen3-32B *prompting* on their FuzzyBench (73.8 vs 68.7) at 1/50 memory, 30 tok/s on
+a MacBook. Covered task families = exactly the glue an agentic coding loop burns
+tokens on: JSON repair, log triage, format conversion, parsing, tool calling (93 %
+on ToolCall-15).
+
+**v3 fit (two-tier local stack).**
+
+    AVA 4B (VRAM)                  reasoning, code synthesis, planning
+    0.6B + hot-swap LoRAs (RAM)    fuzzy glue: parse tool output, repair JSON,
+                                   triage logs, rerank retrieval hits
+
+The co-processor lives in system RAM beside the E1 memory tier — zero VRAM, same
+philosophy (capability on the cheapest resource that carries it). Distribution
+pattern generalizes E1's "texture pack": 23 MB hot-swappable **skill packs** on a
+frozen base — procedures, not just facts; a v3.x can compile packs from its own
+verified self-play data. Independent validation of the compute→weights thesis
+(CODE_PIVOT §5 step 4) at per-function granularity.
+
+**Honest caveats.** Single-step functions only (no multi-turn reasoning, no code
+synthesis — authors' own limitation list); benchmark is self-defined and
+synthetic (gpt-5.2-generated, LLM-verified); compiler↔interpreter coupled (we
+consume their released pair, never train our own compiler); repo one week old.
+
+**Status & gate.** Hypothesis, off critical path, v3.1+. Ablation A18: profile the
+C6 agent loop — adopt only if the 4B provably wastes ≥ 10 % of agentic tokens on
+glue subtasks that the 0.6B+adapter handles at ≥ parity accuracy. Else drop with
+zero cost.
+
 ## What would kill each edge
 
 | Edge | Kill condition | Survives as |
@@ -340,6 +379,7 @@ rationale: [RESEARCH_ROUND_4.md](RESEARCH_ROUND_4.md).
 | E7 flywheel | reward hacking / no verified gain | static v3.0 (unchanged) |
 | E8 tokenizer transfer | A15 probe drop > 1 pp after recovery | donor vocabulary (unchanged) |
 | E9 loop stability + depth-index | A16/A17 no gain at proxy | current HRM loop (unchanged; both default off) |
+| E10 fuzzy-glue co-processor | A18: glue < 10 % of agentic tokens, or 0.6B+adapter below parity | 4B handles its own glue (unchanged) |
 
 Every kill condition leaves v3 ≥ the pre-edge design. The portfolio is strictly
 additive in expectation — that is what makes it a moat rather than a bet.
@@ -360,3 +400,5 @@ additive in expectation — that is what makes it a moat rather than a bet.
 - Yang et al., *Tensor Programs V (μP)*, arXiv:[2203.03466](https://arxiv.org/abs/2203.03466); Cerebras-GPT, arXiv:[2304.03208](https://arxiv.org/abs/2304.03208).
 - Zhao et al., *Absolute Zero*, arXiv:[2505.03335](https://arxiv.org/abs/2505.03335).
 - Behrouz et al., *Titans: Learning to Memorize at Test Time*, arXiv:[2501.00663](https://arxiv.org/abs/2501.00663) — evaluated for the memory tier; deferred to v3.1 pending the critical re-analysis in arXiv:[2510.09551](https://arxiv.org/abs/2510.09551) (reproduction concerns). E1's PKM design wins on evidence maturity.
+- *Program-as-Weights*, arXiv:[2607.02512](https://arxiv.org/abs/2607.02512) — E10; code at github.com/programasweights.
+- Qwen3.5/3.6 MTP: llama.cpp PR #22673 (`--spec-type draft-mtp`); unsloth MTP GGUFs for the full Qwen3.5 family — E3 revision basis.

@@ -290,7 +290,7 @@ C3  T2 sparse upcycle -> ternary MoE + QAT recovery      (~300-600M tok)
 C4  T3 mount HRM loop + PKM memory; halting + latent curriculum on code traces
 C5  Coding SFT: OpenCodeReasoning + FIM + CommitPackFT + teacher traces
 C6  Execution-feedback RL + self-play (S1-S2); agentic harness training
-C7  Pack (TQ1_0/TQ2_0 + Q8) -> GGUF; EAGLE-3 draft head; halting-coupled speculation
+C7  Pack (TQ1_0/TQ2_0 + Q8) -> GGUF; donor MTP heads (--spec-type draft-mtp); halting-coupled speculation
 C8  Full eval matrix vs all tiers; release; S3-S4 self-improvement experiments
 ```
 

@@ -17,7 +17,12 @@ donor:                            # SWAPPED 2026-07-02 (donor re-eval, REVIEW_20
   vocab_size: 248320              # Qwen3.5 tokenizer; tied embeddings
   tie_word_embeddings: true
   thinking_default: true          # traces carry <think> — handle in format contract
-  verify_at_c1: [ffn_intermediate_size, dense_vs_moe_ffn, vision_tower_droppable]
+  mtp_heads: true                 # trained multi-token-prediction heads ship with donor
+                                  # (unsloth/Qwen3.5-4B-MTP-GGUF; llama.cpp PR #22673,
+                                  #  --spec-type draft-mtp, ~1.7x decode). GATE INVARIANT:
+                                  #  every phase must preserve MTP heads or document loss.
+  verify_at_c1: [ffn_intermediate_size, dense_vs_moe_ffn, vision_tower_droppable,
+                 mtp_head_layout, llama_cpp_head_commit_pin]
   previous: Qwen/Qwen3-4B         # superseded — pre-dated Qwen3.5 family
   runners_up:
     - model: nvidia/Nemotron-3-Nano-4B   # Mamba-2 hybrid, MATH500 95.4, 262K ctx
@@ -55,7 +60,13 @@ transplant:                       # CODE_PIVOT.md section 3
       Mamba-3-vs-GDN debate resolves to: keep donor GDN.
     savings: {tokens: 80e6, risks_retired: [R2, R22_mostly], probe_machinery: kept_for_regression_checks}
   t2_moeify:
+    status: DEMOTED_TO_V31_ABLATION   # REVIEW_2026-07 section 1: MoE breaks 4GB budget
     recipe: sparse_upcycling      # 2212.05055 + BitDistiller ternary QAT
+    qat_recipe_candidates:        # 2026-07-09 research round (REVIEW section 13):
+      - ternary_mamba_2606.18114  # grouped W1.58A16 QAT on SSM models — direct
+                                  # prior art for ternary on the GDN hybrid
+      - paretoq_2502.02631        # best sub-8B ternary scaling; candidate to
+                                  # replace BitDistiller as the QAT recipe
     num_routed_experts: 32
     top_k: 4
     routed_intermediate: 1216     # ~9728/8; exact split fixed at C3
