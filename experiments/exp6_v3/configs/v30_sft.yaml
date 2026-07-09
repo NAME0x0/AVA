@@ -8,6 +8,10 @@ donor: Qwen/Qwen3.5-4B
 seed: 1234
 
 # -- data ---------------------------------------------------------------
+# NOTE: seq_len / grad_accum / shard_minutes / sync_minutes below are
+# BASELINES — with auto_hardware (default true) train/hw_profile.py detects
+# the GPU (T4/L4/A100/V100/A2000/CPU) and overrides them + picks fp16/bf16.
+# Set auto_hardware: false to force these values.
 seq_len: 1024                    # laptop: drop to 640; Kaggle/Colab T4: 1024
 sources:
   - name: opencodereasoning      # reasoning-trace backbone (Apache 2.0)

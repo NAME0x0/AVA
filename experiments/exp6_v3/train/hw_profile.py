@@ -1,0 +1,153 @@
+"""Hardware profiles for v3.0 SFT; see docs/v3/REVIEW_2026-07.md section 13."""
+
+import os
+from dataclasses import dataclass
+
+import torch
+
+
+@dataclass
+class HWProfile:
+    name: str
+    vram_gb: float
+    bf16: bool
+    compute_dtype: str
+    seq_len: int
+    grad_accum: int
+    shard_minutes: float
+    sync_minutes: float
+    notes: str
+
+
+PROFILES = {
+    "t4": HWProfile(
+        "t4",
+        15,
+        False,
+        "float16",
+        1024,
+        16,
+        150,
+        30,
+        "Turing: no bf16; fp16 compute",
+    ),
+    "l4": HWProfile(
+        "l4",
+        22,
+        True,
+        "bfloat16",
+        2048,
+        8,
+        150,
+        30,
+        "Ada: bf16 native, ~2x T4",
+    ),
+    "a100": HWProfile(
+        "a100",
+        40,
+        True,
+        "bfloat16",
+        4096,
+        4,
+        110,
+        15,
+        "burst tier: short shards, tight sync — high CU burn",
+    ),
+    "v100": HWProfile(
+        "v100",
+        16,
+        False,
+        "float16",
+        1024,
+        16,
+        150,
+        30,
+        "Volta: fp16",
+    ),
+    "a2000": HWProfile(
+        "a2000",
+        4,
+        True,
+        "bfloat16",
+        640,
+        32,
+        600,
+        30,
+        "laptop lane",
+    ),
+}
+
+
+def _with_hardware_dtype(profile: HWProfile, bf16: bool) -> HWProfile:
+    compute_dtype = "bfloat16" if bf16 else "float16"
+    return HWProfile(
+        profile.name,
+        profile.vram_gb,
+        bf16,
+        compute_dtype,
+        profile.seq_len,
+        profile.grad_accum,
+        profile.shard_minutes,
+        profile.sync_minutes,
+        profile.notes,
+    )
+
+
+def detect_profile() -> HWProfile:
+    if "COLAB_TPU_ADDR" in os.environ or "TPU_NAME" in os.environ:
+        raise RuntimeError(
+            "TPU unsupported: pipeline is PyTorch+bitsandbytes (CUDA only). Select a GPU runtime."
+        )
+
+    if not torch.cuda.is_available():
+        return HWProfile(
+            "cpu",
+            0,
+            False,
+            "float16",
+            256,
+            4,
+            600,
+            60,
+            "dry-run/dev only",
+        )
+
+    device_name = torch.cuda.get_device_name(0).lower()
+    if "p100" in device_name:
+        raise RuntimeError(
+            "P100 unsupported: bitsandbytes 4-bit needs compute capability >= 7.0, "
+            "but P100 is 6.0. Switch Kaggle accelerator to T4 x2."
+        )
+
+    bf16 = bool(torch.cuda.is_bf16_supported())
+    for matcher, profile in PROFILES.items():
+        if matcher in device_name:
+            return _with_hardware_dtype(profile, bf16)
+
+    props = torch.cuda.get_device_properties(0)
+    compute_dtype = "bfloat16" if bf16 else "float16"
+    return HWProfile(
+        "unknown",
+        props.total_memory / 1_000_000_000,
+        bf16,
+        compute_dtype,
+        1024,
+        16,
+        150,
+        30,
+        "unknown gpu: conservative defaults",
+    )
+
+
+def apply_profile(cfg, profile: HWProfile) -> str:
+    cfg.seq_len = profile.seq_len
+    cfg.grad_accum = profile.grad_accum
+    cfg.shard_minutes = profile.shard_minutes
+    cfg.sync_minutes = profile.sync_minutes
+    print(
+        "[hw] "
+        f"{profile.name}: {profile.vram_gb:.1f} GB, dtype={profile.compute_dtype}, "
+        f"seq_len={profile.seq_len}, grad_accum={profile.grad_accum}, "
+        f"shard={profile.shard_minutes}m, sync={profile.sync_minutes}m; {profile.notes}"
+    )
+    return profile.compute_dtype

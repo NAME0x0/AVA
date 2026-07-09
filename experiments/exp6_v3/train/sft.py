@@ -63,6 +63,7 @@ class SFTConfig:
     log_every: int = 20
     # switches
     dry_run: bool = False
+    auto_hardware: bool = True
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> SFTConfig:
@@ -75,7 +76,7 @@ class SFTConfig:
 # --------------------------------------------------------------------------- model builders
 
 
-def _build_qlora_model(cfg: SFTConfig) -> tuple[Any, Any]:
+def _build_qlora_model(cfg: SFTConfig, compute_dtype: torch.dtype) -> tuple[Any, Any]:
     from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
     from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
@@ -83,14 +84,14 @@ def _build_qlora_model(cfg: SFTConfig) -> tuple[Any, Any]:
     bnb = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_compute_dtype=compute_dtype,
         bnb_4bit_use_double_quant=True,
     )
     model = AutoModelForCausalLM.from_pretrained(
         cfg.donor,
         quantization_config=bnb,
         device_map="auto",
-        torch_dtype=torch.bfloat16,
+        torch_dtype=compute_dtype,
         trust_remote_code=True,
     )
     model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
@@ -181,7 +182,16 @@ def train_shard(cfg: SFTConfig, test_rows: dict[str, list[dict]] | None = None) 
     if cfg.dry_run:
         model, tokenizer = _build_dry_run_model()
     else:
-        model, tokenizer = _build_qlora_model(cfg)
+        compute_dtype = torch.bfloat16
+        if cfg.auto_hardware:
+            from .hw_profile import apply_profile, detect_profile
+
+            dtype_str = apply_profile(cfg, detect_profile())
+            compute_dtype = {
+                "bfloat16": torch.bfloat16,
+                "float16": torch.float16,
+            }[dtype_str]
+        model, tokenizer = _build_qlora_model(cfg, compute_dtype)
 
     from .data import tokenizer_has_fim
 

@@ -210,3 +210,76 @@ def test_dry_run_shard_end_to_end() -> None:
     assert summary["end_step"] == 3
     assert summary["last_loss"] == summary["last_loss"]  # not NaN
     assert summary["cursor"]["draws"] > 0
+
+
+def test_hw_profile_cpu_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
+    import torch
+    from train.hw_profile import detect_profile
+
+    monkeypatch.delenv("COLAB_TPU_ADDR", raising=False)
+    monkeypatch.delenv("TPU_NAME", raising=False)
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
+
+    profile = detect_profile()
+
+    assert profile.name == "cpu"
+    assert profile.compute_dtype == "float16"
+
+
+def test_hw_profile_tpu_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
+    from train.hw_profile import detect_profile
+
+    monkeypatch.setenv("TPU_NAME", "x")
+
+    with pytest.raises(RuntimeError):
+        detect_profile()
+
+
+def test_hw_profile_t4_and_p100(monkeypatch: pytest.MonkeyPatch) -> None:
+    import torch
+    from train.hw_profile import detect_profile
+
+    class Props:
+        total_memory = int(15e9)
+
+    monkeypatch.delenv("COLAB_TPU_ADDR", raising=False)
+    monkeypatch.delenv("TPU_NAME", raising=False)
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(torch.cuda, "get_device_name", lambda _: "Tesla T4")
+    monkeypatch.setattr(torch.cuda, "is_bf16_supported", lambda: False)
+    monkeypatch.setattr(torch.cuda, "get_device_properties", lambda _: Props())
+
+    profile = detect_profile()
+
+    assert profile.compute_dtype == "float16"
+    assert profile.seq_len == 1024
+
+    monkeypatch.setattr(torch.cuda, "get_device_name", lambda _: "Tesla P100-PCIE-16GB")
+    with pytest.raises(RuntimeError):
+        detect_profile()
+
+
+def test_apply_profile_mutates_cfg() -> None:
+    from train.hw_profile import HWProfile, apply_profile
+    from train.sft import SFTConfig
+
+    cfg = SFTConfig(dry_run=True)
+    profile = HWProfile(
+        "unit",
+        8,
+        True,
+        "bfloat16",
+        512,
+        7,
+        9,
+        3,
+        "test profile",
+    )
+
+    dtype = apply_profile(cfg, profile)
+
+    assert dtype == "bfloat16"
+    assert cfg.seq_len == 512
+    assert cfg.grad_accum == 7
+    assert cfg.shard_minutes == 9
+    assert cfg.sync_minutes == 3
