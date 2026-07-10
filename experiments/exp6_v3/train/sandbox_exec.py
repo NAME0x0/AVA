@@ -31,7 +31,11 @@ def run_python(code: str, timeout_s: float = 10.0) -> ExecResult:
     with tempfile.TemporaryDirectory(prefix="ava_exec_") as tmp:
         try:
             proc = subprocess.run(
-                [sys.executable, "-I", "-c", code],  # -I: isolated, no user site
+                # No -I: MBPP+/EvalPlus tests import numpy, which -I hides on
+                # machines where packages live in the user site (laptop lane).
+                # Isolation here = process + tmp cwd + timeout; hostile code
+                # belongs in the MCP sandbox, not this eval runner.
+                [sys.executable, "-c", code],
                 cwd=tmp,
                 capture_output=True,
                 text=True,

@@ -115,23 +115,32 @@ def eval_evalplus(
     for ex in bar:
         task_id = str(ex.get("task_id"))
         prompt_code = ex["prompt"]
-        entry = ex.get("entry_point", "")
-        # MBPP+ prompts are natural-language descriptions whose tests call a
-        # specific function name — without naming it, the model invents one
-        # and every test dies with NameError (observed: 6% pass vs ~70% real).
+        # The test code calls a specific function name. HumanEval+ ships it as
+        # entry_point; MBPP+ has NO entry_point column — the name only exists
+        # in the canonical `code` (first def) and the test_list asserts.
+        # Without it the model invents a name and every test dies (measured:
+        # 6-7% pass vs ~70% real).
+        entry = ex.get("entry_point", "") or next(
+            iter(re.findall(r"def\s+(\w+)\s*\(", ex.get("code", ""))), ""
+        )
         name_clause = f" The function MUST be named exactly `{entry}`." if entry else ""
+        example = (ex.get("test_list") or [""])[0]
+        example_clause = f"\nYour solution must satisfy: `{example}`" if example else ""
+        body = (
+            f"```python\n{prompt_code}\n```" if "def " in prompt_code else prompt_code
+        )
         instruction = (
             "Complete the following Python task. Reply with a single "
             f"```python code block containing the full solution.{name_clause}"
-            f"\n\n```python\n{prompt_code}\n```"
+            f"{example_clause}\n\n{body}"
         )
         gen = generate(model, tokenizer, instruction, thinking=thinking)
         solution = _extract_code(gen)
         # EvalPlus schema: `test` defines check(candidate); call it when present,
         # else the test block is a bare assertion suite.
         test_code = ex.get("test", "")
-        entry = ex.get("entry_point", "")
-        harness = solution + "\n\n" + test_code
+        imports = "\n".join(ex.get("test_imports") or [])
+        harness = imports + "\n\n" + solution + "\n\n" + test_code
         if "def check(" in test_code and entry:
             harness += f"\n\ncheck({entry})\n"
         res = check_solution("", harness, timeout_s=timeout_s)
