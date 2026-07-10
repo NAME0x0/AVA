@@ -165,6 +165,23 @@ def eval_mmlu(model, tokenizer, thinking: bool, limit: int = 1000, seed: int = 7
 # --------------------------------------------------------------------------- orchestrator
 
 
+def _seed_report(out_path: str | Path, hub_repo: str | None) -> dict:
+    """Resume-safe: merge into any existing report (local file, else Hub copy)
+    so a partial run's completed modes survive a second session that only runs
+    the missing ones (train/phase_controller.py resume flow)."""
+    if Path(out_path).exists():
+        return json.loads(Path(out_path).read_text(encoding="utf-8"))
+    if hub_repo:
+        try:
+            from huggingface_hub import hf_hub_download
+
+            local = hf_hub_download(hub_repo, f"reports/{Path(out_path).name}")
+            return json.loads(Path(local).read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001 - no prior report == fresh start
+            pass
+    return {}
+
+
 def run_c1(
     model: Any,
     tokenizer: Any,
@@ -174,7 +191,8 @@ def run_c1(
     floor_limits: tuple[int, int] = (500, 1000),
     hub_repo: str | None = None,
 ) -> dict:
-    report: dict[str, Any] = {"meta": {"unix": time.time()}}
+    report: dict[str, Any] = _seed_report(out_path, hub_repo)
+    report["meta"] = {"unix": time.time()}
     for thinking in modes:
         mode = "thinking" if thinking else "non_thinking"
         report[mode] = {

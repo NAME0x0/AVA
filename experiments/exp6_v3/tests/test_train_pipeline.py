@@ -283,3 +283,90 @@ def test_apply_profile_mutates_cfg() -> None:
     assert cfg.grad_accum == 7
     assert cfg.shard_minutes == 9
     assert cfg.sync_minutes == 3
+
+
+# --------------------------------------------------------------------------- phase controller
+
+
+def _decider(files: dict[str, dict]):
+    """Fake Hub: {path: json_content}."""
+    def exists(repo, path):
+        return path in files
+    def load(repo, path):
+        return files[path]
+    return exists, load
+
+
+def test_phase_first_run_is_c1() -> None:
+    from train.phase_controller import decide_phase
+
+    ex, ld = _decider({})
+    d = decide_phase("r", 100, ex, ld)
+    assert d.phase == "C1" and d.modes_needed == (False, True)
+
+
+def test_phase_partial_c1_resumes_missing_mode() -> None:
+    from train.phase_controller import decide_phase
+
+    ex, ld = _decider({"reports/c1_donor_baseline.json": {"non_thinking": {}}})
+    d = decide_phase("r", 100, ex, ld)
+    assert d.phase == "C1" and d.modes_needed == (True,)  # only thinking left
+
+
+def test_phase_c5_start_and_resume() -> None:
+    from train.phase_controller import decide_phase
+
+    base = {"reports/c1_donor_baseline.json": {"non_thinking": {}, "thinking": {}}}
+    ex, ld = _decider(dict(base))
+    assert decide_phase("r", 100, ex, ld).phase == "C5"
+
+    ex, ld = _decider({**base, "checkpoints/C5/LATEST.json": {"step": 40}})
+    d = decide_phase("r", 100, ex, ld)
+    assert d.phase == "C5" and "41/100" in d.reason
+
+
+def test_phase_c5_eval_then_done() -> None:
+    from train.phase_controller import decide_phase
+
+    base = {
+        "reports/c1_donor_baseline.json": {"non_thinking": {}, "thinking": {}},
+        "checkpoints/C5/LATEST.json": {"step": 99},
+    }
+    ex, ld = _decider(dict(base))
+    assert decide_phase("r", 100, ex, ld).phase == "C5_EVAL"
+
+    ex, ld = _decider({**base, "reports/c5_candidate_eval.json": {}})
+    assert decide_phase("r", 100, ex, ld).phase == "DONE"
+
+
+def test_phase_unreachable_repo_falls_back_to_c1() -> None:
+    from train.phase_controller import decide_phase
+
+    def boom(repo, path):
+        raise ConnectionError("offline")
+
+    d = decide_phase("r", 100, boom, None)
+    assert d.phase == "C1"
+
+
+def test_gate_candidate_uses_hub_reports() -> None:
+    from train.phase_controller import gate_candidate
+
+    reports = {
+        "reports/c1_donor_baseline.json": _report(80.0, 70.0),
+        "reports/c5_candidate_eval.json": _report(81.0, 71.0),
+    }
+    res = gate_candidate("r", load_json_fn=lambda repo, path: reports[path])
+    assert res.passed
+
+
+def test_c1_seed_report_merges_existing(tmp_path) -> None:
+    import json as _json
+
+    from train.c1_eval import _seed_report
+
+    out = tmp_path / "c1_donor_baseline.json"
+    out.write_text(_json.dumps({"non_thinking": {"mmlu": {"score": 70}}}))
+    seeded = _seed_report(out, hub_repo=None)
+    assert "non_thinking" in seeded          # completed mode survives resume
+    assert _seed_report(tmp_path / "missing.json", hub_repo=None) == {}
