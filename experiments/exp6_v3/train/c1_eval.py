@@ -45,13 +45,17 @@ def generate(
             add_generation_prompt=True,
             enable_thinking=thinking,
             return_tensors="pt",
+            return_dict=False,
         )
     except TypeError:
         ids = tokenizer.apply_chat_template(
             [{"role": "user", "content": prompt}],
             add_generation_prompt=True,
             return_tensors="pt",
+            return_dict=False,
         )
+    if hasattr(ids, "keys"):  # newer transformers return BatchEncoding anyway
+        ids = ids["input_ids"]
     ids = ids.to(model.device)
     with torch.no_grad():
         out = model.generate(

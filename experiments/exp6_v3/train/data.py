@@ -309,18 +309,23 @@ def encode_completion_masked(
             return_tensors="pt",
         ).input_ids[0]
     else:
-        prompt_ids = tokenizer.apply_chat_template(
+        def _ids(out):  # newer transformers return BatchEncoding even w/ return_dict=False asked
+            return (out["input_ids"] if hasattr(out, "keys") else out)[0]
+
+        prompt_ids = _ids(tokenizer.apply_chat_template(
             [{"role": "user", "content": sample.prompt}],
             add_generation_prompt=True,
             return_tensors="pt",
-        )[0]
-        full_ids = tokenizer.apply_chat_template(
+            return_dict=False,
+        ))
+        full_ids = _ids(tokenizer.apply_chat_template(
             [
                 {"role": "user", "content": sample.prompt},
                 {"role": "assistant", "content": sample.response},
             ],
             return_tensors="pt",
-        )[0]
+            return_dict=False,
+        ))
     if len(full_ids) > max_len or len(full_ids) - len(prompt_ids) < 4:
         return None
     labels = full_ids.clone()
