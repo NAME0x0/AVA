@@ -96,7 +96,9 @@ def ensure_fast_kernels(hub_repo: str | None = None) -> bool:
                         try:
                             from huggingface_hub import HfApi
 
-                            HfApi().upload_file(
+                            api = HfApi()
+                            api.create_repo(hub_repo, private=True, exist_ok=True)
+                            api.upload_file(
                                 path_or_fileobj=wheels[0],
                                 path_in_repo=f"wheels/{_tag()}/{Path(wheels[0]).name}",
                                 repo_id=hub_repo,

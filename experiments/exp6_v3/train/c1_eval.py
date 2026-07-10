@@ -229,7 +229,12 @@ def run_c1(
         if hub_repo:
             from huggingface_hub import HfApi
 
-            HfApi().upload_file(
+            api = HfApi()
+            # C1 may run before anything else ever touched the repo — create it
+            # here or the first upload dies with RepositoryNotFoundError after
+            # hours of eval.
+            api.create_repo(hub_repo, private=True, exist_ok=True)
+            api.upload_file(
                 path_or_fileobj=str(out_path),
                 path_in_repo=f"reports/{Path(out_path).name}",
                 repo_id=hub_repo,
