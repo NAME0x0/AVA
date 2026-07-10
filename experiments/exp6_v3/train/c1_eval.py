@@ -235,6 +235,12 @@ def run_c1(
     code_limit: int | None = None,             # None = full sets
     floor_limits: tuple[int, int] = (500, 1000),
     hub_repo: str | None = None,
+    # Thinking mode is an INFORMATIONAL capability probe, not the gate (the
+    # C5 gate compares non_thinking only). Full thinking eval costs 20+ GPU-h
+    # at ~176 s/task; subsets give the signal at ~4 h. n is recorded per
+    # benchmark, so reports stay honest about sample size.
+    thinking_code_limit: int = 40,
+    thinking_floor_limits: tuple[int, int] = (150, 250),
 ) -> dict:
     report: dict[str, Any] = _seed_report(out_path, hub_repo)
     report["meta"] = {"unix": time.time()}
@@ -258,16 +264,19 @@ def run_c1(
     for thinking in modes:
         mode = "thinking" if thinking else "non_thinking"
         mode_report = report.setdefault(mode, {})
+        c_lim = thinking_code_limit if thinking else code_limit
+        f_lims = thinking_floor_limits if thinking else floor_limits
         todo = [b for b in ("humaneval_plus", "mbpp_plus", "arc_easy", "mmlu")
                 if b not in mode_report]
-        print(f"[c1] === mode={mode} | remaining: {todo or 'nothing (resumed complete)'} ===")
+        print(f"[c1] === mode={mode} | remaining: {todo or 'nothing (resumed complete)'} "
+              f"| code_limit={c_lim} floors={f_lims} ===")
         benches: list[tuple[str, Any]] = [
-            ("humaneval_plus", lambda t=thinking: eval_evalplus(
-                model, tokenizer, "evalplus/humanevalplus", t, code_limit)),
-            ("mbpp_plus", lambda t=thinking: eval_evalplus(
-                model, tokenizer, "evalplus/mbppplus", t, code_limit)),
-            ("arc_easy", lambda t=thinking: eval_arc_easy(model, tokenizer, t, floor_limits[0])),
-            ("mmlu", lambda t=thinking: eval_mmlu(model, tokenizer, t, floor_limits[1])),
+            ("humaneval_plus", lambda t=thinking, cl=c_lim: eval_evalplus(
+                model, tokenizer, "evalplus/humanevalplus", t, cl)),
+            ("mbpp_plus", lambda t=thinking, cl=c_lim: eval_evalplus(
+                model, tokenizer, "evalplus/mbppplus", t, cl)),
+            ("arc_easy", lambda t=thinking, fl=f_lims: eval_arc_easy(model, tokenizer, t, fl[0])),
+            ("mmlu", lambda t=thinking, fl=f_lims: eval_mmlu(model, tokenizer, t, fl[1])),
         ]
         for name, fn in benches:
             if name in mode_report:  # benchmark-level resume
