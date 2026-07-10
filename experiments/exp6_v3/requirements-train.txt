@@ -1,10 +1,10 @@
 # v3.0 training/eval stack — pin majors, let platforms resolve builds.
 # Colab/Kaggle ship torch+CUDA; do NOT reinstall torch there.
-transformers>=4.53
+transformers>=4.56
 datasets>=2.20
 accelerate>=0.33
 peft>=0.12
-bitsandbytes>=0.43
+bitsandbytes>=0.46.1
 huggingface_hub>=0.24
 pyyaml>=6.0
 # NOTE: Qwen3.5 (Gated DeltaNet hybrid) needs a transformers release with

@@ -91,7 +91,7 @@ def _build_qlora_model(cfg: SFTConfig, compute_dtype: torch.dtype) -> tuple[Any,
         cfg.donor,
         quantization_config=bnb,
         device_map="auto",
-        torch_dtype=compute_dtype,
+        dtype=compute_dtype,  # torch_dtype deprecated in transformers >= 4.56
         trust_remote_code=True,
     )
     model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
