@@ -26,6 +26,24 @@ from typing import Any
 
 from .sandbox_exec import check_solution
 
+# --------------------------------------------------------------------------- progress
+
+
+def _progress(iterable: Any, desc: str, total: int | None = None) -> Any:
+    """tqdm live bar (rate + ETA) when available; silent passthrough otherwise."""
+    try:
+        from tqdm.auto import tqdm
+
+        return tqdm(iterable, desc=desc, total=total, dynamic_ncols=True)
+    except Exception:  # noqa: BLE001 - progress is cosmetic, never fatal
+        return iterable
+
+
+def _set_postfix(bar: Any, **kv: Any) -> None:
+    if hasattr(bar, "set_postfix"):
+        bar.set_postfix(**kv)
+
+
 # --------------------------------------------------------------------------- generation
 
 
@@ -93,7 +111,8 @@ def eval_evalplus(
     if limit:
         ds = ds.select(range(min(limit, len(ds))))
     per_task: dict[str, bool] = {}
-    for ex in ds:
+    bar = _progress(ds, desc=dataset_id.split("/")[-1], total=len(ds))
+    for ex in bar:
         task_id = str(ex.get("task_id"))
         prompt_code = ex["prompt"]
         instruction = (
@@ -111,6 +130,7 @@ def eval_evalplus(
             harness += f"\n\ncheck({entry})\n"
         res = check_solution("", harness, timeout_s=timeout_s)
         per_task[task_id] = res.ok
+        _set_postfix(bar, pass_rate=f"{100.0 * sum(per_task.values()) / len(per_task):.1f}%")
     score = 100.0 * sum(per_task.values()) / max(len(per_task), 1)
     return {"score": round(score, 2), "n": len(per_task), "per_task": per_task}
 
@@ -139,7 +159,8 @@ def eval_arc_easy(model, tokenizer, thinking: bool, limit: int = 500) -> dict:
     ds = load_dataset("allenai/ai2_arc", "ARC-Easy", split="test").select(range(limit))
     correct = 0
     n = 0
-    for ex in ds:
+    bar = _progress(ds, desc="arc_easy", total=len(ds))
+    for ex in bar:
         choices, labels = ex["choices"]["text"], ex["choices"]["label"]
         if len(choices) != 4:
             continue
@@ -151,6 +172,7 @@ def eval_arc_easy(model, tokenizer, thinking: bool, limit: int = 500) -> dict:
         gen = generate(model, tokenizer, _mc_prompt(ex["question"], choices), thinking, 64)
         correct += _mc_score(gen, gold)
         n += 1
+        _set_postfix(bar, acc=f"{100.0 * correct / n:.1f}%")
     return {"score": round(100.0 * correct / max(n, 1), 2), "n": n}
 
 
@@ -159,10 +181,14 @@ def eval_mmlu(model, tokenizer, thinking: bool, limit: int = 1000, seed: int = 7
 
     ds = load_dataset("cais/mmlu", "all", split="test").shuffle(seed=seed).select(range(limit))
     correct = 0
-    for ex in ds:
+    done = 0
+    bar = _progress(ds, desc="mmlu", total=len(ds))
+    for ex in bar:
         gold = "ABCD"[ex["answer"]]
         gen = generate(model, tokenizer, _mc_prompt(ex["question"], ex["choices"]), thinking, 64)
         correct += _mc_score(gen, gold)
+        done += 1
+        _set_postfix(bar, acc=f"{100.0 * correct / done:.1f}%")
     return {"score": round(100.0 * correct / max(len(ds), 1), 2), "n": len(ds)}
 
 
@@ -212,6 +238,9 @@ def run_c1(
     for thinking in modes:
         mode = "thinking" if thinking else "non_thinking"
         mode_report = report.setdefault(mode, {})
+        todo = [b for b in ("humaneval_plus", "mbpp_plus", "arc_easy", "mmlu")
+                if b not in mode_report]
+        print(f"[c1] === mode={mode} | remaining: {todo or 'nothing (resumed complete)'} ===")
         benches: list[tuple[str, Any]] = [
             ("humaneval_plus", lambda t=thinking: eval_evalplus(
                 model, tokenizer, "evalplus/humanevalplus", t, code_limit)),
