@@ -197,25 +197,33 @@ def run_c1(
 ) -> dict:
     report: dict[str, Any] = _seed_report(out_path, hub_repo)
     report["meta"] = {"unix": time.time()}
+
+    def _persist() -> None:
+        Path(out_path).write_text(json.dumps(report, indent=2))
+        if hub_repo:
+            from huggingface_hub import HfApi
+
+            HfApi().upload_file(
+                path_or_fileobj=str(out_path),
+                path_in_repo=f"reports/{Path(out_path).name}",
+                repo_id=hub_repo,
+            )
+
     for thinking in modes:
         mode = "thinking" if thinking else "non_thinking"
-        report[mode] = {
-            "humaneval_plus": eval_evalplus(
-                model, tokenizer, "evalplus/humanevalplus", thinking, code_limit
-            ),
-            "mbpp_plus": eval_evalplus(
-                model, tokenizer, "evalplus/mbppplus", thinking, code_limit
-            ),
-            "arc_easy": eval_arc_easy(model, tokenizer, thinking, floor_limits[0]),
-            "mmlu": eval_mmlu(model, tokenizer, thinking, floor_limits[1]),
-        }
-        Path(out_path).write_text(json.dumps(report, indent=2))  # save after each mode
-    if hub_repo:
-        from huggingface_hub import HfApi
-
-        HfApi().upload_file(
-            path_or_fileobj=str(out_path),
-            path_in_repo=f"reports/{Path(out_path).name}",
-            repo_id=hub_repo,
-        )
+        mode_report = report.setdefault(mode, {})
+        benches: list[tuple[str, Any]] = [
+            ("humaneval_plus", lambda t=thinking: eval_evalplus(
+                model, tokenizer, "evalplus/humanevalplus", t, code_limit)),
+            ("mbpp_plus", lambda t=thinking: eval_evalplus(
+                model, tokenizer, "evalplus/mbppplus", t, code_limit)),
+            ("arc_easy", lambda t=thinking: eval_arc_easy(model, tokenizer, t, floor_limits[0])),
+            ("mmlu", lambda t=thinking: eval_mmlu(model, tokenizer, t, floor_limits[1])),
+        ]
+        for name, fn in benches:
+            if name in mode_report:  # benchmark-level resume
+                continue
+            mode_report[name] = fn()
+            _persist()  # save + push after EVERY benchmark — max loss = one bench
+            print(f"[c1] {mode}/{name}: {mode_report[name].get('score')}")
     return report

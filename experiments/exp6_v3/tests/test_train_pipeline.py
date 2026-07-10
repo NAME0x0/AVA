@@ -305,18 +305,34 @@ def test_phase_first_run_is_c1() -> None:
     assert d.phase == "C1" and d.modes_needed == (False, True)
 
 
+_FULL_MODE = {
+    "humaneval_plus": {"score": 1}, "mbpp_plus": {"score": 1},
+    "arc_easy": {"score": 1}, "mmlu": {"score": 1},
+}
+
+
 def test_phase_partial_c1_resumes_missing_mode() -> None:
     from train.phase_controller import decide_phase
 
-    ex, ld = _decider({"reports/c1_donor_baseline.json": {"non_thinking": {}}})
+    # complete non_thinking, absent thinking -> only thinking left
+    ex, ld = _decider(
+        {"reports/c1_donor_baseline.json": {"non_thinking": dict(_FULL_MODE)}}
+    )
     d = decide_phase("r", 100, ex, ld)
-    assert d.phase == "C1" and d.modes_needed == (True,)  # only thinking left
+    assert d.phase == "C1" and d.modes_needed == (True,)
+
+    # mode killed mid-benchmark counts as incomplete (c1_eval saves per-bench)
+    ex, ld = _decider({"reports/c1_donor_baseline.json": {
+        "non_thinking": {"humaneval_plus": {"score": 1}}}})
+    d = decide_phase("r", 100, ex, ld)
+    assert d.phase == "C1" and d.modes_needed == (False, True)
 
 
 def test_phase_c5_start_and_resume() -> None:
     from train.phase_controller import decide_phase
 
-    base = {"reports/c1_donor_baseline.json": {"non_thinking": {}, "thinking": {}}}
+    base = {"reports/c1_donor_baseline.json": {
+        "non_thinking": dict(_FULL_MODE), "thinking": dict(_FULL_MODE)}}
     ex, ld = _decider(dict(base))
     assert decide_phase("r", 100, ex, ld).phase == "C5"
 
@@ -329,7 +345,8 @@ def test_phase_c5_eval_then_done() -> None:
     from train.phase_controller import decide_phase
 
     base = {
-        "reports/c1_donor_baseline.json": {"non_thinking": {}, "thinking": {}},
+        "reports/c1_donor_baseline.json": {
+            "non_thinking": dict(_FULL_MODE), "thinking": dict(_FULL_MODE)},
         "checkpoints/C5/LATEST.json": {"step": 99},
     }
     ex, ld = _decider(dict(base))

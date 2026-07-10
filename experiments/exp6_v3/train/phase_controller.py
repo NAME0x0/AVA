@@ -25,6 +25,7 @@ C1_REPORT = "reports/c1_donor_baseline.json"
 C5_LATEST = "checkpoints/C5/LATEST.json"
 C5_EVAL_REPORT = "reports/c5_candidate_eval.json"
 _MODES = ("non_thinking", "thinking")
+_REQUIRED_BENCHES = ("humaneval_plus", "mbpp_plus", "arc_easy", "mmlu")
 
 
 @dataclass
@@ -67,11 +68,16 @@ def decide_phase(
             "C1", "no donor baseline on Hub", modes_needed=(False, True)
         )
     report = load(ckpt_repo, C1_REPORT)
-    missing = [m for m in _MODES if m not in report]
+    # a mode counts as done only when every benchmark landed (c1_eval saves
+    # per-benchmark, so a killed session leaves a partial mode dict)
+    missing = [
+        m for m in _MODES
+        if not all(b in report.get(m, {}) for b in _REQUIRED_BENCHES)
+    ]
     if missing:
         return PhaseDecision(
             "C1",
-            f"baseline partial — missing mode(s): {missing}",
+            f"baseline partial — incomplete mode(s): {missing}",
             modes_needed=tuple(m == "thinking" for m in missing),
         )
 
