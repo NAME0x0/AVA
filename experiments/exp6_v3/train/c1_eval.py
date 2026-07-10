@@ -115,9 +115,15 @@ def eval_evalplus(
     for ex in bar:
         task_id = str(ex.get("task_id"))
         prompt_code = ex["prompt"]
+        entry = ex.get("entry_point", "")
+        # MBPP+ prompts are natural-language descriptions whose tests call a
+        # specific function name — without naming it, the model invents one
+        # and every test dies with NameError (observed: 6% pass vs ~70% real).
+        name_clause = f" The function MUST be named exactly `{entry}`." if entry else ""
         instruction = (
-            "Complete the following Python function. Reply with a single "
-            f"```python code block containing the full function.\n\n```python\n{prompt_code}\n```"
+            "Complete the following Python task. Reply with a single "
+            f"```python code block containing the full solution.{name_clause}"
+            f"\n\n```python\n{prompt_code}\n```"
         )
         gen = generate(model, tokenizer, instruction, thinking=thinking)
         solution = _extract_code(gen)
