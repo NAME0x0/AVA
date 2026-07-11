@@ -60,10 +60,24 @@ def run_probe(
     )["non_thinking"]
     probe = report["non_thinking"]
     print(f"\n[probe] checkpoint step {step} vs donor baseline "
-          f"(subsets n={code_limit}/{floor_limits} — coarse, trend over precision):")
+          f"(subsets n={code_limit}/{floor_limits}):")
     for bench in ("humaneval_plus", "mbpp_plus", "arc_easy", "mmlu"):
         b, p = baseline[bench]["score"], probe[bench]["score"]
-        print(f"  {bench:16s} donor {b:6.2f} -> probe {p:6.2f}  ({p - b:+.2f})")
-    print("[probe] guide: climbing -> keep training | flat 2 probes -> saturated | "
-          "negative code deltas -> stop and investigate")
+        # MATCHED comparison when per-task results exist (code benches):
+        # probe subsets are the FIRST n tasks — comparing them against the
+        # full-set score misleads (field lesson 2026-07-12: +9.0 "gain" on
+        # HumanEval+ was a -10.0 regression on the matched 30 tasks).
+        base_tasks = baseline[bench].get("per_task") or {}
+        probe_tasks = probe[bench].get("per_task") or {}
+        common = [t for t in probe_tasks if t in base_tasks]
+        if common:
+            bm = 100.0 * sum(bool(base_tasks[t]) for t in common) / len(common)
+            pm = 100.0 * sum(bool(probe_tasks[t]) for t in common) / len(common)
+            print(f"  {bench:16s} MATCHED n={len(common)}: donor {bm:6.2f} -> "
+                  f"probe {pm:6.2f}  ({pm - bm:+.2f})")
+        else:
+            print(f"  {bench:16s} unmatched subset (indicative): donor(full) "
+                  f"{b:6.2f} -> probe {p:6.2f}  ({p - b:+.2f})")
+    print("[probe] guide (MATCHED code deltas only): climbing -> keep training | "
+          "flat 2 probes -> saturated | negative -> stop and investigate")
     return report
