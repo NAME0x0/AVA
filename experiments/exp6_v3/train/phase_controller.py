@@ -68,18 +68,21 @@ def decide_phase(
             "C1", "no donor baseline on Hub", modes_needed=(False, True)
         )
     report = load(ckpt_repo, C1_REPORT)
-    # a mode counts as done only when every benchmark landed (c1_eval saves
-    # per-benchmark, so a killed session leaves a partial mode dict)
-    missing = [
-        m for m in _MODES
-        if not all(b in report.get(m, {}) for b in _REQUIRED_BENCHES)
-    ]
-    if missing:
+    # Gate-relevant mode is non_thinking ONLY (gate.py default) — C1 blocks
+    # the pipeline solely on it. The thinking probe is informational: worth
+    # having, never worth stalling training or burning paid compute for
+    # (observed: full thinking eval = 20+ GPU-h with truncation artifacts).
+    def _mode_done(m: str) -> bool:
+        return all(b in report.get(m, {}) for b in _REQUIRED_BENCHES)
+
+    if not _mode_done("non_thinking"):
         return PhaseDecision(
-            "C1",
-            f"baseline partial — incomplete mode(s): {missing}",
-            modes_needed=tuple(m == "thinking" for m in missing),
+            "C1", "baseline partial — gate mode (non_thinking) incomplete",
+            modes_needed=(False,),
         )
+    if not _mode_done("thinking"):
+        print("[phase] note: thinking probe incomplete — optional; backfill "
+              "on free quota anytime with AVA_PHASE=C1")
 
     # -- C5: training progressed to total_steps? ----------------------------
     if not exists(ckpt_repo, C5_LATEST):

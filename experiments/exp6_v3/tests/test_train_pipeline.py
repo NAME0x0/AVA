@@ -314,18 +314,17 @@ _FULL_MODE = {
 def test_phase_partial_c1_resumes_missing_mode() -> None:
     from train.phase_controller import decide_phase
 
-    # complete non_thinking, absent thinking -> only thinking left
+    # gate mode complete, thinking absent -> C5 proceeds (probe is optional)
     ex, ld = _decider(
         {"reports/c1_donor_baseline.json": {"non_thinking": dict(_FULL_MODE)}}
     )
-    d = decide_phase("r", 100, ex, ld)
-    assert d.phase == "C1" and d.modes_needed == (True,)
+    assert decide_phase("r", 100, ex, ld).phase == "C5"
 
-    # mode killed mid-benchmark counts as incomplete (c1_eval saves per-bench)
+    # gate mode killed mid-benchmark -> still C1 (per-bench resume)
     ex, ld = _decider({"reports/c1_donor_baseline.json": {
         "non_thinking": {"humaneval_plus": {"score": 1}}}})
     d = decide_phase("r", 100, ex, ld)
-    assert d.phase == "C1" and d.modes_needed == (False, True)
+    assert d.phase == "C1" and d.modes_needed == (False,)
 
 
 def test_phase_c5_start_and_resume() -> None:
