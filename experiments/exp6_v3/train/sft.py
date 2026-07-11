@@ -200,6 +200,26 @@ def build_stream(cfg: SFTConfig, test_rows: dict[str, list[dict]] | None = None)
     return MixtureStream(specs, seed=cfg.seed, decontam=decontam)
 
 
+def _lr_lambda(warmup_steps: int, total_steps: int):
+    """Linear warmup -> cosine decay to a 10% floor.
+
+    Replaces the original warmup-then-constant schedule (2026-07-11): constant
+    1e-4 over a 20K-step run leaves the tail stirring noise. Resume replays
+    scheduler steps, so a mid-run schedule change lands as a one-time LR
+    adjustment at the resumed step — acceptable.
+    """
+    import math
+
+    def fn(st: int) -> float:
+        if st < warmup_steps:
+            return (st + 1) / max(warmup_steps, 1)
+        span = max(total_steps - warmup_steps, 1)
+        progress = min((st - warmup_steps) / span, 1.0)
+        return 0.1 + 0.9 * 0.5 * (1.0 + math.cos(math.pi * progress))
+
+    return fn
+
+
 # --------------------------------------------------------------------------- train loop
 
 
@@ -235,7 +255,7 @@ def train_shard(cfg: SFTConfig, test_rows: dict[str, list[dict]] | None = None) 
     except (RuntimeError, TypeError):
         opt = torch.optim.AdamW(params, lr=cfg.lr)
     sched = torch.optim.lr_scheduler.LambdaLR(
-        opt, lambda st: min(1.0, (st + 1) / max(cfg.warmup_steps, 1))
+        opt, _lr_lambda(cfg.warmup_steps, cfg.total_steps)
     )
 
     sync = CheckpointSync(

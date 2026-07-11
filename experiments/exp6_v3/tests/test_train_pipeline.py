@@ -419,3 +419,15 @@ def test_c1_seed_report_merges_existing(tmp_path) -> None:
     seeded = _seed_report(out, hub_repo=None)
     assert "non_thinking" in seeded          # completed mode survives resume
     assert _seed_report(tmp_path / "missing.json", hub_repo=None) == {}
+
+
+def test_lr_schedule_warmup_cosine_floor() -> None:
+    from train.sft import _lr_lambda
+
+    fn = _lr_lambda(warmup_steps=100, total_steps=1000)
+    assert fn(0) == pytest.approx(0.01)          # warmup start
+    assert fn(99) == pytest.approx(1.0)          # warmup peak
+    assert fn(100) == pytest.approx(1.0, abs=1e-3)
+    assert fn(550) < 0.7                         # decaying
+    assert fn(999) == pytest.approx(0.1, abs=1e-3)   # floor
+    assert fn(5000) == pytest.approx(0.1)        # clamped past total
