@@ -89,6 +89,15 @@ def test_fim_transform_short_code_returns_none() -> None:
     assert fim_transform("a=1\nb=2", random.Random(0)) is None
 
 
+def test_fim_transform_boundary_lengths() -> None:
+    # exactly 3*min_span lines crashed in the field: randrange(3, 3)
+    nine = "\n".join(f"l{i}" for i in range(9))
+    assert fim_transform(nine, random.Random(0)) is None
+    ten = "\n".join(f"l{i}" for i in range(10))
+    for seed in range(20):  # every seed must stay in-range
+        assert fim_transform(ten, random.Random(seed)) is not None
+
+
 # --------------------------------------------------------------------------- decontam
 
 

@@ -108,7 +108,9 @@ def tokenizer_has_fim(tokenizer: Any) -> bool:
 def fim_transform(code: str, rng: random.Random, min_span: int = 3) -> str | None:
     """PSM-format FIM sample from a code string; None if too short."""
     lines = code.splitlines()
-    if len(lines) < 3 * min_span:
+    # strict >: randrange(min_span, len - 2*min_span) needs a non-empty range,
+    # so len == 3*min_span exactly is still too short (field crash: randrange(3, 3))
+    if len(lines) <= 3 * min_span:
         return None
     a = rng.randrange(min_span, len(lines) - 2 * min_span)
     b = rng.randrange(a + min_span, len(lines) - min_span)
