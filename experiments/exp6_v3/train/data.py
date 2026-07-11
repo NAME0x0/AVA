@@ -282,6 +282,77 @@ class MixtureStream:
         raise RuntimeError("MixtureStream: 10k consecutive rejects — check sources/filters")
 
 
+# --------------------------------------------------------------------------- batching
+
+class PaddedBatcher:
+    """Length-bucketed padded micro-batches from a MixtureStream.
+
+    Pulls encoded samples into a buffer, sorts by length, and emits batches of
+    similar-length rows padded to the batch max — recovers most of the batch>1
+    throughput without packing's gradient muddiness. Labels pad with -100,
+    attention_mask marks real tokens.
+
+    Resume note: up to `buffer_size` samples may sit in the buffer when a
+    session dies; the mixture cursor counts them as consumed, so a resumed run
+    re-pulls them — a few dozen possibly-repeated samples per preemption,
+    which is noise at SFT scale (documented tradeoff, keeps the cursor simple).
+    """
+
+    def __init__(
+        self,
+        stream: MixtureStream,
+        tokenizer: Any,
+        max_len: int,
+        micro_batch: int,
+        buffer_size: int = 64,
+    ) -> None:
+        self.stream = stream
+        self.tokenizer = tokenizer
+        self.max_len = max_len
+        self.micro_batch = max(1, micro_batch)
+        self.buffer_size = max(buffer_size, self.micro_batch * 4)
+        self.drops = 0
+        self._ready: list[dict] = []
+
+    def _fill(self) -> None:
+        buf: list[dict] = []
+        while len(buf) < self.buffer_size:
+            enc = encode_completion_masked(self.tokenizer, next(self.stream), self.max_len)
+            if enc is None:
+                self.drops += 1
+                continue
+            buf.append(enc)
+        buf.sort(key=lambda e: len(e["input_ids"]))
+        self._ready = [
+            self._collate(buf[i : i + self.micro_batch])
+            for i in range(0, len(buf), self.micro_batch)
+        ]
+
+    def _collate(self, rows: list[dict]) -> dict:
+        import torch
+
+        width = max(len(r["input_ids"]) for r in rows)
+        pad_id = self.tokenizer.pad_token_id or 0
+        n = len(rows)
+        input_ids = torch.full((n, width), pad_id, dtype=rows[0]["input_ids"].dtype)
+        labels = torch.full((n, width), -100, dtype=rows[0]["labels"].dtype)
+        attention_mask = torch.zeros((n, width), dtype=torch.long)
+        for i, r in enumerate(rows):
+            ln = len(r["input_ids"])
+            input_ids[i, :ln] = r["input_ids"]
+            labels[i, :ln] = r["labels"]
+            attention_mask[i, :ln] = 1
+        return {"input_ids": input_ids, "labels": labels, "attention_mask": attention_mask}
+
+    def __iter__(self):
+        return self
+
+    def __next__(self) -> dict:
+        if not self._ready:
+            self._fill()
+        return self._ready.pop()
+
+
 # --------------------------------------------------------------------------- tokenization + masking
 
 def encode_completion_masked(

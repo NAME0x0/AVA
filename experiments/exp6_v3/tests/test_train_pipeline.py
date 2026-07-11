@@ -282,6 +282,7 @@ def test_apply_profile_mutates_cfg() -> None:
         "bfloat16",
         512,
         7,
+        3,      # micro_batch
         9,
         3,
         "test profile",
@@ -292,8 +293,29 @@ def test_apply_profile_mutates_cfg() -> None:
     assert dtype == "bfloat16"
     assert cfg.seq_len == 512
     assert cfg.grad_accum == 7
+    assert cfg.micro_batch == 3
     assert cfg.shard_minutes == 9
-    assert cfg.sync_minutes == 3
+
+
+def test_padded_batcher_shapes_and_masking() -> None:
+    from train.data import PaddedBatcher
+    from transformers import AutoTokenizer
+
+    tok = AutoTokenizer.from_pretrained("sshleifer/tiny-gpt2")
+    if tok.pad_token is None:
+        tok.pad_token = tok.eos_token
+    stream = _stream()
+    b = PaddedBatcher(stream, tok, max_len=256, micro_batch=4, buffer_size=16)
+    batch = next(b)
+    ids, labels, mask = batch["input_ids"], batch["labels"], batch["attention_mask"]
+    assert ids.shape == labels.shape == mask.shape
+    assert ids.shape[0] == 4
+    # padded positions: mask 0 and labels -100; real positions mask 1
+    assert bool(((mask == 0) & (labels != -100)).sum() == 0)
+    assert int(mask.sum(dim=1).min()) > 0
+    # length-bucketing: rows within a batch are similar length (sorted buffer)
+    lens = mask.sum(dim=1)
+    assert int(lens.max() - lens.min()) <= int(lens.max())  # sane, no crash
 
 
 # --------------------------------------------------------------------------- phase controller

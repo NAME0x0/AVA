@@ -29,7 +29,6 @@ from .data import (  # noqa: E402
     DecontamFilter,
     MixtureStream,
     SourceSpec,
-    encode_completion_masked,
 )
 
 
@@ -261,37 +260,81 @@ def train_shard(cfg: SFTConfig, test_rows: dict[str, list[dict]] | None = None) 
             for _ in range(start_step):
                 sched.step()
 
+    # -- throughput: length-bucketed micro-batches + background prefetch -----
+    import queue
+    import threading
+
+    from .data import PaddedBatcher
+
+    torch.backends.cuda.matmul.allow_tf32 = True  # free on Ampere+; no-op on T4
+    torch.backends.cudnn.allow_tf32 = True
+
+    batcher = PaddedBatcher(stream, tokenizer, cfg.seq_len, cfg.micro_batch)
+    batch_q: queue.Queue = queue.Queue(maxsize=4)
+    stop_evt = threading.Event()
+
+    def _producer() -> None:  # tokenize batch N+1 while the GPU chews batch N
+        try:
+            while not stop_evt.is_set():
+                batch_q.put(next(batcher))
+        except Exception as err:  # surfaced by consumer via sentinel
+            batch_q.put(("__error__", err))
+
+    threading.Thread(target=_producer, daemon=True).start()
+
+    def _next_batch() -> dict:
+        item = batch_q.get()
+        if isinstance(item, tuple) and item and item[0] == "__error__":
+            raise item[1]
+        return item
+
     deadline = time.monotonic() + cfg.shard_minutes * 60
     device = next(model.parameters()).device
     model.train()
-    step, last_loss, encoded_drops = start_step, float("nan"), 0
+    step, last_loss, ema_loss = start_step, float("nan"), None
+    win_t0, win_tokens, win_steps = time.monotonic(), 0, 0
 
     while step < cfg.total_steps and time.monotonic() < deadline:
         opt.zero_grad(set_to_none=True)
-        micro_done = 0
-        while micro_done < cfg.grad_accum:
-            sample = next(stream)
-            enc = encode_completion_masked(tokenizer, sample, cfg.seq_len)
-            if enc is None:
-                encoded_drops += 1
-                continue
-            ids = enc["input_ids"].unsqueeze(0).to(device)
-            labels = enc["labels"].unsqueeze(0).to(device)
-            out = model(input_ids=ids, labels=labels)
+        for _ in range(cfg.grad_accum):
+            b = _next_batch()
+            out = model(
+                input_ids=b["input_ids"].to(device),
+                labels=b["labels"].to(device),
+                attention_mask=b["attention_mask"].to(device),
+            )
             (out.loss / cfg.grad_accum).backward()
             last_loss = float(out.loss.detach())
-            micro_done += 1
+            win_tokens += int(b["attention_mask"].sum())
         torch.nn.utils.clip_grad_norm_(params, cfg.max_grad_norm)
         opt.step()
         sched.step()
+        ema_loss = last_loss if ema_loss is None else 0.95 * ema_loss + 0.05 * last_loss
+        win_steps += 1
         if step % cfg.log_every == 0:
-            print(f"[sft] step {step} loss {last_loss:.4f} drops {encoded_drops}")
+            dt = max(time.monotonic() - win_t0, 1e-6)
+            s_per_step = dt / max(win_steps, 1)
+            eta_shard_m = max(deadline - time.monotonic(), 0) / 60
+            eta_total_h = (cfg.total_steps - step) * s_per_step / 3600
+            mem = torch.cuda.max_memory_allocated() / 1e9 if torch.cuda.is_available() else 0
+            print(
+                f"[sft] step {step}/{cfg.total_steps} | loss {last_loss:.4f} "
+                f"(ema {ema_loss:.4f}) | {win_tokens / dt:,.0f} tok/s | "
+                f"{s_per_step:.1f} s/step | drops {batcher.drops} | "
+                f"mem {mem:.1f}GB | shard ends {eta_shard_m:.0f}m | "
+                f"ETA total {eta_total_h:.1f}h | lr {sched.get_last_lr()[0]:.2e}"
+            )
+            win_t0, win_tokens, win_steps = time.monotonic(), 0, 0
         if sync is not None:
             sync.maybe_save(
                 step, model, opt,
                 extra={"loss": last_loss, "mixture_cursor": stream.cursor()},
             )
         step += 1
+    stop_evt.set()
+    while not batch_q.empty():  # unblock the producer so the thread exits
+        batch_q.get_nowait()
+    encoded_drops = batcher.drops
 
     summary = {
         "start_step": start_step,
