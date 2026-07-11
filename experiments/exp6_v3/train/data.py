@@ -295,6 +295,12 @@ def encode_completion_masked(
     FIM samples skip the chat template (raw continuation objective).
     Returns None if the sample doesn't fit or is degenerate.
     """
+    # cheap pre-tokenization reject: chars/token ~ 3-4 for code, so anything
+    # over ~5x the token budget in chars can't fit — skip the expensive
+    # template+tokenize path entirely (field data: 61% drop rate was burning
+    # a full CPU core tokenizing samples that were then discarded)
+    if len(sample.prompt) + len(sample.response) > max_len * 5:
+        return None
     if sample.kind == "fim" or not use_chat_template or not sample.prompt:
         text = sample.response
         ids = tokenizer(text, truncation=True, max_length=max_len, return_tensors="pt").input_ids[0]

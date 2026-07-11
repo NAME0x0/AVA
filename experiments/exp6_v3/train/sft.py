@@ -87,10 +87,19 @@ def _build_qlora_model(cfg: SFTConfig, compute_dtype: torch.dtype) -> tuple[Any,
         bnb_4bit_compute_dtype=compute_dtype,
         bnb_4bit_use_double_quant=True,
     )
+    # Pin to one GPU when the 4-bit model fits (donor ~3.6 GB): device_map
+    # "auto" shards across multi-GPU boxes (Kaggle 2xT4) into a sequential
+    # pipeline where one GPU always idles + cross-device transfers. Only
+    # fall back to auto-sharding on small-VRAM cards.
+    vram_gb = (
+        torch.cuda.get_device_properties(0).total_memory / 1e9
+        if torch.cuda.is_available() else 0
+    )
+    device_map = {"": 0} if vram_gb >= 12 else "auto"
     model = AutoModelForCausalLM.from_pretrained(
         cfg.donor,
         quantization_config=bnb,
-        device_map="auto",
+        device_map=device_map,
         dtype=compute_dtype,  # torch_dtype deprecated in transformers >= 4.56
         trust_remote_code=True,
     )
