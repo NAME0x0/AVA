@@ -230,7 +230,10 @@ def train_shard(cfg: SFTConfig, test_rows: dict[str, list[dict]] | None = None) 
 
     stream = build_stream(cfg, test_rows)
     params = [p for p in model.parameters() if p.requires_grad]
-    opt = torch.optim.AdamW(params, lr=cfg.lr)
+    try:  # fused CUDA kernel when available; CPU/older stacks fall back
+        opt = torch.optim.AdamW(params, lr=cfg.lr, fused=torch.cuda.is_available())
+    except (RuntimeError, TypeError):
+        opt = torch.optim.AdamW(params, lr=cfg.lr)
     sched = torch.optim.lr_scheduler.LambdaLR(
         opt, lambda st: min(1.0, (st + 1) / max(cfg.warmup_steps, 1))
     )
