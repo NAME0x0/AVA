@@ -16,13 +16,15 @@ seq_len: 1024                    # laptop: drop to 640; Kaggle/Colab T4: 1024
 sources:
   - name: opencodereasoning      # reasoning-trace backbone (Apache 2.0)
     hf_id: nvidia/OpenCodeReasoning
-    split: split_0
+    config: split_0              # verified: configs [split_0, split_1]
+    split: split_0               # verified: split inside config is also split_0
     weight: 0.7
     fim_fraction: 0.15           # auto-disabled if tokenizer lacks FIM sentinels
   - name: commitpackft           # edit skill -> hashline dialect (REVIEW section 11.3)
-    hf_id: bigcode/commitpackft
-    split: train
-    weight: 0.3
+    hf_id: bigcode/commitpackft  # legacy script dataset -> direct-file load:
+    data_files: hf://datasets/bigcode/commitpackft/data/python/data.jsonl
+    split: train                 # (python first; more languages join at the
+    weight: 0.3                  #  MultiPL-E stage — one data_files line each)
     fim_fraction: 0.0
 decontam_against:                # R21 floor; full MinHash gate is v3-full work
   - evalplus/humanevalplus

@@ -111,19 +111,11 @@ PROFILES = {
 }
 
 
-def _with_hardware_dtype(profile: HWProfile, bf16: bool) -> HWProfile:
-    compute_dtype = "bfloat16" if bf16 else "float16"
-    return HWProfile(
-        profile.name,
-        profile.vram_gb,
-        bf16,
-        compute_dtype,
-        profile.seq_len,
-        profile.grad_accum,
-        profile.shard_minutes,
-        profile.sync_minutes,
-        profile.notes,
-    )
+# NOTE (2026-07-11 field fix): the table dtype is AUTHORITATIVE for known
+# GPUs. torch.cuda.is_bf16_supported() returns True on Turing (T4) via slow
+# software emulation, so "hardware truth wins" silently picked emulated bf16
+# on T4 — exactly the perf trap the table exists to avoid. The runtime probe
+# is only consulted for GPUs the table doesn't know.
 
 
 def detect_profile() -> HWProfile:
@@ -152,11 +144,11 @@ def detect_profile() -> HWProfile:
             "but P100 is 6.0. Switch Kaggle accelerator to T4 x2."
         )
 
-    bf16 = bool(torch.cuda.is_bf16_supported())
     for matcher, profile in PROFILES.items():
         if matcher in device_name:
-            return _with_hardware_dtype(profile, bf16)
+            return profile
 
+    bf16 = bool(torch.cuda.is_bf16_supported())
     props = torch.cuda.get_device_properties(0)
     compute_dtype = "bfloat16" if bf16 else "float16"
     return HWProfile(

@@ -125,11 +125,24 @@ def _build_dry_run_model() -> tuple[Any, Any]:
 # --------------------------------------------------------------------------- data wiring
 
 
-def _hf_source_iter(hf_id: str, split: str, streaming: bool = True):
+def _hf_source_iter(
+    hf_id: str,
+    split: str,
+    config: str | None = None,
+    data_files: str | None = None,
+    streaming: bool = True,
+):
+    """data_files: direct-file load for legacy script datasets (e.g.
+    bigcode/commitpackft, whose loader script modern `datasets` refuses)."""
     def factory():
         from datasets import load_dataset
 
-        ds = load_dataset(hf_id, split=split, streaming=streaming)
+        if data_files:
+            ds = load_dataset("json", data_files=data_files, split=split, streaming=streaming)
+        elif config:
+            ds = load_dataset(hf_id, config, split=split, streaming=streaming)
+        else:
+            ds = load_dataset(hf_id, split=split, streaming=streaming)
         return iter(ds)
 
     return factory
@@ -159,7 +172,10 @@ def build_stream(cfg: SFTConfig, test_rows: dict[str, list[dict]] | None = None)
         factory = (
             _list_source_iter(test_rows[s["name"]])
             if test_rows is not None
-            else _hf_source_iter(s["hf_id"], s.get("split", "train"))
+            else _hf_source_iter(
+                s["hf_id"], s.get("split", "train"),
+                config=s.get("config"), data_files=s.get("data_files"),
+            )
         )
         specs.append(
             SourceSpec(

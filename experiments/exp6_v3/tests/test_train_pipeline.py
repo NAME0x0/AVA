@@ -246,7 +246,9 @@ def test_hw_profile_t4_and_p100(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("TPU_NAME", raising=False)
     monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
     monkeypatch.setattr(torch.cuda, "get_device_name", lambda _: "Tesla T4")
-    monkeypatch.setattr(torch.cuda, "is_bf16_supported", lambda: False)
+    # torch reports bf16=True on Turing via SLOW emulation — the table must
+    # win for known GPUs (field bug 2026-07-11: T4 silently got bf16)
+    monkeypatch.setattr(torch.cuda, "is_bf16_supported", lambda: True)
     monkeypatch.setattr(torch.cuda, "get_device_properties", lambda _: Props())
 
     profile = detect_profile()
