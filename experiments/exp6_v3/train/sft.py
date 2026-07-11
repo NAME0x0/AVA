@@ -277,9 +277,22 @@ def train_shard(cfg: SFTConfig, test_rows: dict[str, list[dict]] | None = None) 
             payload = torch.load(
                 hf_hub_download(cfg.ckpt_repo, ptr["path"]), map_location="cpu", weights_only=False
             )
-            cur = payload.get("extra", {}).get("mixture_cursor")
+            extra = payload.get("extra", {})
+            # BUG HISTORY (2026-07-11): the end-of-shard save wrote the cursor
+            # under "cursor" (summary key) while resume only read
+            # "mixture_cursor" — the silent `if cur:` skip meant every session
+            # re-trained on the head of the dataset. Read both; never be quiet
+            # about a missing cursor again.
+            cur = extra.get("mixture_cursor") or extra.get("cursor")
             if cur:
                 stream.skip_to(cur)
+                print(f"[sft] data cursor restored: {cur['consumed']}")
+            else:
+                print(
+                    "[sft] *** WARNING: resumed step > 0 but checkpoint has no "
+                    "data cursor — stream restarts from the dataset head. "
+                    "Expect repeated samples this shard. ***"
+                )
             for _ in range(start_step):
                 sched.step()
 
@@ -367,6 +380,6 @@ def train_shard(cfg: SFTConfig, test_rows: dict[str, list[dict]] | None = None) 
         "cursor": stream.cursor(),
     }
     if sync is not None:
-        sync.save(step - 1, model, opt, extra={**summary, "shard_end": True})
+        sync.save(step - 1, model, opt, extra={**summary, "mixture_cursor": stream.cursor(), "shard_end": True})
     print(f"[sft] shard done: {summary}")
     return summary

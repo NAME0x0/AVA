@@ -431,3 +431,60 @@ def test_lr_schedule_warmup_cosine_floor() -> None:
     assert fn(550) < 0.7                         # decaying
     assert fn(999) == pytest.approx(0.1, abs=1e-3)   # floor
     assert fn(5000) == pytest.approx(0.1)        # clamped past total
+
+
+def test_shard_end_save_carries_restorable_cursor(tmp_path, monkeypatch) -> None:
+    """Field bug 2026-07-11: final shard save wrote the cursor as 'cursor'
+    while resume read 'mixture_cursor' — silently retraining on the dataset
+    head every session. The final save must round-trip the data position."""
+    import scripts.checkpoint_sync as cs
+    from train.sft import SFTConfig, train_shard
+
+    class FakeApi:
+        _fake = True
+
+        def __init__(self) -> None:
+            self.files: dict[str, bytes] = {}
+
+        def create_repo(self, repo_id, private=True, exist_ok=True) -> None:
+            pass
+
+        def upload_file(self, path_or_fileobj, path_in_repo, repo_id) -> None:
+            self.files[path_in_repo] = path_or_fileobj.read()
+
+    api = FakeApi()
+    monkeypatch.setattr(cs, "HfApi", lambda: api)
+
+    def fake_download(repo_id, path):
+        local = tmp_path / path.replace("/", "__")
+        local.write_bytes(api.files[path])
+        return str(local)
+
+    monkeypatch.setattr(cs, "hf_hub_download", fake_download)
+    import train.sft as sft_mod
+    monkeypatch.setattr(sft_mod, "CheckpointSync",
+                        lambda *a, **k: cs.CheckpointSync(*a, **{**k, "api": api}))
+    # hf_hub_download is imported inside train_shard's resume path
+    import huggingface_hub
+    monkeypatch.setattr(huggingface_hub, "hf_hub_download", fake_download)
+
+    cfg = SFTConfig(
+        dry_run=False, auto_hardware=False, seq_len=256, grad_accum=2,
+        total_steps=6, shard_minutes=5.0, warmup_steps=2, sync_minutes=999,
+        sources=[{"name": "opencodereasoning", "weight": 1.0, "fim_fraction": 0.0}],
+        decontam_against=[],
+    )
+    # dry-run model but through the sync path: patch the builder
+    monkeypatch.setattr(sft_mod, "_build_qlora_model",
+                        lambda c, d: sft_mod._build_dry_run_model())
+
+    rows = _rows("t", 200)
+    s1 = train_shard(cfg, test_rows={"opencodereasoning": rows})
+    assert s1["end_step"] == 6
+
+    cfg2 = SFTConfig(**{**cfg.__dict__, "total_steps": 10})
+    s2 = train_shard(cfg2, test_rows={"opencodereasoning": rows})
+    assert s2["start_step"] == 6
+    # THE assertion: second shard's cursor continues past the first's,
+    # instead of resetting to a session-local count
+    assert s2["cursor"]["draws"] > s1["cursor"]["draws"]
