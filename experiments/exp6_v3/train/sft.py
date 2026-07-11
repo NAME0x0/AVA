@@ -94,7 +94,11 @@ def _build_qlora_model(cfg: SFTConfig, compute_dtype: torch.dtype) -> tuple[Any,
         dtype=compute_dtype,  # torch_dtype deprecated in transformers >= 4.56
         trust_remote_code=True,
     )
-    model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
+    model = prepare_model_for_kbit_training(
+        model,
+        use_gradient_checkpointing=True,
+        gradient_checkpointing_kwargs={"use_reentrant": False},  # torch>=2.9 requires explicit
+    )
     # Target every linear projection generically: GDN hybrid layer names differ
     # from vanilla attention (q/k/v/o + gdn projections + mlp). all-linear is
     # the donor-agnostic choice and peft resolves it per-architecture.
@@ -266,7 +270,7 @@ def train_shard(cfg: SFTConfig, test_rows: dict[str, list[dict]] | None = None) 
             labels = enc["labels"].unsqueeze(0).to(device)
             out = model(input_ids=ids, labels=labels)
             (out.loss / cfg.grad_accum).backward()
-            last_loss = float(out.loss)
+            last_loss = float(out.loss.detach())
             micro_done += 1
         torch.nn.utils.clip_grad_norm_(params, cfg.max_grad_norm)
         opt.step()
