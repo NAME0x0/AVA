@@ -225,6 +225,10 @@ def _lr_lambda(warmup_steps: int, total_steps: int):
 
 def train_shard(cfg: SFTConfig, test_rows: dict[str, list[dict]] | None = None) -> dict:
     """Run one time-boxed shard. Returns summary dict (for tests + logs)."""
+    import os as _os
+
+    # big-vocab CE allocations fragment badly; expandable segments reclaims
+    _os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
     torch.manual_seed(cfg.seed)
 
     if cfg.dry_run:
