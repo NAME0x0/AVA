@@ -490,3 +490,39 @@ def test_shard_end_save_carries_restorable_cursor(tmp_path, monkeypatch) -> None
     # THE assertion: second shard's cursor continues past the first's,
     # instead of resetting to a session-local count
     assert s2["cursor"]["draws"] > s1["cursor"]["draws"]
+
+
+def test_assemble_program_grafts_and_imports() -> None:
+    from train.c1_eval import _assemble_program
+
+    prompt = "from typing import List\n\n\ndef f(xs: List[int]) -> int:\n    \"\"\"doc\"\"\"\n"
+    # body-only completion (no def) -> prompt grafted
+    prog = _assemble_program(prompt, "    return sum(xs)\n", "f")
+    assert "def f(" in prog and "from typing import" in prog
+    assert prog.count("def f(") == 1  # not doubled
+
+    # full-function completion -> used as-is (prompt not grafted -> no double def)
+    full = "def f(xs: List[int]) -> int:\n    return sum(xs)\n"
+    prog2 = _assemble_program(prompt, full, "f")
+    assert prog2.count("def f(") == 1
+    assert "from typing import" in prog2  # imports always present
+
+
+def test_assemble_program_end_to_end_body_only() -> None:
+    from train.c1_eval import _assemble_program
+    from train.sandbox_exec import check_solution
+
+    prompt = "from typing import List\n\n\ndef add_all(xs: List[int]) -> int:\n    \"\"\"sum\"\"\"\n"
+    body_only = "    return sum(xs)\n"          # correct code, no def, no import
+    prog = _assemble_program(prompt, body_only, "add_all")
+    res = check_solution("", prog + "\n\nassert add_all([1,2,3]) == 6\n")
+    assert res.ok
+
+
+def test_sandbox_runs_oversized_code() -> None:
+    """python -c blows the OS cmdline limit on big EvalPlus tests; file-exec must not."""
+    from train.sandbox_exec import run_python
+
+    big = "x = [\n" + ",\n".join("1" for _ in range(40000)) + "\n]\nassert sum(x) == 40000\n"
+    assert len(big) > 100_000
+    assert run_python(big, timeout_s=30).ok

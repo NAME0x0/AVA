@@ -96,6 +96,29 @@ def _extract_code(text: str) -> str:
     return m.group(1) if m else text
 
 
+# Models legitimately answer "complete this function" two ways, and often omit
+# the typing imports the prompt provided. The old harness ran the raw
+# completion standalone -> body-only answers were SyntaxErrors and
+# `List[int]` annotations were NameErrors, scoring CORRECT code as failures
+# (diagnosed 2026-07-13: 5 of 6 HumanEval "regressions" were this, not the
+# model). Always graft onto the prompt when the entry def is missing, and
+# always provide the common stdlib/typing imports.
+_COMMON_IMPORTS = (
+    "from typing import *  # noqa\n"
+    "import math, re, collections, itertools, functools, heapq, bisect, string\n"
+)
+
+
+def _assemble_program(prompt: str, solution: str, entry_point: str) -> str:
+    if entry_point and re.search(rf"def\s+{re.escape(entry_point)}\s*\(", solution):
+        body = solution                       # model returned the full function
+    elif prompt:
+        body = prompt.rstrip() + "\n" + solution   # body-only -> graft onto signature
+    else:
+        body = solution
+    return _COMMON_IMPORTS + body
+
+
 def eval_evalplus(
     model: Any,
     tokenizer: Any,
@@ -137,10 +160,13 @@ def eval_evalplus(
         gen = generate(model, tokenizer, instruction, thinking=thinking)
         solution = _extract_code(gen)
         # EvalPlus schema: `test` defines check(candidate); call it when present,
-        # else the test block is a bare assertion suite.
+        # else the test block is a bare assertion suite. Grafting-prompt +
+        # common-imports assembly (see _assemble_program) is what makes the
+        # score reflect the code, not harness fragility.
         test_code = ex.get("test", "")
         imports = "\n".join(ex.get("test_imports") or [])
-        harness = imports + "\n\n" + solution + "\n\n" + test_code
+        program = _assemble_program(prompt_code, solution, entry)
+        harness = imports + "\n\n" + program + "\n\n" + test_code
         if "def check(" in test_code and entry:
             harness += f"\n\ncheck({entry})\n"
         res = check_solution("", harness, timeout_s=timeout_s)

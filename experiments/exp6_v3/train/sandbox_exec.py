@@ -11,6 +11,7 @@ Cross-platform: Windows (laptop) + Linux (Colab/Kaggle).
 """
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import tempfile
@@ -29,13 +30,18 @@ class ExecResult:
 def run_python(code: str, timeout_s: float = 10.0) -> ExecResult:
     """Run `code` in a fresh Python subprocess. Never raises on user-code failure."""
     with tempfile.TemporaryDirectory(prefix="ava_exec_") as tmp:
+        # Write to a file rather than `python -c <code>`: EvalPlus tests inline
+        # thousands of cases and blow the OS command-line length limit
+        # (Windows CreateProcess ~32K -> "filename too long"; also a laptop-lane
+        # portability wart). No -I: tests import numpy, which -I hides where
+        # packages live in the user site. Isolation = process + tmp cwd +
+        # timeout; hostile code belongs in the MCP sandbox, not this runner.
+        script = os.path.join(tmp, "_run.py")
+        with open(script, "w", encoding="utf-8") as fh:
+            fh.write(code)
         try:
             proc = subprocess.run(
-                # No -I: MBPP+/EvalPlus tests import numpy, which -I hides on
-                # machines where packages live in the user site (laptop lane).
-                # Isolation here = process + tmp cwd + timeout; hostile code
-                # belongs in the MCP sandbox, not this eval runner.
-                [sys.executable, "-c", code],
+                [sys.executable, script],
                 cwd=tmp,
                 capture_output=True,
                 text=True,
