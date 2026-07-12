@@ -62,7 +62,20 @@ def _restore_rng(state: dict[str, Any]) -> None:
     random.setstate(state["python"])
     torch.set_rng_state(state["torch"])
     if "cuda" in state and torch.cuda.is_available():
-        torch.cuda.set_rng_state_all(state["cuda"])
+        # Cross-hardware resume: a checkpoint saved on Kaggle 2xT4 carries two
+        # CUDA RNG states; restoring on a 1-GPU Colab box crashed
+        # set_rng_state_all (field bug 2026-07-12). Device RNG continuity is
+        # meaningless across different hardware — data order lives in the
+        # python/torch CPU RNG above — so restore what fits and say so.
+        saved = state["cuda"]
+        n = torch.cuda.device_count()
+        if len(saved) != n:
+            print(
+                f"[checkpoint_sync] cuda rng: {len(saved)} saved device state(s), "
+                f"{n} present — cross-hardware resume, restoring first {min(len(saved), n)}"
+            )
+        for i in range(min(len(saved), n)):
+            torch.cuda.set_rng_state(saved[i], device=i)
 
 
 class CheckpointSync:

@@ -104,3 +104,20 @@ def test_fresh_start_when_no_pointer(tmp_path, monkeypatch) -> None:
     monkeypatch.setattr(cs, "hf_hub_download", _fake_download_factory(api, tmp_path))
     sync = cs.CheckpointSync("user/repo", phase="C9", api=api)
     assert sync.resume(torch.nn.Linear(4, 4)) == 0
+
+
+def test_restore_rng_cross_hardware(monkeypatch) -> None:
+    """Checkpoint saved on 2 GPUs must restore on a 1-GPU box (2026-07-12)."""
+    calls: list[int] = []
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(torch.cuda, "device_count", lambda: 1)
+    monkeypatch.setattr(
+        torch.cuda, "set_rng_state", lambda s, device=0: calls.append(device)
+    )
+    state = {
+        "python": __import__("random").getstate(),
+        "torch": torch.get_rng_state(),
+        "cuda": [torch.get_rng_state(), torch.get_rng_state()],  # 2 saved
+    }
+    cs._restore_rng(state)
+    assert calls == [0]  # restored exactly the one available device
