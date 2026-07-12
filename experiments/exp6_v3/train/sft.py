@@ -107,6 +107,10 @@ def _build_qlora_model(cfg: SFTConfig, compute_dtype: torch.dtype) -> tuple[Any,
         device_map=device_map,
         dtype=compute_dtype,  # torch_dtype deprecated in transformers >= 4.56
         trust_remote_code=True,
+        # SDPA fuses the softmax H-block attention (6/32 layers); the
+        # from_pretrained default (eager) has no fusion. Free throughput —
+        # GDN layers are unaffected (they route through FLA, not attention).
+        attn_implementation="sdpa",
     )
     if cfg.load_4bit:
         model = prepare_model_for_kbit_training(
