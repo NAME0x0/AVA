@@ -63,6 +63,7 @@ class SFTConfig:
     # switches
     dry_run: bool = False
     auto_hardware: bool = True
+    load_4bit: bool = True     # profiles disable on cards that fit bf16 weights
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> SFTConfig:
@@ -80,12 +81,17 @@ def _build_qlora_model(cfg: SFTConfig, compute_dtype: torch.dtype) -> tuple[Any,
     from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
     tokenizer = AutoTokenizer.from_pretrained(cfg.donor, trust_remote_code=True)
-    bnb = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=compute_dtype,
-        bnb_4bit_use_double_quant=True,
-    )
+    # Field finding 2026-07-12: bnb 4-bit dequant is the throughput ceiling
+    # (L4 == T4 at ~220 tok/s). Cards that fit bf16 weights (8 GB) skip
+    # quantization entirely — native tensor-core GEMMs, no dequant tax.
+    bnb = None
+    if cfg.load_4bit:
+        bnb = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=compute_dtype,
+            bnb_4bit_use_double_quant=True,
+        )
     # Pin to one GPU when the 4-bit model fits (donor ~3.6 GB): device_map
     # "auto" shards across multi-GPU boxes (Kaggle 2xT4) into a sequential
     # pipeline where one GPU always idles + cross-device transfers. Only
@@ -102,11 +108,18 @@ def _build_qlora_model(cfg: SFTConfig, compute_dtype: torch.dtype) -> tuple[Any,
         dtype=compute_dtype,  # torch_dtype deprecated in transformers >= 4.56
         trust_remote_code=True,
     )
-    model = prepare_model_for_kbit_training(
-        model,
-        use_gradient_checkpointing=True,
-        gradient_checkpointing_kwargs={"use_reentrant": False},  # torch>=2.9 requires explicit
-    )
+    if cfg.load_4bit:
+        model = prepare_model_for_kbit_training(
+            model,
+            use_gradient_checkpointing=True,
+            gradient_checkpointing_kwargs={"use_reentrant": False},
+        )
+    else:
+        model.gradient_checkpointing_enable(
+            gradient_checkpointing_kwargs={"use_reentrant": False}
+        )
+        model.enable_input_require_grads()
+        print("[sft] unquantized bf16 base (no bnb) — dequant tax removed")
     # Target every linear projection generically: GDN hybrid layer names differ
     # from vanilla attention (q/k/v/o + gdn projections + mlp). all-linear is
     # the donor-agnostic choice and peft resolves it per-architecture.

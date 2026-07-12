@@ -15,6 +15,7 @@ class HWProfile:
     seq_len: int
     grad_accum: int
     micro_batch: int
+    load_4bit: bool
     shard_minutes: float
     sync_minutes: float
     notes: str
@@ -29,6 +30,7 @@ PROFILES = {
         1024,
         8,
         2,
+        True,
         150,
         30,
         "Turing: no bf16; fp16 compute",
@@ -41,9 +43,10 @@ PROFILES = {
         2048,
         16,
         1,
+        False,
         150,
         30,
-        "Ada: bf16+Triton; mb1 — 248K-vocab CE chain ~6GB at seq2048 (~18.5GB usable)",
+        "Ada: UNQUANTIZED bf16 LoRA (no bnb dequant tax); weights 8GB + CE chain -> mb1",
     ),
     "a100": HWProfile(
         "a100",
@@ -53,6 +56,7 @@ PROFILES = {
         4096,
         4,
         4,
+        False,
         110,
         15,
         "burst tier: short shards, tight sync — high CU burn",
@@ -65,6 +69,7 @@ PROFILES = {
         1024,
         8,
         2,
+        True,
         150,
         30,
         "Volta: fp16",
@@ -77,6 +82,7 @@ PROFILES = {
         4096,
         2,
         8,
+        False,
         90,
         15,
         "extreme CU burn (~20-30 CU/h): burst only — QLoRA 4B underutilizes it",
@@ -89,6 +95,7 @@ PROFILES = {
         4096,
         2,
         8,
+        False,
         90,
         15,
         "extreme CU burn: burst only",
@@ -101,6 +108,7 @@ PROFILES = {
         4096,
         2,
         8,
+        False,
         90,
         15,
         "Colab G4 (Blackwell): burst tier",
@@ -113,6 +121,7 @@ PROFILES = {
         640,
         32,
         1,
+        True,
         600,
         30,
         "laptop lane",
@@ -142,6 +151,7 @@ def detect_profile() -> HWProfile:
             256,
             4,
             1,
+            True,
             600,
             60,
             "dry-run/dev only",
@@ -169,6 +179,7 @@ def detect_profile() -> HWProfile:
         1024,
         8,
         2,
+        props.total_memory / 1_000_000_000 < 20,
         150,
         30,
         "unknown gpu: conservative defaults",
@@ -179,12 +190,14 @@ def apply_profile(cfg, profile: HWProfile) -> str:
     cfg.seq_len = profile.seq_len
     cfg.grad_accum = profile.grad_accum
     cfg.micro_batch = profile.micro_batch
+    cfg.load_4bit = profile.load_4bit
     cfg.shard_minutes = profile.shard_minutes
     cfg.sync_minutes = profile.sync_minutes
     print(
         "[hw] "
         f"{profile.name}: {profile.vram_gb:.1f} GB, dtype={profile.compute_dtype}, "
         f"seq_len={profile.seq_len}, mb={profile.micro_batch}x{profile.grad_accum}, "
+        f"quant={'4bit' if profile.load_4bit else 'bf16-full'}, "
         f"shard={profile.shard_minutes}m, sync={profile.sync_minutes}m; {profile.notes}"
     )
     return profile.compute_dtype

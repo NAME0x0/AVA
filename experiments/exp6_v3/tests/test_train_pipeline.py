@@ -283,6 +283,7 @@ def test_apply_profile_mutates_cfg() -> None:
         512,
         7,
         3,      # micro_batch
+        False,  # load_4bit
         9,
         3,
         "test profile",
@@ -294,6 +295,7 @@ def test_apply_profile_mutates_cfg() -> None:
     assert cfg.seq_len == 512
     assert cfg.grad_accum == 7
     assert cfg.micro_batch == 3
+    assert cfg.load_4bit is False
     assert cfg.shard_minutes == 9
 
 
