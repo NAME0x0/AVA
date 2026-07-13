@@ -126,11 +126,26 @@ class CheckpointSync:
         extra: dict[str, Any] | None = None,
         force: bool = False,
     ) -> bool:
-        """Push a checkpoint if the sync interval elapsed. Returns True if pushed."""
+        """Push a checkpoint if the sync interval elapsed. Returns True if pushed.
+
+        A transient Hub outage (500s past the retry budget) must NOT crash a
+        multi-hour shard — swallow a fully-failed periodic push and keep
+        training; the next interval retries. `force=True` (end-of-shard) still
+        raises, so a genuine credential/quota failure surfaces loudly.
+        """
         now = time.monotonic()
         if not force and (now - self._last_push) < self.every_seconds:
             return False
-        self.save(step, model, optimizer, extra)
+        try:
+            self.save(step, model, optimizer, extra)
+        except Exception as err:  # noqa: BLE001 - training survives Hub outages
+            if force:
+                raise
+            print(
+                f"[checkpoint_sync] push failed at step {step} ({err!r}); "
+                f"training continues, retrying at next sync interval"
+            )
+            return False
         self._last_push = time.monotonic()
         return True
 

@@ -121,3 +121,21 @@ def test_restore_rng_cross_hardware(monkeypatch) -> None:
     }
     cs._restore_rng(state)
     assert calls == [0]  # restored exactly the one available device
+
+
+def test_maybe_save_survives_push_failure(monkeypatch) -> None:
+    """A transient Hub outage must not crash training on a periodic push."""
+    api = FakeApi()
+    sync = cs.CheckpointSync("user/repo", phase="C5", every_minutes=0, api=api)
+
+    def boom(*a, **k):
+        raise RuntimeError("HTTP 500 (simulated Hub outage)")
+
+    monkeypatch.setattr(sync, "save", boom)
+    model = torch.nn.Linear(4, 4)
+    # periodic push swallows the failure and returns False (training continues)
+    assert sync.maybe_save(1, model) is False
+    # forced (end-of-shard) push still raises so real failures surface
+    import pytest
+    with pytest.raises(RuntimeError):
+        sync.maybe_save(2, model, force=True)
