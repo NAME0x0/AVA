@@ -21,8 +21,8 @@ def run_probe(
     ckpt_repo: str,
     donor: str,
     config_path: str,
-    code_limit: int = 30,
-    floor_limits: tuple[int, int] = (100, 150),
+    code_limit: int = 60,               # n=30 has ~+/-8pp noise — too coarse to
+    floor_limits: tuple[int, int] = (200, 300),  # read a trend; n=60 halves it
 ) -> dict:
     import torch
     from huggingface_hub import hf_hub_download
