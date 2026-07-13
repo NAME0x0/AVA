@@ -43,10 +43,10 @@ PROFILES = {
         2048,
         16,
         1,
-        False,
-        150,
+        True,   # unquantized bf16 OOMs at seq2048 (weights 8.5GB + 248K-vocab
+        150,    # CE chain > 22GB, field 2026-07-13); 4-bit gives ~2x T4 + fits
         30,
-        "Ada: UNQUANTIZED bf16 LoRA (no bnb dequant tax); weights 8GB + CE chain -> mb1",
+        "Ada: 4-bit QLoRA, bf16 compute, seq2048 mb1 — ~2x T4, ~430 tok/s",
     ),
     "a100": HWProfile(
         "a100",
@@ -56,8 +56,8 @@ PROFILES = {
         4096,
         4,
         4,
-        False,
-        110,
+        True,   # keep quantized: L4 showed unquantized bf16 is memory-hungry;
+        110,    # 40GB may fit at seq4096 but untested — 4-bit is the safe default
         15,
         "burst tier: short shards, tight sync — high CU burn",
     ),
@@ -82,7 +82,7 @@ PROFILES = {
         4096,
         2,
         8,
-        False,
+        True,
         90,
         15,
         "extreme CU burn (~20-30 CU/h): burst only — QLoRA 4B underutilizes it",
@@ -95,7 +95,7 @@ PROFILES = {
         4096,
         2,
         8,
-        False,
+        True,
         90,
         15,
         "extreme CU burn: burst only",
@@ -108,7 +108,7 @@ PROFILES = {
         4096,
         2,
         8,
-        False,
+        True,
         90,
         15,
         "Colab G4 (Blackwell): burst tier",
@@ -179,7 +179,7 @@ def detect_profile() -> HWProfile:
         1024,
         8,
         2,
-        props.total_memory / 1_000_000_000 < 20,
+        True,   # 4-bit is the safe universal default (unquantized OOM risk)
         150,
         30,
         "unknown gpu: conservative defaults",
