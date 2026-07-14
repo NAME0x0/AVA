@@ -84,11 +84,13 @@ def _pip(*args: str, timeout: int = 900, env: dict | None = None, verbose: bool 
     return proc.returncode == 0
 
 
-def ensure_fast_kernels(hub_repo: str | None = None, build_conv: bool = True) -> bool:
+def ensure_fast_kernels(hub_repo: str | None = None, build_conv: bool = False) -> bool:
     """Ensure the GDN fast path. Returns True iff both libs end up importable.
 
-    build_conv=False (or AVA_SKIP_KERNELS=1) skips the compiled causal-conv1d
-    source build entirely — fla alone still accelerates the recurrence.
+    Default installs fla only (pure Triton, clean, the win we rely on).
+    causal-conv1d is OPT-IN (build_conv=True) — it froze sessions via all-arch
+    builds and stalled cached-wheel downloads for a marginal conv speedup.
+    AVA_SKIP_KERNELS=1 skips everything (torch fallback).
     """
     if os.environ.get("AVA_SKIP_KERNELS") == "1":
         print("[kernels] AVA_SKIP_KERNELS=1 -> skipping, torch fallback (correct, slower)")
@@ -102,11 +104,17 @@ def ensure_fast_kernels(hub_repo: str | None = None, build_conv: bool = True) ->
         print("[kernels] installing flash-linear-attention (Triton, no compile)...")
         _pip("install", "-q", "flash-linear-attention", timeout=600)
 
-    # -- causal-conv1d: the compiled, fragile part ---------------------------
-    if not _importable("causal_conv1d"):
+    # -- causal-conv1d: the compiled, fragile part — OPT-IN ONLY -------------
+    # Field history: this component froze sessions two ways — an all-arch
+    # source build (~20 min silent) AND a stalled 171 MB cached-wheel download
+    # (hf_hub_download has no wall-clock timeout). Its speedup is marginal (a
+    # small 1D conv) vs fla's recurrence win. So it is now opt-in: default
+    # off. fla alone is the fast path we actually rely on.
+    if build_conv and not _importable("causal_conv1d"):
         got = False
         tag = _tag()
-        # (a) cached wheel from the Hub — seconds
+        # (a) cached wheel from the Hub — seconds (behind build_conv now, so a
+        #     stalled download can't freeze the default path)
         if hub_repo:
             try:
                 from huggingface_hub import HfApi, hf_hub_download
@@ -120,7 +128,7 @@ def ensure_fast_kernels(hub_repo: str | None = None, build_conv: bool = True) ->
             except Exception as err:  # noqa: BLE001
                 print(f"[kernels] hub wheel lookup failed: {err!r}")
         # (b) arch-limited source build — VERBOSE, capped, non-blocking
-        if not got and build_conv:
+        if not got:
             arch = _arch()
             env = dict(os.environ)
             if arch:
@@ -150,8 +158,6 @@ def ensure_fast_kernels(hub_repo: str | None = None, build_conv: bool = True) ->
                             print("[kernels] wheel cached to Hub for future sessions")
                         except Exception as err:  # noqa: BLE001
                             print(f"[kernels] wheel upload failed (non-fatal): {err!r}")
-        elif not got:
-            print("[kernels] causal-conv1d skipped (build_conv=False)")
 
     fla_ok = _importable("fla")
     conv_ok = _importable("causal_conv1d")
