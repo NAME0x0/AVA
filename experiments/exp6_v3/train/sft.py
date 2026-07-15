@@ -56,6 +56,9 @@ class SFTConfig:
     lora_r: int = 16
     lora_alpha: int = 32
     lora_dropout: float = 0.05
+    use_dora: bool = True   # DoRA: decomposes weight into magnitude+direction,
+                            # better quality than plain LoRA at same param count
+                            # (PLAN_2026-07-15_v31 s4). peft>=0.12; ~small overhead.
     # schedule / fabric
     shard_minutes: float = 150.0
     sync_minutes: float = 30.0
@@ -134,6 +137,7 @@ def _build_qlora_model(cfg: SFTConfig, compute_dtype: torch.dtype) -> tuple[Any,
         bias="none",
         task_type="CAUSAL_LM",
         target_modules="all-linear",
+        use_dora=cfg.use_dora,
     )
     model = get_peft_model(model, lcfg)
     model.print_trainable_parameters()

@@ -526,3 +526,19 @@ def test_sandbox_runs_oversized_code() -> None:
     big = "x = [\n" + ",\n".join("1" for _ in range(40000)) + "\n]\nassert sum(x) == 40000\n"
     assert len(big) > 100_000
     assert run_python(big, timeout_s=30).ok
+
+
+def test_dora_flag_flows_through_config(tmp_path) -> None:
+    from train.sft import SFTConfig
+
+    y = tmp_path / "c.yaml"
+    y.write_text(
+        "phase: C5\nckpt_repo: r\ndonor: d\nseed: 1\nseq_len: 8\n"
+        "sources: []\ndecontam_against: []\nlr: 1.0e-4\nmicro_batch: 1\n"
+        "grad_accum: 2\ntotal_steps: 3\nwarmup_steps: 1\nmax_grad_norm: 1.0\n"
+        "lora_r: 16\nlora_alpha: 32\nlora_dropout: 0.05\nuse_dora: true\n"
+        "shard_minutes: 5\nsync_minutes: 30\nlog_every: 20\ndry_run: true\n"
+    )
+    cfg = SFTConfig.from_yaml(str(y))
+    assert cfg.use_dora is True
+    assert SFTConfig(dry_run=True).use_dora is True  # default on

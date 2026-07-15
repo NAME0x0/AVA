@@ -26,6 +26,13 @@ sources:
     split: train                 # (python first; more languages join at the
     weight: 0.3                  #  MultiPL-E stage — one data_files line each)
     fim_fraction: 0.0
+# STAGED (PLAN_2026-07-15_v31 s3) — clean agentic/reasoning upgrade. NOT active
+# until each schema is confirmed with scripts/inspect_dataset.py and a mapper is
+# added to train/data.py SCHEMA_MAPPERS (rule: never map a guessed schema):
+#   - nvidia/Open-SWE-Traces   (207K agentic trajectories, CC BY 4.0) -> agentic
+#   - nvidia/OpenMathReasoning (reasoning muscle, CC BY 4.0)
+#   - open-thoughts/OpenThoughts-114k (open reasoning CoT)
+# Proprietary-distill sets (Claude/GPT traces) are BANNED — s2.
 decontam_against:                # R21 floor; full MinHash gate is v3-full work
   - evalplus/humanevalplus
   - evalplus/mbppplus
@@ -42,6 +49,7 @@ max_grad_norm: 1.0
 lora_r: 16
 lora_alpha: 32
 lora_dropout: 0.05
+use_dora: true                   # DoRA > plain LoRA at same param count (v31 s4)
 
 # -- fabric ---------------------------------------------------------------
 shard_minutes: 150               # kaggle batch: 550; laptop: 600
