@@ -89,3 +89,6 @@ ui/src-tauri/target/
 experiments/exp5_gemma4/results/*.json
 experiments/exp5_gemma4/results/llamacpp_logs/
 experiments/exp5_gemma4/tools/
+
+# local model exports (multi-GB safetensors/GGUF)
+exports/
