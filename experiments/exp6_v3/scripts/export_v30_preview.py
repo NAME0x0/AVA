@@ -84,6 +84,19 @@ def main() -> None:
     model.save_pretrained(out, safe_serialization=True)
     tokenizer.save_pretrained(out)
 
+    # AutoModelForCausalLM drops the donor's MTP draft-head WEIGHTS, but the
+    # saved config still declared mtp_num_hidden_layers=1 — llama.cpp then
+    # expects a blk.32 that doesn't exist ("missing tensor blk.32.attn_norm",
+    # field 2026-07-17). Zero it so the GGUF is self-consistent.
+    import json
+
+    cfg_path = out / "config.json"
+    cfg_json = json.loads(cfg_path.read_text())
+    if cfg_json.get("mtp_num_hidden_layers"):
+        cfg_json["mtp_num_hidden_layers"] = 0
+        cfg_path.write_text(json.dumps(cfg_json, indent=2))
+        print("[export] config: mtp_num_hidden_layers -> 0 (weights not exported)")
+
     # quick sanity: merged model must still generate coherent code (CPU, slow)
     print("[export] CPU generation sanity check (may take ~1 min)...")
     ids = tokenizer.apply_chat_template(
