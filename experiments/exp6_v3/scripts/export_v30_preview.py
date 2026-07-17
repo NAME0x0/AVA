@@ -31,6 +31,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+# This is a CPU merge. If causal_conv1d is installed, transformers' qwen3.5
+# code auto-selects its CUDA-only kernel and the sanity generation dies with
+# "Expected x.is_cuda()" (field, 2026-07-17). Mask the module BEFORE any
+# transformers import so the CPU-capable torch fallback is chosen.
+sys.modules["causal_conv1d"] = None  # type: ignore[assignment]
+
 CKPT_REPO = "NAME0x0/AVA-v3-checkpoints"
 DONOR = "Qwen/Qwen3.5-4B"
 MERGE_USE_DORA = False  # step-2167 adapters predate the DoRA switch — see docstring
