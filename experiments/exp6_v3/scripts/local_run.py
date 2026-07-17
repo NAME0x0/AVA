@@ -109,7 +109,12 @@ def convert() -> None:
 
 
 def _common_flags() -> list[str]:
-    return [
+    # Donor is thinking-by-default. For a coding tool, direct answers are the
+    # sane default (thinking burns the token budget monologuing before code —
+    # field 2026-07-18: a 220-token merge-two-lists gen never reached the code).
+    # AVA_THINK=1 re-enables it for hard problems.
+    think = os.environ.get("AVA_THINK") == "1"
+    flags = [
         "-m", str(GGUF_Q4),
         "-ngl", str(plan_ngl()),
         "-fa", "on",                       # flash attention
@@ -117,15 +122,29 @@ def _common_flags() -> list[str]:
         "--cache-type-v", "q8_0",
         "-c", "8192",                      # sane default ctx on 4 GB; raise on demand
     ]
+    if not think:
+        flags += ["--chat-template-kwargs", '{"enable_thinking": false}']
+    return flags
 
 
 def chat() -> None:
+    # -cnv = conversation mode (applies the chat template); interactive.
     subprocess.run([str(_bins() / "llama-cli"), *_common_flags(), "-cnv"], check=False)
+
+
+def test() -> None:
+    """Non-interactive single-turn proof: applies template, one turn, exits."""
+    prompt = "Write a Python function that merges two sorted lists. Return only the code."
+    subprocess.run(
+        [str(_bins() / "llama-cli"), *_common_flags(), "-cnv", "-st",
+         "--temp", "0", "-n", "256", "-p", prompt],
+        check=False,
+    )
 
 
 def serve() -> None:
     subprocess.run(
-        [str(_bins() / "llama-server"), *_common_flags(), "--port", "8080"],
+        [str(_bins() / "llama-server"), *_common_flags(), "--jinja", "--port", "8080"],
         check=False,
     )
 
@@ -139,12 +158,13 @@ def bench() -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["convert", "chat", "serve", "bench", "plan"])
+    ap.add_argument("cmd", choices=["convert", "chat", "test", "serve", "bench", "plan"])
     cmd = ap.parse_args().cmd
     if cmd == "plan":
         plan_ngl()
     else:
-        {"convert": convert, "chat": chat, "serve": serve, "bench": bench}[cmd]()
+        {"convert": convert, "chat": chat, "test": test,
+         "serve": serve, "bench": bench}[cmd]()
 
 
 if __name__ == "__main__":
