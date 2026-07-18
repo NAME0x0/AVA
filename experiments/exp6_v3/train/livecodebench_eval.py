@@ -136,3 +136,62 @@ def run_livecodebench(
         "by_difficulty": {d: round(100.0 * sum(v) / len(v), 1) for d, v in by_diff.items()},
         "per_task": per_task,
     }
+
+
+def lcb_compare(
+    ckpt_repo: str,
+    donor: str,
+    config_path: str,
+    limit: int = 100,
+    min_date: str | None = "2026-03-01",   # after the donor's training cutoff
+    thinking: bool = False,
+) -> dict:
+    """Donor vs trained checkpoint on the SAME LiveCodeBench problems, one load.
+
+    Trick: an untrained LoRA adapter is zero-init (lora_B=0) -> the model's
+    output equals the raw donor. So we eval with adapters-off (= donor), then
+    resume the trained adapters and eval again (= AVA v3) — same weights base,
+    same problem set, honest matched delta, no second 9 GB download.
+    """
+    import json
+
+    import torch
+    from scripts.checkpoint_sync import CheckpointSync
+
+    from .hw_profile import detect_profile
+    from .sft import SFTConfig, _build_qlora_model
+
+    cfg = SFTConfig.from_yaml(config_path)
+    cfg.ckpt_repo, cfg.donor = ckpt_repo, donor
+    cfg.use_dora = False   # the step-2167 preview predates the DoRA switch (plain LoRA)
+    prof = detect_profile()
+    dtype = torch.bfloat16 if prof.compute_dtype == "bfloat16" else torch.float16
+
+    model, tok = _build_qlora_model(cfg, dtype)
+    model.eval()
+    print(f"[lcb] evaluating DONOR (adapters zeroed) on {limit} stdin problems...")
+    donor_rep = run_livecodebench(model, tok, limit=limit, min_date=min_date, thinking=thinking)
+    print(f"[lcb] DONOR: {donor_rep['score']}%  (n={donor_rep['n']})  {donor_rep['by_difficulty']}")
+
+    step = CheckpointSync(ckpt_repo, phase="C5", trainable_only=True).resume(model) - 1
+    print(f"[lcb] evaluating AVA v3 @ step {step} on the SAME problems...")
+    v3_rep = run_livecodebench(model, tok, limit=limit, min_date=min_date, thinking=thinking)
+    print(f"[lcb] AVA v3 @{step}: {v3_rep['score']}%  (n={v3_rep['n']})  {v3_rep['by_difficulty']}")
+
+    delta = round(v3_rep["score"] - donor_rep["score"], 2)
+    print(f"\n[lcb] === DELTA (v3 - donor) = {delta:+.2f} pp on the same {donor_rep['n']} "
+          f"LiveCodeBench problems (contamination-filtered, date>={min_date}) ===")
+    out = {"donor": donor_rep, "ava_v3": v3_rep, "delta": delta, "step": step,
+           "limit": limit, "min_date": min_date, "thinking": thinking}
+    with open("lcb_compare.json", "w", encoding="utf-8") as fh:
+        json.dump(out, fh, indent=2)
+    try:
+        from huggingface_hub import HfApi
+
+        HfApi().upload_file(path_or_fileobj="lcb_compare.json",
+                            path_in_repo=f"reports/lcb_compare_step{step}.json",
+                            repo_id=ckpt_repo)
+        print(f"[lcb] report pushed -> {ckpt_repo}/reports/lcb_compare_step{step}.json")
+    except Exception as err:  # noqa: BLE001
+        print(f"[lcb] report push failed (non-fatal): {err!r}")
+    return out
