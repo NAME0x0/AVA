@@ -587,3 +587,48 @@ def test_lcb_score_stdin_pass_fail() -> None:
     assert _score_stdin(correct, tests, 10.0) is True
     assert _score_stdin("print(0)\n", tests, 10.0) is False       # wrong output
     assert _score_stdin("import sys\nsys.exit(1)\n", tests, 10.0) is False  # crash
+
+
+# --------------------------------------------------------------------------- canitedit
+def test_canitedit_prompt_and_kind() -> None:
+    from train.canitedit_eval import _build_prompt, _kind
+
+    p = _build_prompt("def f():\n    return 1\n", "make f return 2")
+    assert "def f():" in p and "make f return 2" in p
+    assert "COMPLETE" in p and "```python" in p            # full-program contract
+    assert _kind({"taxonomy": {"change_kind": "corrective"}}) == "corrective"
+    assert _kind({"taxonomy": None}) == "?"                # defensive fallback
+
+
+def test_canitedit_run_scores_edit(monkeypatch) -> None:
+    """Full run loop offline: gold edit passes, no-op edit fails, kind tallied."""
+    import train.canitedit_eval as ce
+
+    row = {
+        "before": "def f():\n    return 1\n",
+        "after": "def f():\n    return 2\n",
+        "tests": "assert f() == 2\n",
+        "instruction_descriptive": "make f return 2",
+        "full_name": "t1",
+        "taxonomy": {"change_kind": "corrective"},
+    }
+    monkeypatch.setattr(ce, "_load_rows", lambda limit: [row])
+
+    monkeypatch.setattr(ce, "generate",
+                        lambda *a, **k: "```python\n" + row["after"] + "\n```")
+    good = ce.run_canitedit(model=None, tokenizer=None)
+    assert good["score"] == 100.0 and good["n"] == 1
+    assert good["by_change_kind"] == {"corrective": 100.0}
+
+    monkeypatch.setattr(ce, "generate",
+                        lambda *a, **k: "```python\n" + row["before"] + "\n```")
+    bad = ce.run_canitedit(model=None, tokenizer=None)
+    assert bad["score"] == 0.0                              # unchanged code fails tests
+
+
+def test_canitedit_bad_instruction() -> None:
+    import pytest
+    from train.canitedit_eval import run_canitedit
+
+    with pytest.raises(ValueError, match="descriptive"):
+        run_canitedit(model=None, tokenizer=None, instruction="bogus")
