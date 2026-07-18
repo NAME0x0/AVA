@@ -27,8 +27,11 @@ class ExecResult:
     stderr: str
 
 
-def run_python(code: str, timeout_s: float = 10.0) -> ExecResult:
-    """Run `code` in a fresh Python subprocess. Never raises on user-code failure."""
+def run_python(code: str, timeout_s: float = 10.0, stdin_data: str | None = None) -> ExecResult:
+    """Run `code` in a fresh Python subprocess. Never raises on user-code failure.
+
+    stdin_data: feed to the program's stdin (LiveCodeBench stdin-type problems).
+    """
     with tempfile.TemporaryDirectory(prefix="ava_exec_") as tmp:
         # Write to a file rather than `python -c <code>`: EvalPlus tests inline
         # thousands of cases and blow the OS command-line length limit
@@ -46,7 +49,8 @@ def run_python(code: str, timeout_s: float = 10.0) -> ExecResult:
                 capture_output=True,
                 text=True,
                 timeout=timeout_s,
-                stdin=subprocess.DEVNULL,
+                input=stdin_data if stdin_data is not None else None,
+                stdin=None if stdin_data is not None else subprocess.DEVNULL,
             )
             return ExecResult(
                 ok=proc.returncode == 0,

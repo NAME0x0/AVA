@@ -542,3 +542,48 @@ def test_dora_flag_flows_through_config(tmp_path) -> None:
     cfg = SFTConfig.from_yaml(str(y))
     assert cfg.use_dora is True
     assert SFTConfig(dry_run=True).use_dora is True  # default on
+
+
+# --------------------------------------------------------------------------- livecodebench
+
+
+def test_lcb_decode_json_double_and_mixed() -> None:
+    import json as _json
+
+    from train.livecodebench_eval import _decode_tests
+
+    good = [{"input": "1\n", "output": "1\n", "testtype": "stdin"}]
+    # plain JSON list
+    assert _decode_tests({"public_test_cases": _json.dumps(good)}) == good
+    # double-encoded (a JSON string wrapping the list) — the char-explosion bug
+    row = {"public_test_cases": _json.dumps(_json.dumps(good))}
+    assert _decode_tests(row) == good
+    # mixed junk: strings + dict-without-io are dropped, valid dict kept
+    row2 = {"public_test_cases": _json.dumps(["junk", {"foo": 1}, good[0]])}
+    assert _decode_tests(row2) == good
+    assert _decode_tests({}) == []
+
+
+def test_lcb_decode_pickle_private() -> None:
+    import base64
+    import pickle
+    import zlib
+
+    from train.livecodebench_eval import _decode_tests
+
+    cases = [{"input": "2 3\n", "output": "5\n", "testtype": "stdin"}]
+    blob = base64.b64encode(zlib.compress(pickle.dumps(cases))).decode()
+    assert _decode_tests({"private_test_cases": blob}) == cases
+
+
+def test_lcb_score_stdin_pass_fail() -> None:
+    from train.livecodebench_eval import _score_stdin
+
+    tests = [
+        {"input": "2 3\n", "output": "5", "testtype": "stdin"},
+        {"input": "10 20\n", "output": "30\n", "testtype": "stdin"},  # trailing-nl tolerant
+    ]
+    correct = "a,b=map(int,input().split())\nprint(a+b)\n"
+    assert _score_stdin(correct, tests, 10.0) is True
+    assert _score_stdin("print(0)\n", tests, 10.0) is False       # wrong output
+    assert _score_stdin("import sys\nsys.exit(1)\n", tests, 10.0) is False  # crash
