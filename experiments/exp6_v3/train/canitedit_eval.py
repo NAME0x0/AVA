@@ -71,14 +71,40 @@ def _load_rows(limit: int | None) -> list[dict]:
     return rows
 
 
-def _report(per_task: dict, by_kind: dict, instruction: str) -> dict:
-    """Build the report dict from raw per-task bools + per-kind bool lists."""
+def _classify(edited: str, tests: str, timeout_s: float) -> tuple[bool, str]:
+    """Split failures so the score is interpretable (iron law): a truncated/
+    incomplete program (SyntaxError) is a MEASUREMENT artifact (token budget /
+    verbosity), whereas a program that runs but fails the asserts is a REAL wrong
+    edit. Mixing them hides which one a low score actually means."""
+    if not edited.strip():
+        return False, "empty"          # no code block extracted at all
+    try:
+        compile(edited, "<edit>", "exec")
+    except SyntaxError:
+        return False, "syntax"         # incomplete / truncated -> artifact-ish
+    res = check_solution(edited, tests, timeout_s=timeout_s)
+    if res.ok:
+        return True, "pass"
+    return False, "timeout" if res.timeout else "tests"   # "tests" = ran, wrong edit
+
+
+def _report(per_task: dict, by_kind: dict, reasons: dict, instruction: str) -> dict:
+    """Report from per-task bools + per-kind bool lists + per-task failure reasons.
+
+    `by_reason` decomposes the failures: pass / syntax (truncated-incomplete) /
+    tests (complete but wrong) / timeout / empty.
+    """
+    by_reason: dict[str, int] = {}
+    for rz in reasons.values():
+        by_reason[rz] = by_reason.get(rz, 0) + 1
     return {
         "score": round(100.0 * sum(per_task.values()) / max(len(per_task), 1), 2),
         "n": len(per_task),
         "instruction": instruction,
         "by_change_kind": {k: round(100.0 * sum(v) / len(v), 1) for k, v in by_kind.items()},
+        "by_reason": by_reason,
         "per_task": per_task,
+        "reasons": reasons,
     }
 
 
@@ -126,7 +152,7 @@ def run_canitedit(
     instruction: str = "descriptive",  # "descriptive" (default) | "lazy" (harder)
     thinking: bool = False,
     timeout_s: float = 15.0,
-    max_new_tokens: int = 1400,
+    max_new_tokens: int = 2560,        # full-program rewrites of 50-80-line files
     hub_repo: str | None = None,       # push per-problem checkpoints here
     resume_key: str | None = None,     # report basename; enables resume + skip-done
     save_every: int = 5,
@@ -141,31 +167,33 @@ def run_canitedit(
     instr_col = f"instruction_{instruction}"
     prior = _seed(resume_key, hub_repo)
     per_task: dict[str, bool] = {k: bool(v) for k, v in prior.get("per_task", {}).items()}
+    reasons: dict[str, str] = dict(prior.get("reasons", {}))
     by_kind: dict[str, list[bool]] = {}
-    # rebuild per-kind tallies for already-done rows so the breakdown stays correct
+    # rebuild per-kind tallies (+ back-fill reasons for legacy reports) for done rows
     for r in rows:
-        if r["full_name"] in per_task:
-            by_kind.setdefault(_kind(r), []).append(per_task[r["full_name"]])
+        name = r["full_name"]
+        if name in per_task:
+            by_kind.setdefault(_kind(r), []).append(per_task[name])
+            reasons.setdefault(name, "pass" if per_task[name] else "legacy_fail")
     todo = [r for r in rows if r["full_name"] not in per_task]
     if per_task:
         print(f"[edit] resuming {resume_key}: {len(per_task)} done, {len(todo)} to go")
     if not todo:                       # fully cached — skip the model entirely
-        return _report(per_task, by_kind, instruction)
+        return _report(per_task, by_kind, reasons, instruction)
 
     bar = _progress(todo, desc=f"canitedit({instruction})", total=len(todo))
     for i, r in enumerate(bar):
         prompt = _build_prompt(r["before"], r[instr_col])
         gen = generate(model, tokenizer, prompt, thinking=thinking, max_new_tokens=max_new_tokens)
-        edited = _extract_code(gen)
-        # tests reference module-level names -> run the full edited program + asserts
-        ok = check_solution(edited, r["tests"], timeout_s=timeout_s).ok
+        ok, reason = _classify(_extract_code(gen), r["tests"], timeout_s)
         per_task[r["full_name"]] = ok
+        reasons[r["full_name"]] = reason
         by_kind.setdefault(_kind(r), []).append(ok)
         _set_postfix(bar, pass_rate=f"{100.0 * sum(per_task.values()) / len(per_task):.1f}%")
         if (i + 1) % save_every == 0:
-            _persist(resume_key, hub_repo, _report(per_task, by_kind, instruction))
+            _persist(resume_key, hub_repo, _report(per_task, by_kind, reasons, instruction))
 
-    report = _report(per_task, by_kind, instruction)
+    report = _report(per_task, by_kind, reasons, instruction)
     _persist(resume_key, hub_repo, report)   # final flush
     return report
 
@@ -177,6 +205,7 @@ def edit_compare(
     limit: int | None = None,
     instruction: str = "descriptive",
     thinking: bool = False,
+    max_new_tokens: int = 2560,
 ) -> dict:
     """Donor vs trained checkpoint on the SAME CanItEdit problems, one model load.
 
@@ -205,18 +234,22 @@ def edit_compare(
 
     model, tok = _build_qlora_model(cfg, dtype)
     model.eval()
-    donor_key = f"canitedit_donor_{instruction}_n{n_tag}"
+    donor_key = f"canitedit_donor_{instruction}_n{n_tag}_t{max_new_tokens}"
     print(f"[edit] evaluating DONOR (adapters zeroed) on CanItEdit ({instruction})...")
     donor_rep = run_canitedit(model, tok, limit=limit, instruction=instruction,
-                              thinking=thinking, hub_repo=ckpt_repo, resume_key=donor_key)
-    print(f"[edit] DONOR: {donor_rep['score']}%  (n={donor_rep['n']})  {donor_rep['by_change_kind']}")
+                              thinking=thinking, max_new_tokens=max_new_tokens,
+                              hub_repo=ckpt_repo, resume_key=donor_key)
+    print(f"[edit] DONOR: {donor_rep['score']}%  (n={donor_rep['n']})  "
+          f"{donor_rep['by_change_kind']}  reasons={donor_rep['by_reason']}")
 
     step = CheckpointSync(ckpt_repo, phase="C5", trainable_only=True).resume(model) - 1
-    v3_key = f"canitedit_v3_step{step}_{instruction}_n{n_tag}"
+    v3_key = f"canitedit_v3_step{step}_{instruction}_n{n_tag}_t{max_new_tokens}"
     print(f"[edit] evaluating AVA v3 @ step {step} on the SAME problems...")
     v3_rep = run_canitedit(model, tok, limit=limit, instruction=instruction,
-                           thinking=thinking, hub_repo=ckpt_repo, resume_key=v3_key)
-    print(f"[edit] AVA v3 @{step}: {v3_rep['score']}%  (n={v3_rep['n']})  {v3_rep['by_change_kind']}")
+                           thinking=thinking, max_new_tokens=max_new_tokens,
+                           hub_repo=ckpt_repo, resume_key=v3_key)
+    print(f"[edit] AVA v3 @{step}: {v3_rep['score']}%  (n={v3_rep['n']})  "
+          f"{v3_rep['by_change_kind']}  reasons={v3_rep['by_reason']}")
 
     delta = round(v3_rep["score"] - donor_rep["score"], 2)
     print(f"\n[edit] === DELTA (v3 - donor) = {delta:+.2f} pp on the same {donor_rep['n']} "

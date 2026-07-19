@@ -634,6 +634,29 @@ def test_canitedit_bad_instruction() -> None:
         run_canitedit(model=None, tokenizer=None, instruction="bogus")
 
 
+def test_canitedit_classify_reasons() -> None:
+    """Failures split into artifact (syntax/truncated) vs real (tests/wrong)."""
+    from train.canitedit_eval import _classify
+
+    assert _classify("def f():\n    return 2\n", "assert f()==2\n", 10.0) == (True, "pass")
+    assert _classify("def f(:\n    return", "assert f()==2\n", 10.0) == (False, "syntax")   # truncated
+    assert _classify("def f():\n    return 9\n", "assert f()==2\n", 10.0) == (False, "tests")  # wrong
+    assert _classify("   ", "assert True\n", 10.0) == (False, "empty")
+
+
+def test_canitedit_run_reports_reasons(monkeypatch) -> None:
+    """run_canitedit surfaces by_reason so a low score is interpretable."""
+    import train.canitedit_eval as ce
+
+    row = {"before": "def f():\n return 1\n", "after": "x", "tests": "assert f()==2\n",
+           "instruction_descriptive": "ret 2", "full_name": "t1",
+           "taxonomy": {"change_kind": "corrective"}}
+    monkeypatch.setattr(ce, "_load_rows", lambda limit: [row])
+    monkeypatch.setattr(ce, "generate", lambda *a, **k: "```python\ndef f(:\n return\n```")  # truncated
+    rep = ce.run_canitedit(model=None, tokenizer=None)
+    assert rep["score"] == 0.0 and rep["by_reason"] == {"syntax": 1}
+
+
 def test_canitedit_resume_skips_done(monkeypatch, tmp_path) -> None:
     """A pre-seeded checkpoint is honoured: done problems are not re-generated,
     their kind tally is rebuilt, and the final state is re-persisted."""
