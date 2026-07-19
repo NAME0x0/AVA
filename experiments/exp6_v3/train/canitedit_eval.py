@@ -21,9 +21,17 @@ Protocol: model gets `before` + instruction, must return the COMPLETE edited pro
 answer legitimately fails instruction-following). Pass@1 = `edited + tests` exits 0.
 Gold `after` validated to pass its own tests through our sandbox (20/20) before this
 harness was trusted.
+
+RESUMABLE (added 2026-07-18): each problem's pass/fail is checkpointed to the Hub
+after every `save_every` items (same fabric as training — Hub is truth). A Colab
+disconnect loses at most one problem; a restart skips everything already done. The
+donor half caches under its own key so it is NEVER re-run once complete — the pain
+was every restart redoing the 71-min donor pass before even reaching v3.
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any
 
 from .c1_eval import _extract_code, _progress, _set_postfix, generate
@@ -63,6 +71,54 @@ def _load_rows(limit: int | None) -> list[dict]:
     return rows
 
 
+def _report(per_task: dict, by_kind: dict, instruction: str) -> dict:
+    """Build the report dict from raw per-task bools + per-kind bool lists."""
+    return {
+        "score": round(100.0 * sum(per_task.values()) / max(len(per_task), 1), 2),
+        "n": len(per_task),
+        "instruction": instruction,
+        "by_change_kind": {k: round(100.0 * sum(v) / len(v), 1) for k, v in by_kind.items()},
+        "per_task": per_task,
+    }
+
+
+def _seed(resume_key: str | None, hub_repo: str | None) -> dict:
+    """Resume-safe (mirrors c1_eval._seed_report): prior per-task results from the
+    local file first (freshest in-session), else the Hub copy (cross-session)."""
+    if not resume_key:
+        return {}
+    local = Path(f"{resume_key}.json")
+    if local.exists():
+        return json.loads(local.read_text(encoding="utf-8"))
+    if hub_repo:
+        try:
+            from huggingface_hub import hf_hub_download
+
+            got = hf_hub_download(hub_repo, f"reports/{resume_key}.json")
+            return json.loads(Path(got).read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001 - no prior report == fresh start
+            pass
+    return {}
+
+
+def _persist(resume_key: str | None, hub_repo: str | None, report: dict) -> None:
+    """Write local always; push to Hub best-effort (a transient Hub error must not
+    kill a 70-min run — local mirror still lets the session resume)."""
+    if not resume_key:
+        return
+    Path(f"{resume_key}.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    if hub_repo:
+        try:
+            from huggingface_hub import HfApi
+
+            api = HfApi()
+            api.create_repo(hub_repo, private=True, exist_ok=True)
+            api.upload_file(path_or_fileobj=f"{resume_key}.json",
+                            path_in_repo=f"reports/{resume_key}.json", repo_id=hub_repo)
+        except Exception as err:  # noqa: BLE001
+            print(f"[edit] checkpoint push failed (non-fatal, local saved): {err!r}")
+
+
 def run_canitedit(
     model: Any,
     tokenizer: Any,
@@ -71,8 +127,11 @@ def run_canitedit(
     thinking: bool = False,
     timeout_s: float = 15.0,
     max_new_tokens: int = 1400,
+    hub_repo: str | None = None,       # push per-problem checkpoints here
+    resume_key: str | None = None,     # report basename; enables resume + skip-done
+    save_every: int = 5,
 ) -> dict:
-    """Greedy pass@1 on CanItEdit. Returns report dict. Raises on empty selection."""
+    """Greedy pass@1 on CanItEdit, resumable per problem. Raises on empty selection."""
     if instruction not in ("descriptive", "lazy"):
         raise ValueError(f"instruction must be 'descriptive' or 'lazy', got {instruction!r}")
     rows = _load_rows(limit)
@@ -80,10 +139,21 @@ def run_canitedit(
         raise RuntimeError(f"canitedit: 0 rows loaded (limit={limit}) — check the dataset.")
 
     instr_col = f"instruction_{instruction}"
-    per_task: dict[str, bool] = {}
+    prior = _seed(resume_key, hub_repo)
+    per_task: dict[str, bool] = {k: bool(v) for k, v in prior.get("per_task", {}).items()}
     by_kind: dict[str, list[bool]] = {}
-    bar = _progress(rows, desc=f"canitedit({instruction})", total=len(rows))
-    for r in bar:
+    # rebuild per-kind tallies for already-done rows so the breakdown stays correct
+    for r in rows:
+        if r["full_name"] in per_task:
+            by_kind.setdefault(_kind(r), []).append(per_task[r["full_name"]])
+    todo = [r for r in rows if r["full_name"] not in per_task]
+    if per_task:
+        print(f"[edit] resuming {resume_key}: {len(per_task)} done, {len(todo)} to go")
+    if not todo:                       # fully cached — skip the model entirely
+        return _report(per_task, by_kind, instruction)
+
+    bar = _progress(todo, desc=f"canitedit({instruction})", total=len(todo))
+    for i, r in enumerate(bar):
         prompt = _build_prompt(r["before"], r[instr_col])
         gen = generate(model, tokenizer, prompt, thinking=thinking, max_new_tokens=max_new_tokens)
         edited = _extract_code(gen)
@@ -92,15 +162,12 @@ def run_canitedit(
         per_task[r["full_name"]] = ok
         by_kind.setdefault(_kind(r), []).append(ok)
         _set_postfix(bar, pass_rate=f"{100.0 * sum(per_task.values()) / len(per_task):.1f}%")
+        if (i + 1) % save_every == 0:
+            _persist(resume_key, hub_repo, _report(per_task, by_kind, instruction))
 
-    score = 100.0 * sum(per_task.values()) / max(len(per_task), 1)
-    return {
-        "score": round(score, 2),
-        "n": len(per_task),
-        "instruction": instruction,
-        "by_change_kind": {k: round(100.0 * sum(v) / len(v), 1) for k, v in by_kind.items()},
-        "per_task": per_task,
-    }
+    report = _report(per_task, by_kind, instruction)
+    _persist(resume_key, hub_repo, report)   # final flush
+    return report
 
 
 def edit_compare(
@@ -119,9 +186,10 @@ def edit_compare(
     ON-TARGET decision: v3 > donor here => the SFT is working (LiveCodeBench -10pp
     was off-target tax); v3 <= donor here => the mix/method needs revisiting before
     more compute.
-    """
-    import json
 
+    Resumable: donor and v3 each checkpoint per problem under their own key, so a
+    disconnect resumes both and the donor half is never recomputed once complete.
+    """
     import torch
     from scripts.checkpoint_sync import CheckpointSync
 
@@ -133,16 +201,21 @@ def edit_compare(
     cfg.use_dora = False   # step-2167 preview predates the DoRA switch (plain LoRA)
     prof = detect_profile()
     dtype = torch.bfloat16 if prof.compute_dtype == "bfloat16" else torch.float16
+    n_tag = limit or 105
 
     model, tok = _build_qlora_model(cfg, dtype)
     model.eval()
+    donor_key = f"canitedit_donor_{instruction}_n{n_tag}"
     print(f"[edit] evaluating DONOR (adapters zeroed) on CanItEdit ({instruction})...")
-    donor_rep = run_canitedit(model, tok, limit=limit, instruction=instruction, thinking=thinking)
+    donor_rep = run_canitedit(model, tok, limit=limit, instruction=instruction,
+                              thinking=thinking, hub_repo=ckpt_repo, resume_key=donor_key)
     print(f"[edit] DONOR: {donor_rep['score']}%  (n={donor_rep['n']})  {donor_rep['by_change_kind']}")
 
     step = CheckpointSync(ckpt_repo, phase="C5", trainable_only=True).resume(model) - 1
+    v3_key = f"canitedit_v3_step{step}_{instruction}_n{n_tag}"
     print(f"[edit] evaluating AVA v3 @ step {step} on the SAME problems...")
-    v3_rep = run_canitedit(model, tok, limit=limit, instruction=instruction, thinking=thinking)
+    v3_rep = run_canitedit(model, tok, limit=limit, instruction=instruction,
+                           thinking=thinking, hub_repo=ckpt_repo, resume_key=v3_key)
     print(f"[edit] AVA v3 @{step}: {v3_rep['score']}%  (n={v3_rep['n']})  {v3_rep['by_change_kind']}")
 
     delta = round(v3_rep["score"] - donor_rep["score"], 2)

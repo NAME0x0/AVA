@@ -632,3 +632,38 @@ def test_canitedit_bad_instruction() -> None:
 
     with pytest.raises(ValueError, match="descriptive"):
         run_canitedit(model=None, tokenizer=None, instruction="bogus")
+
+
+def test_canitedit_resume_skips_done(monkeypatch, tmp_path) -> None:
+    """A pre-seeded checkpoint is honoured: done problems are not re-generated,
+    their kind tally is rebuilt, and the final state is re-persisted."""
+    import json
+
+    import train.canitedit_eval as ce
+    monkeypatch.chdir(tmp_path)
+
+    rows = [
+        {"before": "def f():\n return 1\n", "after": "def f():\n return 2\n",
+         "tests": "assert f()==2\n", "instruction_descriptive": "ret 2",
+         "full_name": "t1", "taxonomy": {"change_kind": "corrective"}},
+        {"before": "def g():\n return 1\n", "after": "def g():\n return 3\n",
+         "tests": "assert g()==3\n", "instruction_descriptive": "ret 3",
+         "full_name": "t2", "taxonomy": {"change_kind": "adaptive"}},
+    ]
+    monkeypatch.setattr(ce, "_load_rows", lambda limit: rows)
+    (tmp_path / "k.json").write_text(json.dumps({"per_task": {"t1": True}}))  # t1 already done
+
+    calls: list[str] = []
+
+    def fake_gen(model, tok, prompt, **kw):
+        calls.append(prompt)
+        return "```python\n" + rows[1]["after"] + "\n```"
+
+    monkeypatch.setattr(ce, "generate", fake_gen)
+    rep = ce.run_canitedit(model=None, tokenizer=None, resume_key="k")
+
+    assert len(calls) == 1 and "def g()" in calls[0]        # only the undone one ran
+    assert rep["n"] == 2 and rep["score"] == 100.0          # t1 carried, t2 passed
+    assert set(rep["by_change_kind"]) == {"corrective", "adaptive"}
+    saved = json.loads((tmp_path / "k.json").read_text())   # re-persisted with both
+    assert set(saved["per_task"]) == {"t1", "t2"}
