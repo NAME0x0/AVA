@@ -1,0 +1,14 @@
+{
+  "corpus_unique_stems": 16575,
+  "arc-challenge": {
+    "n_test": 1172,
+    "exact_stem_match": 8,
+    "ngram13_overlap": 5
+  },
+  "gsm8k": {
+    "n_test": 1319,
+    "exact_stem_match": 0,
+    "ngram13_overlap": 3
+  },
+  "note": "SciQ, OpenBookQA, MMLU, MMLU-Pro, HellaSwag, PIQA, WinoGrande, BoolQ, TruthfulQA, MATH-500, MGSM, HumanEval+, MBPP+, IFEval are not present in the training corpus by construction; overlap = 0."
+}
