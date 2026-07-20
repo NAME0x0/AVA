@@ -1,1 +1,23 @@
 \section{Evaluation Methodology}
+\label{sec:method}
+
+\subsection{Benchmarks}
+We evaluate across six capability families. Knowledge and commonsense multiple choice covers ARC-Easy and ARC-Challenge \citep{clark2018arc}, MMLU \citep{hendrycks2021mmlu} and MMLU-Pro \citep{wang2024mmlupro}, HellaSwag \citep{zellers2019hellaswag}, PIQA \citep{bisk2019piqa}, WinoGrande \citep{sakaguchi2019winogrande}, BoolQ \citep{clark2019boolq}, and TruthfulQA \citep{lin2022truthfulqa}. Mathematical reasoning covers GSM8K \citep{cobbe2021gsm8k}, MATH-500, a 500-problem subset of the MATH dataset \citep{hendrycks2021math} introduced by \citet{lightman2023prm}, and the English, Spanish, and French portions of MGSM \citep{shi2022mgsm}. Code generation uses HumanEval+ and MBPP+, the test-hardened variants of HumanEval \citep{chen2021humaneval} and MBPP \citep{austin2021mbpp} from EvalPlus \citep{liu2023evalplus}. Instruction following uses IFEval \citep{zhou2023ifeval}. We also run GSM8K under self-consistency and under an agentic tool-use harness. MMLU uses five in-context demonstrations; the other multiple-choice sets are zero-shot.
+
+\subsection{Serving}
+All scores use the merged model exported to a Q8\_0 GGUF and served with llama.cpp \citep{gerganov2023llamacpp} (build 69c28f1) through its server, with flash attention, an 8-bit key-value cache, four parallel slots, continuous batching, and an 8{,}192-token context. The 8-bit export retains essentially all of the model's quality; Section~\ref{sec:deploy} reports the perplexity cost of heavier quantization.
+
+\subsection{Scoring}
+Multiple-choice questions are scored by a single forward pass: we read the next-token probabilities restricted to the candidate label tokens and take the arg-max. This differs from the log-likelihood-of-continuation scoring used by some harnesses, in which each full answer string is scored and the most likely is chosen. Letter arg-max measures the answer the model would actually emit; its absolute values are directionally comparable to leaderboard numbers but not identical to them.
+
+Generative tasks use greedy decoding with the model's chat template and its non-thinking mode. Self-consistency draws five samples at temperature 0.7 with nucleus sampling and takes the majority vote over the extracted numeric answer \citep{wang2022selfconsistency}. Code tasks run each generated program in a subprocess sandbox with a five-second limit and a 4~GB memory cap, and count a problem solved only when it passes the full EvalPlus test suite. IFEval checks each response against its instruction constraints with a rule checker covering roughly twenty-five instruction types, and reports prompt-level strict accuracy. The agentic harness exposes a calculator and a Python interpreter and allows up to three tool rounds per question.
+
+\subsection{Confidence intervals}
+Every accuracy is reported with a 95\% Wilson score interval \citep{wilson1927}. For $k$ successes in $n$ trials with $\hat{p} = k/n$ and $z = 1.96$, the interval is
+\[
+\frac{\hat{p} + \dfrac{z^2}{2n} \pm z\sqrt{\dfrac{\hat{p}(1-\hat{p})}{n} + \dfrac{z^2}{4n^2}}}{1 + \dfrac{z^2}{n}}.
+\]
+The Wilson interval stays well behaved at the small sample sizes and extreme proportions that a compact model produces, where the normal approximation does not.
+
+\subsection{Accounting}
+We report 17 benchmark configurations comprising 52{,}027 evaluation instances. The number of model calls is slightly higher, about 52{,}045, because self-consistency issues five generations per question and a small number of items were retried. The count of distinct underlying questions is lower still, since GSM8K appears in four configurations.

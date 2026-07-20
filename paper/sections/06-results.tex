@@ -1,1 +1,17 @@
 \section{Results}
+\label{sec:results}
+
+Table~\ref{tab:results} reports all 17 configurations with 95\% Wilson intervals.
+
+\begin{table}[t]
+\centering
+\input{tables/results_main.tex}
+\caption{AVA-v2 across 17 benchmark configurations. Multiple-choice tasks use letter arg-max; generative tasks use greedy decoding, except the self-consistency row. All runs use the Q8\_0 GGUF.}
+\label{tab:results}
+\end{table}
+
+The model is strongest on knowledge and commonsense multiple choice. ARC-Easy reaches 92.0\% and ARC-Challenge 82.0\%, and MMLU reaches 59.2\% at five shots. On MMLU, 373 of 14{,}042 questions (2.7\%) exceeded the 8{,}192-token context once five demonstrations were prepended, and were scored as incorrect; on the questions that fit, accuracy is 60.8\%. BoolQ (75.0\%) and PIQA (75.9\%) are close behind, while HellaSwag (56.8\%), WinoGrande (56.4\%), and TruthfulQA (47.5\%) are weaker. MMLU-Pro, which is harder and zero-shot, falls to 30.9\%.
+
+Mathematics is the weakest area. GSM8K is 35.3\% under greedy decoding and 44.0\% under five-sample self-consistency. MATH-500 is 18.8\%, and MGSM averages 34.4\% across three languages. Code generation is functional but modest: 19.5\% on HumanEval+ and 35.7\% on MBPP+. IFEval strict accuracy is 31.6\%. The agentic configuration scores 35.4\% on GSM8K, indistinguishable from the greedy run; Section~\ref{sec:analysis} examines why.
+
+A controlled comparison against the unadapted base model is not available. An earlier partial evaluation of the base, on small samples and under a different quantization, placed it near 66\% on ARC-Challenge and 28\% on GSM8K, but those figures use a different protocol and sample size, and a full-set re-evaluation of the base is still pending. We therefore treat the base only as loose context and make no claim of superiority over it. Published scores for other 2B-class models are likewise measured under different prompting, shot counts, and scoring, and are not directly comparable to the values reported here.

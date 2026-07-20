@@ -1,1 +1,33 @@
 \section{Data and Contamination}
+\label{sec:data}
+
+The corpus is a mixture assembled to strengthen behavior on public multiple-choice and grade-school mathematics tasks while preserving the tool-use and identity behavior of the assistant. Table~\ref{tab:data} lists its composition. The science set draws multiple-choice questions from the SciQ \citep{welbl2017sciq} and OpenBookQA \citep{mihaylov2018openbookqa} training splits, rewritten as short explained answers. The mathematics set pairs GSM8K training questions \citep{cobbe2021gsm8k} with chain-of-thought solutions. The ARC-Challenge set takes the training split \citep{clark2018arc} and augments each question with rotated answer-choice orderings, which is why 1{,}119 training questions expand to 4{,}476 examples. The remainder is a small amount of distilled mathematical reasoning and a few dozen hand-written examples covering calculator and code tool use, short reasoning puzzles, assistant identity, and everyday dialogue.
+
+\begin{table}[t]
+\centering
+\begin{tabular}{lrll}
+\toprule
+Component & Examples & Source & Split \\
+\midrule
+Science multiple-choice & 8{,}000 & SciQ, OpenBookQA & train \\
+GSM8K chain-of-thought & 7{,}473 & GSM8K & train \\
+ARC-Challenge, choice-augmented & 4{,}476 & ARC-Challenge & train \\
+Distilled math reasoning & 900 & teacher distillation & --- \\
+Hand-written examples & 37 & synthetic & --- \\
+Tool-use augmentation & 55 & synthetic & --- \\
+\midrule
+Total before holdout & 20{,}941 & & \\
+Held out, unused & 200 & & \\
+Used for training & 20{,}741 & & \\
+\bottomrule
+\end{tabular}
+\caption{Training corpus composition. Every learned component comes from a training split or is written by hand; no validation or test split of any evaluated benchmark contributes to it.}
+\label{tab:data}
+\end{table}
+
+\subsection{Contamination check}
+Because the model is adapted on the ARC-Challenge and GSM8K training splits and later evaluated on their test splits, we measured overlap directly. For each evaluation set we normalized question stems, lowercasing and stripping punctuation and the answer-option block, and compared them against the training corpus by exact match and by 13-gram overlap. GSM8K showed no exact overlap across its 1{,}319 test questions. ARC-Challenge showed 8 exact stem matches out of 1{,}172 (0.68\%). The remaining fifteen benchmarks share no data with the corpus by construction, since their datasets are absent from it.
+
+The ARC-Challenge matches are a property of that benchmark rather than an artifact of the data pipeline. ARC's own training and test splits repeat a small number of templated science questions, for example "which of these is a function of all cells," so a handful of stems in the test set also appear in the training split we adapted on. Even in the worst case, that all eight were answered from memorization, removing them lowers ARC-Challenge accuracy from 82.0\% to 81.9\%, inside the confidence interval reported in Section~\ref{sec:results}. Surveys of contamination and membership inference describe the general form of this risk \citep{tong2026contamination}.
+
+One point should be explicit. Adapting on the ARC-Challenge and GSM8K training splits is a deliberate choice, and it means the model has seen in-distribution examples of these task formats. The scores reported here are held-out test results, not evidence of zero-shot generalization to unfamiliar task types.

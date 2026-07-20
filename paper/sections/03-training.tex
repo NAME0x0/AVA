@@ -1,1 +1,38 @@
 \section{Low-Resource Training System}
+
+\subsection{Base model}
+The base model is Qwen3.5-2B, a vision-language model released by the Qwen team under an Apache-2.0 license \citep{qwen3_5}. It pairs a text transformer with a vision encoder through early-fusion multimodal training, and its language stack combines Gated DeltaNet layers, gated attention, and a sparse mixture-of-experts feed-forward network, with a native context of 262{,}144 tokens. The checkpoint contains 1{,}892{,}736{,}832 parameters in total.
+
+We adapt only the text transformer. The vision encoder is left untouched and is never exercised: every dataset in this study is text-only, and the model is prompted purely as a language model. The description that follows therefore concerns the language stack alone.
+
+\subsection{Adaptation}
+We fine-tune with QLoRA \citep{dettmers2023qlora}, which keeps the base weights frozen and quantized to 4-bit NF4 while training low-rank adapters on top \citep{hu2021lora}. Adapters of rank 16 with scaling factor $\alpha = 32$ and no dropout are attached to the query, key, value, output, gate, up, and down projections of every transformer block. This leaves 10{,}911{,}744 parameters trainable, 0.58\% of the model. Attention uses a scaled dot-product implementation. Table~\ref{tab:trainconfig} lists the configuration.
+
+\begin{table}[t]
+\centering
+\begin{tabular}{ll}
+\toprule
+Setting & Value \\
+\midrule
+Base model & Qwen3.5-2B (text transformer) \\
+Total parameters & 1{,}892{,}736{,}832 \\
+Trainable parameters & 10{,}911{,}744 (0.58\%) \\
+Base quantization & 4-bit NF4 \\
+LoRA rank / $\alpha$ / dropout & 16 / 32 / 0 \\
+Target modules & q, k, v, o, gate, up, down projections \\
+Attention & scaled dot-product \\
+Sequence length & 384 \\
+Batch size $\times$ grad.\ accumulation & $1 \times 8$ \\
+Epochs / optimizer steps & 1 / 2{,}593 \\
+Learning rate & $1.5\times10^{-4}$ \\
+Training examples & 20{,}741 \\
+\bottomrule
+\end{tabular}
+\caption{Training configuration. The corpus and its provenance are described in Section~\ref{sec:data}.}
+\label{tab:trainconfig}
+\end{table}
+
+\subsection{Fitting the run into 4~GB}
+Several choices keep the run inside the memory of a single RTX A2000 Laptop GPU with 4~GB of VRAM, on Windows~11. The base is quantized to 4-bit, so the frozen weights occupy roughly 1~GB rather than the four they would take in half precision. A short sequence length of 384 tokens caps the activation and attention-cache footprint, which is the term that grows with context. A batch size of one with gradient accumulation over eight steps gives an effective batch of eight without holding eight sequences in memory at once. Periodic in-loop evaluation is disabled: the model has a large vocabulary, and materializing logits over it for an evaluation batch overflows the remaining memory, so we hold out 200 examples but score them after training rather than during it.
+
+Under these settings the run peaks at 1.81~GB of VRAM, which leaves headroom on a 4~GB card and keeps inference on the same hardware comfortable. Training a single epoch of 2{,}593 steps takes 100.5 minutes and ends at a training loss of 0.4145. The resulting adapter is 41.6~MiB on disk.

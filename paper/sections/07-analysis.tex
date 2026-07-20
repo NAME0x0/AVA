@@ -1,1 +1,37 @@
 \section{Capability and Failure Analysis}
+\label{sec:analysis}
+
+\subsection{Where knowledge is strong and weak}
+Table~\ref{tab:mmlu} breaks MMLU down by subject. The strongest areas are marketing (84.6\%), management (83.5\%), and high-school biology (81.0\%). The weakest are advanced mathematics and computer science, alongside moral scenarios, a subject known to depress scores across models. MMLU-Pro shows the same shape by category: biology reaches 64.3\%, while mathematics (21.4\%) and law (20.3\%) sit near what ten-option chance and format sensitivity allow. The model carries broad factual and social-science knowledge and loses ground exactly where problems require multi-step symbolic work.
+
+\begin{table}[t]
+\centering
+\input{tables/mmlu_subjects.tex}
+\caption{MMLU accuracy by subject, strongest and weakest ten (5-shot).}
+\label{tab:mmlu}
+\end{table}
+
+\subsection{Mathematics degrades with difficulty and language}
+Two gradients make the mathematical weakness concrete. On MATH-500 (Table~\ref{tab:mathlevels}), accuracy falls from 51.2\% on the easiest problems to 5.2\% on the hardest. On MGSM (Table~\ref{tab:mgsm}), the same grade-school problems drop from 42.8\% in English to 32.0\% in Spanish and 28.4\% in French, so the arithmetic reasoning does not transfer cleanly across languages.
+
+\begin{table}[t]
+\centering
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\input{tables/math_levels.tex}
+\caption{MATH-500 by difficulty level (1 easiest, 5 hardest).}
+\label{tab:mathlevels}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\input{tables/mgsm_lang.tex}
+\caption{MGSM by language.}
+\label{tab:mgsm}
+\end{minipage}
+\end{table}
+
+\subsection{Tool use rarely fires; self-consistency pays}
+The agentic harness changed nothing on GSM8K. The model emitted a tool call on only 8 of 1{,}319 problems (0.6\%), of which 5 were correct, leaving accuracy at 35.4\% against the 35.3\% greedy baseline. The fine-tuning corpus held on the order of fifty tool-use examples against more than fifteen thousand worked math problems, so the model defaults to solving arithmetic directly rather than invoking the calculator. Self-consistency, by contrast, added 8.7 points on GSM8K for the cost of five samples and no retraining. For this model, sampling several chains of thought is the cheaper reasoning lever.
+
+\subsection{Small subsets misstate performance}
+The clearest methodological finding concerns evaluation size. An early estimate of GSM8K accuracy on 50 questions read 48\%. The full 1{,}319-question test set reads 35.3\%, with a 95\% interval of [32.8, 38.0]. The subset overstated the full result by about thirteen points, well outside the interval of either measurement, because at $n = 50$ the interval on a proportion near one half spans roughly $\pm 14$ points. For a compact model whose accuracy sits in the middle of the range, where binomial variance is largest, a fifty-item probe carries little information about the full-set number. This is a specific case of a general caution: reported gains for small models should be read against the sample sizes that produced them.
