@@ -1,0 +1,16 @@
+\section{Related Work}
+
+\paragraph{Parameter-efficient and quantized adaptation.}
+LoRA freezes the pretrained weights and learns low-rank updates to selected projections \citep{hu2021lora}. QLoRA quantizes the frozen base to 4-bit NF4 and back-propagates through it into the LoRA parameters, cutting the memory needed to fine-tune a billion-parameter model by roughly an order of magnitude \citep{dettmers2023qlora}. We use this recipe without modification. The aim is not a new adaptation method but a complete account of what the standard one costs and yields at the 4~GB limit.
+
+\paragraph{Compact and on-device models.}
+A separate line of work targets models small enough to run locally, either by pretraining at reduced scale or by curating higher-quality data \citep{zhang2024tinyllama,gunasekar2023textbooks}. AVA-v2 is not a new base model. It is an adaptation of an existing 2B model, studied under the constraint that the entire process, training through evaluation, happens on one laptop GPU.
+
+\paragraph{Quantized local deployment.}
+The llama.cpp project and the GGUF format have made low-VRAM and CPU inference of quantized models routine \citep{gerganov2023llamacpp}. Quality at aggressive quantization is often assumed rather than measured. We give perplexity across an importance-matrix-calibrated ladder so the deployment trade-off is explicit.
+
+\paragraph{Reliability of benchmark evaluation.}
+Scores for small models are sensitive to prompt format, few-shot selection, and sample size \citep{biderman2024lessons}. We add a concrete case in which a 50-item subset overstated full-set GSM8K accuracy by thirteen points, reported with confidence intervals sized to make such gaps visible.
+
+\paragraph{Inference-time reasoning.}
+Chain-of-thought prompting \citep{wei2022cot} and self-consistency \citep{wang2022selfconsistency} raise reasoning accuracy without retraining. We measure the self-consistency gain for AVA-v2 and compare it against an in-model tool-use pathway that rarely activates, and find the former far more effective for this model.

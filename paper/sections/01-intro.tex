@@ -1,0 +1,26 @@
+\section{Introduction}
+
+The capability of open language models has grown faster than the hardware most people can run them on. Current systems assume several high-memory accelerators, yet many students, hobbyists, and independent researchers have access to a single consumer GPU with 4 to 8~GB of memory. What is achievable at the low end of that range is rarely documented in full. This paper works through one instance from start to finish: the adaptation, evaluation, and deployment of a compact model on a laptop GPU with 4~GB of VRAM.
+
+We begin from Qwen3.5-2B, a recent vision-language model of roughly two billion parameters \citep{qwen3_5}, and adapt only its text transformer with 4-bit QLoRA \citep{dettmers2023qlora,hu2021lora}. The run peaks at 1.81~GB of VRAM, completes in 100 minutes, and writes a 42~MB adapter that modifies 0.58\% of the parameters. We refer to the merged result as AVA-v2. Training and inference both stay under 2~GB, so the model runs on the same hardware that produced it.
+
+Rather than report a single favorable number, we evaluate AVA-v2 across 17 benchmark configurations and attach a 95\% Wilson interval to each score. The profile that emerges is mixed, and in places unflattering. That is the point. A small model adapted cheaply is good at some things and poor at others, and describing that precisely is more useful than a headline.
+
+One observation during the evaluation has consequences past this particular model. An early estimate on 50 GSM8K questions reported 48\% accuracy. The full 1{,}319-question test set reports 35.3\%. The convenient subset overstated the real figure by about thirteen points, a gap several times larger than the confidence interval on either measurement.
+
+We organize the study around three questions.
+\begin{enumerate}
+  \item \emph{Feasibility.} Can a two-billion-parameter model be adapted to a useful degree under 2~GB of peak VRAM on consumer hardware?
+  \item \emph{Capability profile.} Which abilities survive or improve after low-resource QLoRA adaptation, and which stay weak?
+  \item \emph{Evaluation reliability.} How far can small benchmark subsets mislead when estimating the performance of a compact fine-tuned model?
+\end{enumerate}
+
+The paper makes four contributions.
+\begin{enumerate}
+  \item An adaptation pipeline that fits a two-billion-parameter model into 1.81~GB of peak training VRAM on a 4~GB laptop GPU, with every resource cost reported.
+  \item A broad evaluation across 17 benchmark configurations with Wilson intervals, including execution-based coding and self-consistency.
+  \item Evidence, with a worked example, that small evaluation subsets can substantially misstate the performance of compact models.
+  \item Public release of the adapter, merged weights, and an imatrix-calibrated GGUF quantization ladder with measured perplexity.
+\end{enumerate}
+
+A caveat frames everything that follows. The base model is a capable recent system, and the adaptation described here does not make it broadly stronger; on several general benchmarks a well-run base would likely score higher. The value of this study is the reproducible low-resource process, the full-set measurements, and what those measurements reveal about evaluating small models, not a claim that AVA-v2 surpasses its base or any larger model.
