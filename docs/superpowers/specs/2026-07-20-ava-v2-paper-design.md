@@ -133,4 +133,14 @@ Source: `gguf_build/README_GGUF.md`, `gguf_build/AVA-v2.imatrix`, `quantize_all.
 
 ## 11. Process
 
-Prose written by Claude with the `humaniser` skill (natural, non-AI-flat register) — not delegated to Codex. Mechanical evidence-audit grinds may go to Codex only if parallelism is needed. Implementation plan via `writing-plans` skill next.
+Prose written by Claude with the `humaniser` skill applied **in service of scholarly register** (kill AI-flatness / LLM tells, keep formal academic voice) — not delegated to Codex. Mechanical evidence-audit grinds may go to Codex only if parallelism is needed. Implementation plan via `writing-plans` skill next.
+
+## 12. Quality & authenticity bar (non-negotiable — added at author request)
+
+Reads like a genuine, citable scientific paper. Professional, credible, career-building. Hooks sharpened but essence unchanged; nothing false; everything backed.
+
+- **Register.** Authentic academic voice: formal, precise, third-person, measured hedging. Prose paragraphs carry the argument; tables/lists used only where a real paper uses them (results, configs, provenance). No marketing tone. No LLM tells — no "delve / moreover / furthermore" filler, no throat-clearing openers, no over-signposting, no bullet-spam standing in for analysis. `humaniser` applied to reach scholarly register, not casual tone.
+- **Credibility / citable.** Standard structure: Abstract, §1–9, Limitations, References, Appendix. Every claim backed by the evidence ledger (§3–§6). Every citation real and verified before it enters the `.bib` (§8f). Reproducibility appendix. arXiv-ready LaTeX that compiles cleanly. Tables/figures numbered, captioned, with units. Equations where they add rigor (VRAM budget; Wilson score interval). A self-citation BibTeX block so the work is easy to cite.
+- **Hooks (accurate, not inflated).** Title, abstract, and introduction lead with the genuine findings — sub-2 GB feasibility and the "small subsets misrepresent compact models" result (RQ3). Sharp framing, zero overclaim. Research essence unchanged.
+- **Career value.** Real author identity, affiliation, contact; optional ORCID (ask author). Links to public GitHub/HF artifacts. Positioned as rigorous, honest, reproducible systems + empirical work — the kind of preprint that survives scrutiny and reflects well on the author.
+- **Anti-overclaim discipline.** §10 guardrails enforced sentence-by-sentence during drafting; each headline number cross-checked against its source file at write time, never trusted from draft memory.
