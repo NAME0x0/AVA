@@ -1,30 +1,18 @@
-\documentclass[11pt]{article}
-
-\usepackage[margin=1in]{geometry}
-\usepackage[utf8]{inputenc}
+\documentclass[conference]{IEEEtran}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage{microtype}
+\usepackage[utf8]{inputenc}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
-\usepackage{multirow}
 \usepackage{graphicx}
-\usepackage{authblk}
-\usepackage[numbers,round]{natbib}
-\usepackage{xcolor}
-\usepackage[hidelinks]{hyperref}
-\usepackage{url}
+\usepackage[numbers]{natbib}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
 
-\renewcommand\Authfont{\bfseries}
-\setlength{\affilsep}{0.4em}
+\title{AVA-v2: A Reproducible Case Study of Adapting and Evaluating a 1.9B Model Under a 2\,GB VRAM Budget on Consumer Hardware}
 
-\title{\textbf{AVA-v2: A Reproducible Case Study of Adapting and\\
-Evaluating a 1.9B Model Under a 2\,GB VRAM Budget on Consumer Hardware}}
-
-\author[]{Muhammad Afsah Mumtaz}
-\affil[]{Independent Researcher\\\texttt{github.com/NAME0x0}\qquad\texttt{huggingface.co/NAME0x0}}
-
-\date{July 2026}
+\author{\IEEEauthorblockN{Muhammad Afsah Mumtaz}
+\IEEEauthorblockA{Independent Researcher\\
+\texttt{github.com/NAME0x0}\quad\texttt{huggingface.co/NAME0x0}}}
 
 \begin{document}
 \maketitle
@@ -32,6 +20,10 @@ Evaluating a 1.9B Model Under a 2\,GB VRAM Budget on Consumer Hardware}}
 \begin{abstract}
 Open language models have outgrown the hardware most people own. We report an end-to-end case study of adapting and evaluating a compact model within a strict consumer budget. Beginning from Qwen3.5-2B, an approximately two-billion-parameter vision-language model, we fine-tune only its text transformer with 4-bit QLoRA on a single laptop GPU that has 4~GB of memory. Training peaks at 1.81~GB of VRAM, runs for 100 minutes, updates 0.58\% of the parameters, and produces a 42~MB adapter. We evaluate the merged model, which we call AVA-v2, across 17 benchmark configurations covering knowledge, reasoning, mathematics, code, multilingual arithmetic, and instruction following, and report a 95\% Wilson interval for every score. The capability profile is uneven: strong on science and multiple-choice knowledge (ARC-Challenge 82.0\%, ARC-Easy 92.0\%, MMLU 59.2\%) and weak on competition mathematics and strict instruction following. Two results are worth isolating. A 50-question GSM8K estimate of 48\% overstated the full 1{,}319-question result of 35.3\% by about thirteen points, which shows how small subsets can misrepresent compact models. Self-consistency added 8.7 points on GSM8K, whereas an in-model tool-use pathway activated on 0.6\% of problems and changed nothing. The adapter, merged weights, and a quantized GGUF ladder are publicly available.
 \end{abstract}
+
+\begin{IEEEkeywords}
+QLoRA, parameter-efficient fine-tuning, small language models, low-resource training, model evaluation, quantization.
+\end{IEEEkeywords}
 
 \input{sections/01-intro}
 \input{sections/02-related}

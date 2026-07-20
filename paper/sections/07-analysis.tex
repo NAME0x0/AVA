@@ -14,7 +14,7 @@ Table~\ref{tab:mmlu} breaks MMLU down by subject. The strongest areas are market
 \subsection{Mathematics degrades with difficulty and language}
 Two gradients make the mathematical weakness concrete. On MATH-500 (Table~\ref{tab:mathlevels}), accuracy falls from 51.2\% on the easiest problems to 5.2\% on the hardest. On MGSM (Table~\ref{tab:mgsm}), the same grade-school problems drop from 42.8\% in English to 32.0\% in Spanish and 28.4\% in French, so the arithmetic reasoning does not transfer cleanly across languages.
 
-\begin{table}[t]
+\begin{table*}[t]
 \centering
 \begin{minipage}[t]{0.48\linewidth}
 \centering
@@ -28,10 +28,16 @@ Two gradients make the mathematical weakness concrete. On MATH-500 (Table~\ref{t
 \caption{MGSM by language.}
 \label{tab:mgsm}
 \end{minipage}
-\end{table}
+\end{table*}
 
 \subsection{Tool use rarely fires; self-consistency pays}
 The agentic harness changed nothing on GSM8K. The model emitted a tool call on only 8 of 1{,}319 problems (0.6\%), of which 5 were correct, leaving accuracy at 35.4\% against the 35.3\% greedy baseline. The fine-tuning corpus held on the order of fifty tool-use examples against more than fifteen thousand worked math problems, so the model defaults to solving arithmetic directly rather than invoking the calculator. Self-consistency, by contrast, added 8.7 points on GSM8K for the cost of five samples and no retraining. For this model, sampling several chains of thought is the cheaper reasoning lever.
 
 \subsection{Small subsets misstate performance}
-The clearest methodological finding concerns evaluation size. An early estimate of GSM8K accuracy on 50 questions read 48\%. The full 1{,}319-question test set reads 35.3\%, with a 95\% interval of [32.8, 38.0]. The subset overstated the full result by about thirteen points, well outside the interval of either measurement, because at $n = 50$ the interval on a proportion near one half spans roughly $\pm 14$ points. For a compact model whose accuracy sits in the middle of the range, where binomial variance is largest, a fifty-item probe carries little information about the full-set number. This is a specific case of a general caution: reported gains for small models should be read against the sample sizes that produced them.
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/subset_variance.pdf}
+\caption{The 95\% Wilson interval for GSM8K accuracy around the full-set value of 35.3\%, as a function of sample size. At $n=50$ the interval spans roughly 22 to 47\%, so the 50-item probe reading of 48\% is a high-variance draw that the full test set does not support.}
+\label{fig:subset}
+\end{figure}
+The clearest methodological finding concerns evaluation size (Figure~\ref{fig:subset}). An early estimate of GSM8K accuracy on 50 questions read 48\%. The full 1{,}319-question test set reads 35.3\%, with a 95\% interval of [32.8, 38.0]. The subset overstated the full result by about thirteen points, well outside the interval of either measurement, because at $n = 50$ the interval on a proportion near one half spans roughly $\pm 14$ points. For a compact model whose accuracy sits in the middle of the range, where binomial variance is largest, a fifty-item probe carries little information about the full-set number. This is a specific case of a general caution: reported gains for small models should be read against the sample sizes that produced them.

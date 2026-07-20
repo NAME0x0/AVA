@@ -3,12 +3,12 @@
 
 Table~\ref{tab:results} reports all 17 configurations with 95\% Wilson intervals.
 
-\begin{table}[t]
+\begin{table*}[t]
 \centering
 \input{tables/results_main.tex}
 \caption{AVA-v2 across 17 benchmark configurations. Multiple-choice tasks use letter arg-max; generative tasks use greedy decoding, except the self-consistency row. All runs use the Q8\_0 GGUF.}
 \label{tab:results}
-\end{table}
+\end{table*}
 
 The model is strongest on knowledge and commonsense multiple choice. ARC-Easy reaches 92.0\% and ARC-Challenge 82.0\%, and MMLU reaches 59.2\% at five shots. On MMLU, 373 of 14{,}042 questions (2.7\%) exceeded the 8{,}192-token context once five demonstrations were prepended, and were scored as incorrect; on the questions that fit, accuracy is 60.8\%. BoolQ (75.0\%) and PIQA (75.9\%) are close behind, while HellaSwag (56.8\%), WinoGrande (56.4\%), and TruthfulQA (47.5\%) are weaker. MMLU-Pro, which is harder and zero-shot, falls to 30.9\%.
 

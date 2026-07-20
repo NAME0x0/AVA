@@ -6,4 +6,4 @@
 *.fls
 *.fdb_latexmk
 *.toc
-*.pdf
+/main.pdf
