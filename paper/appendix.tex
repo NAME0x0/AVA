@@ -1,1 +1,23 @@
 \section{Reproducibility Details}
+\label{sec:repro}
+
+\paragraph{Environment.}
+Training and evaluation ran on a single NVIDIA RTX A2000 Laptop GPU with 4~GB of memory, under Windows~11. Adaptation uses PEFT 0.18.1 with a 4-bit NF4 base and scaled dot-product attention; the base checkpoint reports transformers 4.57. Evaluation serves the Q8\_0 GGUF with llama.cpp build 69c28f1. The random seed is 42. The complete pinned environment, corpus builders, training configuration, and evaluation harness are in the repository.
+
+\paragraph{Decoding.}
+Multiple-choice scoring reads label-token probabilities and takes the arg-max. Generative decoding is greedy at temperature 0 with the Qwen ChatML-style template in non-thinking mode. Self-consistency uses five samples at temperature 0.7 with nucleus sampling and a majority vote over the extracted numeric answer.
+
+\paragraph{Artifacts.}
+Adapter: \url{https://huggingface.co/NAME0x0/AVA-v2}. Merged weights: \url{https://huggingface.co/NAME0x0/AVA-v2-merged}. GGUF ladder: \url{https://huggingface.co/NAME0x0/AVA-v2-GGUF}. Base model: \url{https://huggingface.co/Qwen/Qwen3.5-2B}. Code and the full evaluation report: \url{https://github.com/NAME0x0/AVA}.
+
+\paragraph{Citing this work.}
+\begin{verbatim}
+@misc{mumtaz2026avav2,
+  title  = {AVA-v2: A Reproducible Case Study of Adapting and
+            Evaluating a 1.9B Model Under a 2 GB VRAM Budget
+            on Consumer Hardware},
+  author = {Muhammad Afsah Mumtaz},
+  year   = {2026},
+  url    = {https://github.com/NAME0x0/AVA}
+}
+\end{verbatim}

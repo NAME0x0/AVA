@@ -1,3 +1,13 @@
 \section{Limitations}
 
+Several limitations bound these results. The most important is the absence of a controlled comparison against the base model: the base was measured only on small samples under a different quantization, and a matched full-set re-evaluation is still pending, so we cannot say how much of the capability profile is due to adaptation rather than to the base itself. The study is also a single run. One seed, one corpus, and one 4~GB laptop GPU produced every number reported here, and we do not characterize variance across seeds, corpora, or hardware.
+
+Two design choices limit scope. Training used a 384-token sequence length, which caps what the model can learn about long-context tasks, and the corpus held only a few dozen tool-use examples, which is why the agentic pathway almost never fires. The evaluation has its own edges. Multiple-choice scoring uses letter arg-max rather than log-likelihood of continuation, so absolute values are not directly comparable to leaderboards that use the latter, and 2.7\% of MMLU questions overflowed the 8{,}192-token context at five shots and were counted wrong, which understates the five-shot number relative to a longer-context run.
+
+Finally, the model was adapted on the ARC-Challenge and GSM8K training splits, so its scores on those benchmarks reflect in-distribution adaptation rather than zero-shot generalization, and the base is a capable recent system that the adaptation specializes rather than broadly improves.
+
 \section{Conclusion}
+
+A 1.9B model's language backbone can be adapted, evaluated across seventeen benchmarks, and packaged for local inference entirely on a single 4~GB laptop GPU, at a peak of 1.81~GB of VRAM and in about 100 minutes. The resulting model is capable on science and general knowledge and weak on competition mathematics, advanced computer science, and strict instruction following, and its behavior is described well only by full-set measurements: a fifty-item GSM8K probe overstated the real figure by thirteen points, and self-consistency proved a cheaper reasoning lever than the model's own tool-use pathway.
+
+We do not claim that AVA-v2 surpasses its base or any larger model. The contribution is a complete and reproducible account of what low-resource adaptation costs and yields, and a reminder that the reliability of a small model's reported numbers depends on how many questions produced them. For readers working under the same constraints, the released artifacts and the full-set measurements are meant to make the trade-offs concrete.
