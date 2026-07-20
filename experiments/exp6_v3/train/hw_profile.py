@@ -170,7 +170,8 @@ def detect_profile() -> HWProfile:
             # (sft.py device_map=auto), so seq2048/mb1 fits — real context room
             # for issue->patch edit examples. A lone T4 keeps seq1024 (single-card
             # safe; seq2048 there would OOM the 248K-vocab CE).
-            if matcher == "t4" and torch.cuda.device_count() > 1:
+            if (matcher == "t4" and torch.cuda.device_count() > 1
+                    and os.environ.get("AVA_SINGLE_GPU") != "1"):
                 return replace(
                     profile, seq_len=2048, grad_accum=16, micro_batch=1,
                     notes="Turing x2 (Kaggle): fp16, seq2048 sharded across 2xT4 (mb1x16)",

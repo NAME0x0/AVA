@@ -13,6 +13,7 @@ seconds. The GPU path differs only in model construction.
 """
 from __future__ import annotations
 
+import os
 import sys
 import time
 from dataclasses import dataclass, field
@@ -109,7 +110,9 @@ def _build_qlora_model(cfg: SFTConfig, compute_dtype: torch.dtype) -> tuple[Any,
     # cross-device transfers cost throughput — the user chose headroom over
     # speed for the edit/agentic phase. A single big card (L4/A100, >=24 GB)
     # still pins to GPU0; sharding there would only add pipeline overhead.
-    if n_gpu > 1 and vram_gb < 24:
+    if os.environ.get("AVA_SINGLE_GPU") == "1":
+        device_map = {"": 0}          # escape hatch: T4x2 sharding broke -> pin GPU0
+    elif n_gpu > 1 and vram_gb < 24:
         device_map = "auto"
     elif vram_gb >= 12:
         device_map = {"": 0}
