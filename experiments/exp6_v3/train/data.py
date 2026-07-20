@@ -180,9 +180,48 @@ def map_commitpackft(ex: dict) -> Sample | None:
     return Sample(prompt=prompt, response=edit, kind="edit")
 
 
+# Permissive repo licenses we keep from Open-SWE-Traces — the underlying repo's
+# license (not the CC-BY-4.0 dataset wrapper). Keeps the $0 free-release identity
+# clean; anything copyleft/unknown is dropped.
+_OSWE_PERMISSIVE = frozenset({
+    "MIT", "Apache-2.0", "BSD-3-Clause", "BSD-2-Clause", "BSD",
+    "ISC", "0BSD", "Unlicense", "Python-2.0", "PSF-2.0",
+})
+
+
+def map_openswe(ex: dict) -> Sample | None:
+    """Open-SWE-Traces (nvidia, CC BY 4.0) -> issue -> gold-patch supervision.
+
+    Full OpenHands agent trajectories are ~45K tokens and do not fit our 2K
+    context on 4 GB, so each RESOLVED (execution-verified) trace is distilled to
+    its target: the issue statement -> the reference unified diff. Real repo
+    bugs/features with verified fixes — edit-grounded, unlike competitive-puzzle
+    reasoning. resolved/license filtering also runs in the iterator (sft.py); this
+    mapper stays defensive so a mislabeled row can never leak in."""
+    if ex.get("resolved") != 1 or ex.get("license") not in _OSWE_PERMISSIVE:
+        return None
+    md = ex.get("metadata") or {}
+    patch = ((md.get("reference_patch") or {}).get("patch") or "").strip()
+    if not patch:
+        return None
+    issue = ""
+    for turn in ex.get("trajectory") or []:       # first user turn = the issue
+        if turn.get("role") == "user":
+            issue = (turn.get("content") or "").strip()
+            break
+    if not issue:
+        return None
+    prompt = (
+        "Resolve this software issue. Reply with a unified diff patch in git "
+        "format (--- / +++ / @@ hunks) that fixes it.\n\n" + issue
+    )
+    return Sample(prompt=prompt, response=patch, kind="edit")
+
+
 SCHEMA_MAPPERS: dict[str, Callable[[dict], Sample | None]] = {
     "opencodereasoning": map_opencodereasoning,
     "commitpackft": map_commitpackft,
+    "openswe": map_openswe,
 }
 
 

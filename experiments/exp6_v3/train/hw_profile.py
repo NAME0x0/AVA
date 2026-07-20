@@ -1,7 +1,7 @@
 """Hardware profiles for v3.0 SFT; see docs/v3/REVIEW_2026-07.md section 13."""
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import torch
 
@@ -166,6 +166,15 @@ def detect_profile() -> HWProfile:
 
     for matcher, profile in PROFILES.items():
         if matcher in device_name:
+            # Kaggle serves T4 x2. With both cards the model shards across ~30 GB
+            # (sft.py device_map=auto), so seq2048/mb1 fits — real context room
+            # for issue->patch edit examples. A lone T4 keeps seq1024 (single-card
+            # safe; seq2048 there would OOM the 248K-vocab CE).
+            if matcher == "t4" and torch.cuda.device_count() > 1:
+                return replace(
+                    profile, seq_len=2048, grad_accum=16, micro_batch=1,
+                    notes="Turing x2 (Kaggle): fp16, seq2048 sharded across 2xT4 (mb1x16)",
+                )
             return profile
 
     bf16 = bool(torch.cuda.is_bf16_supported())

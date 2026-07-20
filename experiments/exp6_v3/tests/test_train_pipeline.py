@@ -690,3 +690,34 @@ def test_canitedit_resume_skips_done(monkeypatch, tmp_path) -> None:
     assert set(rep["by_change_kind"]) == {"corrective", "adaptive"}
     saved = json.loads((tmp_path / "k.json").read_text())   # re-persisted with both
     assert set(saved["per_task"]) == {"t1", "t2"}
+
+
+# --------------------------------------------------------------------------- openswe
+def test_openswe_mapper_issue_to_patch() -> None:
+    """resolved+permissive row -> issue prompt + gold diff response; filters reject
+    the rest (unverified / copyleft / no-patch / no-issue)."""
+    from train.data import Sample, map_openswe
+
+    row = {
+        "resolved": 1, "license": "MIT",
+        "trajectory": [
+            {"role": "system", "content": "you are an agent"},
+            {"role": "user", "content": "Fix the crash in foo()."},
+            {"role": "assistant", "content": "on it"},
+        ],
+        "metadata": {"reference_patch": {"patch": "diff --git a/foo.py b/foo.py\n@@ -1 +1 @@\n-x\n+y\n"}},
+    }
+    s = map_openswe(row)
+    assert isinstance(s, Sample) and s.kind == "edit"
+    assert "Fix the crash in foo()." in s.prompt and "unified diff" in s.prompt
+    assert s.response.startswith("diff --git")
+
+    assert map_openswe({**row, "resolved": 0}) is None                 # unverified
+    assert map_openswe({**row, "license": "GPL-3.0"}) is None          # copyleft
+    assert map_openswe({**row, "metadata": {}}) is None                # no patch
+    assert map_openswe({**row, "trajectory": [{"role": "system", "content": "x"}]}) is None  # no issue
+
+
+def test_openswe_registered() -> None:
+    from train.data import SCHEMA_MAPPERS
+    assert "openswe" in SCHEMA_MAPPERS

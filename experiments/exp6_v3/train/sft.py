@@ -103,7 +103,19 @@ def _build_qlora_model(cfg: SFTConfig, compute_dtype: torch.dtype) -> tuple[Any,
         torch.cuda.get_device_properties(0).total_memory / 1e9
         if torch.cuda.is_available() else 0
     )
-    device_map = {"": 0} if vram_gb >= 12 else "auto"
+    n_gpu = torch.cuda.device_count() if torch.cuda.is_available() else 0
+    # Kaggle T4x2: shard the model across both cards (naive pipeline) so the
+    # 248K-vocab CE at seq2048 has room to breathe. One card sits ~idle and
+    # cross-device transfers cost throughput — the user chose headroom over
+    # speed for the edit/agentic phase. A single big card (L4/A100, >=24 GB)
+    # still pins to GPU0; sharding there would only add pipeline overhead.
+    if n_gpu > 1 and vram_gb < 24:
+        device_map = "auto"
+    elif vram_gb >= 12:
+        device_map = {"": 0}
+    else:
+        device_map = "auto"
+    print(f"[sft] device_map={device_map} (n_gpu={n_gpu}, vram0={vram_gb:.0f}GB)")
     model = AutoModelForCausalLM.from_pretrained(
         cfg.donor,
         quantization_config=bnb,
@@ -188,6 +200,25 @@ def _list_source_iter(rows: list[dict]):
     return factory
 
 
+def _openswe_source_iter(data_files: str, split: str = "train"):
+    """Parquet loader + row filter for nvidia/Open-SWE-Traces: only
+    execution-verified (resolved==1) traces on permissively-licensed repos reach
+    the mixture. Filtering here (not just in the mapper) stops ~90% unresolved
+    rows from wasting mixture draws."""
+    from .data import _OSWE_PERMISSIVE
+
+    def factory():
+        from datasets import load_dataset
+
+        ds = load_dataset("parquet", data_files=data_files, split=split, streaming=True)
+        return (
+            ex for ex in ds
+            if ex.get("resolved") == 1 and ex.get("license") in _OSWE_PERMISSIVE
+        )
+
+    return factory
+
+
 def build_stream(cfg: SFTConfig, test_rows: dict[str, list[dict]] | None = None) -> MixtureStream:
     """test_rows: {source_name: [raw rows]} overrides HF loading (dry runs/tests)."""
     decontam = None
@@ -202,14 +233,15 @@ def build_stream(cfg: SFTConfig, test_rows: dict[str, list[dict]] | None = None)
 
     specs = []
     for s in cfg.sources:
-        factory = (
-            _list_source_iter(test_rows[s["name"]])
-            if test_rows is not None
-            else _hf_source_iter(
+        if test_rows is not None:
+            factory = _list_source_iter(test_rows[s["name"]])
+        elif s.get("loader") == "openswe":
+            factory = _openswe_source_iter(s["data_files"], s.get("split", "train"))
+        else:
+            factory = _hf_source_iter(
                 s["hf_id"], s.get("split", "train"),
                 config=s.get("config"), data_files=s.get("data_files"),
             )
-        )
         specs.append(
             SourceSpec(
                 name=s["name"],

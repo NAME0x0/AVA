@@ -12,24 +12,35 @@ seed: 1234
 # BASELINES — with auto_hardware (default true) train/hw_profile.py detects
 # the GPU (T4/L4/A100/V100/A2000/CPU) and overrides them + picks fp16/bf16.
 # Set auto_hardware: false to force these values.
-seq_len: 1024                    # laptop: drop to 640; Kaggle/Colab T4: 1024
+seq_len: 2048                    # laptop: 640; single T4: 1024; T4x2: 2048 (auto)
+# EDIT-HEAVY PIVOT (2026-07-20): step-2167 lost -11.5pp vs donor on CanItEdit and
+# -10 on LiveCodeBench — the 0.7 reasoning / 0.3 edit mix made a better reasoner
+# and a worse precise-editor. Rebalanced to edit-grounded (0.65 edit / 0.35
+# reasoning); competitive-puzzle reasoning (OCR) down-weighted, real verified SWE
+# edits (Open-SWE) added. Continuing from 2167, re-eval at ~22% (step ~4.4k).
 sources:
   - name: opencodereasoning      # reasoning-trace backbone (Apache 2.0)
     hf_id: nvidia/OpenCodeReasoning
     config: split_0              # verified: configs [split_0, split_1]
     split: split_0               # verified: split inside config is also split_0
-    weight: 0.7
+    weight: 0.35                 # down from 0.7 — was over-weighting puzzle reasoning
     fim_fraction: 0.15           # auto-disabled if tokenizer lacks FIM sentinels
   - name: commitpackft           # edit skill -> hashline dialect (REVIEW section 11.3)
     hf_id: bigcode/commitpackft  # legacy script dataset -> direct-file load:
     data_files: hf://datasets/bigcode/commitpackft/data/python/data.jsonl
     split: train                 # (python first; more languages join at the
-    weight: 0.3                  #  MultiPL-E stage — one data_files line each)
+    weight: 0.30                 #  MultiPL-E stage — one data_files line each)
     fim_fraction: 0.0
-# STAGED (PLAN_2026-07-15_v31 s3) — clean agentic/reasoning upgrade. NOT active
-# until each schema is confirmed with scripts/inspect_dataset.py and a mapper is
-# added to train/data.py SCHEMA_MAPPERS (rule: never map a guessed schema):
-#   - nvidia/Open-SWE-Traces   (207K agentic trajectories, CC BY 4.0) -> agentic
+  - name: openswe                # verified real-world SWE edits (issue -> gold patch)
+    hf_id: nvidia/Open-SWE-Traces               # CC BY 4.0; underlying repos are
+    data_files: hf://datasets/nvidia/Open-SWE-Traces/data/minimax_m25_openhands_trajectories/train-*.parquet
+    split: train                 # filtered to resolved==1 + permissive repo license
+    loader: openswe              # -> sft._openswe_source_iter (parquet + row filter)
+    weight: 0.35                 # edit-grounded reasoning; the on-target upgrade
+    fim_fraction: 0.0
+# STAGED (PLAN_2026-07-15_v31 s3) — remaining clean upgrades. NOT active until
+# each schema is confirmed with scripts/inspect_dataset.py + a mapper is added to
+# train/data.py SCHEMA_MAPPERS (rule: never map a guessed schema):
 #   - nvidia/OpenMathReasoning (reasoning muscle, CC BY 4.0)
 #   - open-thoughts/OpenThoughts-114k (open reasoning CoT)
 # Proprietary-distill sets (Claude/GPT traces) are BANNED — s2.
@@ -49,7 +60,8 @@ max_grad_norm: 1.0
 lora_r: 16
 lora_alpha: 32
 lora_dropout: 0.05
-use_dora: true                   # DoRA > plain LoRA at same param count (v31 s4)
+use_dora: false                  # CONTINUING plain-LoRA step-2167 — DoRA would
+                                 # mismatch its params. DoRA needs a fresh start.
 
 # -- fabric ---------------------------------------------------------------
 shard_minutes: 150               # kaggle batch: 550; laptop: 600
