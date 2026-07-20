@@ -18,9 +18,18 @@
 \setlength{\abovecaptionskip}{8pt}
 \setlength{\belowcaptionskip}{4pt}
 
-\title{AVA-v2: A Reproducible Case Study of Adapting and Evaluating a 1.9B Model Under a 2\,GB VRAM Budget on Consumer Hardware}
+\makeatletter
+\renewenvironment{abstract}{%
+  \par\addvspace{0.4em}%
+  {\centering\textbf{\textit{Abstract}}\par}%
+  \vskip 0.3em%
+  \small\bfseries\noindent\ignorespaces
+}{\par\addvspace{0.4em}}
+\makeatother
 
-\author{\IEEEauthorblockN{Muhammad Afsah Mumtaz}
+\title{\LARGE AVA-v2: Reasoning on a 4\,GB Laptop GPU}
+
+\author{\IEEEauthorblockN{\large\bfseries Muhammad Afsah Mumtaz}
 \IEEEauthorblockA{Independent Researcher\\
 \texttt{github.com/NAME0x0}\quad\texttt{huggingface.co/NAME0x0}}}
 
