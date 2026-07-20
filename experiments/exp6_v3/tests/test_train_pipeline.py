@@ -721,3 +721,24 @@ def test_openswe_mapper_issue_to_patch() -> None:
 def test_openswe_registered() -> None:
     from train.data import SCHEMA_MAPPERS
     assert "openswe" in SCHEMA_MAPPERS
+
+
+def test_skip_to_seeds_added_source() -> None:
+    """Resuming a checkpoint whose cursor predates a newly-added source must NOT
+    KeyError on that source's first draw (the 2026-07-20 openswe-at-2167 bug:
+    skip_to replaced the consumed dict, wiping the added source's 0-seed)."""
+    from train.data import MixtureStream, SourceSpec
+
+    rows_old = [{"input": f"q{i}", "output": f"a{i}"} for i in range(50)]
+    rows_new = [{"input": f"n{i}", "output": f"b{i}"} for i in range(50)]
+    specs = [
+        SourceSpec("opencodereasoning", 0.5, lambda r=rows_old: iter(r)),
+        SourceSpec("openswe", 0.5, lambda r=rows_new: iter(r)),      # ADDED source
+    ]
+    stream = MixtureStream(specs, seed=7)
+    # cursor from "before openswe existed" — no openswe key
+    stream.skip_to({"consumed": {"opencodereasoning": 3}, "draws": 4, "seed": 7})
+    assert stream.cursor()["consumed"]["openswe"] == 0              # seeded, not absent
+    for _ in range(30):                                            # draws hit openswe
+        next(stream)                                               # must not KeyError
+    assert stream.cursor()["consumed"]["openswe"] > 0

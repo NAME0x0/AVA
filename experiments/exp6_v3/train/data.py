@@ -283,10 +283,18 @@ class MixtureStream:
         for _ in range(cursor["draws"]):
             self.rng.choices(self.sources, weights=self._weights)
         for name, count in cursor["consumed"].items():
-            it = self.iters[name]
+            it = self.iters.get(name)   # a source dropped since the checkpoint -> skip
+            if it is None:
+                continue
             for _ in range(count):
                 next(it, None)
-        self.cursor_state = MixtureCursor(consumed=dict(cursor["consumed"]), draws=cursor["draws"])
+        # Sources ADDED since the checkpoint (e.g. openswe at the 2026-07-20 edit
+        # pivot, resuming step 2167) must start at 0 — NOT be absent. The saved
+        # cursor lacks their key, and a missing key KeyErrors on the first draw
+        # (consumed[name] += 1). Seed the full current source set, overlay saved.
+        consumed = {s.name: 0 for s in self.sources}
+        consumed.update(cursor["consumed"])
+        self.cursor_state = MixtureCursor(consumed=consumed, draws=cursor["draws"])
         # NOTE: fim_rng replay is driven by re-drawing; FIM spans after resume
         # differ from the never-preempted run — acceptable (content, not order).
 
