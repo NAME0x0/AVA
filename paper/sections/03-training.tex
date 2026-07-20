@@ -10,6 +10,8 @@ We fine-tune with QLoRA \citep{dettmers2023qlora}, which keeps the base weights 
 
 \begin{table}[t]
 \centering
+\caption{Training configuration. The corpus and its provenance are described in Section~\ref{sec:data}.}
+\label{tab:trainconfig}
 \begin{tabular}{ll}
 \toprule
 Setting & Value \\
@@ -28,8 +30,6 @@ Learning rate & $1.5\times10^{-4}$ \\
 Training examples & 20{,}741 \\
 \bottomrule
 \end{tabular}
-\caption{Training configuration. The corpus and its provenance are described in Section~\ref{sec:data}.}
-\label{tab:trainconfig}
 \end{table}
 
 \subsection{Fitting the run into 4~GB}

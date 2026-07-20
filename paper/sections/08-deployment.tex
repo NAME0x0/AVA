@@ -5,6 +5,8 @@ AVA-v2 is released in three forms: the 41.6~MiB QLoRA adapter, a merged half-pre
 
 \begin{table*}[t]
 \centering
+\caption{GGUF quantization ladder. Perplexity is measured on a held-out slice of the training distribution at 512-token context; lower is better. The sub-8-bit files use an importance matrix calibrated on that distribution. Q5\_K\_M was released without a perplexity measurement.}
+\label{tab:gguf}
 \begin{tabular}{lrrrl}
 \toprule
 Quantization & Size & RAM & Perplexity & vs.\ Q8\_0 \\
@@ -16,8 +18,6 @@ Q5\_K\_M & 1.31~GB & 1.8~GB & --- & --- \\
 Q8\_0 (reference) & 1.87~GB & 2.4~GB & 2.4844 & --- \\
 \bottomrule
 \end{tabular}
-\caption{GGUF quantization ladder. Perplexity is measured on a held-out slice of the training distribution at 512-token context; lower is better. The sub-8-bit files use an importance matrix calibrated on that distribution. Q5\_K\_M was released without a perplexity measurement.}
-\label{tab:gguf}
 \end{table*}
 
 The sub-8-bit files are built with an importance matrix calibrated on the model's own training distribution, which keeps their quality close to the 8-bit reference. The recommended Q4\_K\_M build is 1.19~GB and raises perplexity by 0.25\% over Q8\_0, while the smallest build fits in about 1.6~GB of memory. Every quantization runs without a GPU, so the model deploys on the same class of hardware that trained it. The evaluation in Section~\ref{sec:results} uses the Q8\_0 build, the most faithful of the ladder.
