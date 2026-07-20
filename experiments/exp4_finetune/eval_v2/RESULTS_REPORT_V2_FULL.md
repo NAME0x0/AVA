@@ -4,7 +4,7 @@
 **Hardware:** RTX A2000 Laptop, 4 GB VRAM, Windows 11, llama.cpp b7472-head (commit 69c28f1)
 **Backend:** llama-server, Flash Attention enabled, Q8_0 weights, Q8 KV cache, 4 parallel slots, continuous batching, 8K context
 **Date:** 2026-05-06
-**Total wall time:** 4h 18min across 17 benchmarks (16,872 tasks)
+**Total wall time:** 4h 18min across 17 benchmark configurations comprising 52,027 evaluation instances (~52,045 model calls)
 
 ## Methodology
 
