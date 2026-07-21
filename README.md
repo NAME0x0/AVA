@@ -34,7 +34,7 @@ AVA v2 is a **42 MB QLoRA adapter** for [Qwen 3.5 2B](https://huggingface.co/Qwe
                               *k=5 self-cons
 ```
 
-**What's special**: 82% ARC-Challenge on the full 1,172-question test set beats Llama 3.2 3B-Instruct (78.6%) and matches Phi-4-mini 3.8B (83.7%). Training peaks at **1.81 GB VRAM**. Full 17-benchmark, 52,027-instance eval — every number is reproducible end-to-end on the same laptop.
+**What's special**: 82% ARC-Challenge on the full 1,172-question test set, in the range of 3B-class models like Llama 3.2 3B-Instruct (78.6%) and Phi-4-mini 3.8B (83.7%), each under its own eval protocol. Training peaks at **1.81 GB VRAM**. Full 17-benchmark, 52,027-instance eval — every number is reproducible end-to-end on the same laptop.
 
 > New here? Read [docs/WHY.md](docs/WHY.md) for the one-paragraph version. Then [docs/QUICKSTART.md](docs/QUICKSTART.md) to actually run it.
 
@@ -88,7 +88,7 @@ Full eval: 17 benchmarks, 52,027 evaluation instances, Q8_0 GGUF, 95% Wilson CI.
 | Phi-4-mini 3.8B-Instruct | 3.8B | 83.7 | 67.3 | 88.6 |
 | Mistral 7B-Instruct v0.2 | 7.0B | 55.5 | 60.1 | 52.2 |
 
-Where v2 wins: ARC reasoning at 2B beats every same-size and most 3B-class peers. Where v2 loses: math (GSM8K, MATH-500), narrative commonsense (HellaSwag), and tool routing — all targeted by [AVA v3](docs/ROADMAP.md).
+Strong: ARC reasoning at 2B, competitive with larger peers. Weak: math (GSM8K, MATH-500), narrative commonsense (HellaSwag), and tool routing, all targeted by [AVA v3](docs/ROADMAP.md). External numbers above come from each model's own evaluation under different protocols, so treat them as context, not a controlled comparison.
 
 ---
 

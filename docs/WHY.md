@@ -15,9 +15,9 @@ Everything in this repo — training, evaluation, inference, GGUF export, the fu
 
 ## What's been proven
 
-- **82% ARC-Challenge** on the full 1,172-question set (AVA v2). Beats Llama 3.2 3B-Instruct (78.6%) and matches Phi-4-mini 3.8B (83.7%).
+- **82% ARC-Challenge** on the full 1,172-question set (AVA v2), in the range of 3B-class models like Llama 3.2 3B-Instruct (78.6%) and Phi-4-mini 3.8B (83.7%), each measured under its own protocol.
 - **42 MB adapter**. The training run uses 1.81 GB peak VRAM and finishes in 100 minutes.
-- **17 public benchmarks, 16,872 tasks** evaluated end-to-end on the same laptop.
+- **17 public benchmarks, 52,027 evaluation instances** evaluated end-to-end on the same laptop.
 - Nothing requires special hardware, cloud access, or corporate resources.
 
 ## Why this matters

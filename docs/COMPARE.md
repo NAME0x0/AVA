@@ -19,7 +19,7 @@ All non-AVA scores from official model cards / technical reports. Evaluation pro
 
 ## What this says
 
-**ARC-Challenge — AVA v2 leads its size class.** 82.0% on the full 1,172-question test set is ahead of every 1-2B model surveyed and ahead of Llama 3.2 3B-Instruct (78.6%). Only Phi 3.5/4-mini 3.8B-class models beat it, by 1.7-2.6 pp. Achieved with a 42 MB LoRA on top of an open base — no cluster, no large pretraining run.
+**ARC-Challenge is AVA v2's strongest result.** 82.0% on the full 1,172-question test set is among the highest of the 1-2B models surveyed and above Llama 3.2 3B-Instruct's reported 78.6%, with Phi 3.5/4-mini 3.8B-class models 1.7-2.6 pp higher. As noted above, these are cross-protocol figures, not controlled head-to-heads. Achieved with a 42 MB LoRA on top of an open base, no cluster and no large pretraining run.
 
 **MMLU is competitive at 59.2%.** Close to Mistral 7B (60.1%) and roughly +8 pp over Gemma 2 2B (51.3%). Below Qwen2.5 1.5B (60.9%) and the Phi/Llama 3B-class models (63-69%).
 

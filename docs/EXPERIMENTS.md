@@ -45,8 +45,8 @@ The repo keeps every branch. Closed branches stay so the failure modes remain vi
 
 **Built**: 20K curated corpus (math + science + reasoning + tools), Triton/SDPA training speedup (10.7× per-step on Windows), full 17-benchmark eval pipeline, HF model card, GGUF export path.
 
-**Best results** (full 17-benchmark eval, 16,872 tasks, Q8_0 GGUF):
-- 82.0% ARC-Challenge (full 1,172) — ahead of Llama 3.2 3B-Instruct (78.6%)
+**Best results** (full 17-benchmark eval, 52,027 evaluation instances, Q8_0 GGUF):
+- 82.0% ARC-Challenge (full 1,172); Llama 3.2 3B-Instruct reports 78.6% under its own protocol
 - 92.0% ARC-Easy (2,376)
 - 75.9% PIQA, 75.0% BoolQ
 - 59.2% MMLU 5-shot (14,042)

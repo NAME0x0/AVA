@@ -11,7 +11,7 @@ See [`DESIGN.md`](DESIGN.md) for the full architecture and training plan.
 
 ## Why this exists
 
-AVA v2 (Exp4) is a Qwen 3.5 2B QLoRA fine-tune. Full eval (17 benchmarks, 16,872 tasks) gave 82 % ARC-C / 59 % MMLU / 35 % GSM8K. Math, code, instruction-following are weak. Exp5 (Gemma 4 26B / E4B / E2B) is paused — files retained in `experiments/exp5_gemma4/`. AVA v3 pivots to a Qwen 3.6 base + 1-bit-class quant + MCP tools to push capacity per VRAM by ~5×.
+AVA v2 (Exp4) is a Qwen 3.5 2B QLoRA fine-tune. Full eval (17 benchmarks, 52,027 evaluation instances) gave 82 % ARC-C / 59 % MMLU / 35 % GSM8K. Math, code, instruction-following are weak. Exp5 (Gemma 4 26B / E4B / E2B) is paused — files retained in `experiments/exp5_gemma4/`. AVA v3 pivots to a Qwen 3.6 base + 1-bit-class quant + MCP tools to push capacity per VRAM by ~5×.
 
 ## Layout
 

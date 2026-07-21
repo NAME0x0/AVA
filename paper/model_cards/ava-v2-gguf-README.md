@@ -90,9 +90,9 @@ automatically):
 
 Full 17-benchmark table and protocol: [RESULTS_REPORT_V2_FULL.md](https://github.com/NAME0x0/AVA/blob/main/experiments/exp4_finetune/eval_v2/RESULTS_REPORT_V2_FULL.md).
 
-At 2B parameters, AVA v2's ARC-Challenge (82.0%) sits ahead of Llama 3.2
-3B-Instruct (78.6%) and within two points of Phi-4-mini 3.8B (83.7%) — models
-trained with cluster-scale compute. AVA v2 was trained in 100 minutes on one
+At 2B parameters, AVA v2's ARC-Challenge (82.0%) is in the range of 3B-class
+models like Llama 3.2 3B-Instruct (78.6%) and Phi-4-mini 3.8B (83.7%), each
+measured under its own eval protocol. AVA v2 was trained in 100 minutes on one
 4 GB laptop GPU.
 
 ## Provenance

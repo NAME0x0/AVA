@@ -1,6 +1,6 @@
 # Results
 
-AVA v2 evaluated on 17 public benchmarks, 16,872 tasks total. Q8_0 GGUF served via llama-server. 4 h 18 min wall time on the same RTX A2000 4 GB laptop. 95% Wilson confidence intervals.
+AVA v2 evaluated on 17 public benchmarks, 52,027 evaluation instances total. Q8_0 GGUF served via llama-server. 4 h 18 min wall time on the same RTX A2000 4 GB laptop. 95% Wilson confidence intervals.
 
 Full report: [`experiments/exp4_finetune/eval_v2/RESULTS_REPORT_V2_FULL.md`](../experiments/exp4_finetune/eval_v2/RESULTS_REPORT_V2_FULL.md). Per-benchmark JSON in `experiments/exp4_finetune/eval_v2/results/v2_full/`.
 
