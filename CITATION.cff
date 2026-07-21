@@ -22,6 +22,6 @@ preferred-citation:
   authors:
     - family-names: Mumtaz
       given-names: Muhammad Afsah
-  title: "AVA v2: QLoRA Fine-tuning Under Extreme VRAM Constraints"
+  title: "AVA-v2: Reasoning on a 4 GB Laptop GPU"
   year: 2026
   url: "https://github.com/NAME0x0/AVA"

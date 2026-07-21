@@ -34,9 +34,19 @@ AVA v2 is a **42 MB QLoRA adapter** for [Qwen 3.5 2B](https://huggingface.co/Qwe
                               *k=5 self-cons
 ```
 
-**What's special**: 82% ARC-Challenge on the full 1,172-question test set beats Llama 3.2 3B-Instruct (78.6%) and matches Phi-4-mini 3.8B (83.7%). Training peaks at **1.81 GB VRAM**. Full 17-benchmark / 16,872-task eval — every number is reproducible end-to-end on the same laptop.
+**What's special**: 82% ARC-Challenge on the full 1,172-question test set beats Llama 3.2 3B-Instruct (78.6%) and matches Phi-4-mini 3.8B (83.7%). Training peaks at **1.81 GB VRAM**. Full 17-benchmark, 52,027-instance eval — every number is reproducible end-to-end on the same laptop.
 
 > New here? Read [docs/WHY.md](docs/WHY.md) for the one-paragraph version. Then [docs/QUICKSTART.md](docs/QUICKSTART.md) to actually run it.
+
+---
+
+## Paper
+
+**AVA-v2: Reasoning on a 4 GB Laptop GPU** — a reproducible case study of QLoRA fine-tuning and full-set evaluation of a 2B model on a single 4 GB laptop GPU.
+
+📄 **[Read the paper (PDF)](paper/AVA-v2.pdf)** · preprint (arXiv submission in progress)
+
+It documents the training system, data provenance and a train/test contamination check, the evaluation methodology across 17 benchmarks with 95% Wilson confidence intervals, and the finding that small evaluation subsets substantially misstate compact-model performance.
 
 ---
 
@@ -55,7 +65,7 @@ Other paths (Python adapter, HuggingFace API): [docs/QUICKSTART.md](docs/QUICKST
 
 ## Headline numbers
 
-Full eval: 17 benchmarks, 16,872 tasks, Q8_0 GGUF, 95% Wilson CI. See [docs/RESULTS.md](docs/RESULTS.md) for the full table.
+Full eval: 17 benchmarks, 52,027 evaluation instances, Q8_0 GGUF, 95% Wilson CI. See [docs/RESULTS.md](docs/RESULTS.md) for the full table.
 
 | Benchmark | n | AVA v2 |
 |---|---:|---:|
@@ -163,8 +173,8 @@ The project costs $0 to keep running, but funding accelerates AVA v3 (longer tra
 ## Citation
 
 ```bibtex
-@misc{ava-v2-2026,
-  title  = {AVA v2: QLoRA Fine-tuning Under Extreme VRAM Constraints},
+@misc{mumtaz2026avav2,
+  title  = {AVA-v2: Reasoning on a 4 GB Laptop GPU},
   author = {Muhammad Afsah Mumtaz},
   year   = {2026},
   url    = {https://github.com/NAME0x0/AVA}
