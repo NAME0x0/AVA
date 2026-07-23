@@ -2,7 +2,9 @@
 # Consumed by train/sft.py::SFTConfig.from_yaml. Reproducible from this file
 # + git hash + seed alone (RECIPE reproducibility invariants).
 
-phase: C5
+phase: C5E                       # whole-file EDIT run, FRESH from donor (C5 diff-run
+                                 # step-3044 abandoned — wrong output format). In the
+                                 # notebook set AVA_PHASE=C5E so autopilot starts fresh.
 ckpt_repo: NAME0x0/AVA-v3-checkpoints
 donor: Qwen/Qwen3.5-4B
 seed: 1234
@@ -13,37 +15,32 @@ seed: 1234
 # the GPU (T4/L4/A100/V100/A2000/CPU) and overrides them + picks fp16/bf16.
 # Set auto_hardware: false to force these values.
 seq_len: 2048                    # laptop: 640; single T4: 1024; T4x2: 2048 (auto)
-# EDIT-HEAVY PIVOT (2026-07-20): step-2167 lost -11.5pp vs donor on CanItEdit and
-# -10 on LiveCodeBench — the 0.7 reasoning / 0.3 edit mix made a better reasoner
-# and a worse precise-editor. Rebalanced to edit-grounded (0.65 edit / 0.35
-# reasoning); competitive-puzzle reasoning (OCR) down-weighted, real verified SWE
-# edits (Open-SWE) added. Continuing from 2167, re-eval at ~22% (step ~4.4k).
+# WHOLE-FILE FORMAT FIX (2026-07-23): the -11.5pp @2167 and -17.3pp @3044
+# regressions traced to an OUTPUT-FORMAT mismatch — we trained DIFF output
+# (commitpackft->hashline, openswe->unified-diff) but CanItEdit + every strong
+# open editor + the proven EditCoder recipe use WHOLE-FILE output. Diff training
+# taught a minimality prior -> the model under-edits on substantial changes.
+# Fix: EditPackFT (the benchmark authors' own whole-file set, MIT, filtered from
+# CommitPackFT) becomes the edit backbone; diff sources DROPPED. Light reasoning
+# retained. map_editpackft mirrors canitedit_eval._build_prompt EXACTLY (train==eval).
 sources:
-  - name: opencodereasoning      # reasoning-trace backbone (Apache 2.0)
+  - name: editpackft             # WHOLE-FILE instruction edits — proven CanItEdit
+    hf_id: nuprl/EditPackFT       # recipe (EditCoder). MIT; ex-CommitPackFT, reformatted.
+    split: train
+    weight: 0.75                  # the backbone now — train the format the eval wants
+    fim_fraction: 0.0
+  - name: opencodereasoning      # light reasoning retention (Apache 2.0)
     hf_id: nvidia/OpenCodeReasoning
     config: split_0              # verified: configs [split_0, split_1]
-    split: split_0               # verified: split inside config is also split_0
-    weight: 0.35                 # down from 0.7 — was over-weighting puzzle reasoning
+    split: split_0
+    weight: 0.25                 # kept low — reasoning-heavy caused the @2167 drift
     fim_fraction: 0.15           # auto-disabled if tokenizer lacks FIM sentinels
-  - name: commitpackft           # edit skill -> hashline dialect (REVIEW section 11.3)
-    hf_id: bigcode/commitpackft  # legacy script dataset -> direct-file load:
-    data_files: hf://datasets/bigcode/commitpackft/data/python/data.jsonl
-    split: train                 # (python first; more languages join at the
-    weight: 0.30                 #  MultiPL-E stage — one data_files line each)
-    fim_fraction: 0.0
-  - name: openswe                # verified real-world SWE edits (issue -> gold patch)
-    hf_id: nvidia/Open-SWE-Traces               # CC BY 4.0; underlying repos are
-    data_files: hf://datasets/nvidia/Open-SWE-Traces/data/minimax_m25_openhands_trajectories/train-*.parquet
-    split: train                 # filtered to resolved==1 + permissive repo license
-    loader: openswe              # -> sft._openswe_source_iter (parquet + row filter)
-    weight: 0.35                 # edit-grounded reasoning; the on-target upgrade
-    fim_fraction: 0.0
-# STAGED (PLAN_2026-07-15_v31 s3) — remaining clean upgrades. NOT active until
-# each schema is confirmed with scripts/inspect_dataset.py + a mapper is added to
-# train/data.py SCHEMA_MAPPERS (rule: never map a guessed schema):
-#   - nvidia/OpenMathReasoning (reasoning muscle, CC BY 4.0)
-#   - open-thoughts/OpenThoughts-114k (open reasoning CoT)
-# Proprietary-distill sets (Claude/GPT traces) are BANNED — s2.
+# DROPPED for the whole-file objective (they train DIFF output, which regressed us):
+#   - bigcode/commitpackft via hashline dialect  (map_commitpackft)
+#   - nvidia/Open-SWE-Traces  unified-diff patches (map_openswe)
+# Both mappers stay in train/data.py for a future diff-format / agentic lane.
+# STAGED (not active until schema-confirmed): OpenMathReasoning, OpenThoughts-114k.
+# Proprietary-distill sets (Claude/GPT traces) are BANNED.
 decontam_against:                # R21 floor; full MinHash gate is v3-full work
   - evalplus/humanevalplus
   - evalplus/mbppplus
@@ -60,8 +57,8 @@ max_grad_norm: 1.0
 lora_r: 16
 lora_alpha: 32
 lora_dropout: 0.05
-use_dora: false                  # CONTINUING plain-LoRA step-2167 — DoRA would
-                                 # mismatch its params. DoRA needs a fresh start.
+use_dora: false                  # plain LoRA — isolate the format fix as the single
+                                 # variable vs prior runs; try DoRA once this is proven.
 
 # -- fabric ---------------------------------------------------------------
 shard_minutes: 150               # kaggle batch: 550; laptop: 600

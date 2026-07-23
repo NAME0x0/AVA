@@ -41,14 +41,36 @@ _DATASET = "nuprl/CanItEdit"
 _PARQUET = "data/test-00000-of-00001.parquet"
 
 
-def _build_prompt(before: str, instruction: str) -> str:
+# Few-shot exemplars: clean whole-file edits, deliberately NOT from CanItEdit
+# (contamination). Used only for the donor capability check — does a worked
+# example lift the score? Training stays zero-shot (deployment-realistic).
+_FEWSHOT: list[tuple[str, str, str]] = [
+    (
+        'def greet(name):\n    return "Hello " + name\n',
+        "Make greet raise ValueError when name is empty.",
+        'def greet(name):\n    if not name:\n        raise ValueError("name must not be empty")\n    return "Hello " + name\n',
+    ),
+]
+
+
+def _build_prompt(before: str, instruction: str, few_shot: int = 0) -> str:
+    shots = ""
+    for old, instr, new in _FEWSHOT[:few_shot]:
+        shots += (
+            "Example — current program:\n```python\n" + old + "```\n"
+            "Change to make:\n" + instr + "\n"
+            "Edited program:\n```python\n" + new + "```\n\n"
+        )
+    # few_shot=0 -> `shots` empty -> byte-identical to the training prompt
+    # (train.data.map_editpackft), preserving the train==eval distribution.
     return (
         "You are editing an existing Python program. Apply the requested change "
         "and reply with the COMPLETE edited program in a single ```python code "
         "block — not a diff, not only the changed part.\n\n"
-        "Current program:\n```python\n"
-        f"{before}\n```\n\n"
-        f"Change to make:\n{instruction}"
+        + (shots + "Now do this one.\n\n" if shots else "")
+        + "Current program:\n```python\n"
+        + f"{before}\n```\n\n"
+        + f"Change to make:\n{instruction}"
     )
 
 
@@ -156,6 +178,7 @@ def run_canitedit(
     hub_repo: str | None = None,       # push per-problem checkpoints here
     resume_key: str | None = None,     # report basename; enables resume + skip-done
     save_every: int = 5,
+    few_shot: int = 0,                 # worked exemplars prepended (capability check)
 ) -> dict:
     """Greedy pass@1 on CanItEdit, resumable per problem. Raises on empty selection."""
     if instruction not in ("descriptive", "lazy"):
@@ -183,7 +206,7 @@ def run_canitedit(
 
     bar = _progress(todo, desc=f"canitedit({instruction})", total=len(todo))
     for i, r in enumerate(bar):
-        prompt = _build_prompt(r["before"], r[instr_col])
+        prompt = _build_prompt(r["before"], r[instr_col], few_shot=few_shot)
         gen = generate(model, tokenizer, prompt, thinking=thinking, max_new_tokens=max_new_tokens)
         ok, reason = _classify(_extract_code(gen), r["tests"], timeout_s)
         per_task[r["full_name"]] = ok

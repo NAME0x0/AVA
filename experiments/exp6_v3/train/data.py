@@ -218,10 +218,36 @@ def map_openswe(ex: dict) -> Sample | None:
     return Sample(prompt=prompt, response=patch, kind="edit")
 
 
+def map_editpackft(ex: dict) -> Sample | None:
+    """nuprl/EditPackFT (MIT) -> WHOLE-FILE instruction edit (the proven CanItEdit
+    recipe: the benchmark authors' own training set, filtered from CommitPackFT).
+
+    Critical vs map_commitpackft: this emits the COMPLETE edited file, NOT a diff.
+    The 2026-07-23 finding: we trained diff/hashline output (map_commitpackft +
+    openswe patches) but CanItEdit — and every strong open editor — uses WHOLE-file
+    output. The prompt here mirrors canitedit_eval._build_prompt EXACTLY so train
+    and eval share one distribution (the actual fix for the -11.5pp regression)."""
+    old = ex.get("old_contents") or ""
+    new = ex.get("new_contents") or ""
+    instr = ex.get("instruction") or ex.get("subject") or ""
+    if not old or not new or not instr:
+        return None
+    prompt = (
+        "You are editing an existing Python program. Apply the requested change "
+        "and reply with the COMPLETE edited program in a single ```python code "
+        "block — not a diff, not only the changed part.\n\n"
+        "Current program:\n```python\n"
+        f"{old}\n```\n\n"
+        f"Change to make:\n{instr}"
+    )
+    return Sample(prompt=prompt, response=f"```python\n{new}\n```", kind="edit")
+
+
 SCHEMA_MAPPERS: dict[str, Callable[[dict], Sample | None]] = {
     "opencodereasoning": map_opencodereasoning,
     "commitpackft": map_commitpackft,
     "openswe": map_openswe,
+    "editpackft": map_editpackft,
 }
 
 

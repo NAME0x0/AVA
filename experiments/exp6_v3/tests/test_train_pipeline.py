@@ -742,3 +742,37 @@ def test_skip_to_seeds_added_source() -> None:
     for _ in range(30):                                            # draws hit openswe
         next(stream)                                               # must not KeyError
     assert stream.cursor()["consumed"]["openswe"] > 0
+
+
+# --------------------------------------------------------------------------- editpackft (whole-file)
+def test_editpackft_matches_eval_prompt() -> None:
+    """The whole-file fix hinges on train==eval: map_editpackft's prompt MUST
+    byte-match the zero-shot CanItEdit eval prompt, and the response is a full
+    fenced program (not a diff)."""
+    from train.canitedit_eval import _build_prompt
+    from train.data import Sample, map_editpackft
+
+    old, instr, new = "def f():\n    return 1\n", "make f return 2", "def f():\n    return 2\n"
+    s = map_editpackft({"old_contents": old, "new_contents": new, "instruction": instr})
+    assert isinstance(s, Sample) and s.kind == "edit"
+    assert s.prompt == _build_prompt(old, instr, few_shot=0)        # train == eval
+    assert s.response == "```python\n" + new + "\n```"              # whole-file, fenced
+    assert map_editpackft({"old_contents": old, "new_contents": "", "instruction": instr}) is None
+    assert map_editpackft({"old_contents": "", "new_contents": new, "instruction": instr}) is None
+
+
+def test_editpackft_registered() -> None:
+    from train.data import SCHEMA_MAPPERS
+    assert "editpackft" in SCHEMA_MAPPERS
+
+
+def test_fewshot_zero_is_identity() -> None:
+    """few_shot=0 leaves the prompt byte-identical (preserves train==eval);
+    few_shot=1 prepends a worked example but keeps the same task tail."""
+    from train.canitedit_eval import _build_prompt
+
+    tail = "Current program:\n```python\nX\n```\n\nChange to make:\nY"
+    base = _build_prompt("X", "Y", few_shot=0)
+    assert base.endswith(tail) and "Example" not in base and "Now do this one" not in base
+    fs = _build_prompt("X", "Y", few_shot=1)
+    assert fs.endswith(tail) and "Example" in fs and "Now do this one" in fs
