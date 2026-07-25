@@ -4,6 +4,7 @@ title: "AVA: QLoRA fine-tuning under extreme VRAM constraints"
 authors:
   - family-names: Mumtaz
     given-names: Muhammad Afsah
+    orcid: "https://orcid.org/0009-0008-4569-273X"
 version: "v2"
 date-released: "2026-03-18"
 url: "https://github.com/NAME0x0/AVA"
@@ -22,6 +23,7 @@ preferred-citation:
   authors:
     - family-names: Mumtaz
       given-names: Muhammad Afsah
+      orcid: "https://orcid.org/0009-0008-4569-273X"
   title: "AVA-v2: Reasoning on a 4 GB Laptop GPU"
   year: 2026
   url: "https://github.com/NAME0x0/AVA"
