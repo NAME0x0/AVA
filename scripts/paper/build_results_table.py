@@ -36,5 +36,5 @@ for stem, label in ROWS:
     lines.append(f"{label} & {s['n']:,} & {s['accuracy']*100:.1f} & "
                  f"[{lo*100:.1f}, {hi*100:.1f}] \\\\")
 lines += [r"\bottomrule", r"\end{tabular}"]
-OUT.write_text("\n".join(lines), encoding="utf-8")
+OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
 print(f"wrote {OUT}")

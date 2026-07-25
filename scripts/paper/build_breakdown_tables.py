@@ -23,7 +23,7 @@ lines = [r"\begin{tabular}{lrr}", r"\toprule",
          r"\multicolumn{3}{l}{\emph{Strongest 10}}\\", rows(subs[:10]), r"\midrule",
          r"\multicolumn{3}{l}{\emph{Weakest 10}}\\", rows(subs[-10:]),
          r"\bottomrule", r"\end{tabular}"]
-(T / "mmlu_subjects.tex").write_text("\n".join(lines), encoding="utf-8")
+(T / "mmlu_subjects.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 # MATH-500 by difficulty level
 lv = json.loads((D / "math-500_summary.json").read_text())["by_level"]
@@ -31,7 +31,7 @@ lines = [r"\begin{tabular}{lrr}", r"\toprule", r"Level & $n$ & Acc.\ (\%) \\", r
 for k in sorted(lv):
     lines.append(f"{k} & {lv[k]['n']} & {lv[k]['acc']*100:.1f} \\\\")
 lines += [r"\bottomrule", r"\end{tabular}"]
-(T / "math_levels.tex").write_text("\n".join(lines), encoding="utf-8")
+(T / "math_levels.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 # MGSM by language
 lg = json.loads((D / "mgsm_summary.json").read_text())["by_lang"]
@@ -40,6 +40,6 @@ for k in ("en", "es", "fr"):
     if k in lg:
         lines.append(f"{k} & {lg[k]['n']} & {lg[k]['acc']*100:.1f} \\\\")
 lines += [r"\bottomrule", r"\end{tabular}"]
-(T / "mgsm_lang.tex").write_text("\n".join(lines), encoding="utf-8")
+(T / "mgsm_lang.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 print("wrote mmlu_subjects.tex, math_levels.tex, mgsm_lang.tex")
