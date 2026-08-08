@@ -31,10 +31,11 @@ was every restart redoing the 71-min donor pass before even reaching v3.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
-from .c1_eval import _extract_code, _progress, _set_postfix, generate
+from .c1_eval import _progress, _set_postfix, generate
 from .sandbox_exec import check_solution
 
 _DATASET = "nuprl/CanItEdit"
@@ -72,6 +73,24 @@ def _build_prompt(before: str, instruction: str, few_shot: int = 0) -> str:
         + f"{before}\n```\n\n"
         + f"Change to make:\n{instruction}"
     )
+
+
+_FENCE = re.compile(r"```(?:python|py)?\s*\n(.*?)```", re.DOTALL)
+
+
+def _extract_final_code(text: str) -> str:
+    """LAST fenced block, not the first.
+
+    c1_eval._extract_code takes the first fence, which is right for
+    "complete this function" but WRONG for whole-file editing: a model that
+    reasons before answering quotes the ORIGINAL program in an early fence and
+    puts the edited version last. First-fence extraction then scores the
+    unedited input -> a guaranteed, entirely fake 0% (caught 2026-08-08 on
+    LFM2.5-2.6B, which reasons before it answers). Single-block answers are
+    unaffected: for them first == last, so previously banked scores stand.
+    """
+    blocks = _FENCE.findall(text)
+    return blocks[-1] if blocks else text
 
 
 def _kind(row: dict) -> str:
@@ -208,7 +227,7 @@ def run_canitedit(
     for i, r in enumerate(bar):
         prompt = _build_prompt(r["before"], r[instr_col], few_shot=few_shot)
         gen = generate(model, tokenizer, prompt, thinking=thinking, max_new_tokens=max_new_tokens)
-        ok, reason = _classify(_extract_code(gen), r["tests"], timeout_s)
+        ok, reason = _classify(_extract_final_code(gen), r["tests"], timeout_s)
         per_task[r["full_name"]] = ok
         reasons[r["full_name"]] = reason
         by_kind.setdefault(_kind(r), []).append(ok)

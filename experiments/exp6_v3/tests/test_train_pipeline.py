@@ -634,6 +634,25 @@ def test_canitedit_bad_instruction() -> None:
         run_canitedit(model=None, tokenizer=None, instruction="bogus")
 
 
+def test_canitedit_extracts_last_fence() -> None:
+    """Whole-file editing needs the LAST fenced block. A model that reasons before
+    answering quotes the ORIGINAL program in an early fence; first-fence extraction
+    would score the unedited input as the answer (fake 0%). Single-block answers
+    must be unaffected so previously banked scores remain comparable."""
+    from train.canitedit_eval import _extract_final_code
+
+    verbose = (
+        "Let me look at the current code:\n"
+        "```python\nclass A:\n    def contents(self): return 1\n```\n"
+        "Here is the edited program:\n"
+        "```python\nclass A:\n    def contents(self): return 1\n"
+        "    def header(self): return 2\n```"
+    )
+    assert "header" in _extract_final_code(verbose)          # last block wins
+    assert _extract_final_code("x\n```python\ny=1\n```").strip() == "y=1"  # single
+    assert _extract_final_code("no fences here").strip() == "no fences here"
+
+
 def test_canitedit_classify_reasons() -> None:
     """Failures split into artifact (syntax/truncated) vs real (tests/wrong)."""
     from train.canitedit_eval import _classify
