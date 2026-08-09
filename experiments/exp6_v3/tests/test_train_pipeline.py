@@ -663,6 +663,25 @@ def test_canitedit_classify_reasons() -> None:
     assert _classify("   ", "assert True\n", 10.0) == (False, "empty")
 
 
+def test_canitedit_truncation_beats_compilability() -> None:
+    """A cut-off program is often still syntactically valid, so compilability
+    cannot detect truncation — it silently lands in "tests" and masquerades as a
+    real wrong edit (LFM2.5-2.6B: 8/10 sampled failures were truncated). The
+    cap-hit flag is authoritative."""
+    from train.canitedit_eval import _classify
+
+    valid_but_cut = "def f():\n    return 1\n"          # parses, but was cut off
+    assert _classify(valid_but_cut, "assert f()==2\n", 10.0, truncated=True) == (
+        False, "truncated")
+    assert _classify(valid_but_cut, "assert f()==2\n", 10.0, truncated=False) == (
+        False, "tests")
+    # unparseable + truncated -> truncated (not the weaker "syntax" label)
+    assert _classify("def f(:", "assert True\n", 10.0, truncated=True)[1] == "truncated"
+    # truncated but still correct is a genuine pass
+    assert _classify("def f():\n    return 2\n", "assert f()==2\n", 10.0,
+                     truncated=True) == (True, "pass")
+
+
 def test_canitedit_run_reports_reasons(monkeypatch) -> None:
     """run_canitedit surfaces by_reason so a low score is interpretable."""
     import train.canitedit_eval as ce

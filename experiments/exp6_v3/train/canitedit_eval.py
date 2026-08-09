@@ -112,20 +112,30 @@ def _load_rows(limit: int | None) -> list[dict]:
     return rows
 
 
-def _classify(edited: str, tests: str, timeout_s: float) -> tuple[bool, str]:
-    """Split failures so the score is interpretable (iron law): a truncated/
-    incomplete program (SyntaxError) is a MEASUREMENT artifact (token budget /
-    verbosity), whereas a program that runs but fails the asserts is a REAL wrong
-    edit. Mixing them hides which one a low score actually means."""
+def _classify(edited: str, tests: str, timeout_s: float,
+              truncated: bool = False) -> tuple[bool, str]:
+    """Split failures so the score is interpretable (iron law): a budget-limited
+    answer is a MEASUREMENT artifact, whereas a complete program that fails the
+    asserts is a REAL wrong edit. Mixing them hides what a low score means.
+
+    `truncated` (generation hit the token cap) is authoritative and must be passed
+    in, because compilability CANNOT detect it: a cut-off program is often still
+    syntactically valid, so it silently lands in "tests" and masquerades as a real
+    failure (found 2026-08-09 on LFM2.5-2.6B — 8 of 10 sampled failures were
+    truncated, several of them filed as "tests"). Note the fix relabels reasons
+    only; pass/fail is unchanged, so previously banked SCORES stay comparable.
+    """
     if not edited.strip():
         return False, "empty"          # no code block extracted at all
     try:
         compile(edited, "<edit>", "exec")
     except SyntaxError:
-        return False, "syntax"         # incomplete / truncated -> artifact-ish
+        return False, "truncated" if truncated else "syntax"
     res = check_solution(edited, tests, timeout_s=timeout_s)
     if res.ok:
-        return True, "pass"
+        return True, "pass"            # complete enough to pass -> a real pass
+    if truncated:
+        return False, "truncated"      # ran but cut off: can't call it a wrong edit
     return False, "timeout" if res.timeout else "tests"   # "tests" = ran, wrong edit
 
 
@@ -227,7 +237,14 @@ def run_canitedit(
     for i, r in enumerate(bar):
         prompt = _build_prompt(r["before"], r[instr_col], few_shot=few_shot)
         gen = generate(model, tokenizer, prompt, thinking=thinking, max_new_tokens=max_new_tokens)
-        ok, reason = _classify(_extract_final_code(gen), r["tests"], timeout_s)
+        # cap-hit is only knowable here (needs max_new_tokens + the tokenizer)
+        try:
+            n_gen = len(tokenizer(gen).input_ids)
+        except Exception:  # noqa: BLE001 - never let instrumentation kill a run
+            n_gen = 0
+        truncated = n_gen >= max_new_tokens - 32
+        ok, reason = _classify(_extract_final_code(gen), r["tests"], timeout_s,
+                               truncated=truncated)
         per_task[r["full_name"]] = ok
         reasons[r["full_name"]] = reason
         by_kind.setdefault(_kind(r), []).append(ok)
