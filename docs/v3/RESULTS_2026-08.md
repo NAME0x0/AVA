@@ -88,6 +88,21 @@ LFM2.5 writes an analysis, re-quotes the original program, then answers.
   (`terse`) was clearly worse.
 - Combining tricks does not stack (`sys_terse_prefill` ≡ `system`).
 
+### Full 52-problem confirmation (2026-08-09)
+
+| prompt | LFM2.5-2.6B | passes |
+|---|---|---|
+| baseline | 38.46% | 20/52 |
+| **system** | **42.31%** | 22/52 |
+| donor Qwen3.5-4B (baseline prompt) | 53.85% | 28/52 |
+
+- System prompt is worth **+3.85 pp and -34% tokens** — free, keep it.
+- **The n=12 sample overstated the gain 3x** (+33% relative there, +10% here).
+  Another entry in the small-n ledger.
+- **Donor verdict unchanged**: LFM2.5 stays ~11.5 pp behind even prompt-tuned.
+- Truncation is structural for LFM2.5: **12/52 (23%) still hit the cap** after the
+  token cut, and an earlier probe flipped 0/10 at double budget.
+
 ### Proxy transfer rule (important, reusable)
 
 Small siblings **transfer token/format effects** — the 230M predicted `system` at
