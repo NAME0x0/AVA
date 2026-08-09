@@ -1,0 +1,50 @@
+{
+  "baseline": {
+    "tokens_mean": 439.5,
+    "tokens_median": 460.0,
+    "fences_mean": 1.08,
+    "parses": "9/12",
+    "pass": "0/12",
+    "wall_s": 138
+  },
+  "terse": {
+    "tokens_mean": 371.6,
+    "tokens_median": 315.5,
+    "fences_mean": 1,
+    "parses": "11/12",
+    "pass": "0/12",
+    "wall_s": 127
+  },
+  "system": {
+    "tokens_mean": 305.7,
+    "tokens_median": 291.0,
+    "fences_mean": 1,
+    "parses": "12/12",
+    "pass": "0/12",
+    "wall_s": 105
+  },
+  "prefill": {
+    "tokens_mean": 381.2,
+    "tokens_median": 366.0,
+    "fences_mean": 1,
+    "parses": "12/12",
+    "pass": "1/12",
+    "wall_s": 123
+  },
+  "terse_prefill": {
+    "tokens_mean": 368.6,
+    "tokens_median": 312.5,
+    "fences_mean": 1,
+    "parses": "11/12",
+    "pass": "0/12",
+    "wall_s": 119
+  },
+  "sys_terse_prefill": {
+    "tokens_mean": 307.3,
+    "tokens_median": 291.5,
+    "fences_mean": 1,
+    "parses": "12/12",
+    "pass": "0/12",
+    "wall_s": 102
+  }
+}
