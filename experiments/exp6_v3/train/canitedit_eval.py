@@ -264,11 +264,34 @@ def run_canitedit(
     bar = _progress(todo, desc=f"canitedit({instruction})", total=len(todo))
     for i, r in enumerate(bar):
         prompt = _build_prompt(r["before"], r[instr_col], few_shot=few_shot)
-        gen = (_generate_with_system(model, tokenizer, prompt, system_prompt,
-                                     max_new_tokens)
-               if system_prompt else
-               generate(model, tokenizer, prompt, thinking=thinking,
-                        max_new_tokens=max_new_tokens))
+        try:
+            gen = (_generate_with_system(model, tokenizer, prompt, system_prompt,
+                                         max_new_tokens)
+                   if system_prompt else
+                   generate(model, tokenizer, prompt, thinking=thinking,
+                            max_new_tokens=max_new_tokens))
+        except Exception as err:  # noqa: BLE001 - OOM on one problem != run over
+            import torch
+
+            if "out of memory" not in str(err).lower():
+                raise
+            torch.cuda.empty_cache()
+            print(f"[edit] OOM on {r['full_name']} -> recorded as oom, continuing")
+            per_task[r["full_name"]] = False
+            reasons[r["full_name"]] = "oom"
+            by_kind.setdefault(_kind(r), []).append(False)
+            _persist(resume_key, hub_repo, _report(per_task, by_kind, reasons,
+                                                   instruction))
+            continue
+        # Long-run resilience: a single oversized problem must not kill a 2h eval
+        # (donor OOM'd at problem ~41 of 52 on 4 GB, 2026-08-09). Free the cache
+        # each step to stop fragmentation accumulating across 52 generations.
+        try:
+            import torch
+
+            torch.cuda.empty_cache()
+        except Exception:  # noqa: BLE001 - housekeeping must never be fatal
+            pass
         # cap-hit is only knowable here (needs max_new_tokens + the tokenizer)
         try:
             n_gen = len(tokenizer(gen).input_ids)
