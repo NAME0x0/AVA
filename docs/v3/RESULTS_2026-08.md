@@ -103,6 +103,23 @@ LFM2.5 writes an analysis, re-quotes the original program, then answers.
 - Truncation is structural for LFM2.5: **12/52 (23%) still hit the cap** after the
   token cut, and an earlier probe flipped 0/10 at double budget.
 
+### System prompt is NOT universal — it fixes a pathology (2026-08-10)
+
+Matched, excluding the 2 problems the donor OOM'd on (both were passes under
+the baseline prompt, so the donor's raw 50.0% understates it):
+
+| | baseline prompt | + system prompt |
+|---|---|---|
+| **Qwen3.5-4B** | **52.00%** (26/50) | **52.00%** (26/50) |
+| LFM2.5-2.6B | 40.00% (20/50) | 42.00% (21/50) |
+
+- **Exactly neutral for the donor.** A partial run at 30/52 suggested +2 and I
+  called it a universal win; the full set falsified that.
+- Rule: the constraint helps only models that actually have the pathology.
+  Qwen was already terse (1 fence, no preamble) so there was nothing to
+  suppress. **Apply per-model based on measured verbosity, not as a default.**
+- **Donor verdict settled: Qwen3.5-4B by ~10 pp, prompt-tuned or not.**
+
 ### Proxy transfer rule (important, reusable)
 
 Small siblings **transfer token/format effects** — the 230M predicted `system` at
