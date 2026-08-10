@@ -814,3 +814,74 @@ def test_fewshot_zero_is_identity() -> None:
     assert base.endswith(tail) and "Example" not in base and "Now do this one" not in base
     fs = _build_prompt("X", "Y", few_shot=1)
     assert fs.endswith(tail) and "Example" in fs and "Now do this one" in fs
+
+
+# --------------------------------------------------------------------------- autoresearch
+def test_autoresearch_space_invariants() -> None:
+    """REFERENCE must cover every knob with an in-space value, and knobs that
+    are inert on this hardware must stay out (they would pad the space with
+    noise generators and make plateau detection worse)."""
+    import ratchet.autoresearch_config as A
+
+    assert set(A.REFERENCE) == set(A.SPACE)
+    for k, v in A.REFERENCE.items():
+        assert v in A.SPACE[k], f"{k}={v!r} not in its own space"
+    for inert in ("sm", "ts", "mg", "ncmoe", "numa", "cache_reuse", "defrag"):
+        assert inert not in A.SPACE, f"inert knob {inert} leaked into the box"
+
+
+def test_autoresearch_one_knob_mutation() -> None:
+    """Every candidate differs from its parent by exactly one knob, so any
+    accepted win is attributable to a single change."""
+    import random
+
+    import ratchet.autoresearch_config as A
+
+    rng = random.Random(0)
+    for _ in range(300):
+        nxt = A.neighbour(A.REFERENCE, A.SPACE, rng)
+        diff = [k for k in A.REFERENCE if nxt[k] != A.REFERENCE[k]]
+        assert len(diff) == 1, diff
+
+
+def test_autoresearch_quality_tiering() -> None:
+    """Quality-affecting knobs route to the perplexity guard; pure-runtime
+    knobs route to token agreement. Mixing them means either the guard rejects
+    every legitimate change or it goes blind to real damage."""
+    import ratchet.autoresearch_config as A
+
+    for q in ("ctk", "ctv", "fa", "nkvo", "ot"):
+        assert q in A.QUALITY_KNOBS
+    for r in ("b", "ub", "t", "poll", "nopo"):
+        assert r not in A.QUALITY_KNOBS
+
+
+def test_autoresearch_calibration_is_diverse() -> None:
+    """The perplexity corpus must not be a short repeated block.
+
+    Measured 2026-08-10: a block repeated 40x is memorised after one pass
+    (ppl ~1.3) and the guard inverts — q4_0 KV scored 2.25% *better* than f16,
+    so every destructive quality knob would have passed. With a diverse corpus
+    the same comparison reads +6.26%, correctly rejected.
+    """
+    import ratchet.autoresearch_config as A
+
+    text = A._CALIB_FALLBACK
+    assert len(set(text.split("\n"))) > 15, "fallback corpus is too repetitive"
+    # a memorisable corpus is one where a short prefix tiles the whole thing
+    assert text.count(text[:120]) == 1, "corpus repeats its own opening block"
+
+
+def test_autoresearch_lockfile_blocks_second_instance(tmp_path, monkeypatch) -> None:
+    """Concurrent instances competing for one GPU destroyed the 2026-08-09 run
+    (search ended BELOW its own baseline). The lock must make that impossible."""
+    import pytest
+    import ratchet.autoresearch_config as A
+
+    monkeypatch.setattr(A, "LOCK", tmp_path / "ar.lock")
+    with A.Lock():
+        assert A.LOCK.exists()
+        with pytest.raises(SystemExit, match="another autoresearch instance"):
+            with A.Lock():
+                pass
+    assert not A.LOCK.exists(), "lock must be released on exit"
