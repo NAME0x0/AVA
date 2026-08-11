@@ -830,18 +830,28 @@ def test_autoresearch_space_invariants() -> None:
         assert inert not in A.SPACE, f"inert knob {inert} leaked into the box"
 
 
-def test_autoresearch_one_knob_mutation() -> None:
-    """Every candidate differs from its parent by exactly one knob, so any
-    accepted win is attributable to a single change."""
+def test_autoresearch_mutation_is_one_knob_or_coupled_pair() -> None:
+    """Candidates differ by one knob (attributable) or by a COUPLED pair.
+
+    Pairs exist because some values are only legal with an enabler: measured
+    2026-08-11, every quantized -ctv was rejected at validation since quantized
+    V-cache needs flash-attention ON while the reference is fa=auto. A pure
+    single-knob walk can never reach those, leaving part of the box dead.
+    """
     import random
 
     import ratchet.autoresearch_config as A
 
     rng = random.Random(0)
-    for _ in range(300):
+    reachable = set()
+    for _ in range(2000):
         nxt = A.neighbour(A.REFERENCE, A.SPACE, rng)
         diff = [k for k in A.REFERENCE if nxt[k] != A.REFERENCE[k]]
-        assert len(diff) == 1, diff
+        assert len(diff) in (1, 2), diff
+        if len(diff) == 2:                       # a pair must be a COUPLED one
+            assert set(diff) == {"ctv", "fa"} and nxt["fa"] == "on"
+        reachable.add((nxt["ctv"], nxt["fa"]))
+    assert any(c != "f16" and f == "on" for c, f in reachable),         "quantized V-cache unreachable — the coupled move is not firing"
 
 
 def test_autoresearch_quality_tiering() -> None:

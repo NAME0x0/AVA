@@ -333,6 +333,9 @@ def validate_space(model: str) -> dict[str, list]:
         for v in values:
             cfg = dict(REFERENCE)
             cfg[knob] = v
+            for ck, cv, ce in COUPLED:          # test with the enabler present
+                if ck == knob and cv == v:
+                    cfg[ce] = COUPLED_ENABLER[ce]
             if knob == "spec":
                 good = run_cli_spec(model, cfg, 8)[0] is not None
             else:
@@ -347,9 +350,37 @@ def validate_space(model: str) -> dict[str, list]:
 
 
 # ----------------------------------------------------------------- search
-def neighbour(cfg: dict, space: dict, rng: random.Random) -> dict:
-    """One-knob mutation: every win stays attributable to a single change."""
+# Knobs that are only VALID in combination. Single-knob hill-climbing cannot
+# reach these: measured 2026-08-11, every quantized -ctv value was rejected at
+# validation because quantized V-cache requires flash-attention explicitly ON,
+# while the reference uses fa=auto. Reaching ctv=q8_0 needs fa=on AND ctv=q8_0
+# changed together, so a whole region of the box was unreachable dead space.
+COUPLED: list[tuple[str, object, str]] = [
+    ("ctv", "q8_0", "fa"), ("ctv", "q5_1", "fa"),
+    ("ctv", "q4_0", "fa"), ("ctv", "iq4_nl", "fa"),
+]
+COUPLED_ENABLER = {"fa": "on"}
+
+
+def neighbour(cfg: dict, space: dict, rng: random.Random,
+              pair_prob: float = 0.15) -> dict:
+    """Mutate one knob — or, occasionally, a coupled PAIR.
+
+    One-knob moves keep wins attributable to a single change, which is why they
+    are the default. But some values are only legal alongside an enabler (see
+    COUPLED), so a pure single-knob walk can never reach them. With probability
+    `pair_prob` we make the enabling move and the dependent move together.
+    """
     nxt = dict(cfg)
+    if rng.random() < pair_prob:
+        opts = [(k, v, e) for k, v, e in COUPLED
+                if k in space and v in space[k] and e in space
+                and COUPLED_ENABLER[e] in space[e]
+                and not (cfg[k] == v and cfg[e] == COUPLED_ENABLER[e])]
+        if opts:
+            k, v, e = rng.choice(opts)
+            nxt[k], nxt[e] = v, COUPLED_ENABLER[e]
+            return nxt
     k = rng.choice([k for k in space if len(space[k]) > 1])
     nxt[k] = rng.choice([x for x in space[k] if x != cfg[k]])
     return nxt
