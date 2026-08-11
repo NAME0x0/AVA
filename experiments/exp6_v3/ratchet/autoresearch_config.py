@@ -58,6 +58,7 @@ import json
 import os
 import random
 import re
+import statistics
 import subprocess
 import time
 from pathlib import Path
@@ -201,12 +202,33 @@ def gpu_state() -> tuple[int, int]:
         return -1, -1
 
 
-def require_exclusive_gpu(budget_mib: int) -> None:
+def require_exclusive_gpu(budget_mib: int, fatal: bool = True,
+                          wait_s: float = 600.0) -> bool:
+    """Refuse to measure while another process holds VRAM.
+
+    fatal=True at startup (nothing to lose by aborting). Inside the loop it
+    must WAIT instead: a transient Windows shell spike should not terminate a
+    ten-hour run, which is what SystemExit-per-experiment would do.
+    """
     used, _ = gpu_state()
-    if used > budget_mib:
+    if used <= budget_mib:
+        return True
+    if fatal:
         raise SystemExit(
             f"GPU already holds {used} MiB (> {budget_mib}). Another job is "
             f"running and measurements would be contaminated. Aborting.")
+    waited = 0.0
+    while waited < wait_s:
+        time.sleep(30)
+        waited += 30
+        used, _ = gpu_state()
+        if used <= budget_mib:
+            print(f"[auto] GPU freed after {waited:.0f}s; resuming", flush=True)
+            return True
+    print(f"[auto] GPU still holds {used} MiB after {wait_s:.0f}s — skipping "
+          f"this experiment rather than recording a contaminated number",
+          flush=True)
+    return False
 
 
 def wait_thermal(ceiling_c: int, delay_s: float) -> None:
@@ -336,13 +358,22 @@ def neighbour(cfg: dict, space: dict, rng: random.Random) -> dict:
 def evaluate(model: str, cfg: dict, args, ref: dict) -> dict:
     """Speed, plus whichever guard the changed knobs demand."""
     wait_thermal(args.temp_ceiling, args.delay)
-    require_exclusive_gpu(args.vram_budget)
+    if not require_exclusive_gpu(args.vram_budget, fatal=False):
+        return {"ok": False, "why": "gpu busy (skipped)"}
 
     if cfg.get("spec", "none") != "none":               # spec axis -> llama-cli
-        tps, text = run_cli_spec(model, cfg, args.tokens)
-        if tps is None:
-            return {"ok": False, "why": "invalid/crash"}
-        speed, sd = tps, ref.get("cli_sd", 0.0)
+        # Repeat properly. A single CLI run reported sd=0, which collapsed the
+        # acceptance threshold and could promote one lucky measurement as a
+        # real win — noise promotion inside the noise guard.
+        runs, text = [], ""
+        for _ in range(max(3, args.spec_repeats)):
+            tps, txt = run_cli_spec(model, cfg, args.tokens)
+            if tps is None:
+                return {"ok": False, "why": "invalid/crash"}
+            runs.append(tps)
+            text = txt
+        speed = statistics.mean(runs)
+        sd = statistics.stdev(runs) if len(runs) > 1 else 0.0
     else:
         b = run_bench(model, cfg, args.repeats, args.tokens,
                       args.prompt_tokens, args.delay)
@@ -371,14 +402,62 @@ def evaluate(model: str, cfg: dict, args, ref: dict) -> dict:
 
 
 def search(model: str, args) -> dict:
+    """Wrapper that ALWAYS restores GPU clocks.
+
+    Without this, an engaged clock lock survives the process and leaves the
+    machine throttled until a manual `nvidia-smi -rgc` or a reboot.
+    """
+    try:
+        return _search(model, args)
+    finally:
+        try:
+            from ratchet.power_governor import reset_clocks
+
+            if reset_clocks():
+                print("[auto] SM clocks restored", flush=True)
+        except Exception:  # noqa: BLE001 - never mask the real error
+            pass
+
+
+def _search(model: str, args) -> dict:
     rng = random.Random(args.seed)
     sp = Path(args.state)
     deadline = time.monotonic() + args.hours * 3600
     state = json.loads(sp.read_text()) if sp.exists() else None
 
+    require_exclusive_gpu(args.vram_budget)
+    ppl_file = build_calibration(Path(args.ppl_file))
+
+    # Clock locking is the single biggest lever on measurement quality: measured
+    # 2026-08-10, sd was 5.8 t/s on a cold GPU but 28-45 t/s under sustained
+    # load, because this laptop card clock-bounces (660 MHz observed against a
+    # 2100 MHz ceiling). That inflates the acceptance bar past every realistic
+    # win. Needs an elevated shell; degrade loudly when denied.
+    #
+    # Applied on RESUME too, not just fresh start: a resumed run must share the
+    # thermal/clock regime of the incumbent it is comparing against.
+    locked = False
+    try:
+        from ratchet.power_governor import lock_clocks
+
+        locked = lock_clocks(0.85)
+    except Exception:  # noqa: BLE001
+        locked = False
+    print(f"[auto] SM clock lock: {'ENGAGED' if locked else 'DENIED (not elevated)'}"
+          f" — {'stable' if locked else 'EXPECT HIGH VARIANCE; wins under ~10% may be undetectable'}",
+          flush=True)
+
+    # Warm to steady state BEFORE measuring anything. A cold reference is not
+    # comparable to later measurements: run 1 measured 453 t/s cold, then its
+    # own incumbent re-measured at 328 t/s on the identical config.
+    print(f"[auto] warming GPU to steady state ({args.warmup_s}s)...", flush=True)
+    t_warm = time.monotonic()
+    while time.monotonic() - t_warm < args.warmup_s:
+        run_bench(model, REFERENCE, 2, args.tokens, args.prompt_tokens, 0)
+    _, t_now = gpu_state()
+    print(f"[auto] warm at {t_now}C", flush=True)
+
     if state is None:
-        require_exclusive_gpu(args.vram_budget)
-        ppl_file = build_calibration(Path(args.ppl_file))
         print("[auto] validating knob values against the binary...", flush=True)
         space = validate_space(model)
         print("[auto] measuring reference...", flush=True)
@@ -466,6 +545,10 @@ def main() -> None:
     ap.add_argument("--delay", type=float, default=1.0)
     ap.add_argument("--no-check-text", dest="check_text", action="store_false")
     ap.add_argument("--ppl-file", default="D:/AVA/ratchet/logs/ppl_calib.txt")
+    ap.add_argument("--spec-repeats", type=int, default=3,
+                    help="repeats for the llama-cli spec axis (sd=0 otherwise)")
+    ap.add_argument("--warmup-s", type=float, default=180.0,
+                    help="seconds of load before the reference is measured")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--state", default="D:/AVA/ratchet/logs/autoresearch_state.json")
     ap.set_defaults(check_text=True)
