@@ -49,7 +49,7 @@ Parameter accounting matters here. The full **Qwen3.5-4B checkpoint is approxima
 
 There is also a distribution trade-off: Liquid's license has a commercial-use restriction tied to a **$10 million annual-revenue threshold**. If AVA must support unrestricted commercial reuse by organizations of any size, that makes the Apache-licensed candidates more attractive. [Liquid license](https://huggingface.co/LiquidAI/LFM2.5-2.6B/blob/main/LICENSE)
 
-Your existing [August results](docs/v3/RESULTS_2026-08.md) favor Qwen over LFM on coding edits. Those results remain useful evidence, but the log explicitly says LFM's tool-use strength was unmeasured. We need an evaluation that represents this new product ambition.
+Your existing [August results](https://github.com/NAME0x0/AVA/blob/0dbc045797c8be0953c2748f98f9b1ba87d32e70/docs/v3/RESULTS_2026-08.md) favor Qwen over LFM on coding edits. Those results remain useful evidence, but the log explicitly says LFM's tool-use strength was unmeasured. We need an evaluation that represents this new product ambition.
 
 **The biggest investment should be a training environment for everyday work.** I would build realistic, executable tasks involving calendars, messages, files, documents, spreadsheets, search, and reminders. Each task needs a known starting state and a way to check whether the requested outcome actually happened.
 
@@ -155,7 +155,7 @@ Let a task $x$ be sampled from a target distribution $\mathcal D$ of real user r
 
 An illustrative optimization objective is:
 
-$$
+```math
 \max_{\theta,\,\mathcal H}\;
 \mathbb E_{x\sim\mathcal D}
 \left[
@@ -164,15 +164,15 @@ R(x,s_0,s_T)
 -\lambda_E\frac{E(x)}{E_{\mathrm{ref}}}
 -\lambda_H H(x)
 \right]
-$$
+```
 
 subject to:
 
-$$
+```math
 P\leq4\times10^9,\qquad
 M_d\leq M_{d,\max},\qquad
 B_j\geq B_{j,\min}.
-$$
+```
 
 Here $\mathcal H$ is the host/runtime design, and $B_j$ is a retained capability such as writing quality or multilingual instruction following. Reference values normalize seconds and joules so that the coefficients have an interpretable scale.
 
@@ -184,10 +184,10 @@ Keep the component metrics visible. A scalar objective is useful for optimizatio
 
 For a workflow containing $n$ required successful steps, the chain rule gives:
 
-$$
+```math
 P(\text{all succeed})=
 \prod_{t=1}^{n}P(S_t\mid S_1,\ldots,S_{t-1}).
-$$
+```
 
 If each conditional probability is approximately $p$, this becomes $p^n$. At $p=0.98$ and $n=10$, it is approximately 0.8171. The homogeneous approximation is illustrative; actual failures can be correlated and recovery can change the sequence.
 
@@ -197,21 +197,21 @@ This motivates shorter valid workflows, stronger intermediate checks, and recove
 
 For independent attempts with success probability $p$:
 
-$$
+```math
 P(\text{at least one success in }k)=1-(1-p)^k,
 \qquad
 P(\text{all }k\text{ succeed})=p^k.
-$$
+```
 
 With $p=0.8$ and $k=4$, these are 99.84% and 40.96%, respectively. The first is helpful when a verifier can cheaply select a correct result. The second is closer to the expectation that the same routine should work repeatedly. Neither number can replace reporting the actual attempt budget and verifier quality.
 
 For a serial task workload, use aggregate useful work divided by aggregate elapsed cost:
 
-$$
+```math
 \mathrm{UsefulThroughput}=
 \frac{\sum_i\mathbf 1[\text{task }i\text{ successfully completed}]}
 {\sum_i T_i}.
-$$
+```
 
 Do not silently exclude failures, timeouts, or repairs from the denominator. For concurrent service, measure completed useful tasks over the actual elapsed measurement window and report concurrency and resources; summing overlapping request latencies does not measure physical service throughput.
 
@@ -239,27 +239,27 @@ It can be better to use 2.8B well than to occupy the entire cap. Conversely, a l
 
 For a bias-free decoder with tied input/output embeddings, vocabulary size $V$, hidden width $d$, SwiGLU intermediate width $d_f$, and $L$ layers:
 
-$$
+```math
 P_{\mathrm{embed}}=Vd,
 \qquad
 P_{\mathrm{FFN/layer}}\approx3dd_f.
-$$
+```
 
 With grouped-query attention, $H_q$ query heads, $H_{kv}$ key/value heads, and head width $d_h$:
 
-$$
+```math
 P_{\mathrm{attention/layer}}\approx
 d(2H_qd_h+2H_{kv}d_h).
-$$
+```
 
 The two query-width terms account for the query and output projections. Extra attention gates, biases, and other modules require additional terms.
 
 For an illustrative dense control with:
 
-$$
+```math
 V=128000,\quad d=2560,\quad d_f=8192,\quad L=32,
 \quad H_q=20,\quad H_{kv}=4,\quad d_h=128,
-$$
+```
 
 the major matrices contain:
 
@@ -278,20 +278,20 @@ This example explains the budget; it does not establish an optimal architecture.
 
 For groups of parameters $P_i$ stored at $b_i$ bits:
 
-$$
+```math
 M_{\mathrm{weights}}\approx
 \sum_i\frac{P_i b_i}{8}+M_{\mathrm{scales}}+M_{\mathrm{metadata}}.
-$$
+```
 
 For 3.2B weights at four bits, raw weight bits occupy 1.6 GB, using decimal GB. If every group of 64 weights carries a two-byte scale, those scales add 0.1 GB. This simplified representation totals 1.7 GB before higher-precision tensors, zero points if used, tokenizer files, and runtime workspaces.
 
 The complete working set is closer to:
 
-$$
+```math
 M_{\mathrm{peak}}=
 M_{\mathrm{weights}}+M_{\mathrm{KV}}+M_{\mathrm{recurrent}}
 +M_{\mathrm{activations}}+M_{\mathrm{workspace}}+M_{\mathrm{application}}.
-$$
+```
 
 Peak allocations need measurement. The peak may occur during loading, prompt processing, image processing, or generation rather than when the model is idle.
 
@@ -299,9 +299,9 @@ Peak allocations need measurement. The peak may occur during loading, prompt pro
 
 For uniform attention layers, one sequence, and equal key/value precision:
 
-$$
+```math
 M_{\mathrm{KV}}=2L_{\mathrm{att}}H_{kv}d_h n_{\mathrm{ctx}}b_{\mathrm{element}},
-$$
+```
 
 where $b_{\mathrm{element}}$ is bytes per stored element, not bits.
 
@@ -309,10 +309,10 @@ An illustrative configuration with eight attention layers, four KV heads, head w
 
 Some recurrent mixers carry matrix states of a form approximately proportional to:
 
-$$
+```math
 M_{\mathrm{recurrent}}\propto
 L_{\mathrm{rec}}H d_kd_v b_{\mathrm{state}}.
-$$
+```
 
 The state can be independent of sequence length while still being substantial. A hybrid model retains the sequence-dependent cache of its full-attention layers. “Constant recurrent state” does not mean constant total model memory.
 
@@ -320,33 +320,33 @@ The state can be independent of sequence length while still being substantial. A
 
 For batch-one decoding that streams most weight bytes each token:
 
-$$
+```math
 \mathrm{tokens/s}\lesssim
 \frac{B_{\mathrm{effective}}}{M_{\mathrm{bytes\ streamed/token}}}.
-$$
+```
 
 With an assumed effective bandwidth of 100 GB/s and 1.7 GB streamed per token, the simplified bandwidth ceiling is approximately 58.8 tokens/s. This is not a hardware prediction. Cache reuse, quantization kernels, compute, KV traffic, dispatch overhead, and memory contention change the result.
 
 At a kernel level, a rough lower bound is:
 
-$$
+```math
 T_{\mathrm{kernel}}\gtrsim
 \max\left(\frac{F}{F_{\mathrm{effective}}},
 \frac{D}{B_{\mathrm{effective}}}\right),
-$$
+```
 
 with additional launch and synchronization overhead. Smaller arithmetic alone does not guarantee a faster implementation.
 
 User-visible time also includes prompt processing and external work:
 
-$$
+```math
 T_{\mathrm{task}}\approx
 T_{\mathrm{load}}+
 \frac{N_{\mathrm{uncached\ prompt}}}{r_{\mathrm{prefill}}}+
 \frac{N_{\mathrm{generated}}}{r_{\mathrm{decode}}}+
 T_{\mathrm{tool\ critical\ path}}+
 T_{\mathrm{host}}.
-$$
+```
 
 This is a workload approximation. If independent tools run concurrently, use their dependency graph's critical path, not the sum of all network durations. A model can decode faster while taking longer to finish because it produces more reasoning tokens or makes more calls.
 
@@ -356,9 +356,9 @@ Compare tokens per task and characters per second when tokenizers differ. Token/
 
 For dense full-model training, a common sizing approximation is:
 
-$$
+```math
 F_{\mathrm{train}}\approx6PN,
-$$
+```
 
 where $N$ is the number of training tokens. It is a rough estimate, not a measurement for every architecture or training method.
 
@@ -368,10 +368,10 @@ LoRA reduces trainable parameters and optimizer state. It does not remove most b
 
 Keep an explicit ledger:
 
-$$
+```math
 F_{\mathrm{total}}=
 F_{\mathrm{updates}}+F_{\mathrm{rollouts}}+F_{\mathrm{teachers}}+F_{\mathrm{evaluation}}.
-$$
+```
 
 Also record GPU-hours, environment CPU-hours, wall time, and consumed energy separately. They are different quantities. A rollout-efficient method is not automatically cheaper end to end.
 
@@ -472,20 +472,20 @@ Public benchmark answers, hidden tests, and evaluation-specific instructions mus
 
 An illustrative supervised objective is:
 
-$$
+```math
 \mathcal L_{\mathrm{SFT}}=
 -\mathbb E_{(x,y)\sim\mathcal T}
-\sum_{t\in\mathcal A}\log\pi_\theta(y_t\mid x,y_{<t}),
-$$
+\sum_{t\in\mathcal A}\log\pi_\theta(y_t\mid x,y_{\lt t}),
+```
 
 where $\mathcal A$ selects assistant-generated tokens. Environment results should remain distinguishable from model output; training the model to impersonate successful tool responses would undermine the execution boundary.
 
 Use a mixture of domains:
 
-$$
+```math
 \mathcal L_{\mathrm{mix}}=\sum_d w_d\mathcal L_d,
 \qquad w_d\geq0,\quad\sum_d w_d=1.
-$$
+```
 
 Choose mixture weights empirically. A long trajectory can dominate a token-weighted loss, while an example-weighted loss may overemphasize short cases. Report both tokens and episodes per domain. Preserve enough ordinary assistance to detect and prevent narrow specialization.
 
@@ -497,12 +497,12 @@ Train on sequences long enough to include a useful observation-action-result-rec
 
 Let $s_t$ include the current prompt, observed history, retrieved information, and valid tool definitions. Generate those states using the current student. For a compatible teacher distribution $q_d$, one illustrative forward-KL distillation loss is:
 
-$$
+```math
 \mathcal L_{\mathrm{OPD}}=
 \mathbb E_{x,\,s_t\sim\pi_\theta}
 \sum_t\mathrm{KL}
 \left(q_d(\cdot\mid s_t)\;\|\;\pi_\theta(\cdot\mid s_t)\right).
-$$
+```
 
 This is a proposed mathematical form, not a claim that every cited method uses this KL direction. In a practical supervised update, sampled prefixes and teacher targets can be treated as fixed for the minibatch; that update is not the full policy gradient through the state-distribution expectation. Compare alternative KL directions and training arrangements if they materially change results.
 
@@ -514,21 +514,21 @@ Privileged teacher context can include a verified solution or a useful skill dur
 
 For a group of $G$ rollouts on the same task, a simple normalized advantage is:
 
-$$
+```math
 \widehat A_i=
-\frac{R_i-\overline R}{\operatorname{std}(R_1,\ldots,R_G)+\epsilon}.
-$$
+\frac{R_i-\overline R}{\mathrm{std}(R_1,\ldots,R_G)+\epsilon}.
+```
 
 A clipped policy objective can then limit the size of an update using the ratio between current and rollout-policy probabilities. In schematic form:
 
-$$
+```math
 \mathcal L_{\mathrm{policy}}=
 -\mathbb E\left[
 \min\left(r_i\widehat A_i,
-\operatorname{clip}(r_i,1-\varepsilon,1+\varepsilon)\widehat A_i\right)
+\mathrm{clip}(r_i,1-\varepsilon,1+\varepsilon)\widehat A_i\right)
 \right]
 +\beta\mathcal L_{\mathrm{reference}}.
-$$
+```
 
 The exact token normalization, reference penalty, rollout versioning, and reward allocation must be specified by an implementation. This equation is a design outline, not a complete RL algorithm.
 
@@ -550,11 +550,11 @@ Executable verification is powerful but imperfect. A test can omit a requirement
 
 Use replay from broad assistance tasks and a reference model where useful. A proposed retention term is:
 
-$$
+```math
 \mathcal L_{\mathrm{retain}}=
 \mathbb E_{x\sim\mathcal D_{\mathrm{general}}}
 \mathrm{KL}(\pi_{\mathrm{reference}}\;\|\;\pi_\theta).
-$$
+```
 
 Evaluate the actual behavior rather than assuming the regularizer guarantees retention. Too much reference pressure can also prevent improvement. Check writing, factual uncertainty, refusal appropriateness, multilingual tasks, and conversation after every substantial specialist update.
 
@@ -576,9 +576,9 @@ The following are proposed experiments. Several ingredients are established tech
 
 An illustrative state transition is:
 
-$$
+```math
 z_{t+1}=f_\theta(z_t,o_{t+1},r_{t+1}),
-$$
+```
 
 where $r_{t+1}$ is a host-produced receipt. The host remains authoritative about what was actually executed. The model's summary of a receipt is not an execution certificate.
 
@@ -594,10 +594,10 @@ where $r_{t+1}$ is a host-produced receipt. The host remains authoritative about
 
 Given current information $b$ and a possible computation or observation $u$, define a conceptual value of information:
 
-$$
-\operatorname{VOI}(u\mid b)=
+```math
+\mathrm{VOI}(u\mid b)=
 \mathbb E[V(b')\mid b,u]-V(b)-\lambda C(u).
-$$
+```
 
 Here $V$ estimates useful achievable task value, and $C$ is normalized cost. This is a decision principle, not an oracle available at inference.
 
@@ -617,10 +617,10 @@ Here $V$ estimates useful achievable task value, and $C$ is normalized cost. Thi
 
 A useful conceptual objective resembles rate-distortion optimization:
 
-$$
-\min_c\;\operatorname{Size}(c)
-+\lambda\operatorname{TaskError}(c),
-$$
+```math
+\min_c\;\mathrm{Size}(c)
++\lambda\mathrm{TaskError}(c),
+```
 
 with hard preservation requirements for selected fields. The size/error trade-off is task-dependent; preserving a critical account identifier can matter more than preserving an entire paragraph.
 
@@ -638,12 +638,12 @@ with hard preservation requirements for selected fields. The size/error trade-of
 
 For diagnostics, let $D$ mean the necessary tool is available after discovery, $S$ mean the correct tool is selected, and $A$ mean its arguments are semantically correct. The chain rule gives:
 
-$$
+```math
 P(D\cap S\cap A\mid x)=
 P(D\mid x)
 P(S\mid D,x)
 P(A\mid D,S,x).
-$$
+```
 
 This does not assume independence. Authorization, execution, and final-state verification are additional stages with their own conditional failure rates.
 
@@ -661,9 +661,9 @@ This does not assume independence. Authorization, execution, and final-state ver
 
 If compilation costs $C_{\mathrm{compile}}$ seconds and saves $\Delta T$ seconds per valid reuse, time breaks even after:
 
-$$
+```math
 n>\frac{C_{\mathrm{compile}}}{\Delta T}.
-$$
+```
 
 For example, 30 seconds of validation and compilation with five seconds saved per reuse breaks even after more than six reuses. Reliability and maintenance can matter more than this simple time calculation.
 
@@ -708,10 +708,10 @@ This JSON is an illustrative intermediate representation, not an existing AVA AP
 
 **Mechanism:** In a dedicated architecture branch, allow a shared refinement block to run a bounded number of times over task representations. An illustrative recurrence is:
 
-$$
+```math
 h^{(k+1)}=h^{(k)}+g_k\odot F_\theta(h^{(k)},c),
 \qquad 0\leq g_k\leq1.
-$$
+```
 
 Here $c$ represents available context. This schematic does not specify attention-cache semantics or prove a useful halting policy. Both are necessary for a real implementation.
 
@@ -731,11 +731,11 @@ Compare refinement on action-boundary representations with refinement on every g
 
 An illustrative allocation problem is:
 
-$$
+```math
 \min_{b_1,\ldots,b_L}\sum_\ell s_\ell(b_\ell)
 \quad\text{subject to}\quad
 \sum_\ell\frac{P_\ell b_\ell}{8}+M_{\mathrm{overhead}}\leq M_{\max},
-$$
+```
 
 where $s_\ell$ estimates task loss at a supported precision. Layer interactions mean the additive estimate must be checked on the final combined model.
 
@@ -753,17 +753,17 @@ where $s_\ell$ estimates task loss at a supported precision. Layer interactions 
 
 For $k$ draft tokens with an illustrative independent acceptance probability $a$, the expected emitted tokens in a standard draft/verify cycle with a correction or bonus token are:
 
-$$
+```math
 \mathbb E[N_{\mathrm{cycle}}]=\sum_{j=0}^{k}a^j.
-$$
+```
 
 For $k=4$ and $a=0.8$, this is 3.3616 tokens. A simplified speedup estimate is:
 
-$$
-\operatorname{Speedup}\approx
+```math
+\mathrm{Speedup}\approx
 \frac{\mathbb E[N_{\mathrm{cycle}}]c_{\mathrm{target/token}}}
 {kc_{\mathrm{draft/token}}+c_{\mathrm{verify}}(k)}.
-$$
+```
 
 Actual acceptance rates are not independent or constant, and verification has cache and scheduling costs. The drafter also consumes memory and parameters.
 
@@ -781,11 +781,11 @@ Actual acceptance rates are not independent or constant, and verification has ca
 
 One proposed priority score is:
 
-$$
+```math
 q(x)\propto
 \frac{f(x)v(x)[1-p_{\mathrm{success}}(x)]p_{\mathrm{learnable}}(x)}
 {c(x)+\epsilon},
-$$
+```
 
 where frequency $f$, value $v$, success probability, learnability, and cost are estimated. This is a heuristic, not a proven optimal curriculum. Preserve a minimum allocation to rare important tasks and broad capabilities.
 
@@ -803,10 +803,10 @@ where frequency $f$, value $v$, success probability, learnability, and cost are 
 
 An illustrative auxiliary loss is:
 
-$$
+```math
 \mathcal L_{\mathrm{transition}}=
 -\log p_\theta(\Delta s_{\mathrm{observable}}\mid o_t,a_t).
-$$
+```
 
 Only observed, relevant changes belong in the target; the model should not infer hidden application state as ground truth. This learned predictor can advise the host but cannot certify a real operation.
 
@@ -824,10 +824,10 @@ Only observed, relevant changes belong in the target; the model should not infer
 
 A proposed regularizer is:
 
-$$
+```math
 \mathcal L_{\mathrm{equiv}}=
 d\big(\Phi(\pi_\theta(x)),\Phi(\pi_\theta(T(x)))\big),
-$$
+```
 
 where $T$ is a verified meaning-preserving transformation and $\Phi$ extracts task-relevant decisions. In practice, use supervised targets or an explicitly chosen estimator; discrete executed trajectories are not automatically differentiable.
 
@@ -998,9 +998,9 @@ A verifier that shares the same blind spots as the generator can produce convinc
 
 Zero observed failures is not proof of zero risk. Under an idealized independent Bernoulli model, observing zero failures in $n$ trials gives a one-sided 95% upper bound:
 
-$$
+```math
 p_{\mathrm{failure,upper}}=1-0.05^{1/n}\approx\frac{3}{n}.
-$$
+```
 
 At 1,000 trials that is approximately 0.30%. Heterogeneous tasks, correlated failures, and adversarial inputs can make this simple model inappropriate. The calculation illustrates why a zero in a small report should not be presented as a guarantee.
 
